@@ -75,33 +75,59 @@ public class Login extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
+        try {
+            String username = request.getParameter("username");
+            String password = request.getParameter("password");
+            
+            // Trim whitespace từ form input
+            if (username != null) {
+                username = username.trim();
+            }
+            if (password != null) {
+                password = password.trim();
+            }
 
-        Users user = userService.login(username, password);
+            Users user = userService.login(username, password);
 
-        if (user == null) {
-            request.setAttribute("error", "Invalid username or password");
-            request.getRequestDispatcher("Login.jsp").forward(request, response);
-            return;
-        }
+            if (user == null) {
+                request.setAttribute("error", "Invalid username or password. Please check your credentials or contact administrator if database connection fails.");
+                request.getRequestDispatcher("Login.jsp").forward(request, response);
+                return;
+            }
 
         HttpSession session = request.getSession();
         session.setAttribute("user", user);
         session.setAttribute("role", user.getRole());
         
-        switch (user.getRole()) {
-            case "Admin":
-                response.sendRedirect("AdminDashboard.jsp");
-                break;
-            case "Manager":
-                response.sendRedirect("index.html");
-                break;
-            case "IT Support":
-                response.sendRedirect("index.html");
-                break;
-            default:
-                response.sendRedirect("index.html");
+        // Redirect theo role
+        String role = user.getRole();
+        if (role != null) {
+            switch (role) {
+                case "Admin":
+                    response.sendRedirect("AdminDashboard.jsp");
+                    break;
+                case "Manager":
+                case "User":
+                    response.sendRedirect("UserDashboard.jsp");
+                    break;
+                case "IT Support":
+                    response.sendRedirect("ITDashboard.jsp");
+                    break;
+                default:
+                    request.setAttribute("error", "Role không hợp lệ. Vui lòng liên hệ quản trị viên.");
+                    request.getRequestDispatcher("Login.jsp").forward(request, response);
+                    return;
+            }
+        } else {
+            request.setAttribute("error", "Không thể xác định role. Vui lòng đăng nhập lại.");
+            request.getRequestDispatcher("Login.jsp").forward(request, response);
+        }
+        } catch (Exception e) {
+            // Log lỗi và hiển thị thông báo cho user
+            System.err.println("Login error: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("error", "Database connection error. Please contact administrator.");
+            request.getRequestDispatcher("Login.jsp").forward(request, response);
         }
     }
 

@@ -16,6 +16,13 @@ public class UserDao extends DbContext{
     public List<Users> getAllUsers()
     {
         List<Users> list = new ArrayList<>();
+        
+        // Kiểm tra connection
+        if (connection == null) {
+            System.err.println("Database connection is null. Cannot get users.");
+            return list;
+        }
+        
         String sql = "SELECT [Id]\n" +
             "      ,[Username]\n" +
             "      ,[Email]\n" +
@@ -56,12 +63,27 @@ public class UserDao extends DbContext{
     }
     
     public Users login(String username, String password) {
+    // Kiểm tra null hoặc empty
+    if (username == null || password == null || username.trim().isEmpty() || password.trim().isEmpty()) {
+        return null;
+    }
+    
+    // Kiểm tra connection
+    if (connection == null) {
+        System.err.println("Database connection is null. Cannot perform login.");
+        return null;
+    }
+    
+    // Trim để loại bỏ khoảng trắng
+    username = username.trim();
+    password = password.trim();
+    
     String sql = """
         SELECT Id, Username, FullName, Role, IsActive
         FROM Users
         WHERE Username = ?
           AND PasswordHash = ?
-          AND IsActive = '1'
+          AND IsActive = 1
     """;
 
     try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -109,11 +131,11 @@ public class UserDao extends DbContext{
         UserDao dao = new UserDao();
 
         String username = "admin";   
-        String password = "123";  
+        String password = "123456";  
 
         Users user = dao.login(username, password);
 
-        if (user == null) {
+        if (user != null) {
             System.out.println("Login Success");
         } else {
             System.out.println("Login Failed");
