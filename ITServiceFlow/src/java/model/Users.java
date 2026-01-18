@@ -19,13 +19,13 @@ public class Users {
     private String Role;
     private int DepartmentId;
     private int LocationId;
-    private boolean Status;
+    private boolean IsActive;
     private Date CreatedAt;
 
     public Users() {
     }
 
-    public Users(int Id, String Username, String Email, String PasswordHash, String FullName, String Role, int DepartmentId, int LocationId, boolean Status, Date CreatedAt) {
+    public Users(int Id, String Username, String Email, String PasswordHash, String FullName, String Role, int DepartmentId, int LocationId, boolean IsActive, Date CreatedAt) {
         this.Id = Id;
         this.Username = Username;
         this.Email = Email;
@@ -34,7 +34,7 @@ public class Users {
         this.Role = Role;
         this.DepartmentId = DepartmentId;
         this.LocationId = LocationId;
-        this.Status = Status;
+        this.IsActive = IsActive;
         this.CreatedAt = CreatedAt;
     }
 
@@ -96,12 +96,12 @@ public class Users {
         this.DepartmentId = DepartmentId;
     }
 
-    public boolean isStatus() {
-        return Status;
+    public boolean IsActive() {
+        return IsActive;
     }
 
-    public void setStatus(boolean Status) {
-        this.Status = Status;
+    public void IsActive(boolean IsActive) {
+        this.IsActive = IsActive;
     }
 
     public Date getCreatedAt() {

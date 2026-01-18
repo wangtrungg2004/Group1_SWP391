@@ -24,7 +24,7 @@ public class UserDao extends DbContext{
             "      ,[Role]\n" +
             "      ,[DepartmentId]\n" +
             "      ,[LocationId]\n" +
-            "      ,[Status]\n" +
+            "      ,[IsActive]\n" +
             "      ,[CreatedAt]\n" +
             "  FROM [dbo].[Users]";
         try
@@ -41,7 +41,7 @@ public class UserDao extends DbContext{
                 user.setRole(rs.getString("Role"));
                 user.setDepartmentId(rs.getInt("DepartmentId"));
                 user.setLocationId(rs.getInt("LocationId"));
-                user.setStatus(rs.getBoolean("Status"));
+                user.IsActive(rs.getBoolean("IsActive"));
                 user.setCreatedAt(rs.getDate("CreatedAt"));
                 list.add(user);
                 
@@ -60,7 +60,7 @@ public class UserDao extends DbContext{
         FROM Users
         WHERE Username = ?
           AND PasswordHash = ?
-          AND Status = 'Active'
+          AND IsActive = '1'
     """;
 
     try (PreparedStatement ps = connection.prepareStatement(sql)) {

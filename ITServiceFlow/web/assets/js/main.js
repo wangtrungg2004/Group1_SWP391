@@ -474,3 +474,4 @@ class CorporateLoginForm {
 document.addEventListener('DOMContentLoaded', () => {
     new CorporateLoginForm();
 });
+

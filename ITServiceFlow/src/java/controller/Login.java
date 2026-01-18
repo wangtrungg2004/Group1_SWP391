@@ -92,7 +92,7 @@ public class Login extends HttpServlet {
         
         switch (user.getRole()) {
             case "Admin":
-                response.sendRedirect("index.html");
+                response.sendRedirect("AdminDashboard.jsp");
                 break;
             case "Manager":
                 response.sendRedirect("index.html");
