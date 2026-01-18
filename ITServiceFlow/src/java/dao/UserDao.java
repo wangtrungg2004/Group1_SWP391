@@ -35,6 +35,7 @@ public class UserDao extends DbContext{
             {
                 Users user = new Users();
                 user.setId(rs.getInt("Id"));
+                user.setUsername(rs.getString("Username")); // Username là cột thứ 2
                 user.setEmail(rs.getString("Email"));
                 user.setPasswordHash(rs.getString("PasswordHash"));
                 user.setFullName(rs.getString("FullName"));
@@ -56,7 +57,7 @@ public class UserDao extends DbContext{
     
     public Users login(String username, String password) {
     String sql = """
-        SELECT Id, Username, FullName, Role, Status
+        SELECT Id, Username, FullName, Role, IsActive
         FROM Users
         WHERE Username = ?
           AND PasswordHash = ?
@@ -83,43 +84,43 @@ public class UserDao extends DbContext{
 }
 
     
-    public static void main(String[] args) {
-        UserDao dao = new UserDao();
-        List<Users> users = dao.getAllUsers();
-
-        if (users == null || users.isEmpty()) {
-            System.out.println("Error");
-        } else {
-            System.out.println("User List:");
-            for (Users u : users) {
-                System.out.println(
-                    u.getId() + " | "
-                    + u.getFullName() + " | "
-                    + u.getEmail() + " | "
-                    + u.getRole()
-                );
-            }
-        }
-    }
-
-    
-    
-//     public static void main(String[] args) {
+//    public static void main(String[] args) {
 //        UserDao dao = new UserDao();
+//        List<Users> users = dao.getAllUsers();
 //
-//        String username = "admin";   
-//        String password = "123";  
-//
-//        Users user = dao.login(username, password);
-//
-//        if (user == null) {
-//            System.out.println("Login Success");
+//        if (users == null || users.isEmpty()) {
+//            System.out.println("Error");
 //        } else {
-//            System.out.println("Login Failed");
-//            System.out.println("ID: " + user.getId());
-//            System.out.println("Username: " + user.getUsername());
-//            System.out.println("FullName: " + user.getFullName());
-//            System.out.println("Role: " + user.getRole());
+//            System.out.println("User List:");
+//            for (Users u : users) {
+//                System.out.println(
+//                    u.getId() + " | "
+//                    + u.getUsername()+ " | "
+//                    + u.getEmail() + " | "
+//                    + u.getRole()
+//                );
+//            }
 //        }
 //    }
+
+    
+    
+     public static void main(String[] args) {
+        UserDao dao = new UserDao();
+
+        String username = "admin";   
+        String password = "123";  
+
+        Users user = dao.login(username, password);
+
+        if (user == null) {
+            System.out.println("Login Success");
+        } else {
+            System.out.println("Login Failed");
+            System.out.println("ID: " + user.getId());
+            System.out.println("Username: " + user.getUsername());
+            System.out.println("FullName: " + user.getFullName());
+            System.out.println("Role: " + user.getRole());
+        }
+    }
 }
