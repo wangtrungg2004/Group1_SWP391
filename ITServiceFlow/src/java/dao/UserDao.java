@@ -61,7 +61,7 @@ public class UserDao extends DbContext{
         FROM Users
         WHERE Username = ?
           AND PasswordHash = ?
-          AND IsActive = '1'
+          AND IsActive = 1
     """;
 
     try (PreparedStatement ps = connection.prepareStatement(sql)) {

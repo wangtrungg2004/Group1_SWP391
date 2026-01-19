@@ -75,7 +75,6 @@
         </div>
     </div>
 
-    <script src="../../shared/js/form-utils.js"></script>
-    <script src="assets/js/main.js"></script>
+    <script src="assets/js/login.js"></script>
 </body>
 </html>
