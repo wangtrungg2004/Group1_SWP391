@@ -943,3 +943,9 @@
 
 </html>
 
+<script>
+    $(document).ready(function () {
+        $('.fixed-button').remove();
+    });
+</script>
+

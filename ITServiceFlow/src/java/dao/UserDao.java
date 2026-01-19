@@ -106,43 +106,43 @@ public class UserDao extends DbContext{
 }
 
     
-//    public static void main(String[] args) {
-//        UserDao dao = new UserDao();
-//        List<Users> users = dao.getAllUsers();
-//
-//        if (users == null || users.isEmpty()) {
-//            System.out.println("Error");
-//        } else {
-//            System.out.println("User List:");
-//            for (Users u : users) {
-//                System.out.println(
-//                    u.getId() + " | "
-//                    + u.getUsername()+ " | "
-//                    + u.getEmail() + " | "
-//                    + u.getRole()
-//                );
-//            }
-//        }
-//    }
-
-    
-    
-     public static void main(String[] args) {
+    public static void main(String[] args) {
         UserDao dao = new UserDao();
+        List<Users> users = dao.getAllUsers();
 
-        String username = "admin";   
-        String password = "123456";  
-
-        Users user = dao.login(username, password);
-
-        if (user != null) {
-            System.out.println("Login Success");
-            System.out.println("ID: " + user.getId());
-            System.out.println("Username: " + user.getUsername());
-            System.out.println("FullName: " + user.getFullName());
-            System.out.println("Role: " + user.getRole());
+        if (users == null || users.isEmpty()) {
+            System.out.println("Error");
         } else {
-            System.out.println("Login Failed");
+            System.out.println("User List:");
+            for (Users u : users) {
+                System.out.println(
+                    u.getId() + " | "
+                    + u.getUsername()+ " | "
+                    + u.getEmail() + " | "
+                    + u.getRole()
+                );
+            }
         }
     }
+
+    
+//    
+//     public static void main(String[] args) {
+//        UserDao dao = new UserDao();
+//
+//        String username = "admin";   
+//        String password = "123456";  
+//
+//        Users user = dao.login(username, password);
+//
+//        if (user != null) {
+//            System.out.println("Login Success");
+//            System.out.println("ID: " + user.getId());
+//            System.out.println("Username: " + user.getUsername());
+//            System.out.println("FullName: " + user.getFullName());
+//            System.out.println("Role: " + user.getRole());
+//        } else {
+//            System.out.println("Login Failed");
+//        }
+//    }
 }
