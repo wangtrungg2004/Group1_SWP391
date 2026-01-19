@@ -12,12 +12,22 @@
   /**
    * Apply .scrolled class to the body as the page is scrolled down
    */
-  function toggleScrolled() {
-    const selectBody = document.querySelector('body');
-    const selectHeader = document.querySelector('#header');
-    if (!selectHeader.classList.contains('scroll-up-sticky') && !selectHeader.classList.contains('sticky-top') && !selectHeader.classList.contains('fixed-top')) return;
-    window.scrollY > 100 ? selectBody.classList.add('scrolled') : selectBody.classList.remove('scrolled');
-  }
+function toggleScrolled() {
+  const selectBody = document.querySelector('body');
+  const selectHeader = document.querySelector('#header');
+
+  if (!selectHeader) return;   // ✅ FIX QUAN TRỌNG
+
+  if (
+    !selectHeader.classList.contains('scroll-up-sticky') &&
+    !selectHeader.classList.contains('sticky-top') &&
+    !selectHeader.classList.contains('fixed-top')
+  ) return;
+
+  window.scrollY > 100
+    ? selectBody.classList.add('scrolled')
+    : selectBody.classList.remove('scrolled');
+}
 
   document.addEventListener('scroll', toggleScrolled);
   window.addEventListener('load', toggleScrolled);
@@ -80,16 +90,18 @@
       window.scrollY > 100 ? scrollTop.classList.add('active') : scrollTop.classList.remove('active');
     }
   }
-  scrollTop.addEventListener('click', (e) => {
-    e.preventDefault();
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
+  if (scrollTop) {
+    scrollTop.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     });
-  });
 
-  window.addEventListener('load', toggleScrollTop);
-  document.addEventListener('scroll', toggleScrollTop);
+    window.addEventListener('load', toggleScrollTop);
+    document.addEventListener('scroll', toggleScrollTop);
+  }
 
   /**
    * Animation on scroll function and init
@@ -275,12 +287,19 @@ class CorporateLoginForm {
     }
     
     setupPasswordToggle() {
-        this.passwordToggle.addEventListener('click', () => {
+        if (!this.passwordToggle || !this.passwordInput) return; // Exit if elements don't exist
+        
+        this.passwordToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
             const type = this.passwordInput.type === 'password' ? 'text' : 'password';
             this.passwordInput.type = type;
             
             const icon = this.passwordToggle.querySelector('.toggle-icon');
-            icon.classList.toggle('show-password', type === 'text');
+            if (icon) {
+                icon.classList.toggle('show-password', type === 'text');
+            }
         });
     }
     
@@ -474,4 +493,7 @@ class CorporateLoginForm {
 document.addEventListener('DOMContentLoaded', () => {
     new CorporateLoginForm();
 });
+
+
+
 

@@ -7,13 +7,11 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%
-    // Kiểm tra đăng nhập - Filter sẽ xử lý, nhưng thêm check ở đây để an toàn
     if (session.getAttribute("user") == null) {
         response.sendRedirect("Login.jsp");
         return;
     }
     
-    // Lấy thông tin user và role từ session
     String role = (String) session.getAttribute("role");
     model.Users user = (model.Users) session.getAttribute("user");
 %>
@@ -66,8 +64,8 @@
 		<div class="navbar-wrapper ">
 			<div class="navbar-brand header-logo">
 				<a href="AdminDashboard.jsp" class="b-brand">
-					<img src="assets/images/logo.svg" alt="" class="logo images">
-					<img src="assets/images/logo-icon.svg" alt="" class="logo-thumb images">
+<!--					<img src="assets/images/logo.svg" alt="" class="logo images">
+					<img src="assets/images/logo-icon.svg" alt="" class="logo-thumb images">-->
 				</a>
 				<a class="mobile-menu" id="mobile-collapse" href="#!"><span></span></a>
 			</div>
@@ -98,7 +96,7 @@
 						<label>Forms &amp; table</label>
 					</li>
 					<li class="nav-item">
-						<a href="form_elements.html" class="nav-link"><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Form elements</span></a>
+						<a href="ProblemList" class="nav-link"><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Problem List</span></a>
 					</li>
 					<li class="nav-item">
 						<a href="tbl_bootstrap.html" class="nav-link"><span class="pcoded-micon"><i class="feather icon-align-justify"></i></span><span class="pcoded-mtext">Bootstrap table</span></a>
