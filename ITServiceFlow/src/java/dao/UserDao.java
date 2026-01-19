@@ -49,7 +49,7 @@ public class UserDao extends DbContext{
                 user.setRole(rs.getString("Role"));
                 user.setDepartmentId(rs.getInt("DepartmentId"));
                 user.setLocationId(rs.getInt("LocationId"));
-                user.IsActive(rs.getBoolean("IsActive"));
+                user.setIsActive(rs.getBoolean("IsActive"));
                 user.setCreatedAt(rs.getDate("CreatedAt"));
                 list.add(user);
                 
@@ -137,12 +137,12 @@ public class UserDao extends DbContext{
 
         if (user != null) {
             System.out.println("Login Success");
-        } else {
-            System.out.println("Login Failed");
             System.out.println("ID: " + user.getId());
             System.out.println("Username: " + user.getUsername());
             System.out.println("FullName: " + user.getFullName());
             System.out.println("Role: " + user.getRole());
+        } else {
+            System.out.println("Login Failed");
         }
     }
 }
