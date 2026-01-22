@@ -1,5 +1,5 @@
 <%-- 
-    Document   : ProblemList
+    Document   : ProblemDetail
     Created on : Jan 18, 2026, 8:16:37 PM
     Author     : DELL
 --%>
@@ -301,12 +301,12 @@
                                     <div class="row align-items-center">
                                         <div class="col-md-12">
                                             <div class="page-header-title">
-                                                <h5 class="m-b-10">Form Elements</h5>
+                                                <h5 class="m-b-10">Problem Detail</h5>
                                             </div>
                                             <ul class="breadcrumb">
                                                 <li class="breadcrumb-item"><a href="index.html"><i class="feather icon-home"></i></a></li>
-                                                <li class="breadcrumb-item"><a href="#!">Form Components</a></li>
-                                                <li class="breadcrumb-item"><a href="#!">Form Elements</a></li>
+                                                <li class="breadcrumb-item"><a href="ProblemList">Problem List</a></li>
+                                                <li class="breadcrumb-item"><a href="#!">Problem Detail</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -315,218 +315,104 @@
                             <!-- [ breadcrumb ] end -->
                             <!-- [ Main Content ] start -->
                             <div class="row">
-                                <!-- [ form-element ] start -->
                                 <div class="col-sm-12">
                                     <div class="card">
                                         <div class="card-header">
-                                            <h5>Basic Componant</h5>
-                                        </div>
-                                        <div class="card-body table-border-style">
-                                        <c:if test="${empty problem}">
-                                            <div class="alert alert-warning">
-                                             Problem list is empty
+                                            <h5>Problem Details</h5>
+                                            <div class="card-header-right">
+                                                <a href="ProblemList" class="btn btn-sm btn-secondary">
+                                                    <i class="feather icon-arrow-left"></i> Back to List
+                                                </a>
                                             </div>
-                                        </c:if>
-                                            
-                                        <div class="table-responsive">
-                                            <table class="table table-hover">
-                                                <thead class="thead-dark">
-                                                    <tr>
-                                                        <th>ID</th>
-                                                        <th>Ticket Number</th>
-                                                        <th>Title</th>
-                                                        <th>Status</th>
-                                                        <th>Created By</th>
-                                                        <th>Created At</th>
-                                                        <th>Action</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <c:choose>
-                                                        <c:when test="${empty problem}">
-                                                            <tr>
-                                                                <td colspan="6" class="text-center text-muted">
-                                                                    <i>No problems found</i>
-                                                                </td>
-                                                            </tr>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <c:forEach items="${problem}" var="p">
-                                                                <tr>
-                                                                    <td>${p.id}</td>
-                                                                    <td>${p.ticketNumber}</td>
-                                                                    <td>${p.title}</td>
-                                                                    <td>
-                                                                        <span class="badge badge-info">
-                                                                            ${p.status}
-                                                                        </span>
-                                                                    </td>
-                                                                    <td>${p.createdByName != null ? p.createdByName : p.createdBy}</td>
-                                                                    <td>${p.createdAt}</td>
-                                                                    <td>
-                                                                        <a class="btn btn-sm btn-primary"
-                                                                           href="ProblemDetail?Id=${p.id}">
-                                                                            Detail
-                                                                        </a>
-                                                                        <a class="btn btn-sm btn-primary"
-                                                                           href="ProblemDetail?Id=${p.id}">
-                                                                            Update
-                                                                        </a>
-                                                                    </td>
-                                                                </tr>
-                                                            </c:forEach>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
-                                    </div>
-                                    <!-- Input group -->
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h5>Input Group</h5>
                                         </div>
                                         <div class="card-body">
-                                            <div class="input-group mb-3">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text" id="basic-addon1">@</span>
+                                            <c:if test="${not empty error}">
+                                                <div class="alert alert-danger">
+                                                    <h4>Error</h4>
+                                                    <p>${error}</p>
+                                                    <a href="ProblemList" class="btn btn-primary">Back to Problem List</a>
                                                 </div>
-                                                <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
-                                            </div>
-                                            <div class="input-group mb-3">
-                                                <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text" id="basic-addon2">@example.com</span>
-                                                </div>
-                                            </div>
-                                            <label for="basic-url">Your vanity URL</label>
-                                            <div class="input-group mb-3">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text" id="basic-addon3">https://example.com/users/</span>
-                                                </div>
-                                                <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3">
-                                            </div>
-                                            <div class="input-group mb-3">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text">$</span>
-                                                </div>
-                                                <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text">.00</span>
-                                                </div>
-                                            </div>
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text">With textarea</span>
-                                                </div>
-                                                <textarea class="form-control" aria-label="With textarea"></textarea>
-                                            </div>
-                                            <h5 class="mt-5">Button Addons</h5>
-                                            <hr>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="input-group mb-3">
-                                                        <div class="input-group-prepend">
-                                                            <button class="btn btn-primary" type="button">Button</button>
-                                                        </div>
-                                                        <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1">
+                                            </c:if>
+                                            <c:choose>
+                                                <c:when test="${empty problem && empty error}">
+                                                    <div class="alert alert-warning">
+                                                        <h4>Problem not found</h4>
+                                                        <p>The problem you are looking for does not exist or has been deleted.</p>
+                                                        <a href="ProblemList" class="btn btn-primary">Back to Problem List</a>
                                                     </div>
-                                                    <div class="input-group mb-3">
-                                                        <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
-                                                        <div class="input-group-append">
-                                                            <button class="btn btn-primary" type="button">Button</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="input-group mb-3">
-                                                        <div class="input-group-prepend">
-                                                            <button class="btn btn-primary" type="button">Button</button>
-                                                            <button class="btn btn-secondary" type="button">Button</button>
-                                                        </div>
-                                                        <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1">
-                                                    </div>
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
-                                                        <div class="input-group-append">
-                                                            <button class="btn btn-secondary" type="button">Button</button>
-                                                            <button class="btn btn-primary" type="button">Button</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <h5 class="mt-5">Buttons With Dropdowns</h5>
-                                                    <hr>
-                                                    <div class="input-group mb-3">
-                                                        <div class="input-group-prepend">
-                                                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</button>
-                                                            <div class="dropdown-menu">
-                                                                <a class="dropdown-item" href="#!">Action</a>
-                                                                <a class="dropdown-item" href="#!">Another action</a>
-                                                                <a class="dropdown-item" href="#!">Something else here</a>
-                                                                <div role="separator" class="dropdown-divider"></div>
-                                                                <a class="dropdown-item" href="#!">Separated link</a>
-                                                            </div>
-                                                        </div>
-                                                        <input type="text" class="form-control" aria-label="Text input with dropdown button">
-                                                    </div>
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control" aria-label="Text input with dropdown button">
-                                                        <div class="input-group-append">
-                                                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</button>
-                                                            <div class="dropdown-menu">
-                                                                <a class="dropdown-item" href="#!">Action</a>
-                                                                <a class="dropdown-item" href="#!">Another action</a>
-                                                                <a class="dropdown-item" href="#!">Something else here</a>
-                                                                <div role="separator" class="dropdown-divider"></div>
-                                                                <a class="dropdown-item" href="#!">Separated link</a>
-                                                            </div>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <table class="table table-bordered">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <th width="200">ID</th>
+                                                                        <td>${problem.id}</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th>Ticket Number</th>
+                                                                        <td><strong>${problem.ticketNumber}</strong></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th>Title</th>
+                                                                        <td><strong>${problem.title}</strong></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th>Status</th>
+                                                                        <td>
+                                                                            <span class="badge badge-info">
+                                                                                ${problem.status}
+                                                                            </span>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th>Description</th>
+                                                                        <td>
+                                                                            <div class="p-3 bg-light rounded">
+                                                                                ${problem.description != null ? problem.description : 'N/A'}
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th>Root Cause</th>
+                                                                        <td>
+                                                                            <div class="p-3 bg-light rounded">
+                                                                                ${problem.rootCause != null ? problem.rootCause : 'N/A'}
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th>Workaround</th>
+                                                                        <td>
+                                                                            <div class="p-3 bg-light rounded">
+                                                                                ${problem.workaround != null ? problem.workaround : 'N/A'}
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th>Created By</th>
+                                                                        <td>${problem.createdByName != null ? problem.createdByName : problem.createdBy}</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th>Assigned To</th>
+                                                                        <td>${problem.assignedTo != null && problem.assignedTo > 0 ? problem.assignedTo : 'Not Assigned'}</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th>Created At</th>
+                                                                        <td>${problem.createdAt}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <h5 class="mt-5">Segmented Buttons</h5>
-                                                    <hr>
-                                                    <div class="input-group mb-3">
-                                                        <div class="input-group-prepend">
-                                                            <button type="button" class="btn btn-secondary">Action</button>
-                                                            <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Toggle
-                                                                    Dropdown</span></button>
-                                                            <div class="dropdown-menu">
-                                                                <a class="dropdown-item" href="#!">Action</a>
-                                                                <a class="dropdown-item" href="#!">Another action</a>
-                                                                <a class="dropdown-item" href="#!">Something else here</a>
-                                                                <div role="separator" class="dropdown-divider"></div>
-                                                                <a class="dropdown-item" href="#!">Separated link</a>
-                                                            </div>
-                                                        </div>
-                                                        <input type="text" class="form-control" aria-label="Text input with segmented dropdown button">
-                                                    </div>
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control" aria-label="Text input with segmented dropdown button">
-                                                        <div class="input-group-append">
-                                                            <button type="button" class="btn btn-secondary">Action</button>
-                                                            <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Toggle
-                                                                    Dropdown</span></button>
-                                                            <div class="dropdown-menu">
-                                                                <a class="dropdown-item" href="#!">Action</a>
-                                                                <a class="dropdown-item" href="#!">Another action</a>
-                                                                <a class="dropdown-item" href="#!">Something else here</a>
-                                                                <div role="separator" class="dropdown-divider"></div>
-                                                                <a class="dropdown-item" href="#!">Separated link</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </div>
                                     </div>
                                 </div>
-                                <!-- [ form-element ] end -->
-                                <!-- [ Main Content ] end -->
                             </div>
+                            <!-- [ Main Content ] end -->
                         </div>
                     </div>
                 </div>

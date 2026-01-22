@@ -96,7 +96,7 @@ public class Users {
         this.DepartmentId = DepartmentId;
     }
 
-    public boolean isActive() {
+    public boolean isIsActive() {
         return IsActive;
     }
 

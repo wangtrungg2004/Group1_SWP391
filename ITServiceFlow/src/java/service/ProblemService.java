@@ -16,4 +16,16 @@ public class ProblemService {
     {
         return dao.getAllProblems();
     }
+    public Problems getProblemById(int pId)
+    {
+        return dao.getProblemById(pId);
+    }
+    public boolean updateProblem(Problems problem)
+    {
+        if (problem == null) return false;
+        if (problem.getId() <= 0) return false;
+        if (problem.getTitle() == null || problem.getTitle().isBlank()) return false;
+
+        return dao.updateProblem(problem);
+    }
 }
