@@ -112,9 +112,7 @@ public class ProblemDao extends DbContext{
             "      ,[RootCause] = ?\n" +
             "      ,[Workaround] = ?\n" +
             "      ,[Status] = ?\n" +
-            "      ,[CreatedBy] = ?\n" +
             "      ,[AssignedTo] = ?\n" +
-            "      ,[CreatedAt] = ?\n" +
             " WHERE Id = ?";
             try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setString(1,p.getTicketNumber());
@@ -123,10 +121,8 @@ public class ProblemDao extends DbContext{
             stm.setString(4, p.getRootCause());
             stm.setString(5, p.getWorkaround());
             stm.setString(6, p.getStatus());
-            stm.setInt(7, p.getCreatedBy());
-            stm.setInt(8, p.getAssignedTo());
-            stm.setTimestamp(9, new Timestamp(p.getCreatedAt().getTime()));
-            stm.setInt(10, p.getId());
+            stm.setInt(7, p.getAssignedTo());
+            stm.setInt(8, p.getId());
 
             return stm.executeUpdate() > 0;
             // Kiểm tra xem có update được dòng nào không
@@ -164,67 +160,67 @@ public class ProblemDao extends DbContext{
     
     
     
-//    public static void main(String[] args) {
-//
-//        ProblemDao dao = new ProblemDao();
-//        List<Problems> list = dao.getAllProblems();
-//
-//        if (list.isEmpty()) {
-//            System.out.println("Errored");
-//            return;
-//        }
-//
-//        for (Problems p : list) {
-//            System.out.println("Id          : " + p.getId());
-//            System.out.println("TicketNumber: " + p.getTicketNumber());
-//            System.out.println("Title       : " + p.getTitle());
-//            System.out.println("Description : " + p.getDescription());
-//            System.out.println("RootCause   : " + p.getRootCause());
-//            System.out.println("Workaround  : " + p.getWorkaround());
-//            System.out.println("Status      : " + p.getStatus());
-//            System.out.println("CreatedBy   : " + p.getCreatedBy());
-//            System.out.println("AssignedTo  : " + p.getAssignedTo());
-//            System.out.println("CreatedAt   : " + p.getCreatedAt());
-//            System.out.println("--------------------------------------");
-//        }
-//    }
     public static void main(String[] args) {
 
         ProblemDao dao = new ProblemDao();
+        List<Problems> list = dao.getAllProblems();
 
-        int testProblemId = 1;
-
-        // 1️⃣ Lấy problem hiện tại từ DB
-        Problems p = dao.getProblemById(testProblemId);
-
-        if (p == null) {
-            System.out.println("❌ Problem NOT found with Id = " + testProblemId);
+        if (list.isEmpty()) {
+            System.out.println("Errored");
             return;
         }
 
-        // 2️⃣ In dữ liệu trước khi update
-        System.out.println("===== BEFORE UPDATE =====");
-        System.out.println("Title: " + p.getTitle());
-        System.out.println("Status: " + p.getStatus());
-        System.out.println("Workaround: " + p.getWorkaround());
-
-        p.setTitle(p.getTitle() + " (Updated)");
-        p.setStatus("RESOLVED");
-        p.setWorkaround("Restart service and clear cache");
-
-        boolean success = dao.updateProblem(p);
-
-        if (success) {
-            System.out.println("✅ UPDATE SUCCESS");
-        } else {
-            System.out.println("❌ UPDATE FAILED");
+        for (Problems p : list) {
+            System.out.println("Id          : " + p.getId());
+            System.out.println("TicketNumber: " + p.getTicketNumber());
+            System.out.println("Title       : " + p.getTitle());
+            System.out.println("Description : " + p.getDescription());
+            System.out.println("RootCause   : " + p.getRootCause());
+            System.out.println("Workaround  : " + p.getWorkaround());
+            System.out.println("Status      : " + p.getStatus());
+            System.out.println("CreatedBy   : " + p.getCreatedBy());
+            System.out.println("AssignedTo  : " + p.getAssignedTo());
+            System.out.println("CreatedAt   : " + p.getCreatedAt());
+            System.out.println("--------------------------------------");
         }
-
-        Problems updated = dao.getProblemById(testProblemId);
-
-        System.out.println("===== AFTER UPDATE =====");
-        System.out.println("Title: " + updated.getTitle());
-        System.out.println("Status: " + updated.getStatus());
-        System.out.println("Workaround: " + updated.getWorkaround());
     }
+//    public static void main(String[] args) {
+//
+//        ProblemDao dao = new ProblemDao();
+//
+//        int testProblemId = 1;
+//
+//        // 1️⃣ Lấy problem hiện tại từ DB
+//        Problems p = dao.getProblemById(testProblemId);
+//
+//        if (p == null) {
+//            System.out.println("❌ Problem NOT found with Id = " + testProblemId);
+//            return;
+//        }
+//
+//        // 2️⃣ In dữ liệu trước khi update
+//        System.out.println("===== BEFORE UPDATE =====");
+//        System.out.println("Title: " + p.getTitle());
+//        System.out.println("Status: " + p.getStatus());
+//        System.out.println("Workaround: " + p.getWorkaround());
+//
+//        p.setTitle(p.getTitle() + " (Updated)");
+//        p.setStatus("RESOLVED");
+//        p.setWorkaround("Restart service and clear cache");
+//
+//        boolean success = dao.updateProblem(p);
+//
+//        if (success) {
+//            System.out.println("✅ UPDATE SUCCESS");
+//        } else {
+//            System.out.println("❌ UPDATE FAILED");
+//        }
+//
+//        Problems updated = dao.getProblemById(testProblemId);
+//
+//        System.out.println("===== AFTER UPDATE =====");
+//        System.out.println("Title: " + updated.getTitle());
+//        System.out.println("Status: " + updated.getStatus());
+//        System.out.println("Workaround: " + updated.getWorkaround());
+//    }
 }

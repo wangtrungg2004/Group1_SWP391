@@ -369,7 +369,7 @@
                                                                             Detail
                                                                         </a>
                                                                         <a class="btn btn-sm btn-primary"
-                                                                           href="ProblemDetail?Id=${p.id}">
+                                                                           href="ProblemUpdate?Id=${p.id}">
                                                                             Update
                                                                         </a>
                                                                     </td>

@@ -7,16 +7,17 @@ package controller.Problems;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.List;
 import model.Problems;
 import service.ProblemService;
 /**
  *
  * @author DELL
  */
+@WebServlet(name = "ProblemUpdate", urlPatterns = {"/ProblemUpdate"})
 public class ProblemUpdate extends HttpServlet {
 
     /**
@@ -58,29 +59,20 @@ public class ProblemUpdate extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
         String ProblemId = request.getParameter("Id");
-        if(ProblemId == null || ProblemId.trim().isEmpty())
-        {
-            request.setAttribute("error", "Problem ID is required");
-            request.getRequestDispatcher("ProblemDetail.jsp").forward(request, response);
-            return;
+        if (ProblemId == null || ProblemId.trim().isEmpty()) {
+            ProblemId = request.getParameter("id");
         }
-        try
-        {
+        try {
             int id = Integer.parseInt(ProblemId);
             Problems pro = problemService.getProblemById(id);
-            if (pro == null) {
-                request.setAttribute("error", "Problem not found with ID: " + id);
-                request.getRequestDispatcher("ProblemDetail.jsp").forward(request, response);
-                return;
-            }
             request.setAttribute("problem", pro);
-            request.getRequestDispatcher("ProblemDetail.jsp").forward(request, response);
-        }
-        catch(Exception ex)
-        {
+            request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
+        } 
+        catch(Exception ex) {
             ex.printStackTrace();
+            request.setAttribute("error", "Error loading problem: " + ex.getMessage());
+            request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
         }
     }
 
@@ -95,7 +87,31 @@ public class ProblemUpdate extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+        try {
+            int id = Integer.parseInt(request.getParameter("Id"));
+
+            Problems pro = problemService.getProblemById(id);
+
+            pro.setTitle(request.getParameter("Title"));
+            pro.setDescription(request.getParameter("Description"));
+            pro.setRootCause(request.getParameter("RootCause"));
+            pro.setWorkaround(request.getParameter("Workaround"));
+            pro.setStatus(request.getParameter("Status"));
+
+            String assignedTo = request.getParameter("AssignedTo");
+            if (assignedTo != null && !assignedTo.isEmpty()) {
+                pro.setAssignedTo(Integer.parseInt(assignedTo));
+            }
+
+            problemService.updateProblem(pro);
+
+            response.sendRedirect("ProblemDetail?Id=" + id);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Update failed");
+            request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
+        }    
     }
 
     /**
