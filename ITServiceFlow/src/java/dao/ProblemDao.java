@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import model.Problems;
 import Utils.DbContext;
+import java.time.Year;
 /**
  *
  * @author DELL
@@ -134,6 +135,84 @@ public class ProblemDao extends DbContext{
         }
     }
     
+    public boolean addProblem(String Title, String Description,
+            String RootCause, String WalkAround, String Status, int CreatedBy, int AssignedTo, Date CreatedAt) {
+        
+        String TicketNumber = getNextTicketNumber();
+        
+        String sql = "INSERT INTO [dbo].[Problems]\n" +
+"           ([TicketNumber]\n" +
+"           ,[Title]\n" +
+"           ,[Description]\n" +
+"           ,[RootCause]\n" +
+"           ,[Workaround]\n" +
+"           ,[Status]\n" +
+"           ,[CreatedBy]\n" +
+"           ,[AssignedTo]\n" +
+"           ,[CreatedAt])\n" +
+"     VALUES\n" +
+"           (?\n" +
+"           ,?\n" +
+"           ,?\n" +
+"           ,?\n" +
+"           ,?\n" +
+"           ,?\n" +
+"           ,?\n" +
+"           ,?\n" +
+"           ,GETDATE())";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, TicketNumber);
+            stm.setString(2, Title);
+            stm.setString(3,Description);
+            stm.setString(4, RootCause);
+            stm.setString(5, WalkAround);
+            stm.setString(6, Status);
+            stm.setInt(7, CreatedBy);
+            stm.setInt(8, AssignedTo);
+//            stm.setDate(9, CreatedAt);
+            stm.executeUpdate();
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+    
+    
+    public String getNextTicketNumber() {
+
+        int year = Year.now().getValue();
+        String prefix = "PRB-" + year + "-";
+
+        String sql =
+            "SELECT MAX(TicketNumber) " +
+            "FROM Problems " +
+            "WHERE TicketNumber LIKE ?";
+
+        int next = 1;
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+
+            stm.setString(1, prefix + "%");
+            ResultSet rs = stm.executeQuery();
+
+            if (rs.next() && rs.getString(1) != null) {
+                String last = rs.getString(1); // PRB-2026-015
+                String seq = last.substring(last.lastIndexOf('-') + 1);
+                next = Integer.parseInt(seq) + 1;
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            // fallback an toàn
+//            return prefix + "001";
+        }
+
+        return prefix + String.format("%03d", next);
+    }
+
+
+    
 //    public static void main(String[] args) {
 //
 //        ProblemDao dao = new ProblemDao(); // constructor đã mở connection
@@ -159,31 +238,53 @@ public class ProblemDao extends DbContext{
 //    }
     
     
-    
-    public static void main(String[] args) {
+public static void main(String[] args) {
 
-        ProblemDao dao = new ProblemDao();
-        List<Problems> list = dao.getAllProblems();
+    ProblemDao dao = new ProblemDao();
 
-        if (list.isEmpty()) {
-            System.out.println("Errored");
-            return;
-        }
+    boolean result = dao.addProblem(
+        "Test add problem",                 // Title
+        "This is a test description",       // Description
+        null,                               // RootCause
+        "Restart application",              // Workaround
+        "OPEN",                             // Status
+        1,                                  // CreatedBy (userId có sẵn trong DB)
+        2,                                  // AssignedTo (userId có sẵn trong DB)
+        new java.sql.Date(System.currentTimeMillis())
+    );
 
-        for (Problems p : list) {
-            System.out.println("Id          : " + p.getId());
-            System.out.println("TicketNumber: " + p.getTicketNumber());
-            System.out.println("Title       : " + p.getTitle());
-            System.out.println("Description : " + p.getDescription());
-            System.out.println("RootCause   : " + p.getRootCause());
-            System.out.println("Workaround  : " + p.getWorkaround());
-            System.out.println("Status      : " + p.getStatus());
-            System.out.println("CreatedBy   : " + p.getCreatedBy());
-            System.out.println("AssignedTo  : " + p.getAssignedTo());
-            System.out.println("CreatedAt   : " + p.getCreatedAt());
-            System.out.println("--------------------------------------");
-        }
+    if (result) {
+        System.out.println("Insert Problem SUCCESS");
+    } else {
+        System.out.println("Insert Problem FAILED");
     }
+}
+
+
+//    public static void main(String[] args) {
+//
+//        ProblemDao dao = new ProblemDao();
+//        List<Problems> list = dao.getAllProblems();
+//
+//        if (list.isEmpty()) {
+//            System.out.println("Errored");
+//            return;
+//        }
+//
+//        for (Problems p : list) {
+//            System.out.println("Id          : " + p.getId());
+//            System.out.println("TicketNumber: " + p.getTicketNumber());
+//            System.out.println("Title       : " + p.getTitle());
+//            System.out.println("Description : " + p.getDescription());
+//            System.out.println("RootCause   : " + p.getRootCause());
+//            System.out.println("Workaround  : " + p.getWorkaround());
+//            System.out.println("Status      : " + p.getStatus());
+//            System.out.println("CreatedBy   : " + p.getCreatedBy());
+//            System.out.println("AssignedTo  : " + p.getAssignedTo());
+//            System.out.println("CreatedAt   : " + p.getCreatedAt());
+//            System.out.println("--------------------------------------");
+//        }
+//    }
 //    public static void main(String[] args) {
 //
 //        ProblemDao dao = new ProblemDao();

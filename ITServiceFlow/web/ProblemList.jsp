@@ -318,8 +318,11 @@
                                 <!-- [ form-element ] start -->
                                 <div class="col-sm-12">
                                     <div class="card">
-                                        <div class="card-header">
-                                            <h5>Basic Componant</h5>
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h5 class="m-0">Problem List</h5>
+                                            <a href="ProblemAdd" class="btn btn-primary">
+                                                <i class="feather icon-plus"></i> Add
+                                            </a>
                                         </div>
                                         <div class="card-body table-border-style">
                                         <c:if test="${empty problem}">

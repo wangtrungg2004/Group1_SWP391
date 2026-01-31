@@ -4,6 +4,7 @@
  */
 package service;
 import dao.ProblemDao;
+import java.sql.Date;
 import java.util.List;
 import model.Problems;
 /**
@@ -27,5 +28,14 @@ public class ProblemService {
         if (problem.getTitle() == null || problem.getTitle().isBlank()) return false;
 
         return dao.updateProblem(problem);
+    }
+    
+    public String getNextTicketNumber() {
+        return dao.getNextTicketNumber();
+    }
+    public boolean insertProblem(String TicketNumber, String Title, String Description,
+            String RootCause, String WalkAround, String Status, int CreatedBy, int AssignedTo, Date CreatedAt)
+    {
+        return dao.addProblem(Title, Description, RootCause, WalkAround, Status, CreatedBy, AssignedTo, CreatedAt);
     }
 }
