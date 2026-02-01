@@ -38,4 +38,8 @@ public class ProblemService {
     {
         return dao.addProblem(Title, Description, RootCause, WalkAround, Status, CreatedBy, AssignedTo, CreatedAt);
     }
+    public boolean deleteProblem(int Id)
+    {
+        return dao.deleteProblem(Id);
+    }
 }

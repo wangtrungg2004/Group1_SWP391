@@ -77,6 +77,31 @@ public class ProblemList extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       
+       String ProblemId = request.getParameter("Id");
+        
+        try {
+            int id = Integer.parseInt(ProblemId);
+            
+            // Kiểm tra user có tồn tại không
+            Problems pro = problemService.getProblemById(id);
+            if (pro == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Problem not found");
+                return;
+            }
+            
+            // Thực hiện delete
+            boolean deleted = problemService.deleteProblem(id);
+            if (!deleted) {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to delete user");
+                return;
+            }
+            
+            // Redirect về danh sách users sau khi delete thành công
+            response.sendRedirect("ProblemList");
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ProblemId format");
+        } catch (NullPointerException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ProblemId parameter is missing");
+        }
     }
 }

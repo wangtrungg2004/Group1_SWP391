@@ -211,6 +211,23 @@ public class ProblemDao extends DbContext{
         return prefix + String.format("%03d", next);
     }
 
+    public boolean deleteProblem(int ProblemId)
+    {
+        String sql = "DELETE FROM [dbo].[Problems]\n" +
+                "      WHERE Id = ?";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, ProblemId);
+            stm.executeUpdate();
+            return true;
+//            int rows = stm.executeUpdate();
+//            return rows > 0;
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            return false;
+        }
+    }
 
     
 //    public static void main(String[] args) {

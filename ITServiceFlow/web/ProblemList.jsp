@@ -366,7 +366,7 @@
                                                                     </td>
                                                                     <td>${p.createdByName != null ? p.createdByName : p.createdBy}</td>
                                                                     <td>${p.createdAt}</td>
-                                                                    <td>
+                                                                    <td class="d-flex gap-1">
                                                                         <a class="btn btn-sm btn-primary"
                                                                            href="ProblemDetail?Id=${p.id}">
                                                                             Detail
@@ -375,6 +375,14 @@
                                                                            href="ProblemUpdate?Id=${p.id}">
                                                                             Update
                                                                         </a>
+                                                                        <form action="ProblemList" method="post"
+                                                                                onsubmit="return confirm('Delete this Problem?');"
+                                                                                style="display:inline;">
+                                                                              <input type="hidden" name="Id" value="${p.id}">
+                                                                              <button type="submit" class="btn btn-sm btn-danger">
+                                                                                  Delete
+                                                                              </button>
+                                                                          </form>
                                                                     </td>
                                                                 </tr>
                                                             </c:forEach>
