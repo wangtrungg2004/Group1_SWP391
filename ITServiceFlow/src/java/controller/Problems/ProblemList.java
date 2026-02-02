@@ -60,8 +60,10 @@ public class ProblemList extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-            List<Problems> problem = problemService.getAllProblems();
-            
+            String keyword = request.getParameter("keyword");
+            List<Problems> problem = problemService.searchProblem(keyword != null ? keyword : "");
+            request.setAttribute("problem", problem);
+            request.setAttribute("filterKeyword", keyword);  
             request.setAttribute("problem", problem);
             request.getRequestDispatcher("ProblemList.jsp").forward(request, response);
     }

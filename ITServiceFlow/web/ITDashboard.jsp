@@ -92,7 +92,7 @@
     <!-- [ navigation menu ] end -->
 
     <!-- [ Header ] start -->
-    <header class="navbar pcoded-header navbar-expand-lg navbar-light header-blue">
+    <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed">
         <div class="m-header">
             <a class="mobile-menu" id="mobile-collapse1" href="#!"><span></span></a>
             <a href="#!" class="b-brand">
@@ -243,9 +243,15 @@
     <!-- [ Main Content ] end -->
 
     <!-- Required Js -->
+    <script src="assets/plugins/jquery/js/jquery.min.js"></script>
     <script src="assets/js/vendor-all.min.js"></script>
     <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
     <script src="assets/js/pcoded.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.fixed-button').remove();
+        });
+    </script>
 </body>
 
 </html>

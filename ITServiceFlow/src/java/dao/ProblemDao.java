@@ -229,6 +229,48 @@ public class ProblemDao extends DbContext{
         }
     }
 
+    public List<Problems> searchProblem(String keyword)
+    {
+        List<Problems> list = new ArrayList<>();
+        try
+        {
+            String sql = "SELECT p.Id, p.TicketNumber, p.Title, p.Description, " +
+             "p.RootCause, p.Workaround, p.Status, p.CreatedBy, " +
+             "u.FullName AS CreatedByName, p.AssignedTo, p.CreatedAt " +
+             "FROM dbo.Problems p " +
+             "LEFT JOIN dbo.Users u ON p.CreatedBy = u.Id " +
+             "WHERE (p.Title LIKE ? OR p.TicketNumber LIKE ?)";
+            
+            PreparedStatement stm = connection.prepareStatement(sql);
+            String searchValue = "%" + keyword + "%";
+            stm.setString(1, searchValue);
+            stm.setString(2, searchValue);
+            
+            ResultSet rs = stm.executeQuery();
+            while(rs.next())
+            {
+               Problems pro = new Problems();
+               pro.setId(rs.getInt("Id"));
+               pro.setTicketNumber(rs.getString("TicketNumber"));
+               pro.setTitle(rs.getString("Title"));
+               pro.setDescription(rs.getString("Description"));
+               pro.setRootCause(rs.getString("RootCause"));
+               pro.setWorkaround(rs.getString("Workaround"));
+               pro.setStatus(rs.getString("Status"));
+               pro.setCreatedBy(rs.getInt("CreatedBy"));
+               pro.setCreatedByName(rs.getString("CreatedByName"));
+               pro.setAssignedTo(rs.getInt("AssignedTo"));
+               pro.setCreatedAt(rs.getDate("CreatedAt"));
+               list.add(pro);
+            }
+            
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return list;
+    }
     
 //    public static void main(String[] args) {
 //
@@ -255,27 +297,27 @@ public class ProblemDao extends DbContext{
 //    }
     
     
-public static void main(String[] args) {
-
-    ProblemDao dao = new ProblemDao();
-
-    boolean result = dao.addProblem(
-        "Test add problem",                 // Title
-        "This is a test description",       // Description
-        null,                               // RootCause
-        "Restart application",              // Workaround
-        "OPEN",                             // Status
-        1,                                  // CreatedBy (userId có sẵn trong DB)
-        2,                                  // AssignedTo (userId có sẵn trong DB)
-        new java.sql.Date(System.currentTimeMillis())
-    );
-
-    if (result) {
-        System.out.println("Insert Problem SUCCESS");
-    } else {
-        System.out.println("Insert Problem FAILED");
-    }
-}
+//public static void main(String[] args) {
+//
+//    ProblemDao dao = new ProblemDao();
+//
+//    boolean result = dao.addProblem(
+//        "Test add problem",                 // Title
+//        "This is a test description",       // Description
+//        null,                               // RootCause
+//        "Restart application",              // Workaround
+//        "OPEN",                             // Status
+//        1,                                  // CreatedBy (userId có sẵn trong DB)
+//        2,                                  // AssignedTo (userId có sẵn trong DB)
+//        new java.sql.Date(System.currentTimeMillis())
+//    );
+//
+//    if (result) {
+//        System.out.println("Insert Problem SUCCESS");
+//    } else {
+//        System.out.println("Insert Problem FAILED");
+//    }
+//}
 
 
 //    public static void main(String[] args) {
@@ -312,7 +354,7 @@ public static void main(String[] args) {
 //        Problems p = dao.getProblemById(testProblemId);
 //
 //        if (p == null) {
-//            System.out.println("❌ Problem NOT found with Id = " + testProblemId);
+//            System.out.println("Problem NOT found with Id = " + testProblemId);
 //            return;
 //        }
 //
@@ -329,9 +371,9 @@ public static void main(String[] args) {
 //        boolean success = dao.updateProblem(p);
 //
 //        if (success) {
-//            System.out.println("✅ UPDATE SUCCESS");
+//            System.out.println("UPDATE SUCCESS");
 //        } else {
-//            System.out.println("❌ UPDATE FAILED");
+//            System.out.println("UPDATE FAILED");
 //        }
 //
 //        Problems updated = dao.getProblemById(testProblemId);
@@ -341,4 +383,23 @@ public static void main(String[] args) {
 //        System.out.println("Status: " + updated.getStatus());
 //        System.out.println("Workaround: " + updated.getWorkaround());
 //    }
+    
+    
+    public static void main(String[] args) {
+    ProblemDao dao = new ProblemDao();
+
+    String keyword = "2026"; 
+    List<Problems> result = dao.searchProblem(keyword);
+
+    System.out.println("Total results: " + result.size());
+    for (Problems p : result) {
+        System.out.println(
+            p.getTicketNumber() + " | " +
+            p.getTitle() + " | " +
+            p.getStatus() + " | " +
+            p.getCreatedByName()
+        );
+    }
+}
+
 }

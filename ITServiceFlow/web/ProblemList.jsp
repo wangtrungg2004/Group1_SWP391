@@ -330,7 +330,15 @@
                                              Problem list is empty
                                             </div>
                                         </c:if>
-                                            
+                                            <form action="ProblemList" method="get" class="mb-3">
+                                                <div class="input-group">
+                                                    <input type="text" name="keyword" class="form-control" placeholder="Search by Title or Ticket Number..."
+                                                           value="${filterKeyword != null ? filterKeyword : ''}">
+                                                    <div class="input-group-append">
+                                                        <button type="submit" class="btn btn-primary">Search</button>
+                                                    </div>
+                                                </div>
+                                            </form>
                                         <div class="table-responsive">
                                             <table class="table table-hover">
                                                 <thead class="thead-dark">

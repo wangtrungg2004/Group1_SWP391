@@ -42,4 +42,12 @@ public class ProblemService {
     {
         return dao.deleteProblem(Id);
     }
+    public List<Problems> searchProblem(String keyword)
+    {
+        if(keyword == null || keyword.isBlank())
+        {
+            return dao.getAllProblems();
+        }
+        return dao.searchProblem(keyword);
+    }
 }
