@@ -386,20 +386,20 @@ public class ProblemDao extends DbContext{
     
     
     public static void main(String[] args) {
-    ProblemDao dao = new ProblemDao();
+        ProblemDao dao = new ProblemDao();
 
-    String keyword = "2026"; 
-    List<Problems> result = dao.searchProblem(keyword);
+        String keyword = "2026"; 
+        List<Problems> result = dao.searchProblem(keyword);
 
-    System.out.println("Total results: " + result.size());
-    for (Problems p : result) {
-        System.out.println(
-            p.getTicketNumber() + " | " +
-            p.getTitle() + " | " +
-            p.getStatus() + " | " +
-            p.getCreatedByName()
-        );
+        System.out.println("Total results: " + result.size());
+        for (Problems p : result) {
+            System.out.println(
+                p.getTicketNumber() + " | " +
+                p.getTitle() + " | " +
+                p.getStatus() + " | " +
+                p.getCreatedByName()
+            );
+        }
     }
-}
 
 }
