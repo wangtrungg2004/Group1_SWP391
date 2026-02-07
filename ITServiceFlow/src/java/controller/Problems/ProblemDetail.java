@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import model.Problems;
+import model.Tickets;
 import service.ProblemService;
 /**
  *
@@ -64,11 +65,11 @@ public class ProblemDetail extends HttpServlet {
         String ProblemId = request.getParameter("Id");
         
         // Kiểm tra null trước khi parse
-        if (ProblemId == null || ProblemId.trim().isEmpty()) {
-            request.setAttribute("error", "Problem ID is required");
-            request.getRequestDispatcher("ProblemDetail.jsp").forward(request, response);
-            return;
-        }
+//        if (ProblemId == null || ProblemId.trim().isEmpty()) {
+//            request.setAttribute("error", "Problem ID is required");
+//            request.getRequestDispatcher("ProblemDetail.jsp").forward(request, response);
+//            return;
+//        }
         
         try {
             int id = Integer.parseInt(ProblemId);
@@ -79,7 +80,9 @@ public class ProblemDetail extends HttpServlet {
                 request.getRequestDispatcher("ProblemDetail.jsp").forward(request, response);
                 return;
             }
+            List<Tickets> relatedTickets = problemService.getRelatedTicket(id);
             request.setAttribute("problem", pro);
+            request.setAttribute("relatedTickets", relatedTickets);
             request.getRequestDispatcher("ProblemDetail.jsp").forward(request, response);
         } catch (NumberFormatException e) {
             request.setAttribute("error", "Invalid Problem ID format: " + ProblemId);

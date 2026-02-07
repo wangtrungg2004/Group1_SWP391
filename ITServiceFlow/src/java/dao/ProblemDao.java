@@ -9,6 +9,7 @@ import java.util.List;
 import model.Problems;
 import Utils.DbContext;
 import java.time.Year;
+import model.Tickets;
 /**
  *
  * @author DELL
@@ -272,6 +273,79 @@ public class ProblemDao extends DbContext{
         return list;
     }
     
+    public List<Tickets> viewRelatedTicket(int Id)
+    {
+        List<Tickets> list = new ArrayList<>();
+        String sql = "SELECT\n" +
+                "    t.Id,\n" +
+                "    t.TicketNumber,\n" +
+                "    t.TicketType,\n" +
+                "    t.Title,\n" +
+                "    t.Description,\n" +
+                "    t.CategoryId,\n" +
+                "    t.LocationId,\n" +
+                "    t.Impact,\n" +
+                "    t.Urgency,\n" +
+                "    t.PriorityId,\n" +
+                "    t.ServiceCatalogId,\n" +
+                "    t.RequiresApproval,\n" +
+                "    t.ApprovedBy,\n" +
+                "    t.ApprovedAt,\n" +
+                "    t.Status,\n" +
+                "    t.CreatedBy,\n" +
+                "    t.AssignedTo,\n" +
+                "    t.ParentTicketId,\n" +
+                "    t.ResolvedAt,\n" +
+                "    t.ClosedAt,\n" +
+                "    t.CreatedAt,\n" +
+                "    t.UpdatedAt,\n" +
+                "    t.CurrentLevel\n" +
+                "FROM dbo.ProblemTickets AS pt\n" +
+                "INNER JOIN dbo.Tickets AS t\n" +
+                "    ON pt.TicketId = t.Id\n" +
+                "WHERE pt.ProblemId = ?\n" +
+                "ORDER BY t.CreatedAt DESC;";
+        try
+        {
+           PreparedStatement stm = connection.prepareStatement(sql);
+           stm.setInt(1, Id);
+           ResultSet rs = stm.executeQuery();
+           while(rs.next())
+           {
+               Tickets ticket = new Tickets();
+            ticket.setId(rs.getInt("Id"));
+            ticket.setTicketNumber(rs.getString("TicketNumber"));
+            ticket.setTicketType(rs.getString("TicketType"));
+            ticket.setTitle(rs.getString("Title"));
+            ticket.setDescription(rs.getString("Description"));
+            ticket.setCategoryId(rs.getInt("CategoryId"));
+            ticket.setLocationId(rs.getInt("LocationId"));
+            ticket.setImpact(rs.getInt("Impact"));
+            ticket.setUrgency(rs.getInt("Urgency"));
+            ticket.setPriorityId(rs.getInt("PriorityId"));
+            ticket.setServiceCatalogId(rs.getInt("ServiceCatalogId"));
+            ticket.setRequiresApproval(rs.getBoolean("RequiresApproval"));
+            ticket.setApprovedBy(rs.getInt("ApprovedBy"));
+            ticket.setApprovedAt(rs.getDate("ApprovedAt"));
+            ticket.setStatus(rs.getString("Status"));
+            ticket.setCreatedBy(rs.getInt("CreatedBy"));
+            ticket.setAssignedTo(rs.getInt("AssignedTo"));
+            ticket.setParentTicketId(rs.getInt("ParentTicketId"));
+            ticket.setResolvedAt(rs.getDate("ResolvedAt"));
+            ticket.setClosedAt(rs.getDate("ClosedAt"));
+            ticket.setCreatedAt(rs.getDate("CreatedAt"));
+            ticket.setUpdatedAt(rs.getDate("UpdatedAt"));
+            ticket.setCurrentLevel(rs.getInt("CurrentLevel"));
+            list.add(ticket);
+           }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+    
 //    public static void main(String[] args) {
 //
 //        ProblemDao dao = new ProblemDao(); // constructor đã mở connection
@@ -385,21 +459,43 @@ public class ProblemDao extends DbContext{
 //    }
     
     
+//    public static void main(String[] args) {
+//        ProblemDao dao = new ProblemDao();
+//
+//        String keyword = "2026"; 
+//        List<Problems> result = dao.searchProblem(keyword);
+//
+//        System.out.println("Total results: " + result.size());
+//        for (Problems p : result) {
+//            System.out.println(
+//                p.getTicketNumber() + " | " +
+//                p.getTitle() + " | " +
+//                p.getStatus() + " | " +
+//                p.getCreatedByName()
+//            );
+//        }
+//    }
+    
     public static void main(String[] args) {
-        ProblemDao dao = new ProblemDao();
+    ProblemDao dao = new ProblemDao(); // hoặc DAO bạn đang dùng
 
-        String keyword = "2026"; 
-        List<Problems> result = dao.searchProblem(keyword);
+    int testProblemId = 3; // đổi ID có thật trong DB
+    List<Tickets> tickets = dao.viewRelatedTicket(testProblemId);
 
-        System.out.println("Total results: " + result.size());
-        for (Problems p : result) {
+    if (tickets.isEmpty()) {
+        System.out.println("No ticket linked with problemId = " + testProblemId);
+    } else {
+        System.out.println("✅ list Problem Linked:");
+        for (Tickets t : tickets) {
             System.out.println(
-                p.getTicketNumber() + " | " +
-                p.getTitle() + " | " +
-                p.getStatus() + " | " +
-                p.getCreatedByName()
+                "ID: " + t.getId() +
+                " | Number: " + t.getTicketNumber() +
+                " | Title: " + t.getTitle() +
+                " | Status: " + t.getStatus()
             );
         }
     }
+}
+
 
 }

@@ -7,7 +7,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import model.Notifications;
-import Utils.DbContext;
 import java.time.Year;
 import Utils.DbContext;
 

@@ -7,6 +7,7 @@ import dao.ProblemDao;
 import java.sql.Date;
 import java.util.List;
 import model.Problems;
+import model.Tickets;
 /**
  *
  * @author DELL
@@ -49,5 +50,9 @@ public class ProblemService {
             return dao.getAllProblems();
         }
         return dao.searchProblem(keyword);
+    }
+    public List<Tickets> getRelatedTicket(int Id)
+    {
+        return dao.viewRelatedTicket(Id);
     }
 }
