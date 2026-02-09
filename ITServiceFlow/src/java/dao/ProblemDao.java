@@ -346,6 +346,18 @@ public class ProblemDao extends DbContext{
         return list;
     }
     
+    public int getLatestProblemId() {
+        String sql = "SELECT TOP 1 Id FROM [dbo].[Problems] ORDER BY Id DESC";
+        try (PreparedStatement stm = connection.prepareStatement(sql);
+             ResultSet rs = stm.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("Id");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return -1;
+    }
 //    public static void main(String[] args) {
 //
 //        ProblemDao dao = new ProblemDao(); // constructor đã mở connection

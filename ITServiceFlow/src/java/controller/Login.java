@@ -98,6 +98,7 @@ public class Login extends HttpServlet {
         HttpSession session = request.getSession();
         session.setAttribute("user", user);
         session.setAttribute("role", user.getRole());
+        session.setAttribute("userId", user.getId());
         
         // Redirect theo role
         String role = user.getRole();

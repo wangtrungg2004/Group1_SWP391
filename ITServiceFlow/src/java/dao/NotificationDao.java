@@ -50,7 +50,7 @@ public class NotificationDao extends DbContext{
         return list;
     }
     
-    public boolean addNotification(int UserId, String Message, int RelatedTicketId,boolean IsRead)
+    public boolean addNotification(int UserId, String Message, Integer RelatedTicketId,boolean IsRead)
     {
         String sql = "INSERT INTO [dbo].[Notifications]\n" +
 "           ([UserId]\n" +
@@ -69,7 +69,11 @@ public class NotificationDao extends DbContext{
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setInt(1,UserId);
             stm.setString(2, Message);
-            stm.setInt(3, RelatedTicketId);
+            if (RelatedTicketId == null) {
+                stm.setNull(3, java.sql.Types.INTEGER);
+            } else {
+                stm.setInt(3, RelatedTicketId);
+            }
             stm.setBoolean(4, IsRead);
             stm.executeUpdate();
             return true;
@@ -78,6 +82,28 @@ public class NotificationDao extends DbContext{
         {
             ex.printStackTrace();
             return false;
+        }
+    }
+    
+    public static void main(String[] args) {
+        NotificationDao dao = new NotificationDao();
+
+        int userId = 1;                 // ID user có trong DB
+        String message = "Test notification from main";
+        Integer relatedTicketId = null;      // Ticket ID (có thể null nếu cho phép)
+        boolean isRead = false;
+
+        boolean result = dao.addNotification(
+                userId,
+                message,
+                relatedTicketId,
+                isRead
+        );
+
+        if (result) {
+            System.out.println("✅ Add notification SUCCESS");
+        } else {
+            System.out.println("❌ Add notification FAILED");
         }
     }
 }

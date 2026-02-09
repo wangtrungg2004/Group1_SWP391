@@ -4,6 +4,7 @@
  */
 package controller.Problems;
 
+import dao.NotificationDao;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -54,6 +55,7 @@ public class ProblemAdd extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     ProblemService problemService = new ProblemService();
+    NotificationDao notificationDao = new NotificationDao();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -110,6 +112,18 @@ public class ProblemAdd extends HttpServlet {
         );
         
         if (success) {
+            int newProblemId = problemService.getLatestProblemId();
+            if (newProblemId > 0) {
+                String message = "New problem: " + Title + " (Status: " + Status + ")";
+
+                // Gửi notification cho người được assign (nếu có)
+                if (assignedTo > 0) {
+                    notificationDao.addNotification(assignedTo, message, null, false);
+                }
+
+                // (Tùy chọn) Gửi thêm cho người tạo
+                // notificationDao.addNotification(createdBy, message, null, false);
+            }
             response.sendRedirect("ProblemList?success=Problem added successfully!");
         } else {
             request.setAttribute("error", "Failed to add problem. Please try again.");

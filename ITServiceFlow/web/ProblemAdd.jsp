@@ -1,5 +1,18 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page import="dao.NotificationDao" %>
+<%@ page import="model.Notifications" %>
+<%@ page import="java.util.List" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
+<%
+    List<Notifications> notifications = new java.util.ArrayList<>();
+    Integer userId = (Integer) session.getAttribute("userId");
+    if (userId != null) {
+        NotificationDao notificationDao = new NotificationDao();
+        notifications = notificationDao.getAllNotifications();
+    }
+    request.setAttribute("notifications", notifications);
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,16 +92,31 @@
                                 <div class="float-right"><a href="#!" class="m-r-10">mark as read</a><a href="#!">clear all</a></div>
                             </div>
                             <ul class="noti-body">
-                                <li class="n-title"><p class="m-b-0">NEW</p></li>
-                                <li class="notification">
-                                    <div class="media">
-                                        <img class="img-radius" src="assets/images/user/avatar-1.jpg" alt="">
-                                        <div class="media-body">
-                                            <p><strong>John Doe</strong><span class="n-time text-muted"><i class="icon feather icon-clock m-r-10"></i>5 min</span></p>
-                                            <p>New ticket Added</p>
-                                        </div>
-                                    </div>
-                                </li>
+                                <c:choose>
+                                    <c:when test="${empty notifications}">
+                                        <li class="notification"><p class="text-muted m-2">No notifications</p></li>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <c:forEach items="${notifications}" var="notification">
+                                            <c:if test="${notification.userId == sessionScope.userId}">
+                                                <li class="notification">
+                                                    <div class="media">
+                                                        <img class="img-radius" src="assets/images/user/avatar-1.jpg" alt="">
+                                                        <div class="media-body">
+                                                            <p>
+                                                                <span class="n-time text-muted">
+                                                                    <i class="icon feather icon-clock m-r-10"></i>
+                                                                    <fmt:formatDate value="${notification.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
+                                                                </span>
+                                                            </p>
+                                                            <p><c:out value="${notification.message}"/></p>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </c:if>
+                                        </c:forEach>
+                                    </c:otherwise>
+                                </c:choose>
                             </ul>
                             <div class="noti-footer"><a href="#!">show all</a></div>
                         </div>

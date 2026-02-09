@@ -55,4 +55,7 @@ public class ProblemService {
     {
         return dao.viewRelatedTicket(Id);
     }
+    public int getLatestProblemId() {
+        return dao.getLatestProblemId();
+    }
 }

@@ -4,6 +4,7 @@
  */
 package controller.Problems;
 
+import com.sun.nio.sctp.Notification;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -12,8 +13,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import model.Notifications;
 import model.Problems;
 import service.ProblemService;
+import service.NotificationService;
 /**
  *
  * @author DELL
@@ -57,14 +60,17 @@ public class ProblemList extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     ProblemService problemService = new ProblemService();
+    NotificationService notificationService = new NotificationService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
             String keyword = request.getParameter("keyword");
             List<Problems> problem = problemService.searchProblem(keyword != null ? keyword : "");
+            List<Notifications> notifications = notificationService.getAllNotification();
+            request.setAttribute("notifications", notifications);
             request.setAttribute("problem", problem);
             request.setAttribute("filterKeyword", keyword);  
-            request.setAttribute("problem", problem);
+//            request.setAttribute("problem", problem);
             request.getRequestDispatcher("ProblemList.jsp").forward(request, response);
     }
 
