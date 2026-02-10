@@ -62,7 +62,6 @@
     </div>
     <!-- [ Pre-loader ] End -->
     <!-- [ navigation menu ] start -->
-    <!-- [ navigation menu ] start -->
 	<nav class="pcoded-navbar menupos-fixed menu-light brand-blue ">
 		<div class="navbar-wrapper ">
 			<div class="navbar-brand header-logo">
@@ -80,38 +79,12 @@
 					<li class="nav-item">
 						<a href="AdminDashboard.jsp" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
 					</li>
-					<li class="nav-item pcoded-menu-caption">
-						<label>UI Element</label>
-					</li>
-					<li class="nav-item pcoded-hasmenu">
-						<a href="#!" class="nav-link"><span class="pcoded-micon"><i class="feather icon-box"></i></span><span class="pcoded-mtext">Componant</span></a>
-						<ul class="pcoded-submenu">
-							<li class=""><a href="bc_button.html" class="">Button</a></li>
-							<li class=""><a href="bc_badges.html" class="">Badges</a></li>
-							<li class=""><a href="bc_breadcrumb-pagination.html" class="">Breadcrumb & paggination</a></li>
-							<li class=""><a href="bc_collapse.html" class="">Collapse</a></li>
-							<li class=""><a href="bc_progress.html" class="">Progress</a></li>
-							<li class=""><a href="bc_tabs.html" class="">Tabs & pills</a></li>
-							<li class=""><a href="bc_typography.html" class="">Typography</a></li>
-						</ul>
-					</li>
+					
 					<li class="nav-item pcoded-menu-caption">
 						<label>Forms &amp; table</label>
 					</li>
 					<li class="nav-item">
 						<a href="ProblemList" class="nav-link"><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Problem List</span></a>
-					</li>
-					<li class="nav-item">
-						<a href="tbl_bootstrap.html" class="nav-link"><span class="pcoded-micon"><i class="feather icon-align-justify"></i></span><span class="pcoded-mtext">Bootstrap table</span></a>
-					</li>
-					<li class="nav-item pcoded-menu-caption">
-						<label>Chart & Maps</label>
-					</li>
-					<li class="nav-item">
-						<a href="chart-morris.html" class="nav-link"><span class="pcoded-micon"><i class="feather icon-pie-chart"></i></span><span class="pcoded-mtext">Chart</span></a>
-					</li>
-					<li class="nav-item">
-						<a href="map-google.html" class="nav-link"><span class="pcoded-micon"><i class="feather icon-map"></i></span><span class="pcoded-mtext">Maps</span></a>
 					</li>
 					<!-- Menu chỉ dành cho Admin -->
 					<c:if test="${role == 'Admin'}">
@@ -145,24 +118,11 @@
 							<a href="Tickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-help-circle"></i></span><span class="pcoded-mtext">Quản lý Ticket</span></a>
 						</li>
 					</c:if>
-					
-					<li class="nav-item pcoded-menu-caption">
-						<label>Pages</label>
-					</li>
-					<li class="nav-item pcoded-hasmenu">
-						<a href="#!" class="nav-link"><span class="pcoded-micon"><i class="feather icon-lock"></i></span><span class="pcoded-mtext">Authentication</span></a>
-						<ul class="pcoded-submenu">
-							<li class=""><a href="auth-signup.html" class="" target="_blank">Sign up</a></li>
-							<li class=""><a href="auth-signin.html" class="" target="_blank">Sign in</a></li>
-						</ul>
-					</li>
-					<li class="nav-item"><a href="sample-page.html" class="nav-link"><span class="pcoded-micon"><i class="feather icon-sidebar"></i></span><span class="pcoded-mtext">Sample page</span></a></li>
-					<li class="nav-item disabled"><a href="#!" class="nav-link"><span class="pcoded-micon"><i class="feather icon-power"></i></span><span class="pcoded-mtext">Disabled menu</span></a></li>
 				</ul>
 			</div>
 		</div>
 	</nav>
-    <!-- [ navigation menu ] end -->
+	<!-- [ navigation menu ] end -->
 
     <!-- [ Header ] start -->
     <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed">
@@ -295,7 +255,7 @@
                                         <div class="card-header d-flex justify-content-between align-items-center">
                                             <h5 class="m-0">Problem List</h5>
                                             <a href="ProblemAdd" class="btn btn-primary">
-                                                <i class="feather icon-plus"></i> Add
+                                                <i class="feather icon-plus"></i> Add New Problem
                                             </a>
                                         </div>
                                         <div class="card-body table-border-style">
@@ -377,145 +337,6 @@
 
                                     </div>
                                     <!-- Input group -->
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h5>Input Group</h5>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="input-group mb-3">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text" id="basic-addon1">@</span>
-                                                </div>
-                                                <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
-                                            </div>
-                                            <div class="input-group mb-3">
-                                                <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text" id="basic-addon2">@example.com</span>
-                                                </div>
-                                            </div>
-                                            <label for="basic-url">Your vanity URL</label>
-                                            <div class="input-group mb-3">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text" id="basic-addon3">https://example.com/users/</span>
-                                                </div>
-                                                <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3">
-                                            </div>
-                                            <div class="input-group mb-3">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text">$</span>
-                                                </div>
-                                                <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text">.00</span>
-                                                </div>
-                                            </div>
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text">With textarea</span>
-                                                </div>
-                                                <textarea class="form-control" aria-label="With textarea"></textarea>
-                                            </div>
-                                            <h5 class="mt-5">Button Addons</h5>
-                                            <hr>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="input-group mb-3">
-                                                        <div class="input-group-prepend">
-                                                            <button class="btn btn-primary" type="button">Button</button>
-                                                        </div>
-                                                        <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1">
-                                                    </div>
-                                                    <div class="input-group mb-3">
-                                                        <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
-                                                        <div class="input-group-append">
-                                                            <button class="btn btn-primary" type="button">Button</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="input-group mb-3">
-                                                        <div class="input-group-prepend">
-                                                            <button class="btn btn-primary" type="button">Button</button>
-                                                            <button class="btn btn-secondary" type="button">Button</button>
-                                                        </div>
-                                                        <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1">
-                                                    </div>
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
-                                                        <div class="input-group-append">
-                                                            <button class="btn btn-secondary" type="button">Button</button>
-                                                            <button class="btn btn-primary" type="button">Button</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <h5 class="mt-5">Buttons With Dropdowns</h5>
-                                                    <hr>
-                                                    <div class="input-group mb-3">
-                                                        <div class="input-group-prepend">
-                                                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</button>
-                                                            <div class="dropdown-menu">
-                                                                <a class="dropdown-item" href="#!">Action</a>
-                                                                <a class="dropdown-item" href="#!">Another action</a>
-                                                                <a class="dropdown-item" href="#!">Something else here</a>
-                                                                <div role="separator" class="dropdown-divider"></div>
-                                                                <a class="dropdown-item" href="#!">Separated link</a>
-                                                            </div>
-                                                        </div>
-                                                        <input type="text" class="form-control" aria-label="Text input with dropdown button">
-                                                    </div>
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control" aria-label="Text input with dropdown button">
-                                                        <div class="input-group-append">
-                                                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</button>
-                                                            <div class="dropdown-menu">
-                                                                <a class="dropdown-item" href="#!">Action</a>
-                                                                <a class="dropdown-item" href="#!">Another action</a>
-                                                                <a class="dropdown-item" href="#!">Something else here</a>
-                                                                <div role="separator" class="dropdown-divider"></div>
-                                                                <a class="dropdown-item" href="#!">Separated link</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <h5 class="mt-5">Segmented Buttons</h5>
-                                                    <hr>
-                                                    <div class="input-group mb-3">
-                                                        <div class="input-group-prepend">
-                                                            <button type="button" class="btn btn-secondary">Action</button>
-                                                            <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Toggle
-                                                                    Dropdown</span></button>
-                                                            <div class="dropdown-menu">
-                                                                <a class="dropdown-item" href="#!">Action</a>
-                                                                <a class="dropdown-item" href="#!">Another action</a>
-                                                                <a class="dropdown-item" href="#!">Something else here</a>
-                                                                <div role="separator" class="dropdown-divider"></div>
-                                                                <a class="dropdown-item" href="#!">Separated link</a>
-                                                            </div>
-                                                        </div>
-                                                        <input type="text" class="form-control" aria-label="Text input with segmented dropdown button">
-                                                    </div>
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control" aria-label="Text input with segmented dropdown button">
-                                                        <div class="input-group-append">
-                                                            <button type="button" class="btn btn-secondary">Action</button>
-                                                            <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Toggle
-                                                                    Dropdown</span></button>
-                                                            <div class="dropdown-menu">
-                                                                <a class="dropdown-item" href="#!">Action</a>
-                                                                <a class="dropdown-item" href="#!">Another action</a>
-                                                                <a class="dropdown-item" href="#!">Something else here</a>
-                                                                <div role="separator" class="dropdown-divider"></div>
-                                                                <a class="dropdown-item" href="#!">Separated link</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                                 <!-- [ form-element ] end -->
                                 <!-- [ Main Content ] end -->

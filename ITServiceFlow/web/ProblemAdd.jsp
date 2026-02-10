@@ -213,8 +213,17 @@
                                             <!-- Assigned To -->
                                             <div class="form-group">
                                                 <label><strong>Assigned To</strong></label>
-                                                <input type="number" name="AssignedTo" class="form-control"
-                                                       placeholder="Enter user ID">
+                                                <select name="AssignedTo" class="form-control">
+                                                    <option value="">-- Select assignee --</option>
+                                                    <c:forEach items="${assignees}" var="u">
+                                                        <%-- Nếu muốn lọc theo role, ví dụ chỉ IT Support: --%>
+                                                        <%-- <c:if test="${u.role == 'IT Support'}"> --%>
+                                                            <option value="${u.id}">
+                                                                ${u.fullName} (${u.username})
+                                                            </option>
+                                                        <%-- </c:if> --%>
+                                                    </c:forEach>
+                                                </select>
                                             </div>
 
                                             <!-- Description -->

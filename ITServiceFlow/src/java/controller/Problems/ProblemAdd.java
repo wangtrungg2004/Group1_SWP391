@@ -12,7 +12,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
 import service.ProblemService;
+import model.Users;
+import service.UserService;
 /**
  *
  * @author DELL
@@ -56,9 +59,12 @@ public class ProblemAdd extends HttpServlet {
      */
     ProblemService problemService = new ProblemService();
     NotificationDao notificationDao = new NotificationDao();
+    UserService userService = new UserService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        List<Users> assignees = userService.getAllUser();
+        request.setAttribute("assignees",assignees);
         request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
     }
 

@@ -80,6 +80,7 @@
 					<li class="nav-item">
 						<a href="AdminDashboard.jsp" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
 					</li>
+					
 					<li class="nav-item pcoded-menu-caption">
 						<label>Forms &amp; table</label>
 					</li>
@@ -122,7 +123,7 @@
 			</div>
 		</div>
 	</nav>
-    <!-- [ navigation menu ] end -->
+	<!-- [ navigation menu ] end -->
 
     <!-- [ Header ] start -->
     <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed">
