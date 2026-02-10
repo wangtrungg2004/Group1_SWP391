@@ -19,8 +19,10 @@ public class Problems {
     private int CreatedBy;
     private String CreatedByName;
     private int AssignedTo;
-    
-    public Problems(int Id, String TicketNumber, String Title, String Description, String RootCause, String Workaround, String Status, int CreatedBy, String CreatedByName, int AssignedTo, Date CreatedAt) {
+    private String AssignedToName;
+    private Date CreatedAt;
+
+    public Problems(int Id, String TicketNumber, String Title, String Description, String RootCause, String Workaround, String Status, int CreatedBy, String CreatedByName, int AssignedTo, String AssignedToName, Date CreatedAt) {
         this.Id = Id;
         this.TicketNumber = TicketNumber;
         this.Title = Title;
@@ -31,13 +33,21 @@ public class Problems {
         this.CreatedBy = CreatedBy;
         this.CreatedByName = CreatedByName;
         this.AssignedTo = AssignedTo;
+        this.AssignedToName = AssignedToName;
         this.CreatedAt = CreatedAt;
     }
-    private Date CreatedAt;
 
     public Problems() {
     }
 
+    public String getAssignedToName() {
+        return AssignedToName;
+    }
+
+    public void setAssignedToName(String AssignedToName) {
+        this.AssignedToName = AssignedToName;
+    }
+    
     public int getAssignedTo() {
         return AssignedTo;
     }

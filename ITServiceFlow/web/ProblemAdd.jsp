@@ -217,11 +217,11 @@
                                                     <option value="">-- Select assignee --</option>
                                                     <c:forEach items="${assignees}" var="u">
                                                         <%-- Nếu muốn lọc theo role, ví dụ chỉ IT Support: --%>
-                                                        <%-- <c:if test="${u.role == 'IT Support'}"> --%>
+                                                         <c:if test="${u.role == 'IT Support'}"> 
                                                             <option value="${u.id}">
                                                                 ${u.fullName} (${u.username})
                                                             </option>
-                                                        <%-- </c:if> --%>
+                                                         </c:if> 
                                                     </c:forEach>
                                                 </select>
                                             </div>

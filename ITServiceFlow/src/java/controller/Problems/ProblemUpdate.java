@@ -11,8 +11,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 import model.Problems;
+import model.Users;
 import service.ProblemService;
+import service.UserService;
 /**
  *
  * @author DELL
@@ -56,6 +59,7 @@ public class ProblemUpdate extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     ProblemService problemService = new ProblemService();
+    UserService userService = new UserService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -66,6 +70,8 @@ public class ProblemUpdate extends HttpServlet {
         try {
             int id = Integer.parseInt(ProblemId);
             Problems pro = problemService.getProblemById(id);
+            List<Users> assignees = userService.getAllUser();
+            request.setAttribute("assignees", assignees);
             request.setAttribute("problem", pro);
             request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
         } 

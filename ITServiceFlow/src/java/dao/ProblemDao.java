@@ -71,11 +71,13 @@ public class ProblemDao extends DbContext{
                                p.[Workaround],
                                p.[Status],
                                p.[CreatedBy],
-                               u.[FullName] AS CreatedByName,
+                               u1.[FullName] AS CreatedByName,
                                p.[AssignedTo],
+                               u2.[FullName] AS AssignedToName,
                                p.[CreatedAt]
                         FROM [dbo].[Problems] p
-                        LEFT JOIN [dbo].[Users] u ON p.CreatedBy = u.Id
+                        LEFT JOIN [dbo].[Users] u1 ON p.CreatedBy = u1.Id
+                        LEFT JOIN Users u2 ON p.AssignedTo = u2.Id
                         WHERE p.Id = ?
                     """;
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
@@ -95,6 +97,7 @@ public class ProblemDao extends DbContext{
                     p.setCreatedByName(rs.getString("CreatedByName"));
                     p.setAssignedTo(rs.getInt("AssignedTo"));
                     p.setCreatedAt(rs.getDate("CreatedAt"));
+                    p.setAssignedToName(rs.getString("AssignedToName"));
                     return p;
                 }
             }

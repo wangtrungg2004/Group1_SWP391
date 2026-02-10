@@ -336,7 +336,11 @@
                                                                     </tr>
                                                                     <tr>
                                                                         <th>Assigned To</th>
-                                                                        <td>${problem.assignedTo != null && problem.assignedTo > 0 ? problem.assignedTo : 'Not Assigned'}</td>
+                                                                        <td>
+                                                                            ${problem.assignedTo > 0 
+                                                                                ? (problem.assignedToName != null ? problem.assignedToName : problem.assignedTo)
+                                                                                : 'Not Assigned'}
+                                                                        </td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th>Created At</th>

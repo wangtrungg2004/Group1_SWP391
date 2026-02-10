@@ -332,14 +332,19 @@
                                                                     </select>
                                                                 </div>
                                                             </div>
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label for="AssignedTo"><strong>Assigned To</strong></label>
-                                                                    <input type="number" class="form-control" id="AssignedTo"
-                                                                           name="AssignedTo" value="${problem.assignedTo}"
-                                                                           placeholder="Enter user ID">
-                                                                    <small class="form-text text-muted">Enter the user ID who will handle this problem</small>
-                                                                </div>
+                                                            <div class="form-group">
+                                                                <label for="AssignedTo"><strong>Assigned To</strong></label>
+                                                                <select id="AssignedTo" name="AssignedTo" class="form-control">
+                                                                    <option value="">-- Select assignee --</option>
+                                                                    <c:forEach items="${assignees}" var="u">
+                                                                        <option value="${u.id}" ${u.id == problem.assignedTo ? 'selected' : ''}>
+                                                                            ${u.fullName} (${u.username})
+                                                                        </option>
+                                                                    </c:forEach>
+                                                                </select>
+                                                                <small class="form-text text-muted">
+                                                                    Select the user who will handle this problem
+                                                                </small>
                                                             </div>
                                                         </div>
 
