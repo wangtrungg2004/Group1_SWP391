@@ -77,7 +77,7 @@
 	<nav class="pcoded-navbar menupos-fixed menu-light brand-blue ">
 		<div class="navbar-wrapper ">
 			<div class="navbar-brand header-logo">
-				<a href="AdminDashboard.jsp" class="b-brand">
+				<a href="ManagerDashboard.jsp" class="b-brand">
 <!--					<img src="assets/images/logo.svg" alt="" class="logo images">
 					<img src="assets/images/logo-icon.svg" alt="" class="logo-thumb images">-->
 				</a>

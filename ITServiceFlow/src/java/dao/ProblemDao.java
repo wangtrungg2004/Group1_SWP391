@@ -77,7 +77,7 @@ public class ProblemDao extends DbContext{
                                p.[CreatedAt]
                         FROM [dbo].[Problems] p
                         LEFT JOIN [dbo].[Users] u1 ON p.CreatedBy = u1.Id
-                        LEFT JOIN Users u2 ON p.AssignedTo = u2.Id
+                        LEFT JOIN [dbo].[Users] u2 ON p.AssignedTo = u2.Id
                         WHERE p.Id = ?
                     """;
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
@@ -126,7 +126,11 @@ public class ProblemDao extends DbContext{
             stm.setString(4, p.getRootCause());
             stm.setString(5, p.getWorkaround());
             stm.setString(6, p.getStatus());
-            stm.setInt(7, p.getAssignedTo());
+            if (p.getAssignedTo() > 0) {
+                stm.setInt(7, p.getAssignedTo());
+            } else {
+                stm.setNull(7, java.sql.Types.INTEGER);
+            }
             stm.setInt(8, p.getId());
 
             return stm.executeUpdate() > 0;
@@ -167,12 +171,16 @@ public class ProblemDao extends DbContext{
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setString(1, TicketNumber);
             stm.setString(2, Title);
-            stm.setString(3,Description);
+            stm.setString(3, Description);
             stm.setString(4, RootCause);
             stm.setString(5, WalkAround);
             stm.setString(6, Status);
             stm.setInt(7, CreatedBy);
-            stm.setInt(8, AssignedTo);
+            if (AssignedTo > 0) {
+                stm.setInt(8, AssignedTo);
+            } else {
+                stm.setNull(8, java.sql.Types.INTEGER);
+            }
 //            stm.setDate(9, CreatedAt);
             stm.executeUpdate();
             return true;

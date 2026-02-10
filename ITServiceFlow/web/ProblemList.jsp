@@ -205,7 +205,7 @@
                             <div class="pro-head">
                                 <img src="assets/images/user/avatar-1.jpg" class="img-radius" alt="User-Profile-Image">
                                 <span>John Doe</span>
-                                <a href="auth-signin.html" class="dud-logout" title="Logout">
+                                <a href="Logout" class="dud-logout" title="Logout">
                                     <i class="feather icon-log-out"></i>
                                 </a>
                             </div>
@@ -213,7 +213,7 @@
                                 <li><a href="#!" class="dropdown-item"><i class="feather icon-settings"></i> Settings</a></li>
                                 <li><a href="#!" class="dropdown-item"><i class="feather icon-user"></i> Profile</a></li>
                                 <li><a href="message.html" class="dropdown-item"><i class="feather icon-mail"></i> My Messages</a></li>
-                                <li><a href="auth-signin.html" class="dropdown-item"><i class="feather icon-lock"></i> Lock Screen</a></li>
+                                <li><a href="Logout" class="dropdown-item"><i class="feather icon-lock"></i> Lock Screen</a></li>
                             </ul>
                         </div>
                     </div>

@@ -209,7 +209,7 @@
                             <div class="pro-head">
                                 <img src="assets/images/user/avatar-1.jpg" class="img-radius" alt="User-Profile-Image">
                                 <span>John Doe</span>
-                                <a href="auth-signin.html" class="dud-logout" title="Logout">
+                                <a href="Logout" class="dud-logout" title="Logout">
                                     <i class="feather icon-log-out"></i>
                                 </a>
                             </div>
@@ -217,7 +217,7 @@
                                 <li><a href="#!" class="dropdown-item"><i class="feather icon-settings"></i> Settings</a></li>
                                 <li><a href="#!" class="dropdown-item"><i class="feather icon-user"></i> Profile</a></li>
                                 <li><a href="message.html" class="dropdown-item"><i class="feather icon-mail"></i> My Messages</a></li>
-                                <li><a href="auth-signin.html" class="dropdown-item"><i class="feather icon-lock"></i> Lock Screen</a></li>
+                                <li><a href="Logout" class="dropdown-item"><i class="feather icon-lock"></i> Lock Screen</a></li>
                             </ul>
                         </div>
                     </div>
@@ -271,15 +271,16 @@
                                                     <a href="ProblemList" class="btn btn-primary">Back to Problem List</a>
                                                 </div>
                                             </c:if>
-                                            <c:choose>
-                                                <c:when test="${empty problem && empty error}">
-                                                    <div class="alert alert-warning">
-                                                        <h4>Problem not found</h4>
-                                                        <p>The problem you are looking for does not exist or has been deleted.</p>
-                                                        <a href="ProblemList" class="btn btn-primary">Back to Problem List</a>
-                                                    </div>
-                                                </c:when>
-                                                <c:otherwise>
+                                            <c:if test="${empty error}">
+                                                <c:choose>
+                                                    <c:when test="${empty problem}">
+                                                        <div class="alert alert-warning">
+                                                            <h4>Problem not found</h4>
+                                                            <p>The problem you are looking for does not exist or has been deleted.</p>
+                                                            <a href="ProblemList" class="btn btn-primary">Back to Problem List</a>
+                                                        </div>
+                                                    </c:when>
+                                                    <c:otherwise>
                                                     <div class="row">
                                                         <!-- Cột trái: Problem Details -->
                                                         <div class="col-md-7 col-lg-8 pr-lg-3" style="min-width: 0;">
@@ -419,8 +420,9 @@
                                                             </div>
 
                                                     </div>
-                                                </c:otherwise>
-                                            </c:choose>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </c:if>
                                         </div>
                                     </div>
                                 </div>

@@ -13,9 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import model.Problems;
-import model.Users;
 import service.ProblemService;
-import service.UserService;
 /**
  *
  * @author DELL
@@ -59,26 +57,31 @@ public class ProblemUpdate extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     ProblemService problemService = new ProblemService();
-    UserService userService = new UserService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String ProblemId = request.getParameter("Id");
-        if (ProblemId == null || ProblemId.trim().isEmpty()) {
-            ProblemId = request.getParameter("id");
+        if(ProblemId == null || ProblemId.trim().isEmpty())
+        {
+            request.setAttribute("error", "Problem ID is required");
+            request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
+            return;
         }
-        try {
+        try
+        {
             int id = Integer.parseInt(ProblemId);
             Problems pro = problemService.getProblemById(id);
-            List<Users> assignees = userService.getAllUser();
-            request.setAttribute("assignees", assignees);
+            if (pro == null) {
+                request.setAttribute("error", "Problem not found with ID: " + id);
+                request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
+                return;
+            }
             request.setAttribute("problem", pro);
             request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
-        } 
-        catch(Exception ex) {
+        }
+        catch(Exception ex)
+        {
             ex.printStackTrace();
-            request.setAttribute("error", "Error loading problem: " + ex.getMessage());
-            request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
         }
     }
 
@@ -93,31 +96,45 @@ public class ProblemUpdate extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+//        String ProblemId = request.getParameter("Id");
+//        String TicketNumber = request.getParameter("TicketNumber");
+//        String Title = request.getParameter("Title");
+//        String Description = request.getParameter("Description");
+//        String rootCause = request.getParameter("RootCause");
+//        String workaround = request.getParameter("Workaround");
+//        String status = request.getParameter("Status");
+//        String assignedToStr = request.getParameter("AssignedTo");
+//        
+        
+        
         try {
             int id = Integer.parseInt(request.getParameter("Id"));
 
-            Problems pro = problemService.getProblemById(id);
+        Problems pro = problemService.getProblemById(id);
 
             pro.setTitle(request.getParameter("Title"));
             pro.setDescription(request.getParameter("Description"));
             pro.setRootCause(request.getParameter("RootCause"));
             pro.setWorkaround(request.getParameter("Workaround"));
             pro.setStatus(request.getParameter("Status"));
+            
+        String assignedToStr = request.getParameter("AssignedTo");
+        if (assignedToStr != null && !assignedToStr.isEmpty()) {
+            pro.setAssignedTo(Integer.parseInt(assignedToStr));
+        }
 
-            String assignedTo = request.getParameter("AssignedTo");
-            if (assignedTo != null && !assignedTo.isEmpty()) {
-                pro.setAssignedTo(Integer.parseInt(assignedTo));
-            }
+        boolean success = problemService.updateProblem(pro);
 
-            problemService.updateProblem(pro);
-
+        if (success) {
             response.sendRedirect("ProblemDetail?Id=" + id);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else {
             request.setAttribute("error", "Update failed");
+            request.setAttribute("problem", pro);
             request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
-        }    
+        }
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid UserId format");
+        }
     }
 
     /**
