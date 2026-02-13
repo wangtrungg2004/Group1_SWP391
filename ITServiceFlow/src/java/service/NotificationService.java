@@ -20,4 +20,8 @@ public class NotificationService {
     {
         return dao.getAllNotifications();
     }
+    public List<Notifications> getAllUserNotification(int id)
+    {
+        return dao.getNotificationsByUserId(id);
+    }
 }

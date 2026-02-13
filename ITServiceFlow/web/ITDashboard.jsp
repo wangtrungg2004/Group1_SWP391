@@ -6,22 +6,45 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ page import="java.util.List" %>
+<%@ page import="model.Notifications" %>
+<%@ page import="dao.NotificationDao" %>
 <%
-    // Kiểm tra đăng nhập
+    // 1. Kiểm tra đăng nhập
     if (session.getAttribute("user") == null) {
         response.sendRedirect("Login.jsp");
         return;
     }
-    
-    // Kiểm tra quyền truy cập
+
+    // 2. Lấy thông tin từ session
+    model.Users user = (model.Users) session.getAttribute("user");
+    Integer userId = (Integer) session.getAttribute("userId");
     String role = (String) session.getAttribute("role");
+
+    // 3. Kiểm tra quyền truy cập (chỉ IT Support được vào)
     if (role == null || !role.equals("IT Support")) {
         response.sendRedirect("Login.jsp");
         return;
     }
-    
-    model.Users user = (model.Users) session.getAttribute("user");
+
+    // 4. Load notifications (nếu chưa có)
+    if (request.getAttribute("notifications") == null && userId != null) {
+        dao.NotificationDao notificationDao = new dao.NotificationDao();
+        List<Notifications> notifications;
+
+        // Admin & Manager: xem tất cả
+        if ("Admin".equals(role) || "Manager".equals(role)) {
+            notifications = notificationDao.getAllNotifications();
+        } 
+        // Các role khác: chỉ xem của mình
+        else {
+            notifications = notificationDao.getNotificationsByUserId(userId);
+        }
+
+        request.setAttribute("notifications", notifications);
+    }
 %>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -54,88 +77,9 @@
         </div>
     </div>
     <!-- [ Pre-loader ] End -->
-
+    <jsp:include page="includes/sidebar.jsp"/>
+    <jsp:include page="includes/header.jsp"/>
     <!-- [ navigation menu ] start -->
-    <nav class="pcoded-navbar menupos-fixed menu-light brand-blue ">
-        <div class="navbar-wrapper ">
-            <div class="navbar-brand header-logo">
-                <a href="ITDashboard.jsp" class="b-brand">
-                    <img src="assets/images/logo.svg" alt="" class="logo images">
-                    <img src="assets/images/logo-icon.svg" alt="" class="logo-thumb images">
-                </a>
-                <a class="mobile-menu" id="mobile-collapse" href="#!"><span></span></a>
-            </div>
-            <div class="navbar-content scroll-div">
-                <ul class="nav pcoded-inner-navbar">
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>Navigation</label>
-                    </li>
-                    <li class="nav-item">
-                        <a href="ITDashboard.jsp" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
-                    </li>
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>Hỗ trợ</label>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Tickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-help-circle"></i></span><span class="pcoded-mtext">Quản lý Tickets</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="AssignedTickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-user-check"></i></span><span class="pcoded-mtext">Tickets được giao</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="PendingTickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-clock"></i></span><span class="pcoded-mtext">Tickets đang chờ</span></a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    <!-- [ navigation menu ] end -->
-
-    <!-- [ Header ] start -->
-    <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed">
-        <div class="m-header">
-            <a class="mobile-menu" id="mobile-collapse1" href="#!"><span></span></a>
-            <a href="#!" class="b-brand">
-                <div class="b-bg">
-                    <i class="feather icon-trending-up"></i>
-                </div>
-                <span class="b-title">ITServiceFlow</span>
-            </a>
-        </div>
-        <a class="mobile-menu" id="mobile-header" href="#!">
-            <i class="feather icon-more-horizontal"></i>
-        </a>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav mr-auto">
-                <li><a href="#!" class="full-screen" onclick="javascript:toggleFullScreen()"><i class="feather icon-maximize"></i></a></li>
-            </ul>
-            <ul class="navbar-nav ml-auto">
-                <li>
-                    <div class="dropdown drp-user">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <i class="icon feather icon-settings"></i>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right profile-notification">
-                            <div class="pro-head">
-                                <img src="assets/images/user/avatar-1.jpg" class="img-radius" alt="User-Profile-Image">
-                                <span><%= user != null ? user.getFullName() : "IT Support" %></span>
-                                <span style="display: block; font-size: 11px; color: #999;"><%= role != null ? role : "" %></span>
-                                <a href="Logout" class="dud-logout" title="Logout">
-                                    <i class="feather icon-log-out"></i>
-                                </a>
-                            </div>
-                            <ul class="pro-body">
-                                <li><a href="ITProfile" class="dropdown-item"><i class="feather icon-user"></i> Profile</a></li>
-                                <li><a href="Logout" class="dropdown-item"><i class="feather icon-log-out"></i> Logout</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </header>
-    <!-- [ Header ] end -->
-
     <!-- [ Main Content ] start -->
     <div class="pcoded-main-container">
         <div class="pcoded-wrapper">

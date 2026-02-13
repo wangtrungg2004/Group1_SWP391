@@ -12,6 +12,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import model.Notifications;
 import model.Problems;
@@ -66,7 +67,21 @@ public class ProblemList extends HttpServlet {
             throws ServletException, IOException {
             String keyword = request.getParameter("keyword");
             List<Problems> problem = problemService.searchProblem(keyword != null ? keyword : "");
-            List<Notifications> notifications = notificationService.getAllNotification();
+            HttpSession session = request.getSession();
+            String role = (String) session.getAttribute("role");
+            Integer userId = (Integer) session.getAttribute("userId");
+
+            List<Notifications> notifications = new java.util.ArrayList<>();
+
+            if (role != null && userId != null) {
+                if ("Admin".equals(role) || "Manager".equals(role)) {
+                    notifications = notificationService.getAllNotification();
+                } 
+                else {
+                    notifications = notificationService.getAllUserNotification(userId);
+                }
+            }
+
             request.setAttribute("notifications", notifications);
             request.setAttribute("problem", problem);
             request.setAttribute("filterKeyword", keyword);  
