@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 import model.Notifications;
 import model.Problems;
@@ -65,28 +66,63 @@ public class ProblemList extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-            String keyword = request.getParameter("keyword");
-            List<Problems> problem = problemService.searchProblem(keyword != null ? keyword : "");
-            HttpSession session = request.getSession();
-            String role = (String) session.getAttribute("role");
-            Integer userId = (Integer) session.getAttribute("userId");
+        
+        String keyword = request.getParameter("keyword");
+        if (keyword == null) {
+            keyword = "";
+        }
 
-            List<Notifications> notifications = new java.util.ArrayList<>();
+        HttpSession session = request.getSession();
+        String role = (String) session.getAttribute("role");
+        Integer userId = (Integer) session.getAttribute("userId");
 
-            if (role != null && userId != null) {
-                if ("Admin".equals(role) || "Manager".equals(role)) {
-                    notifications = notificationService.getAllNotification();
-                } 
-                else {
-                    notifications = notificationService.getAllUserNotification(userId);
-                }
+        List<Notifications> notifications = new ArrayList<>();
+        if (role != null && userId != null) {
+            if ("Admin".equals(role) || "Manager".equals(role)) {
+                notifications = notificationService.getAllNotification();
+            } else {
+                notifications = notificationService.getAllUserNotification(userId);
             }
+        }
 
-            request.setAttribute("notifications", notifications);
-            request.setAttribute("problem", problem);
-            request.setAttribute("filterKeyword", keyword);  
-//            request.setAttribute("problem", problem);
-            request.getRequestDispatcher("ProblemList.jsp").forward(request, response);
+        int page = 1;
+        int pageSize = 2;
+        String pageParam = request.getParameter("page");
+
+        try {
+            if (pageParam != null && !pageParam.isEmpty()) {
+                page = Integer.parseInt(pageParam);
+            }
+            if (page < 1) page = 1;
+        } catch (NumberFormatException e) {
+            page = 1;
+        }
+
+        List<Problems> problems;
+        int totalRecords;
+        int totalPages;
+
+        if (!keyword.isEmpty()) {
+            problems = problemService.searchProblem(keyword);
+            totalRecords = problems.size();
+            totalPages = 1;
+            page = 1;
+        } else {
+            problems = problemService.getProblemsWithPages(page, pageSize);
+            totalRecords = problemService.getTotalProblem();
+            totalPages = (totalRecords + pageSize - 1) / pageSize;
+            if (totalPages < 1) totalPages = 1;
+        }
+
+        request.setAttribute("problem", problems);
+        request.setAttribute("notifications", notifications);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalRecords", totalRecords);
+        request.setAttribute("pageSize", pageSize);
+        request.setAttribute("filterKeyword", keyword);
+
+        request.getRequestDispatcher("ProblemList.jsp").forward(request, response);
     }
 
     /**

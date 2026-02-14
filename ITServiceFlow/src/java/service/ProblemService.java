@@ -58,4 +58,11 @@ public class ProblemService {
     public int getLatestProblemId() {
         return dao.getLatestProblemId();
     }
+    
+    public List<Problems> getProblemsWithPages(int page, int pageSize) {
+        return dao.getProblemsWithPages(page, pageSize);
+    }
+    public int getTotalProblem() {
+        return dao.getTotalProblem();
+    }
 }

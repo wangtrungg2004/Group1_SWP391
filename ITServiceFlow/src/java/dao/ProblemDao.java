@@ -60,6 +60,56 @@ public class ProblemDao extends DbContext{
         return list;
     }
     
+    public List<Problems> getProblemsWithPages(int page, int pageSize) {
+        List<Problems> list = new ArrayList<>();
+        try {
+            String sql = "SELECT p.Id, p.TicketNumber, p.Title, p.Description, "
+                      + "p.RootCause, p.Workaround, p.Status, p.CreatedBy, "
+                      + "u.FullName AS CreatedByName, p.AssignedTo, p.CreatedAt "
+                      + "FROM dbo.Problems p "
+                      + "LEFT JOIN dbo.Users u ON p.CreatedBy = u.Id "
+                      + "ORDER BY p.Id "
+                      + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            int offset = (page - 1) * pageSize;
+            stm.setInt(1, offset);
+            stm.setInt(2, pageSize);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Problems pro = new Problems();
+                pro.setId(rs.getInt("Id"));
+                pro.setTicketNumber(rs.getString("TicketNumber"));
+                pro.setTitle(rs.getString("Title"));
+                pro.setDescription(rs.getString("Description"));
+                pro.setRootCause(rs.getString("RootCause"));
+                pro.setWorkaround(rs.getString("Workaround"));
+                pro.setStatus(rs.getString("Status"));
+                pro.setCreatedBy(rs.getInt("CreatedBy"));
+                pro.setCreatedByName(rs.getString("CreatedByName"));
+                pro.setAssignedTo(rs.getInt("AssignedTo"));
+                pro.setCreatedAt(rs.getDate("CreatedAt"));
+                list.add(pro);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+
+    public int getTotalProblem() {
+        String sql = "SELECT COUNT(Id) FROM dbo.Problems";
+        try {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return 0;
+    }
+    
     public Problems getProblemById(int ProblemId)
     {
         String sql = """
