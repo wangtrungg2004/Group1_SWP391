@@ -62,7 +62,18 @@ public class ProblemService {
     public List<Problems> getProblemsWithPages(int page, int pageSize) {
         return dao.getProblemsWithPages(page, pageSize);
     }
+    
     public int getTotalProblem() {
         return dao.getTotalProblem();
+    }
+    
+    public List<Problems> getAssignProblemWithPage(int id, int page, int pageSize)
+    {
+        return dao.getAssignProblems(id, page, pageSize);
+    }
+    
+    public int getTotalAssignProblem(int id)
+    {
+        return dao.getTotalAssignProblems(id);
     }
 }

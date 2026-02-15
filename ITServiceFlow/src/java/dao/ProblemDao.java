@@ -419,6 +419,68 @@ public class ProblemDao extends DbContext{
         }
         return -1;
     }
+    
+    public List<Problems> getAssignProblems(int userId, int page, int pageSize)
+    {
+        List<Problems> list = new ArrayList<>();
+        String sql = "SELECT p.Id, p.TicketNumber, p.Title, p.Description,\n" +
+"               p.RootCause, p.Workaround, p.Status, p.CreatedBy,\n" +
+"               u.FullName AS CreatedByName, p.AssignedTo, p.CreatedAt\n" +
+"        FROM dbo.Problems p\n" +
+"        LEFT JOIN dbo.Users u ON p.CreatedBy = u.Id\n" +
+"        WHERE p.AssignedTo = ?\n" +
+"        ORDER BY p.CreatedAt DESC\n" +
+"        OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        
+        try
+        {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            int offset = (page - 1) * pageSize;
+
+            stm.setInt(1, userId);
+            stm.setInt(2, offset);
+            stm.setInt(3, pageSize);
+            ResultSet rs = stm.executeQuery();
+            while(rs.next())
+            {
+                            Problems pro = new Problems();
+            pro.setId(rs.getInt("Id"));
+            pro.setTicketNumber(rs.getString("TicketNumber"));
+            pro.setTitle(rs.getString("Title"));
+            pro.setDescription(rs.getString("Description"));
+            pro.setRootCause(rs.getString("RootCause"));
+            pro.setWorkaround(rs.getString("Workaround"));
+            pro.setStatus(rs.getString("Status"));
+            pro.setCreatedBy(rs.getInt("CreatedBy"));
+            pro.setCreatedByName(rs.getString("CreatedByName"));
+            pro.setAssignedTo(rs.getInt("AssignedTo"));
+            pro.setCreatedAt(rs.getDate("CreatedAt"));
+            list.add(pro);
+            }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+    
+    public int getTotalAssignProblems(int userId) {
+        String sql = "SELECT COUNT(Id) FROM dbo.Problems WHERE AssignedTo = ?";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, userId);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
 //    public static void main(String[] args) {
 //
 //        ProblemDao dao = new ProblemDao(); // constructor đã mở connection

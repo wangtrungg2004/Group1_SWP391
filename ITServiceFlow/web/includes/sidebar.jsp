@@ -48,7 +48,7 @@
                     </li>
                 </c:if>
 
-                <!-- Menu cho IT Support vÃ  Admin -->
+                <!-- Menu cho IT Support -->
                 <c:if test="${role == 'IT Support'}">
                             <li class="nav-item pcoded-menu-caption">
                                 <label>Navigation</label>
@@ -60,13 +60,16 @@
                                 <label>H? tr?</label>
                             </li>
                             <li class="nav-item">
-                                <a href="Tickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-help-circle"></i></span><span class="pcoded-mtext">Qu?n lý Tickets</span></a>
+                                <a href="Tickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-help-circle"></i></span><span class="pcoded-mtext">Qu?n lï¿½ Tickets</span></a>
                             </li>
                             <li class="nav-item">
                                 <a href="AssignedTickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-user-check"></i></span><span class="pcoded-mtext">Tickets ???c giao</span></a>
                             </li>
                             <li class="nav-item">
                                 <a href="PendingTickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-clock"></i></span><span class="pcoded-mtext">Tickets ?ang ch?</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="ITProblemListController" class="nav-link"><span class="pcoded-micon"><i class="feather icon-clock"></i></span><span class="pcoded-mtext">Problem List</span></a>
                             </li>
                 </c:if>
             </ul>
