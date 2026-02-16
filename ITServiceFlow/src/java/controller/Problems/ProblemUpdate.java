@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import model.Problems;
+import model.Tickets;
 import service.ProblemService;
 /**
  *
@@ -76,6 +77,8 @@ public class ProblemUpdate extends HttpServlet {
                 request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
                 return;
             }
+            List<Tickets> relatedTickets = problemService.getRelatedTicket(id);
+            request.setAttribute("relatedTickets", relatedTickets);
             request.setAttribute("problem", pro);
             request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
         }

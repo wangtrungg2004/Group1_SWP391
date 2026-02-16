@@ -122,7 +122,7 @@
                                                     <c:otherwise>
                                                     <div class="row">
                                                         <!-- Cột trái: Problem Details -->
-                                                        <div class="col-md-7 col-lg-8 pr-lg-3" style="min-width: 0;">
+                                                        <div class="col-md-6 col-lg-6 pr-lg-3" style="min-width: 0;">
                                                             <div class="table-responsive">
                                                             <table class="table table-bordered">
                                                                 <tbody>
@@ -192,7 +192,7 @@
                                                         </div>
                                                         <!-- Cột phải: Related Tickets -->
                                                         <!-- Cột phải: Related Tickets -->
-                                                            <div class="col-md-5 col-lg-4 pl-lg-0" style="min-width:0;">
+                                                            <div class="col-md-6 col-lg-6 pl-lg-0" style="min-width:0;">
                                                                 <div class="card h-100">
                                                                     <div class="card-header">
                                                                         <h5 class="m-0">

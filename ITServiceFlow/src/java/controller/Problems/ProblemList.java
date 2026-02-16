@@ -86,7 +86,7 @@ public class ProblemList extends HttpServlet {
         }
 
         int page = 1;
-        int pageSize = 2;
+        int pageSize = 10;
         String pageParam = request.getParameter("page");
 
         try {

@@ -99,7 +99,7 @@
                                                             <option value="KNOWN_ERROR">KNOWN ERROR</option>
                                                             <option value="RFC_RAISED">RFC RAISED</option>
                                                             <option value="RESOLVED">RESOLVED</option>
-                                                            <option value="CLOSED">CLOSED</option>
+                                                            <!--<option value="CLOSED">CLOSED</option>-->
                                                 </select>
                                             </div>
 
@@ -126,19 +126,19 @@
                                                           rows="4" placeholder="Problem description"></textarea>
                                             </div>
 
-                                            <!-- Root Cause -->
+<!--                                             Root Cause 
                                             <div class="form-group">
                                                 <label><strong>Root Cause</strong></label>
                                                 <textarea name="RootCause" class="form-control"
                                                           rows="3"></textarea>
                                             </div>
 
-                                            <!-- Workaround -->
+                                             Workaround 
                                             <div class="form-group">
                                                 <label><strong>Workaround</strong></label>
                                                 <textarea name="Workaround" class="form-control"
                                                           rows="3"></textarea>
-                                            </div>
+                                            </div>-->
 
                                             <!-- Buttons -->
                                             <div class="mt-4">

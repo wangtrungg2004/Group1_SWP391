@@ -131,6 +131,9 @@
                                                     </div>
                                                 </c:when>
                                                 <c:otherwise>
+                                                    <div class="row">
+                                                        <!-- Cột trái: Form update -->
+                                                        <div class="col-md-6 col-lg-6 pr-lg-3" style="min-width: 0;">
                                                     <form method="post" action="ProblemUpdate" id="updateProblemForm">
                                                         <!-- ID bắt buộc -->
                                                         <input type="hidden" name="Id" value="${problem.id}">
@@ -198,7 +201,7 @@
                                                             </div>
                                                         </div>
 
-                                                        <div class="row">
+<!--                                                        <div class="row">
                                                             <div class="col-md-12">
                                                                 <div class="form-group">
                                                                     <label for="RootCause"><strong>Root Cause</strong></label>
@@ -218,7 +221,7 @@
                                                                               placeholder="Enter workaround solution">${problem.workaround}</textarea>
                                                                 </div>
                                                             </div>
-                                                        </div>
+                                                        </div>-->
 
                                                         <hr>
 
@@ -253,6 +256,63 @@
                                                             </a>
                                                         </div>
                                                     </form>
+                                                        </div>
+                                                        <!-- Cột phải: Related Tickets -->
+                                                        <div class="col-md-6 col-lg-6 pl-lg-0" style="min-width:0;">
+                                                            <div class="card h-100">
+                                                                <div class="card-header">
+                                                                    <h5 class="m-0">
+                                                                        <i class="feather icon-link"></i> Related Tickets
+                                                                    </h5>
+                                                                </div>
+                                                                <div class="card-body p-2">
+                                                            <c:choose>
+                                                                <c:when test="${empty relatedTickets}">
+                                                                    <div class="alert alert-info mb-0">
+                                                                        <i class="feather icon-info"></i>
+                                                                        No related tickets found for this problem.
+                                                                    </div>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <div class="table-responsive">
+                                                                        <table class="table table-hover table-sm mb-0">
+                                                                            <thead class="thead-light">
+                                                                                <tr>
+                                                                                    <th>Ticket</th>
+                                                                                    <th>Type</th>
+                                                                                    <!--<th>Status</th>-->
+                                                                                    <th class="text-center">Action</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <c:forEach items="${relatedTickets}" var="ticket">
+                                                                                    <tr>
+                                                                                        <td style="max-width:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                                                                            <strong>${ticket.ticketNumber}</strong><br/>
+                                                                                            <small class="text-muted">${ticket.title}</small>
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            <span class="badge badge-secondary">${ticket.ticketType}</span>
+                                                                                        </td>
+<!--                                                                                        <td>
+                                                                                            <span class="badge badge-info">${ticket.status}</span>
+                                                                                        </td>-->
+                                                                                        <td class="text-center">
+                                                                                            <a href="TicketDetail?Id=${ticket.id}" class="btn btn-sm btn-primary">
+                                                                                                <i class="feather icon-eye"></i>
+                                                                                            </a>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </c:forEach>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </c:otherwise>
                                             </c:choose>
                                         </div>
