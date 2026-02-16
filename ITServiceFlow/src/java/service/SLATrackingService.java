@@ -27,7 +27,21 @@ public class SLATrackingService {
 
     public void applySLARuleToTicket(int ticketId, String ticketType, int priorityId) {
         // 1. Find matching SLA Rule
+<<<<<<< HEAD
         SLARule matchedRule = slaRuleDao.getActiveRuleByTypeAndPriority(ticketType, priorityId);
+=======
+        List<SLARule> rules = slaRuleDao.getAllSLARules(); // In real scenario, filter by Type/Priority
+        SLARule matchedRule = null;
+
+        for (SLARule rule : rules) {
+            if ("Active".equals(rule.getStatus()) &&
+                    rule.getTicketType().equalsIgnoreCase(ticketType) &&
+                    rule.getPriorityId() == priorityId) {
+                matchedRule = rule;
+                break;
+            }
+        }
+>>>>>>> 1763278990a4a240d89ada2a865acfd8b2595d22
 
         if (matchedRule != null) {
             // 2. Calculate Deadlines

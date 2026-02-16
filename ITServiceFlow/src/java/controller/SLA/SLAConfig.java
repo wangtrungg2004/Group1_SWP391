@@ -142,6 +142,7 @@ public class SLAConfig extends HttpServlet {
             String status = request.getParameter("status");
 
             try {
+<<<<<<< HEAD
                 // Validation
                 if (slaName == null || slaName.trim().isEmpty()) {
                     session.setAttribute("errorMessage", "SLA Name cannot be empty.");
@@ -149,10 +150,13 @@ public class SLAConfig extends HttpServlet {
                     return;
                 }
 
+=======
+>>>>>>> 1763278990a4a240d89ada2a865acfd8b2595d22
                 int priorityId = Integer.parseInt(priorityIdRaw);
                 int responseTime = Integer.parseInt(responseTimeRaw);
                 int resolutionTime = Integer.parseInt(resolutionTimeRaw);
 
+<<<<<<< HEAD
                 if (responseTime <= 0 || resolutionTime <= 0) {
                     session.setAttribute("errorMessage", "Times must be greater than 0.");
                     response.sendRedirect("SLAConfig");
@@ -167,11 +171,16 @@ public class SLAConfig extends HttpServlet {
 
                 SLARule rule = new SLARule();
                 rule.setSlaName(slaName.trim());
+=======
+                SLARule rule = new SLARule();
+                rule.setSlaName(slaName);
+>>>>>>> 1763278990a4a240d89ada2a865acfd8b2595d22
                 rule.setTicketType(ticketType);
                 rule.setPriorityId(priorityId);
                 rule.setResponseTime(responseTime);
                 rule.setResolutionTime(resolutionTime);
                 rule.setStatus(status);
+<<<<<<< HEAD
                 rule.setCreatedBy(userId);
 
                 boolean success;
@@ -195,6 +204,24 @@ public class SLAConfig extends HttpServlet {
 
             } catch (NumberFormatException e) {
                 session.setAttribute("errorMessage", "Invalid number format.");
+=======
+                rule.setCreatedBy(userId); // For update, this might need logic to keep original creator or track
+                                           // updater
+
+                if (idRaw != null && !idRaw.isEmpty()) {
+                    // Update
+                    int id = Integer.parseInt(idRaw);
+                    rule.setId(id);
+                    slaRuleService.updateSLARule(rule);
+                } else {
+                    // Add
+                    slaRuleService.addSLARule(rule);
+                }
+
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                // Handle error
+>>>>>>> 1763278990a4a240d89ada2a865acfd8b2595d22
             }
         }
 

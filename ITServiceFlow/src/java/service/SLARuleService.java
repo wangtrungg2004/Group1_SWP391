@@ -44,10 +44,13 @@ public class SLARuleService {
         return slaRuleDao.getSLARuleById(id);
     }
 
+<<<<<<< HEAD
     public SLARule getActiveRuleByTypeAndPriority(String ticketType, int priorityId) {
         return slaRuleDao.getActiveRuleByTypeAndPriority(ticketType, priorityId);
     }
 
+=======
+>>>>>>> 1763278990a4a240d89ada2a865acfd8b2595d22
     public List<SLARule> searchSLARules(String name, String type, Integer priorityId, String status, int page,
             int pageSize) {
         return slaRuleDao.searchSLARules(name, type, priorityId, status, page, pageSize);

@@ -18,6 +18,7 @@ import model.SLARule;
  */
 public class SLARuleDao extends DbContext {
 
+<<<<<<< HEAD
     private void deactivateRulesByTypeAndPriority(String ticketType, int priorityId) {
         String sql = "UPDATE [dbo].[SLARules] SET Status = 'Inactive', UpdatedAt = GETDATE() "
                 + "WHERE TicketType = ? AND PriorityId = ? AND Status = 'Active'";
@@ -31,6 +32,8 @@ public class SLARuleDao extends DbContext {
         }
     }
 
+=======
+>>>>>>> 1763278990a4a240d89ada2a865acfd8b2595d22
     public List<SLARule> getAllSLARules() {
         List<SLARule> list = new ArrayList<>();
         String sql = "SELECT s.Id, s.SLAName, s.TicketType, s.PriorityId, s.ResponseTime, s.ResolutionTime, s.Status, s.CreatedBy, s.CreatedAt, s.UpdatedAt, "
@@ -87,6 +90,7 @@ public class SLARuleDao extends DbContext {
     }
 
     public boolean addSLARule(SLARule sla) {
+<<<<<<< HEAD
         try {
             if ("Active".equalsIgnoreCase(sla.getStatus())) {
                 deactivateRulesByTypeAndPriority(sla.getTicketType(), sla.getPriorityId());
@@ -95,6 +99,11 @@ public class SLARuleDao extends DbContext {
             String sql = "INSERT INTO [dbo].[SLARules] (SLAName, TicketType, PriorityId, ResponseTime, ResolutionTime, Status, CreatedBy, CreatedAt, UpdatedAt) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
 
+=======
+        String sql = "INSERT INTO [dbo].[SLARules] (SLAName, TicketType, PriorityId, ResponseTime, ResolutionTime, Status, CreatedBy, CreatedAt, UpdatedAt) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
+        try {
+>>>>>>> 1763278990a4a240d89ada2a865acfd8b2595d22
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setString(1, sla.getSlaName());
             stm.setString(2, sla.getTicketType());
@@ -166,6 +175,7 @@ public class SLARuleDao extends DbContext {
         return null;
     }
 
+<<<<<<< HEAD
     public SLARule getActiveRuleByTypeAndPriority(String ticketType, int priorityId) {
         String sql = "SELECT * FROM [dbo].[SLARules] WHERE TicketType = ? AND PriorityId = ? AND Status = 'Active'";
         try {
@@ -190,6 +200,8 @@ public class SLARuleDao extends DbContext {
         return null;
     }
 
+=======
+>>>>>>> 1763278990a4a240d89ada2a865acfd8b2595d22
     public List<SLARule> searchSLARules(String name, String type, Integer priorityId, String status, int page,
             int pageSize) {
         List<SLARule> list = new ArrayList<>();

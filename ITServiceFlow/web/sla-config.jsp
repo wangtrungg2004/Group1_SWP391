@@ -63,6 +63,7 @@
                                         <!-- [ breadcrumb ] end -->
 
                                         <!-- [ Main Content ] start -->
+<<<<<<< HEAD
 
                                         <c:if test="${not empty sessionScope.successMessage}">
                                             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -84,6 +85,8 @@
                                             <c:remove var="errorMessage" scope="session" />
                                         </c:if>
 
+=======
+>>>>>>> 1763278990a4a240d89ada2a865acfd8b2595d22
                                         <div class="row">
                                             <!-- SLA List -->
                                             <div class="col-xl-8 col-md-12">
