@@ -1,4 +1,4 @@
-<%-- 
+﻿<%-- 
     Left sidebar - phân quyền theo session attribute "role".
     Các trang cần set role trong session (từ Login) hoặc filter.
 --%>
@@ -39,7 +39,17 @@
                 </c:if>
 
                 <!-- Menu cho Manager và Admin -->
+                
                 <c:if test="${role == 'Admin' || role == 'Manager'}">
+                    <li class="nav-item pcoded-menu-caption">
+                        <label>SLA Management</label>
+                    </li>
+                    <li class="nav-item">
+                        <a href="SLAConfig" class="nav-link"><span class="pcoded-micon"><i class="feather icon-settings"></i></span><span class="pcoded-mtext">SLA Configuration</span></a>
+                    </li>
+                </c:if>
+
+<c:if test="${role == 'Admin' || role == 'Manager'}">
                     <li class="nav-item pcoded-menu-caption">
                         <label>Report</label>
                     </li>
@@ -60,7 +70,7 @@
                                 <label>H? tr?</label>
                             </li>
                             <li class="nav-item">
-                                <a href="Tickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-help-circle"></i></span><span class="pcoded-mtext">Qu?n l� Tickets</span></a>
+                                <a href="Tickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-help-circle"></i></span><span class="pcoded-mtext">Qu?n l� Tickets</span></a>
                             </li>
                             <li class="nav-item">
                                 <a href="AssignedTickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-user-check"></i></span><span class="pcoded-mtext">Tickets ???c giao</span></a>
@@ -74,3 +84,4 @@
     </div>
 </nav>
 <!-- [ navigation menu ] end -->
+
