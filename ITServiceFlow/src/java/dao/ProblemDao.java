@@ -1,0 +1,636 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package dao;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import model.Problems;
+import Utils.DbContext;
+import java.time.Year;
+import model.Tickets;
+/**
+ *
+ * @author DELL
+ */
+public class ProblemDao extends DbContext{
+    public List<Problems> getAllProblems()
+    {
+        List<Problems> list = new ArrayList<>();
+        String sql = "SELECT p.[Id]\n" +
+            "      ,p.[TicketNumber]\n" +
+            "      ,p.[Title]\n" +
+            "      ,p.[Description]\n" +
+            "      ,p.[RootCause]\n" +
+            "      ,p.[Workaround]\n" +
+            "      ,p.[Status]\n" +
+            "      ,p.[CreatedBy]\n" +
+            "      ,u.[FullName] AS CreatedByName\n" +
+            "      ,p.[AssignedTo]\n" +
+            "      ,p.[CreatedAt]\n" +
+            "  FROM [dbo].[Problems] p\n" +
+            "  LEFT JOIN [dbo].[Users] u ON p.[CreatedBy] = u.[Id]";
+        
+        try
+        {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            ResultSet rs = stm.executeQuery();
+            while(rs.next())
+            {
+               Problems pro = new Problems();
+               pro.setId(rs.getInt("Id"));
+               pro.setTicketNumber(rs.getString("TicketNumber"));
+               pro.setTitle(rs.getString("Title"));
+               pro.setDescription(rs.getString("Description"));
+               pro.setRootCause(rs.getString("RootCause"));
+               pro.setWorkaround(rs.getString("Workaround"));
+               pro.setStatus(rs.getString("Status"));
+               pro.setCreatedBy(rs.getInt("CreatedBy"));
+               pro.setCreatedByName(rs.getString("CreatedByName"));
+               pro.setAssignedTo(rs.getInt("AssignedTo"));
+               pro.setCreatedAt(rs.getDate("CreatedAt"));
+               list.add(pro);
+            }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+    
+    public List<Problems> getProblemsWithPages(int page, int pageSize) {
+        List<Problems> list = new ArrayList<>();
+        try {
+            String sql = "SELECT p.Id, p.TicketNumber, p.Title, p.Description, "
+                      + "p.RootCause, p.Workaround, p.Status, p.CreatedBy, "
+                      + "u.FullName AS CreatedByName, p.AssignedTo, p.CreatedAt "
+                      + "FROM dbo.Problems p "
+                      + "LEFT JOIN dbo.Users u ON p.CreatedBy = u.Id "
+                      + "ORDER BY p.Id "
+                      + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            int offset = (page - 1) * pageSize;
+            stm.setInt(1, offset);
+            stm.setInt(2, pageSize);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Problems pro = new Problems();
+                pro.setId(rs.getInt("Id"));
+                pro.setTicketNumber(rs.getString("TicketNumber"));
+                pro.setTitle(rs.getString("Title"));
+                pro.setDescription(rs.getString("Description"));
+                pro.setRootCause(rs.getString("RootCause"));
+                pro.setWorkaround(rs.getString("Workaround"));
+                pro.setStatus(rs.getString("Status"));
+                pro.setCreatedBy(rs.getInt("CreatedBy"));
+                pro.setCreatedByName(rs.getString("CreatedByName"));
+                pro.setAssignedTo(rs.getInt("AssignedTo"));
+                pro.setCreatedAt(rs.getDate("CreatedAt"));
+                list.add(pro);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+
+    public int getTotalProblem() {
+        String sql = "SELECT COUNT(Id) FROM dbo.Problems";
+        try {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return 0;
+    }
+    
+    public Problems getProblemById(int ProblemId)
+    {
+        String sql = """
+                        SELECT p.[Id],
+                               p.[TicketNumber],
+                               p.[Title],
+                               p.[Description],
+                               p.[RootCause],
+                               p.[Workaround],
+                               p.[Status],
+                               p.[CreatedBy],
+                               u1.[FullName] AS CreatedByName,
+                               p.[AssignedTo],
+                               u2.[FullName] AS AssignedToName,
+                               p.[CreatedAt]
+                        FROM [dbo].[Problems] p
+                        LEFT JOIN [dbo].[Users] u1 ON p.CreatedBy = u1.Id
+                        LEFT JOIN [dbo].[Users] u2 ON p.AssignedTo = u2.Id
+                        WHERE p.Id = ?
+                    """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, ProblemId);
+            try (ResultSet rs = stm.executeQuery()) {
+                if(rs.next())
+                {
+                    Problems p = new Problems();
+                    p.setId(rs.getInt("Id"));
+                    p.setTicketNumber(rs.getString("TicketNumber"));
+                    p.setTitle(rs.getString("Title"));
+                    p.setDescription(rs.getString("Description"));
+                    p.setRootCause(rs.getString("RootCause"));
+                    p.setWorkaround(rs.getString("Workaround"));
+                    p.setStatus(rs.getString("Status"));
+                    p.setCreatedBy(rs.getInt("CreatedBy"));
+                    p.setCreatedByName(rs.getString("CreatedByName"));
+                    p.setAssignedTo(rs.getInt("AssignedTo"));
+                    p.setCreatedAt(rs.getDate("CreatedAt"));
+                    p.setAssignedToName(rs.getString("AssignedToName"));
+                    return p;
+                }
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+    
+    public boolean updateProblem(Problems p)
+    {
+        String sql = "UPDATE [dbo].[Problems]\n" +
+            "   SET [TicketNumber] = ?\n" +
+            "      ,[Title] = ?\n" +
+            "      ,[Description] = ?\n" +
+            "      ,[RootCause] = ?\n" +
+            "      ,[Workaround] = ?\n" +
+            "      ,[Status] = ?\n" +
+            "      ,[AssignedTo] = ?\n" +
+            " WHERE Id = ?";
+            try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1,p.getTicketNumber());
+            stm.setString(2, p.getTitle());
+            stm.setString(3, p.getDescription());
+            stm.setString(4, p.getRootCause());
+            stm.setString(5, p.getWorkaround());
+            stm.setString(6, p.getStatus());
+            if (p.getAssignedTo() > 0) {
+                stm.setInt(7, p.getAssignedTo());
+            } else {
+                stm.setNull(7, java.sql.Types.INTEGER);
+            }
+            stm.setInt(8, p.getId());
+
+            return stm.executeUpdate() > 0;
+            // Kiểm tra xem có update được dòng nào không
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+    
+    public boolean addProblem(String Title, String Description,
+            String RootCause, String WalkAround, String Status, int CreatedBy, int AssignedTo, Date CreatedAt) {
+        
+        String TicketNumber = getNextTicketNumber();
+        
+        String sql = "INSERT INTO [dbo].[Problems]\n" +
+"           ([TicketNumber]\n" +
+"           ,[Title]\n" +
+"           ,[Description]\n" +
+"           ,[RootCause]\n" +
+"           ,[Workaround]\n" +
+"           ,[Status]\n" +
+"           ,[CreatedBy]\n" +
+"           ,[AssignedTo]\n" +
+"           ,[CreatedAt])\n" +
+"     VALUES\n" +
+"           (?\n" +
+"           ,?\n" +
+"           ,?\n" +
+"           ,?\n" +
+"           ,?\n" +
+"           ,?\n" +
+"           ,?\n" +
+"           ,?\n" +
+"           ,GETDATE())";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, TicketNumber);
+            stm.setString(2, Title);
+            stm.setString(3, Description);
+            stm.setString(4, RootCause);
+            stm.setString(5, WalkAround);
+            stm.setString(6, Status);
+            stm.setInt(7, CreatedBy);
+            if (AssignedTo > 0) {
+                stm.setInt(8, AssignedTo);
+            } else {
+                stm.setNull(8, java.sql.Types.INTEGER);
+            }
+//            stm.setDate(9, CreatedAt);
+            stm.executeUpdate();
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+    
+    
+    public String getNextTicketNumber() {
+
+        int year = Year.now().getValue();
+        String prefix = "PRB-" + year + "-";
+
+        String sql =
+            "SELECT MAX(TicketNumber) " +
+            "FROM Problems " +
+            "WHERE TicketNumber LIKE ?";
+
+        int next = 1;
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+
+            stm.setString(1, prefix + "%");
+            ResultSet rs = stm.executeQuery();
+
+            if (rs.next() && rs.getString(1) != null) {
+                String last = rs.getString(1); // PRB-2026-015
+                String seq = last.substring(last.lastIndexOf('-') + 1);
+                next = Integer.parseInt(seq) + 1;
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            // fallback an toàn
+//            return prefix + "001";
+        }
+
+        return prefix + String.format("%03d", next);
+    }
+
+    public boolean deleteProblem(int ProblemId)
+    {
+        String sql = "DELETE FROM [dbo].[Problems]\n" +
+                "      WHERE Id = ?";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, ProblemId);
+            stm.executeUpdate();
+            return true;
+//            int rows = stm.executeUpdate();
+//            return rows > 0;
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    public List<Problems> searchProblem(String keyword)
+    {
+        List<Problems> list = new ArrayList<>();
+        try
+        {
+            String sql = "SELECT p.Id, p.TicketNumber, p.Title, p.Description, " +
+             "p.RootCause, p.Workaround, p.Status, p.CreatedBy, " +
+             "u.FullName AS CreatedByName, p.AssignedTo, p.CreatedAt " +
+             "FROM dbo.Problems p " +
+             "LEFT JOIN dbo.Users u ON p.CreatedBy = u.Id " +
+             "WHERE (p.Title LIKE ? OR p.TicketNumber LIKE ?)";
+            
+            PreparedStatement stm = connection.prepareStatement(sql);
+            String searchValue = "%" + keyword + "%";
+            stm.setString(1, searchValue);
+            stm.setString(2, searchValue);
+            
+            ResultSet rs = stm.executeQuery();
+            while(rs.next())
+            {
+               Problems pro = new Problems();
+               pro.setId(rs.getInt("Id"));
+               pro.setTicketNumber(rs.getString("TicketNumber"));
+               pro.setTitle(rs.getString("Title"));
+               pro.setDescription(rs.getString("Description"));
+               pro.setRootCause(rs.getString("RootCause"));
+               pro.setWorkaround(rs.getString("Workaround"));
+               pro.setStatus(rs.getString("Status"));
+               pro.setCreatedBy(rs.getInt("CreatedBy"));
+               pro.setCreatedByName(rs.getString("CreatedByName"));
+               pro.setAssignedTo(rs.getInt("AssignedTo"));
+               pro.setCreatedAt(rs.getDate("CreatedAt"));
+               list.add(pro);
+            }
+            
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+    
+    public List<Tickets> viewRelatedTicket(int Id)
+    {
+        List<Tickets> list = new ArrayList<>();
+        String sql = "SELECT\n" +
+                "    t.Id,\n" +
+                "    t.TicketNumber,\n" +
+                "    t.TicketType,\n" +
+                "    t.Title,\n" +
+                "    t.Description,\n" +
+                "    t.CategoryId,\n" +
+                "    t.LocationId,\n" +
+                "    t.Impact,\n" +
+                "    t.Urgency,\n" +
+                "    t.PriorityId,\n" +
+                "    t.ServiceCatalogId,\n" +
+                "    t.RequiresApproval,\n" +
+                "    t.ApprovedBy,\n" +
+                "    t.ApprovedAt,\n" +
+                "    t.Status,\n" +
+                "    t.CreatedBy,\n" +
+                "    t.AssignedTo,\n" +
+                "    t.ParentTicketId,\n" +
+                "    t.ResolvedAt,\n" +
+                "    t.ClosedAt,\n" +
+                "    t.CreatedAt,\n" +
+                "    t.UpdatedAt,\n" +
+                "    t.CurrentLevel\n" +
+                "FROM dbo.ProblemTickets AS pt\n" +
+                "INNER JOIN dbo.Tickets AS t\n" +
+                "    ON pt.TicketId = t.Id\n" +
+                "WHERE pt.ProblemId = ?\n" +
+                "ORDER BY t.CreatedAt DESC;";
+        try
+        {
+           PreparedStatement stm = connection.prepareStatement(sql);
+           stm.setInt(1, Id);
+           ResultSet rs = stm.executeQuery();
+           while(rs.next())
+           {
+               Tickets ticket = new Tickets();
+            ticket.setId(rs.getInt("Id"));
+            ticket.setTicketNumber(rs.getString("TicketNumber"));
+            ticket.setTicketType(rs.getString("TicketType"));
+            ticket.setTitle(rs.getString("Title"));
+            ticket.setDescription(rs.getString("Description"));
+            ticket.setCategoryId(rs.getInt("CategoryId"));
+            ticket.setLocationId(rs.getInt("LocationId"));
+            ticket.setImpact(rs.getInt("Impact"));
+            ticket.setUrgency(rs.getInt("Urgency"));
+            ticket.setPriorityId(rs.getInt("PriorityId"));
+            ticket.setServiceCatalogId(rs.getInt("ServiceCatalogId"));
+            ticket.setRequiresApproval(rs.getBoolean("RequiresApproval"));
+            ticket.setApprovedBy(rs.getInt("ApprovedBy"));
+            ticket.setApprovedAt(rs.getDate("ApprovedAt"));
+            ticket.setStatus(rs.getString("Status"));
+            ticket.setCreatedBy(rs.getInt("CreatedBy"));
+            ticket.setAssignedTo(rs.getInt("AssignedTo"));
+            ticket.setParentTicketId(rs.getInt("ParentTicketId"));
+            ticket.setResolvedAt(rs.getDate("ResolvedAt"));
+            ticket.setClosedAt(rs.getDate("ClosedAt"));
+            ticket.setCreatedAt(rs.getDate("CreatedAt"));
+            ticket.setUpdatedAt(rs.getDate("UpdatedAt"));
+            ticket.setCurrentLevel(rs.getInt("CurrentLevel"));
+            list.add(ticket);
+           }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+    
+    public int getLatestProblemId() {
+        String sql = "SELECT TOP 1 Id FROM [dbo].[Problems] ORDER BY Id DESC";
+        try (PreparedStatement stm = connection.prepareStatement(sql);
+             ResultSet rs = stm.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("Id");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return -1;
+    }
+    
+    public List<Problems> getAssignProblems(int userId, int page, int pageSize)
+    {
+        List<Problems> list = new ArrayList<>();
+        String sql = "SELECT p.Id, p.TicketNumber, p.Title, p.Description,\n" +
+"               p.RootCause, p.Workaround, p.Status, p.CreatedBy,\n" +
+"               u.FullName AS CreatedByName, p.AssignedTo, p.CreatedAt\n" +
+"        FROM dbo.Problems p\n" +
+"        LEFT JOIN dbo.Users u ON p.CreatedBy = u.Id\n" +
+"        WHERE p.AssignedTo = ?\n" +
+"        ORDER BY p.CreatedAt DESC\n" +
+"        OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        
+        try
+        {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            int offset = (page - 1) * pageSize;
+
+            stm.setInt(1, userId);
+            stm.setInt(2, offset);
+            stm.setInt(3, pageSize);
+            ResultSet rs = stm.executeQuery();
+            while(rs.next())
+            {
+                            Problems pro = new Problems();
+            pro.setId(rs.getInt("Id"));
+            pro.setTicketNumber(rs.getString("TicketNumber"));
+            pro.setTitle(rs.getString("Title"));
+            pro.setDescription(rs.getString("Description"));
+            pro.setRootCause(rs.getString("RootCause"));
+            pro.setWorkaround(rs.getString("Workaround"));
+            pro.setStatus(rs.getString("Status"));
+            pro.setCreatedBy(rs.getInt("CreatedBy"));
+            pro.setCreatedByName(rs.getString("CreatedByName"));
+            pro.setAssignedTo(rs.getInt("AssignedTo"));
+            pro.setCreatedAt(rs.getDate("CreatedAt"));
+            list.add(pro);
+            }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+    
+    public int getTotalAssignProblems(int userId) {
+        String sql = "SELECT COUNT(Id) FROM dbo.Problems WHERE AssignedTo = ?";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, userId);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+//    public static void main(String[] args) {
+//
+//        ProblemDao dao = new ProblemDao(); // constructor đã mở connection
+//        int testProblemId = 1;
+//
+//        Problems p = dao.getProblemById(testProblemId);
+//
+//        if (p != null) {
+//            System.out.println("===== PROBLEM FOUND =====");
+//            System.out.println("Id: " + p.getId());
+//            System.out.println("TicketNumber: " + p.getTicketNumber());
+//            System.out.println("Title: " + p.getTitle());
+//            System.out.println("Description: " + p.getDescription());
+//            System.out.println("RootCause: " + p.getRootCause());
+//            System.out.println("Workaround: " + p.getWorkaround());
+//            System.out.println("Status: " + p.getStatus());
+//            System.out.println("CreatedByName: " + p.getCreatedByName());
+//            System.out.println("AssignedTo: " + p.getAssignedTo());
+//            System.out.println("CreatedAt: " + p.getCreatedAt());
+//        } else {
+//            System.out.println("❌ Problem NOT found with Id = " + testProblemId);
+//        }
+//    }
+    
+    
+//public static void main(String[] args) {
+//
+//    ProblemDao dao = new ProblemDao();
+//
+//    boolean result = dao.addProblem(
+//        "Test add problem",                 // Title
+//        "This is a test description",       // Description
+//        null,                               // RootCause
+//        "Restart application",              // Workaround
+//        "OPEN",                             // Status
+//        1,                                  // CreatedBy (userId có sẵn trong DB)
+//        2,                                  // AssignedTo (userId có sẵn trong DB)
+//        new java.sql.Date(System.currentTimeMillis())
+//    );
+//
+//    if (result) {
+//        System.out.println("Insert Problem SUCCESS");
+//    } else {
+//        System.out.println("Insert Problem FAILED");
+//    }
+//}
+
+
+//    public static void main(String[] args) {
+//
+//        ProblemDao dao = new ProblemDao();
+//        List<Problems> list = dao.getAllProblems();
+//
+//        if (list.isEmpty()) {
+//            System.out.println("Errored");
+//            return;
+//        }
+//
+//        for (Problems p : list) {
+//            System.out.println("Id          : " + p.getId());
+//            System.out.println("TicketNumber: " + p.getTicketNumber());
+//            System.out.println("Title       : " + p.getTitle());
+//            System.out.println("Description : " + p.getDescription());
+//            System.out.println("RootCause   : " + p.getRootCause());
+//            System.out.println("Workaround  : " + p.getWorkaround());
+//            System.out.println("Status      : " + p.getStatus());
+//            System.out.println("CreatedBy   : " + p.getCreatedBy());
+//            System.out.println("AssignedTo  : " + p.getAssignedTo());
+//            System.out.println("CreatedAt   : " + p.getCreatedAt());
+//            System.out.println("--------------------------------------");
+//        }
+//    }
+//    public static void main(String[] args) {
+//
+//        ProblemDao dao = new ProblemDao();
+//
+//        int testProblemId = 1;
+//
+//        // 1️⃣ Lấy problem hiện tại từ DB
+//        Problems p = dao.getProblemById(testProblemId);
+//
+//        if (p == null) {
+//            System.out.println("Problem NOT found with Id = " + testProblemId);
+//            return;
+//        }
+//
+//        // 2️⃣ In dữ liệu trước khi update
+//        System.out.println("===== BEFORE UPDATE =====");
+//        System.out.println("Title: " + p.getTitle());
+//        System.out.println("Status: " + p.getStatus());
+//        System.out.println("Workaround: " + p.getWorkaround());
+//
+//        p.setTitle(p.getTitle() + " (Updated)");
+//        p.setStatus("RESOLVED");
+//        p.setWorkaround("Restart service and clear cache");
+//
+//        boolean success = dao.updateProblem(p);
+//
+//        if (success) {
+//            System.out.println("UPDATE SUCCESS");
+//        } else {
+//            System.out.println("UPDATE FAILED");
+//        }
+//
+//        Problems updated = dao.getProblemById(testProblemId);
+//
+//        System.out.println("===== AFTER UPDATE =====");
+//        System.out.println("Title: " + updated.getTitle());
+//        System.out.println("Status: " + updated.getStatus());
+//        System.out.println("Workaround: " + updated.getWorkaround());
+//    }
+    
+    
+//    public static void main(String[] args) {
+//        ProblemDao dao = new ProblemDao();
+//
+//        String keyword = "2026"; 
+//        List<Problems> result = dao.searchProblem(keyword);
+//
+//        System.out.println("Total results: " + result.size());
+//        for (Problems p : result) {
+//            System.out.println(
+//                p.getTicketNumber() + " | " +
+//                p.getTitle() + " | " +
+//                p.getStatus() + " | " +
+//                p.getCreatedByName()
+//            );
+//        }
+//    }
+    
+    public static void main(String[] args) {
+    ProblemDao dao = new ProblemDao(); // hoặc DAO bạn đang dùng
+
+    int testProblemId = 3; // đổi ID có thật trong DB
+    List<Tickets> tickets = dao.viewRelatedTicket(testProblemId);
+
+    if (tickets.isEmpty()) {
+        System.out.println("No ticket linked with problemId = " + testProblemId);
+    } else {
+        System.out.println("✅ list Problem Linked:");
+        for (Tickets t : tickets) {
+            System.out.println(
+                "ID: " + t.getId() +
+                " | Number: " + t.getTicketNumber() +
+                " | Title: " + t.getTitle() +
+                " | Status: " + t.getStatus()
+            );
+        }
+    }
+}
+
+
+}
