@@ -21,6 +21,8 @@ public class Users {
     private int LocationId;
     private boolean IsActive;
     private Date CreatedAt;
+    private String ResetToken;
+    private Date ResetTokenExpiry;
 
     public Users() {
     }
@@ -119,6 +121,20 @@ public class Users {
     public void setLocationId(int LocationId) {
         this.LocationId = LocationId;
     }
-    
-    
+
+    public String getResetToken() {
+        return ResetToken;
+    }
+
+    public void setResetToken(String ResetToken) {
+        this.ResetToken = ResetToken;
+    }
+
+    public Date getResetTokenExpiry() {
+        return ResetTokenExpiry;
+    }
+
+    public void setResetTokenExpiry(Date ResetTokenExpiry) {
+        this.ResetTokenExpiry = ResetTokenExpiry;
+    }
 }

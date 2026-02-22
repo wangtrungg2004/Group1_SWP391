@@ -43,6 +43,65 @@
     <!-- vendor css -->
     <link rel="stylesheet" href="assets/css/style.css">
     
+    <style>
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid;
+            height: 100%;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        .stat-card.blue { border-left-color: #2196F3; }
+        .stat-card.green { border-left-color: #4CAF50; }
+        .stat-card.yellow { border-left-color: #FFC107; }
+        .stat-card.purple { border-left-color: #9C27B0; }
+        .stat-card h6 {
+            color: #6c757d;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+        .stat-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            color: #333;
+        }
+        .stat-card .icon {
+            font-size: 2.5rem;
+            opacity: 0.3;
+            float: right;
+            margin-top: -10px;
+        }
+        .welcome-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        .welcome-card h5 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        .welcome-card ul {
+            margin-top: 15px;
+            padding-left: 20px;
+        }
+        .welcome-card ul li {
+            margin-bottom: 8px;
+        }
+    </style>
+    
     <title>IT Support Dashboard - ITServiceFlow</title>
 </head>
 
@@ -165,51 +224,31 @@
                             <div class="row">
                                 <!-- [ Statistics ] start -->
                                 <div class="col-md-6 col-xl-3">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <h6 class="mb-4">Tickets mới</h6>
-                                            <div class="row d-flex align-items-center">
-                                                <div class="col-9">
-                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-file-plus text-c-green f-30 m-r-10"></i>0</h3>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="stat-card green">
+                                        <h6>Tickets mới</h6>
+                                        <h3>0</h3>
+                                        <i class="feather icon-file-plus icon"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-xl-3">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <h6 class="mb-4">Tickets đang xử lý</h6>
-                                            <div class="row d-flex align-items-center">
-                                                <div class="col-9">
-                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-clock text-c-yellow f-30 m-r-10"></i>0</h3>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="stat-card yellow">
+                                        <h6>Tickets đang xử lý</h6>
+                                        <h3>0</h3>
+                                        <i class="feather icon-clock icon"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-xl-3">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <h6 class="mb-4">Tickets đã giải quyết</h6>
-                                            <div class="row d-flex align-items-center">
-                                                <div class="col-9">
-                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-check-circle text-c-blue f-30 m-r-10"></i>0</h3>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="stat-card blue">
+                                        <h6>Tickets đã giải quyết</h6>
+                                        <h3>0</h3>
+                                        <i class="feather icon-check-circle icon"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-xl-3">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <h6 class="mb-4">Tổng Tickets</h6>
-                                            <div class="row d-flex align-items-center">
-                                                <div class="col-9">
-                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-list text-c-purple f-30 m-r-10"></i>0</h3>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="stat-card purple">
+                                        <h6>Tổng Tickets</h6>
+                                        <h3>0</h3>
+                                        <i class="feather icon-list icon"></i>
                                     </div>
                                 </div>
                                 <!-- [ Statistics ] end -->
@@ -217,19 +256,15 @@
 
                             <div class="row">
                                 <div class="col-xl-12">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h5>Chào mừng, <%= user != null ? user.getFullName() : "IT Support" %>!</h5>
-                                        </div>
-                                        <div class="card-body">
-                                            <p>Đây là trang dashboard dành cho IT Support. Bạn có thể:</p>
-                                            <ul>
-                                                <li>Xem và quản lý tất cả tickets</li>
-                                                <li>Nhận và xử lý tickets được giao</li>
-                                                <li>Cập nhật trạng thái tickets</li>
-                                                <li>Xem tickets đang chờ xử lý</li>
-                                            </ul>
-                                        </div>
+                                    <div class="welcome-card">
+                                        <h5><i class="feather icon-headphones"></i> Chào mừng, <%= user != null ? user.getFullName() : "IT Support" %>!</h5>
+                                        <p>Đây là trang dashboard dành cho IT Support. Bạn có thể:</p>
+                                        <ul>
+                                            <li><i class="feather icon-file-text"></i> Xem và quản lý tất cả tickets</li>
+                                            <li><i class="feather icon-user-check"></i> Nhận và xử lý tickets được giao</li>
+                                            <li><i class="feather icon-edit"></i> Cập nhật trạng thái tickets</li>
+                                            <li><i class="feather icon-clock"></i> Xem tickets đang chờ xử lý</li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>

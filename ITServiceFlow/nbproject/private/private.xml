@@ -16,6 +16,19 @@
             <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/model/model.java</file>
             <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/model/Users.java</file>
             <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/HomeController.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/Logout.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/filter/AuthorizationFilter.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/web/UserDashboard.jsp</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/web/ITDashboard.jsp</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/web/ManageDepartments.jsp</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/web/assets/css/pages/create-user.css</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/web/assets/css/pages/pages.css</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/web/CreateUser.jsp</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/service/DepartmentService.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/model/Department.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/CreateUser.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/ManageDepartments.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/GoogleAuthCallback.java</file>
         </group>
     </open-files>
 </project-private>

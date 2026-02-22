@@ -16,6 +16,16 @@
         <servlet-class>controller.Logout</servlet-class>
     </servlet>
     
+    <servlet>
+        <servlet-name>CreateUser</servlet-name>
+        <servlet-class>controller.CreateUser</servlet-class>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>ManageDepartments</servlet-name>
+        <servlet-class>controller.ManageDepartments</servlet-class>
+    </servlet>
+    
     <!-- Servlet Mapping -->
     <servlet-mapping>
         <servlet-name>Login</servlet-name>
@@ -25,6 +35,16 @@
     <servlet-mapping>
         <servlet-name>Logout</servlet-name>
         <url-pattern>/Logout</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>CreateUser</servlet-name>
+        <url-pattern>/CreateUser</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>ManageDepartments</servlet-name>
+        <url-pattern>/ManageDepartments</url-pattern>
     </servlet-mapping>
     
     <!-- Filter Declaration -->

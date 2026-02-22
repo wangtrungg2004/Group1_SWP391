@@ -50,6 +50,45 @@
 
 	<!-- vendor css -->
 	<link rel="stylesheet" href="assets/css/style.css">
+	
+	<style>
+		.stat-card {
+			background: white;
+			border-radius: 10px;
+			padding: 25px;
+			box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+			transition: all 0.3s ease;
+			border-left: 4px solid;
+			height: 100%;
+		}
+		.stat-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+		}
+		.stat-card .card-body {
+			padding: 0;
+		}
+		.stat-card h6 {
+			color: #6c757d;
+			font-size: 0.9rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			margin-bottom: 15px;
+			letter-spacing: 0.5px;
+		}
+		.stat-card h3 {
+			font-size: 2rem;
+			font-weight: 700;
+			margin: 0;
+			color: #333;
+		}
+		.stat-card .icon {
+			font-size: 2.5rem;
+			opacity: 0.3;
+			float: right;
+			margin-top: -10px;
+		}
+	</style>
 </head>
 
 <body class="">
@@ -116,6 +155,12 @@
 					<c:if test="${role == 'Admin'}">
 						<li class="nav-item pcoded-menu-caption">
 							<label>Quản trị hệ thống</label>
+						</li>
+						<li class="nav-item">
+							<a href="CreateUser" class="nav-link"><span class="pcoded-micon"><i class="feather icon-user-plus"></i></span><span class="pcoded-mtext">Tạo User</span></a>
+						</li>
+						<li class="nav-item">
+							<a href="ManageDepartments" class="nav-link"><span class="pcoded-micon"><i class="feather icon-layers"></i></span><span class="pcoded-mtext">Quản lý Departments</span></a>
 						</li>
 						<li class="nav-item">
 							<a href="UserManagement" class="nav-link"><span class="pcoded-micon"><i class="feather icon-users"></i></span><span class="pcoded-mtext">Quản lý User</span></a>
