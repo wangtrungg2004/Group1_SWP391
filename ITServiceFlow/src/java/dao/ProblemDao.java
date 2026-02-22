@@ -18,19 +18,10 @@ public class ProblemDao extends DbContext{
     public List<Problems> getAllProblems()
     {
         List<Problems> list = new ArrayList<>();
-        String sql = "SELECT p.[Id]\n" +
-            "      ,p.[TicketNumber]\n" +
-            "      ,p.[Title]\n" +
-            "      ,p.[Description]\n" +
-            "      ,p.[RootCause]\n" +
-            "      ,p.[Workaround]\n" +
-            "      ,p.[Status]\n" +
-            "      ,p.[CreatedBy]\n" +
-            "      ,u.[FullName] AS CreatedByName\n" +
-            "      ,p.[AssignedTo]\n" +
-            "      ,p.[CreatedAt]\n" +
-            "  FROM [dbo].[Problems] p\n" +
-            "  LEFT JOIN [dbo].[Users] u ON p.[CreatedBy] = u.[Id]";
+        String sql = "SELECT p.[Id], p.[TicketNumber], p.[Title], p.[Description], p.[RootCause], p.[Workaround], p.[Status],\n" +
+                        "       p.[CreatedBy], u.[FullName] AS CreatedByName, p.[AssignedTo], p.[CreatedAt]\n" +
+                        "FROM [dbo].[Problems] p\n" +
+                        "LEFT JOIN [dbo].[Users] u ON p.[CreatedBy] = u.[Id]";
         
         try
         {
@@ -146,8 +137,8 @@ public class ProblemDao extends DbContext{
                     p.setCreatedBy(rs.getInt("CreatedBy"));
                     p.setCreatedByName(rs.getString("CreatedByName"));
                     p.setAssignedTo(rs.getInt("AssignedTo"));
-                    p.setCreatedAt(rs.getDate("CreatedAt"));
                     p.setAssignedToName(rs.getString("AssignedToName"));
+                    p.setCreatedAt(rs.getDate("CreatedAt"));
                     return p;
                 }
             }
@@ -231,7 +222,6 @@ public class ProblemDao extends DbContext{
             } else {
                 stm.setNull(8, java.sql.Types.INTEGER);
             }
-//            stm.setDate(9, CreatedAt);
             stm.executeUpdate();
             return true;
         } catch (Exception ex) {

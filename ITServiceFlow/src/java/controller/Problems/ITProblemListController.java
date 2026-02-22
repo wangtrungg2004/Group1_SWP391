@@ -71,16 +71,19 @@ public class ITProblemListController extends HttpServlet {
         int page = 1;
 
         String pageStr = request.getParameter("page");
-        if (pageStr != null) {
-            page = Integer.parseInt(pageStr);
+        try {
+            if (pageStr != null && !pageStr.isEmpty()) {
+                page = Integer.parseInt(pageStr);
+            }
+            if (page < 1) page = 1;
+        } catch (NumberFormatException e) {
+            page = 1;
         }
-
 
         int totalRecords = problemService.getTotalAssignProblem(userId);
-        int totalPages = totalRecords / pageSize;
-        if (totalRecords % pageSize != 0) {
-            totalPages++;
-        }
+        int totalPages = (totalRecords + pageSize - 1) / pageSize;
+        if (totalPages < 1) totalPages = 1;
+        if (page > totalPages) page = totalPages;
 
         List<Problems> problems =
                 problemService.getAssignProblemWithPage(userId, page, pageSize);

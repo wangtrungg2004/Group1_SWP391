@@ -69,7 +69,7 @@ public class ProblemAdd extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         List<Users> assignees = userService.getAllUser();
-        request.setAttribute("assignees",assignees);
+        request.setAttribute("assignees", assignees);
         request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
     }
 
@@ -89,9 +89,11 @@ public class ProblemAdd extends HttpServlet {
         String Description = trimOrNull(request.getParameter("Description"));
         String RootCause   = trimOrNull(request.getParameter("RootCause"));
         String Workaround  = trimOrNull(request.getParameter("Workaround"));
-        String Status      = trimOrNull(request.getParameter("Status"));
+//        String Status      = trimOrNull(request.getParameter("Status"));
         String assignedToStr = request.getParameter("AssignedTo");
 
+        final String defaultStatus = "New";
+        
         int assignedTo = 0;
         if (assignedToStr != null && !assignedToStr.trim().isEmpty()) {
             try {
@@ -124,7 +126,7 @@ public class ProblemAdd extends HttpServlet {
             Description,
             RootCause,
             Workaround,
-            Status,
+            defaultStatus,
             createdBy,
             assignedTo,
             createdAt
@@ -133,7 +135,7 @@ public class ProblemAdd extends HttpServlet {
         if (success) {
             int newProblemId = problemService.getLatestProblemId();
             if (newProblemId > 0) {
-                String message = "New problem: " + Title + " (Status: " + Status + ")";
+                String message = "New problem: " + Title + " (Status: " + defaultStatus + ")";
 
                 // Gửi notification cho người được assign (nếu có)
                 if (assignedTo > 0) {
