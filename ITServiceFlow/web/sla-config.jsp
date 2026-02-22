@@ -63,12 +63,28 @@
                                         <!-- [ breadcrumb ] end -->
 
                                         <!-- [ Main Content ] start -->
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 21fb2ceca814b602237c1a9239d60577738016e8
+>>>>>>> 3dd5aa557803e4dbc9a9b39c17449ccda9d3d815
 
                                         <c:if test="${not empty sessionScope.successMessage}">
                                             <div class="alert alert-success alert-dismissible fade show" role="alert">
                                                 ${sessionScope.successMessage}
+<<<<<<< HEAD
                                                 <button type="button" class="close" data-dismiss="alert"
                                                     aria-label="Close">
+=======
+<<<<<<< HEAD
+                                                <button type="button" class="close" data-dismiss="alert"
+                                                    aria-label="Close">
+=======
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+>>>>>>> 21fb2ceca814b602237c1a9239d60577738016e8
+>>>>>>> 3dd5aa557803e4dbc9a9b39c17449ccda9d3d815
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
                                             </div>
@@ -78,14 +94,31 @@
                                         <c:if test="${not empty sessionScope.errorMessage}">
                                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                                 ${sessionScope.errorMessage}
+<<<<<<< HEAD
                                                 <button type="button" class="close" data-dismiss="alert"
                                                     aria-label="Close">
+=======
+<<<<<<< HEAD
+                                                <button type="button" class="close" data-dismiss="alert"
+                                                    aria-label="Close">
+=======
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+>>>>>>> 21fb2ceca814b602237c1a9239d60577738016e8
+>>>>>>> 3dd5aa557803e4dbc9a9b39c17449ccda9d3d815
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
                                             </div>
                                             <c:remove var="errorMessage" scope="session" />
                                         </c:if>
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 1763278990a4a240d89ada2a865acfd8b2595d22
+>>>>>>> 21fb2ceca814b602237c1a9239d60577738016e8
+>>>>>>> 3dd5aa557803e4dbc9a9b39c17449ccda9d3d815
                                         <div class="row">
                                             <!-- SLA List -->
                                             <div class="col-xl-8 col-md-12">
@@ -163,12 +196,22 @@
                                                                     </c:if>
                                                                     <c:forEach items="${slaRules}" var="sla">
                                                                         <tr>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 3dd5aa557803e4dbc9a9b39c17449ccda9d3d815
                                                                             <td>
                                                                                 <a
                                                                                     href="SLAConfig?action=detail&id=${sla.id}">
                                                                                     ${sla.slaName}
                                                                                 </a>
                                                                             </td>
+<<<<<<< HEAD
+=======
+=======
+                                                                            <td>${sla.slaName}</td>
+>>>>>>> 21fb2ceca814b602237c1a9239d60577738016e8
+>>>>>>> 3dd5aa557803e4dbc9a9b39c17449ccda9d3d815
                                                                             <td>${sla.ticketType}</td>
                                                                             <td>${sla.priorityName}</td>
                                                                             <td>${sla.responseTime}</td>

@@ -40,6 +40,10 @@ public class SLAConfig extends HttpServlet {
 
         // Handle Edit request (populate form)
         String action = request.getParameter("action");
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 3dd5aa557803e4dbc9a9b39c17449ccda9d3d815
         if ("detail".equals(action)) {
             String idRaw = request.getParameter("id");
             if (idRaw != null) {
@@ -54,6 +58,12 @@ public class SLAConfig extends HttpServlet {
                 }
             }
         } else if ("edit".equals(action)) {
+<<<<<<< HEAD
+=======
+=======
+        if ("edit".equals(action)) {
+>>>>>>> 21fb2ceca814b602237c1a9239d60577738016e8
+>>>>>>> 3dd5aa557803e4dbc9a9b39c17449ccda9d3d815
             String idRaw = request.getParameter("id");
             if (idRaw != null) {
                 try {
@@ -140,6 +150,10 @@ public class SLAConfig extends HttpServlet {
                 try {
                     int id = Integer.parseInt(idRaw);
                     slaRuleService.deleteSLARule(id);
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 3dd5aa557803e4dbc9a9b39c17449ccda9d3d815
                     session.setAttribute("successMessage", "SLA Rule deleted successfully.");
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
@@ -188,6 +202,11 @@ public class SLAConfig extends HttpServlet {
                         response.sendRedirect("SLAConfig?action=detail&id=" + id);
                         return;
                     }
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 21fb2ceca814b602237c1a9239d60577738016e8
+>>>>>>> 3dd5aa557803e4dbc9a9b39c17449ccda9d3d815
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
                 }
@@ -203,6 +222,13 @@ public class SLAConfig extends HttpServlet {
             String status = request.getParameter("status");
 
             try {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 21fb2ceca814b602237c1a9239d60577738016e8
+>>>>>>> 3dd5aa557803e4dbc9a9b39c17449ccda9d3d815
                 // Validation
                 if (slaName == null || slaName.trim().isEmpty()) {
                     session.setAttribute("errorMessage", "SLA Name cannot be empty.");
@@ -210,10 +236,25 @@ public class SLAConfig extends HttpServlet {
                     return;
                 }
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 1763278990a4a240d89ada2a865acfd8b2595d22
+>>>>>>> 21fb2ceca814b602237c1a9239d60577738016e8
+>>>>>>> 3dd5aa557803e4dbc9a9b39c17449ccda9d3d815
                 int priorityId = Integer.parseInt(priorityIdRaw);
                 int responseTime = Integer.parseInt(responseTimeRaw);
                 int resolutionTime = Integer.parseInt(resolutionTimeRaw);
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 21fb2ceca814b602237c1a9239d60577738016e8
+>>>>>>> 3dd5aa557803e4dbc9a9b39c17449ccda9d3d815
                 if (responseTime <= 0 || resolutionTime <= 0) {
                     session.setAttribute("errorMessage", "Times must be greater than 0.");
                     response.sendRedirect("SLAConfig");
@@ -228,11 +269,28 @@ public class SLAConfig extends HttpServlet {
 
                 SLARule rule = new SLARule();
                 rule.setSlaName(slaName.trim());
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+=======
+                SLARule rule = new SLARule();
+                rule.setSlaName(slaName);
+>>>>>>> 1763278990a4a240d89ada2a865acfd8b2595d22
+>>>>>>> 21fb2ceca814b602237c1a9239d60577738016e8
+>>>>>>> 3dd5aa557803e4dbc9a9b39c17449ccda9d3d815
                 rule.setTicketType(ticketType);
                 rule.setPriorityId(priorityId);
                 rule.setResponseTime(responseTime);
                 rule.setResolutionTime(resolutionTime);
                 rule.setStatus(status);
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 21fb2ceca814b602237c1a9239d60577738016e8
+>>>>>>> 3dd5aa557803e4dbc9a9b39c17449ccda9d3d815
                 rule.setCreatedBy(userId);
 
                 boolean success;
@@ -256,6 +314,30 @@ public class SLAConfig extends HttpServlet {
 
             } catch (NumberFormatException e) {
                 session.setAttribute("errorMessage", "Invalid number format.");
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+=======
+                rule.setCreatedBy(userId); // For update, this might need logic to keep original creator or track
+                                           // updater
+
+                if (idRaw != null && !idRaw.isEmpty()) {
+                    // Update
+                    int id = Integer.parseInt(idRaw);
+                    rule.setId(id);
+                    slaRuleService.updateSLARule(rule);
+                } else {
+                    // Add
+                    slaRuleService.addSLARule(rule);
+                }
+
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                // Handle error
+>>>>>>> 1763278990a4a240d89ada2a865acfd8b2595d22
+>>>>>>> 21fb2ceca814b602237c1a9239d60577738016e8
+>>>>>>> 3dd5aa557803e4dbc9a9b39c17449ccda9d3d815
             }
         }
 
