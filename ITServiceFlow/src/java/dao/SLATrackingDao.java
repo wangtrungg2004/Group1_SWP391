@@ -28,7 +28,6 @@ public class SLATrackingDao extends DbContext {
         }
         return false;
     }
-<<<<<<< HEAD
 
     public java.util.Map<String, Integer> getSLAStatistics() {
         java.util.Map<String, Integer> stats = new java.util.HashMap<>();
@@ -95,6 +94,4 @@ public class SLATrackingDao extends DbContext {
         }
         return list;
     }
-=======
->>>>>>> 3dd5aa557803e4dbc9a9b39c17449ccda9d3d815
 }
