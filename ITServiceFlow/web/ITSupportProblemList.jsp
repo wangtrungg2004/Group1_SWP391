@@ -168,15 +168,18 @@
                                                                            href="ProblemDetail?Id=${p.id}">
                                                                             Detail
                                                                         </a>
-<!--                                                                        <form action="ProblemList" method="post"
-                                                                                onsubmit="return confirm('Delete this Problem?');"
-                                                                                style="display:inline;">
-                                                                              <input type="hidden" name="Id" value="${p.id}">
-                                                                              <button type="submit" class="btn btn-sm btn-danger">
-                                                                                  Delete
-                                                                              </button>
-                                                                          </form>-->
+                                                                            <c:if test="${p.status eq 'NEW'}">
+                                                                                <form action="ITProblemListController" method="post" style="display:inline;">
+                                                                                    <input type="hidden" name="problemId" value="${p.id}">
+                                                                                    <button type="submit"
+                                                                                            class="btn btn-sm btn-warning"
+                                                                                            onclick="return confirm('Start investigation for this problem?');">
+                                                                                        Start Investigation
+                                                                                    </button>
+                                                                                </form>
+                                                                            </c:if>
                                                                     </td>
+                                                                    
                                                                 </tr>
                                                             </c:forEach>
                                                         </c:otherwise>
