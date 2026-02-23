@@ -1,142 +1,177 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%
+    if (session.getAttribute("user") == null) {
+        response.sendRedirect("Login.jsp");
+        return;
+    }
+%>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Create New Ticket</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .hidden-section { display: none; }
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <title>Tạo Ticket Mới - ITServiceFlow</title>
+
+    <link rel="stylesheet" href="assets/fonts/fontawesome/css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="assets/plugins/animation/css/animate.min.css">
+    <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body class="bg-light">
 
-<div class="container mt-5">
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">Submit a New Ticket</h4>
-        </div>
-        <div class="card-body">
-            
-            <c:if test="${not empty errorMessage}">
-                <div class="alert alert-danger">${errorMessage}</div>
-            </c:if>
+<body class="">
+    <div class="loader-bg">
+        <div class="loader-track"><div class="loader-fill"></div></div>
+    </div>
 
-            <form action="${pageContext.request.contextPath}/ticket/create" method="POST" id="ticketForm">
-                
-                <div class="mb-3">
-                    <label class="form-label fw-bold">How can we help you?</label>
-                    <select name="ticketType" id="ticketType" class="form-select" onchange="toggleFormFields()" required>
-                        <option value="Incident" selected>Report an Issue (Something is broken)</option>
-                        <option value="ServiceRequest">Request a Service (I need something new)</option>
-                    </select>
-                </div>
+    <jsp:include page="../includes/sidebar.jsp"/>
+    <jsp:include page="../includes/header.jsp"/>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Title (Short Summary)</label>
-                    <input type="text" name="title" class="form-control" placeholder="e.g., Cannot access email" required maxlength="255">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Detailed Description</label>
-                    <textarea name="description" class="form-control" rows="4" placeholder="Please provide as much detail as possible..." required></textarea>
-                </div>
-
-                <div id="incidentSection">
-                    <h5 class="text-secondary border-bottom pb-2 mt-4">Issue Details</h5>
+    <div class="pcoded-main-container">
+        <div class="pcoded-wrapper">
+            <div class="pcoded-content">
+                <div class="pcoded-inner-content">
                     
-                    <div class="mb-3">
-                        <label class="form-label">Category</label>
-                        <select name="categoryId" id="incidentCategory" class="form-select incident-field" required>
-                            <option value="">-- Select Category --</option>
-                            <option value="1">Hardware (Laptop, PC, Monitor)</option>
-                            <option value="2">Software (Windows, Office, ERP)</option>
-                            <option value="3">Network & Internet</option>
-                        </select>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Impact (How many people are affected?)</label>
-                            <select name="impact" class="form-select incident-field" required>
-                                <option value="3">Low </option>
-                                <option value="2">Medium </option>
-                                <option value="1">High </option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Urgency (How fast do you need this fixed?)</label>
-                            <select name="urgency" class="form-select incident-field" required>
-                                <option value="3">Low (Can wait a few days)</option>
-                                <option value="2">Medium (Need it today)</option>
-                                <option value="1">High (Business is stopped!)</option>
-                            </select>
+                    <div class="page-header">
+                        <div class="page-block">
+                            <div class="row align-items-center">
+                                <div class="col-md-12">
+                                    <div class="page-header-title">
+                                        <h5 class="m-b-10">Tạo Yêu Cầu Hỗ Trợ Mới</h5>
+                                    </div>
+                                    <ul class="breadcrumb">
+                                        <li class="breadcrumb-item"><a href="UserDashboard.jsp"><i class="feather icon-home"></i></a></li>
+                                        <li class="breadcrumb-item"><a href="#!">Tạo Ticket</a></li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div id="requestSection" class="hidden-section">
-                    <h5 class="text-secondary border-bottom pb-2 mt-4">Service Details</h5>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Select from Service Catalog</label>
-                        <select name="serviceCatalogId" id="serviceCatalog" class="form-select request-field">
-                            <option value="">-- Select a Service --</option>
-                            <option value="1">Request a new Laptop</option>
-                            <option value="2">Request Software Installation</option>
-                            <option value="3">VPN Access Request</option>
-                        </select>
+                    <div class="main-body">
+                        <div class="page-wrapper">
+                            
+                            <div class="row">
+                                <div class="col-sm-12 col-md-10 col-xl-8">
+                                    <div class="card">
+                                        <div class="card-header bg-light">
+                                            <h5>Điền thông tin yêu cầu</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <c:if test="${not empty errorMessage}">
+                                                <div class="alert alert-danger">${errorMessage}</div>
+                                            </c:if>
+
+                                            <form action="CreateTicket" method="POST" id="ticketForm">
+                                                
+                                                <div class="form-group mb-3">
+                                                    <label class="font-weight-bold">Bạn đang cần gì?</label>
+                                                    <select name="ticketType" id="ticketType" class="form-control" onchange="toggleFormFields()" required>
+                                                        <option value="Incident" selected>Báo lỗi (Máy móc, phần mềm bị hỏng)</option>
+                                                        <option value="ServiceRequest">Yêu cầu Dịch vụ (Xin cấp tài khoản, thiết bị mới)</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="form-group mb-3">
+                                                    <label class="font-weight-bold">Tiêu đề (Ngắn gọn)</label>
+                                                    <input type="text" name="title" class="form-control" placeholder="Ví dụ: Không thể in tài liệu..." required maxlength="255">
+                                                </div>
+
+                                                <div class="form-group mb-3">
+                                                    <label class="font-weight-bold">Mô tả chi tiết</label>
+                                                    <textarea name="description" class="form-control" rows="5" placeholder="Vui lòng cung cấp càng nhiều chi tiết càng tốt..." required></textarea>
+                                                </div>
+
+                                                <div id="incidentSection">
+                                                    <hr>
+                                                    <h6 class="text-primary mb-3"><i class="feather icon-alert-triangle"></i> Chi tiết Sự cố</h6>
+                                                    <div class="form-group mb-3">
+                                                        <label>Danh mục (Category)</label>
+                                                        <select name="categoryId" class="form-control incident-field" required>
+                                                            <option value="">-- Chọn danh mục --</option>
+                                                            <option value="1">Hardware (Phần cứng)</option>
+                                                            <option value="2">Software (Phần mềm)</option>
+                                                            <option value="3">Network (Mạng)</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6 form-group">
+                                                            <label>Mức độ ảnh hưởng (Impact)</label>
+                                                            <select name="impact" class="form-control incident-field" required>
+                                                                <option value="3">Low (Chỉ mình tôi)</option>
+                                                                <option value="2">Medium (Cả phòng ban)</option>
+                                                                <option value="1">High (Toàn công ty)</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6 form-group">
+                                                            <label>Độ khẩn cấp (Urgency)</label>
+                                                            <select name="urgency" class="form-control incident-field" required>
+                                                                <option value="3">Low (Có thể đợi vài ngày)</option>
+                                                                <option value="2">Medium (Cần trong ngày)</option>
+                                                                <option value="1">High (Đang dừng việc, cần ngay!)</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div id="requestSection" style="display: none;">
+                                                    <hr>
+                                                    <h6 class="text-success mb-3"><i class="feather icon-shopping-cart"></i> Chi tiết Dịch vụ</h6>
+                                                    <div class="form-group mb-3">
+                                                        <label>Danh mục dịch vụ (Service Catalog)</label>
+                                                        <select name="serviceCatalogId" class="form-control request-field">
+                                                            <option value="">-- Chọn dịch vụ cần cấp --</option>
+                                                            <option value="1">Xin cấp Laptop mới</option>
+                                                            <option value="2">Yêu cầu cài đặt phần mềm</option>
+                                                            <option value="3">Yêu cầu cấp quyền ERP</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="text-right mt-4">
+                                                    <button type="submit" class="btn btn-primary"><i class="feather icon-save"></i> Gửi Yêu Cầu</button>
+                                                </div>
+                                            </form>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
                     </div>
                 </div>
-
-                <div class="text-end mt-4">
-                    <a href="${pageContext.request.contextPath}/ticket/list" class="btn btn-secondary me-2">Cancel</a>
-                    <button type="submit" class="btn btn-primary px-4">Submit Ticket</button>
-                </div>
-
-            </form>
+            </div>
         </div>
     </div>
-</div>
+    <script src="assets/js/vendor-all.min.js"></script>
+    <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/pcoded.min.js"></script>
+    
+    <script>
+        function toggleFormFields() {
+            var type = document.getElementById("ticketType").value;
+            var incSection = document.getElementById("incidentSection");
+            var reqSection = document.getElementById("requestSection");
+            var incFields = document.querySelectorAll(".incident-field");
+            var reqFields = document.querySelectorAll(".request-field");
 
-<script>
-    function toggleFormFields() {
-        // Lấy giá trị loại Ticket (Incident hoặc ServiceRequest)
-        var type = document.getElementById("ticketType").value;
-        
-        // Lấy các khu vực (div) và các input/select bên trong
-        var incSection = document.getElementById("incidentSection");
-        var reqSection = document.getElementById("requestSection");
-        
-        var incFields = document.querySelectorAll(".incident-field");
-        var reqFields = document.querySelectorAll(".request-field");
-
-        if (type === "Incident") {
-            // Hiện form Lỗi, Ẩn form Dịch vụ
-            incSection.style.display = "block";
-            reqSection.style.display = "none";
-            
-            // Bật thuộc tính 'required' cho Incident, tắt của Request
-            incFields.forEach(f => f.setAttribute("required", "true"));
-            reqFields.forEach(f => f.removeAttribute("required"));
-            
-        } else if (type === "ServiceRequest") {
-            // Hiện form Dịch vụ, Ẩn form Lỗi
-            incSection.style.display = "none";
-            reqSection.style.display = "block";
-            
-            // Bật thuộc tính 'required' cho Request, tắt của Incident
-            reqFields.forEach(f => f.setAttribute("required", "true"));
-            incFields.forEach(f => f.removeAttribute("required"));
+            if (type === "Incident") {
+                incSection.style.display = "block";
+                reqSection.style.display = "none";
+                incFields.forEach(f => f.setAttribute("required", "true"));
+                reqFields.forEach(f => f.removeAttribute("required"));
+            } else {
+                incSection.style.display = "none";
+                reqSection.style.display = "block";
+                reqFields.forEach(f => f.setAttribute("required", "true"));
+                incFields.forEach(f => f.removeAttribute("required"));
+            }
         }
-    }
-
-    // Chạy hàm 1 lần khi trang vừa load xong để đảm bảo form hiển thị đúng theo giá trị mặc định
-    window.onload = function() {
-        toggleFormFields();
-    };
-</script>
-
+        
+        // Chạy khi load trang
+        window.onload = function() {
+            toggleFormFields();
+        };
+    </script>
 </body>
 </html>
