@@ -93,8 +93,8 @@
                                             <!-- Status -->
                                            <div class="form-group">
                                                 <label><strong>Status</strong></label>
-                                                <input type="text" class="form-control" value="New" readonly disabled>
-                                                <input type="hidden" name="Status" value="New">
+                                                <input type="text" class="form-control" value="NEW" readonly disabled>
+                                                <input type="hidden" name="Status" value="NEW">
                                             </div>
                                             
                                             <!-- Assigned To -->

@@ -153,55 +153,69 @@
                                                         <div class="row">
                                                             <div class="col-md-12">
                                                                 <div class="form-group">
-                                                                    <label for="Title"><strong>Title <span class="text-danger">*</span></strong></label>
-                                                                    <input type="text" class="form-control" id="Title"
-                                                                           name="Title" value="${problem.title}" required
-                                                                           placeholder="Enter problem title">
+                                                                    <c:if test="${role eq 'IT Support'}">
+                                                                        <input type="hidden" name="Title" value="${problem.title}">
+                                                                    </c:if>
+                                                                    <c:if test="${role ne 'IT Support'}">
+                                                                        <label for="Title"><strong>Title <span class="text-danger">*</span></strong></label>
+                                                                        <input type="text" class="form-control" id="Title" name="Title" value="${problem.title}"
+                                                                               required placeholder="Enter problem title">
+                                                                    </c:if>
                                                                 </div>
                                                             </div>
                                                         </div>
-
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label for="Status"><strong>Status <span class="text-danger">*</span></strong></label>
-                                                                    <select name="Status" id="Status" class="form-control" required>
-                                                                        <option value="">-- Select Status --</option>
-                                                                        <option value="NEW" ${problem.status == 'NEW' ? 'selected' : ''}>NEW</option>
-                                                                        <option value="OPEN" ${problem.status == 'OPEN' ? 'selected' : ''}>OPEN</option>
-                                                                        <option value="RESOLVED" ${problem.status == 'RESOLVED' ? 'selected' : ''}>RESOLVED</option>
-                                                                        <option value="CLOSED" ${problem.status == 'CLOSED' ? 'selected' : ''}>CLOSED</option>
-                                                                    </select>
+                                                        <c:if test="${role eq 'IT Support'}">
+                                                            <input type="hidden" id="Status" name="Status" value="${problem.status}">
+                                                        </c:if>
+                                                        <c:if test="${role ne 'IT Support'}">
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label><strong>Status</strong></label>
+                                                                        <input type="text" class="form-control" value="${problem.status}" readonly disabled>
+                                                                        <input type="hidden" id="Status" name="Status" value="${problem.status}">
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="form-group">
-                                                                <label for="AssignedTo"><strong>Assigned To</strong></label>
-                                                                <select id="AssignedTo" name="AssignedTo" class="form-control">
-                                                                    <option value="">-- Select assignee --</option>
-                                                                    <c:forEach items="${assignees}" var="u">
-                                                                        <option value="${u.id}" ${u.id == problem.assignedTo ? 'selected' : ''}>
-                                                                            ${u.fullName} (${u.username})
-                                                                        </option>
-                                                                    </c:forEach>
-                                                                </select>
-                                                                <small class="form-text text-muted">
-                                                                    Select the user who will handle this problem
-                                                                </small>
-                                                            </div>
-                                                        </div>
-
+                                                        </c:if>
+                                                        
                                                         <div class="row">
                                                             <div class="col-md-12">
                                                                 <div class="form-group">
-                                                                    <label for="Description"><strong>Description</strong></label>
-                                                                    <textarea name="Description" id="Description" 
-                                                                              class="form-control" rows="4" 
-                                                                              placeholder="Enter problem description">${problem.description}</textarea>
-                                                                </div>
+                                                                    <c:if test="${role eq 'IT Support'}">
+                                                                        <input type="hidden" name="AssignedTo" value="${problem.assignedTo}">
+                                                                    </c:if>
+                                                                    <c:if test="${role ne 'IT Support'}">
+                                                                        <label for="AssignedTo"><strong>Assigned To</strong></label>
+                                                                        <select id="AssignedTo" name="AssignedTo" class="form-control">
+                                                                            <option value="">-- Select assignee --</option>
+                                                                            <c:forEach items="${assignees}" var="u">
+                                                                                <option value="${u.id}" ${u.id == problem.assignedTo ? 'selected' : ''}>
+                                                                                    ${u.fullName} (${u.username})
+                                                                                </option>
+                                                                            </c:forEach>
+                                                                        </select>
+                                                                        <small class="form-text text-muted">
+                                                                            Select the user who will handle this problem
+                                                                        </small>
+                                                                    </c:if>
+                                                                </div>  
                                                             </div>
                                                         </div>
+                                                                           
+                                                        <c:if test="${role ne 'IT Support'}">
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label for="Description"><strong>Description</strong></label>
+                                                                        <textarea name="Description" id="Description" class="form-control" rows="4"
+                                                                                  placeholder="Enter problem description">${problem.description}</textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </c:if>
 
-<!--                                                        <div class="row">
+                                                        <div class="row">
                                                             <div class="col-md-12">
                                                                 <div class="form-group">
                                                                     <label for="RootCause"><strong>Root Cause</strong></label>
@@ -221,7 +235,7 @@
                                                                               placeholder="Enter workaround solution">${problem.workaround}</textarea>
                                                                 </div>
                                                             </div>
-                                                        </div>-->
+                                                        </div>
 
                                                         <hr>
 

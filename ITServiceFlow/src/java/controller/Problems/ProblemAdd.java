@@ -92,7 +92,7 @@ public class ProblemAdd extends HttpServlet {
 //        String Status      = trimOrNull(request.getParameter("Status"));
         String assignedToStr = request.getParameter("AssignedTo");
 
-        final String defaultStatus = "New";
+        final String defaultStatus = "NEW";
         
         int assignedTo = 0;
         if (assignedToStr != null && !assignedToStr.trim().isEmpty()) {

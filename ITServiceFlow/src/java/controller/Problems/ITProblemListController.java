@@ -120,15 +120,20 @@ public class ITProblemListController extends HttpServlet {
                 return;
             }
             
-            // Thực hiện delete
+            // Thực hiện start investigation
             boolean startInvestigation = problemService.updateAssignStatus(id);
             if (!startInvestigation) {
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to start investigation");
                 return;
             }
             
-            // Redirect về danh sách users sau khi delete thành công
-            response.sendRedirect("ITProblemListController");
+            // Nếu gọi từ trang detail thì quay lại ProblemDetail, không thì về danh sách
+            String fromDetail = request.getParameter("fromDetail");
+            if ("1".equals(fromDetail)) {
+                response.sendRedirect("ProblemDetail?Id=" + id);
+            } else {
+                response.sendRedirect("ITProblemListController");
+            }
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ProblemId format");
         } catch (NullPointerException e) {

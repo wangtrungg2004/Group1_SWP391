@@ -168,16 +168,6 @@
                                                                            href="ProblemDetail?Id=${p.id}">
                                                                             Detail
                                                                         </a>
-                                                                            <c:if test="${p.status eq 'NEW'}">
-                                                                                <form action="ITProblemListController" method="post" style="display:inline;">
-                                                                                    <input type="hidden" name="problemId" value="${p.id}">
-                                                                                    <button type="submit"
-                                                                                            class="btn btn-sm btn-warning"
-                                                                                            onclick="return confirm('Start investigation for this problem?');">
-                                                                                        Start Investigation
-                                                                                    </button>
-                                                                                </form>
-                                                                            </c:if>
                                                                     </td>
                                                                     
                                                                 </tr>

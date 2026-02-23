@@ -21,6 +21,7 @@
     String role = (String) session.getAttribute("role");
     String problemListUrl = "IT Support".equals(role) ? "ITProblemListController" : "ProblemList";
     request.setAttribute("problemListUrl", problemListUrl);
+    request.setAttribute("role", role != null ? role : "");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -99,7 +100,22 @@
                                     <div class="card">
                                         <div class="card-header">
                                             <h5>Problem Details</h5>
-                                            <div class="card-header-right">
+                                            <div class="card-header-right d-flex align-items-center gap-2">
+                                                <c:if test="${role eq 'IT Support' and not empty problem and problem.status eq 'NEW'}">
+                                                    <form action="ITProblemListController" method="post" style="display:inline;">
+                                                        <input type="hidden" name="problemId" value="${problem.id}">
+                                                        <input type="hidden" name="fromDetail" value="1">
+                                                        <button type="submit" class="btn btn-sm btn-warning"
+                                                                onclick="return confirm('Start investigation for this problem?');">
+                                                            <i class="feather icon-play-circle"></i> Start Investigation
+                                                        </button>
+                                                    </form>
+                                                </c:if>
+                                                <c:if test="${role eq 'IT Support' and not empty problem and problem.status ne 'NEW'}">
+                                                    <a href="ProblemUpdate?Id=${problem.id}" class="btn btn-sm btn-primary">
+                                                        <i class="feather icon-edit-2"></i> Update
+                                                    </a>
+                                                </c:if>
                                                 <a href="${problemListUrl}" class="btn btn-sm btn-secondary">
                                                     <i class="feather icon-arrow-left"></i> Back to List
                                                 </a>
