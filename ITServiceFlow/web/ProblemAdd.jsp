@@ -91,18 +91,12 @@
                                             </div>
 
                                             <!-- Status -->
-                                            <div class="form-group">
+                                           <div class="form-group">
                                                 <label><strong>Status</strong></label>
-                                                <select name="Status" class="form-control">
-                                                            <option value="NEW">NEW</option>
-                                                            <option value="UNDER_INVESTIGATION">UNDER INVESTIGATION</option>
-                                                            <option value="KNOWN_ERROR">KNOWN ERROR</option>
-                                                            <option value="RFC_RAISED">RFC RAISED</option>
-                                                            <option value="RESOLVED">RESOLVED</option>
-                                                            <!--<option value="CLOSED">CLOSED</option>-->
-                                                </select>
+                                                <input type="text" class="form-control" value="New" readonly disabled>
+                                                <input type="hidden" name="Status" value="New">
                                             </div>
-
+                                            
                                             <!-- Assigned To -->
                                             <div class="form-group">
                                                 <label><strong>Assigned To</strong></label>

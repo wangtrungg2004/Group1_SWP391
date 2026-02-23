@@ -123,6 +123,7 @@
                                                         <th>Title</th>
                                                         <th>Status</th>
                                                         <th>Created By</th>
+                                                        <th>Assign To</th>
                                                         <th>Created At</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -148,6 +149,7 @@
                                                                         </span>
                                                                     </td>
                                                                     <td>${p.createdByName != null ? p.createdByName : p.createdBy}</td>
+                                                                    <td>${p.assignedToName != null && p.assignedToName != '' ? p.assignedToName : '-'}</td>
                                                                     <td>${p.createdAt}</td>
                                                                     <td class="d-flex gap-1">
                                                                         <a class="btn btn-sm btn-primary"

@@ -15,6 +15,7 @@ import java.util.List;
 import model.Problems;
 import model.Tickets;
 import service.ProblemService;
+import service.UserService;
 /**
  *
  * @author DELL
@@ -58,6 +59,8 @@ public class ProblemUpdate extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     ProblemService problemService = new ProblemService();
+    UserService userService = new UserService();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -80,6 +83,7 @@ public class ProblemUpdate extends HttpServlet {
             List<Tickets> relatedTickets = problemService.getRelatedTicket(id);
             request.setAttribute("relatedTickets", relatedTickets);
             request.setAttribute("problem", pro);
+            request.setAttribute("assignees", userService.getAllUser());
             request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
         }
         catch(Exception ex)

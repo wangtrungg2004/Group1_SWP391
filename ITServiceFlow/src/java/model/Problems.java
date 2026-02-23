@@ -135,6 +135,4 @@ public class Problems {
     public void setCreatedByName(String CreatedByName) {
         this.CreatedByName = CreatedByName;
     }
-    
-    
 }

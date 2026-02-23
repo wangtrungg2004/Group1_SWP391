@@ -76,4 +76,9 @@ public class ProblemService {
     {
         return dao.getTotalAssignProblems(id);
     }
+    
+    public boolean updateAssignStatus(int Id)
+    {
+        return dao.startInvestigation(Id);
+    }
 }

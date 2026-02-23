@@ -108,10 +108,11 @@ public class ProblemList extends HttpServlet {
             totalPages = 1;
             page = 1;
         } else {
-            problems = problemService.getProblemsWithPages(page, pageSize);
             totalRecords = problemService.getTotalProblem();
             totalPages = (totalRecords + pageSize - 1) / pageSize;
             if (totalPages < 1) totalPages = 1;
+            if (page > totalPages) page = totalPages;
+            problems = problemService.getProblemsWithPages(page, pageSize);
         }
 
         request.setAttribute("problem", problems);

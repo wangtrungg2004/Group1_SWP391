@@ -18,19 +18,11 @@ public class ProblemDao extends DbContext{
     public List<Problems> getAllProblems()
     {
         List<Problems> list = new ArrayList<>();
-        String sql = "SELECT p.[Id]\n" +
-            "      ,p.[TicketNumber]\n" +
-            "      ,p.[Title]\n" +
-            "      ,p.[Description]\n" +
-            "      ,p.[RootCause]\n" +
-            "      ,p.[Workaround]\n" +
-            "      ,p.[Status]\n" +
-            "      ,p.[CreatedBy]\n" +
-            "      ,u.[FullName] AS CreatedByName\n" +
-            "      ,p.[AssignedTo]\n" +
-            "      ,p.[CreatedAt]\n" +
-            "  FROM [dbo].[Problems] p\n" +
-            "  LEFT JOIN [dbo].[Users] u ON p.[CreatedBy] = u.[Id]";
+        String sql = "SELECT p.[Id], p.[TicketNumber], p.[Title], p.[Description], p.[RootCause], p.[Workaround], p.[Status],\n" +
+                        "       p.[CreatedBy], u.[FullName] AS CreatedByName, p.[AssignedTo], u2.[FullName] AS AssignedToName, p.[CreatedAt]\n" +
+                        "FROM [dbo].[Problems] p\n" +
+                        "LEFT JOIN [dbo].[Users] u ON p.[CreatedBy] = u.[Id]\n" +
+                        "LEFT JOIN [dbo].[Users] u2 ON p.[AssignedTo] = u2.[Id]";
         
         try
         {
@@ -49,6 +41,7 @@ public class ProblemDao extends DbContext{
                pro.setCreatedBy(rs.getInt("CreatedBy"));
                pro.setCreatedByName(rs.getString("CreatedByName"));
                pro.setAssignedTo(rs.getInt("AssignedTo"));
+               pro.setAssignedToName(rs.getString("AssignedToName"));
                pro.setCreatedAt(rs.getDate("CreatedAt"));
                list.add(pro);
             }
@@ -65,9 +58,10 @@ public class ProblemDao extends DbContext{
         try {
             String sql = "SELECT p.Id, p.TicketNumber, p.Title, p.Description, "
                       + "p.RootCause, p.Workaround, p.Status, p.CreatedBy, "
-                      + "u.FullName AS CreatedByName, p.AssignedTo, p.CreatedAt "
+                      + "u.FullName AS CreatedByName, p.AssignedTo, u2.FullName AS AssignedToName, p.CreatedAt "
                       + "FROM dbo.Problems p "
                       + "LEFT JOIN dbo.Users u ON p.CreatedBy = u.Id "
+                      + "LEFT JOIN dbo.Users u2 ON p.AssignedTo = u2.Id "
                       + "ORDER BY p.Id "
                       + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
             PreparedStatement stm = connection.prepareStatement(sql);
@@ -87,6 +81,7 @@ public class ProblemDao extends DbContext{
                 pro.setCreatedBy(rs.getInt("CreatedBy"));
                 pro.setCreatedByName(rs.getString("CreatedByName"));
                 pro.setAssignedTo(rs.getInt("AssignedTo"));
+                pro.setAssignedToName(rs.getString("AssignedToName"));
                 pro.setCreatedAt(rs.getDate("CreatedAt"));
                 list.add(pro);
             }
@@ -146,8 +141,8 @@ public class ProblemDao extends DbContext{
                     p.setCreatedBy(rs.getInt("CreatedBy"));
                     p.setCreatedByName(rs.getString("CreatedByName"));
                     p.setAssignedTo(rs.getInt("AssignedTo"));
-                    p.setCreatedAt(rs.getDate("CreatedAt"));
                     p.setAssignedToName(rs.getString("AssignedToName"));
+                    p.setCreatedAt(rs.getDate("CreatedAt"));
                     return p;
                 }
             }
@@ -184,7 +179,6 @@ public class ProblemDao extends DbContext{
             stm.setInt(8, p.getId());
 
             return stm.executeUpdate() > 0;
-            // Kiểm tra xem có update được dòng nào không
         }
         catch(Exception ex)
         {
@@ -231,7 +225,6 @@ public class ProblemDao extends DbContext{
             } else {
                 stm.setNull(8, java.sql.Types.INTEGER);
             }
-//            stm.setDate(9, CreatedAt);
             stm.executeUpdate();
             return true;
         } catch (Exception ex) {
@@ -298,9 +291,10 @@ public class ProblemDao extends DbContext{
         {
             String sql = "SELECT p.Id, p.TicketNumber, p.Title, p.Description, " +
              "p.RootCause, p.Workaround, p.Status, p.CreatedBy, " +
-             "u.FullName AS CreatedByName, p.AssignedTo, p.CreatedAt " +
+             "u.FullName AS CreatedByName, p.AssignedTo, u2.FullName AS AssignedToName, p.CreatedAt " +
              "FROM dbo.Problems p " +
              "LEFT JOIN dbo.Users u ON p.CreatedBy = u.Id " +
+             "LEFT JOIN dbo.Users u2 ON p.AssignedTo = u2.Id " +
              "WHERE (p.Title LIKE ? OR p.TicketNumber LIKE ?)";
             
             PreparedStatement stm = connection.prepareStatement(sql);
@@ -322,6 +316,7 @@ public class ProblemDao extends DbContext{
                pro.setCreatedBy(rs.getInt("CreatedBy"));
                pro.setCreatedByName(rs.getString("CreatedByName"));
                pro.setAssignedTo(rs.getInt("AssignedTo"));
+               pro.setAssignedToName(rs.getString("AssignedToName"));
                pro.setCreatedAt(rs.getDate("CreatedAt"));
                list.add(pro);
             }
@@ -425,9 +420,10 @@ public class ProblemDao extends DbContext{
         List<Problems> list = new ArrayList<>();
         String sql = "SELECT p.Id, p.TicketNumber, p.Title, p.Description,\n" +
 "               p.RootCause, p.Workaround, p.Status, p.CreatedBy,\n" +
-"               u.FullName AS CreatedByName, p.AssignedTo, p.CreatedAt\n" +
+"               u.FullName AS CreatedByName, p.AssignedTo, u2.FullName AS AssignedToName, p.CreatedAt\n" +
 "        FROM dbo.Problems p\n" +
 "        LEFT JOIN dbo.Users u ON p.CreatedBy = u.Id\n" +
+"        LEFT JOIN dbo.Users u2 ON p.AssignedTo = u2.Id\n" +
 "        WHERE p.AssignedTo = ?\n" +
 "        ORDER BY p.CreatedAt DESC\n" +
 "        OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
@@ -454,6 +450,7 @@ public class ProblemDao extends DbContext{
             pro.setCreatedBy(rs.getInt("CreatedBy"));
             pro.setCreatedByName(rs.getString("CreatedByName"));
             pro.setAssignedTo(rs.getInt("AssignedTo"));
+            pro.setAssignedToName(rs.getString("AssignedToName"));
             pro.setCreatedAt(rs.getDate("CreatedAt"));
             list.add(pro);
             }
@@ -479,6 +476,21 @@ public class ProblemDao extends DbContext{
         }
 
         return 0;
+    }
+    
+    public boolean startInvestigation(int problemId) {
+        String sql = "UPDATE [dbo].[Problems] " +
+                     "SET [Status] = ? " +
+                     "WHERE Id = ? AND Status = 'NEW'";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, "UNDER_INVESTIGATION");
+            stm.setInt(2, problemId);
+            return stm.executeUpdate() > 0;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
     }
 
 //    public static void main(String[] args) {
@@ -612,25 +624,48 @@ public class ProblemDao extends DbContext{
 //    }
     
     public static void main(String[] args) {
-    ProblemDao dao = new ProblemDao(); // hoặc DAO bạn đang dùng
 
-    int testProblemId = 3; // đổi ID có thật trong DB
-    List<Tickets> tickets = dao.viewRelatedTicket(testProblemId);
+        ProblemDao dao = new ProblemDao();
 
-    if (tickets.isEmpty()) {
-        System.out.println("No ticket linked with problemId = " + testProblemId);
-    } else {
-        System.out.println("✅ list Problem Linked:");
-        for (Tickets t : tickets) {
-            System.out.println(
-                "ID: " + t.getId() +
-                " | Number: " + t.getTicketNumber() +
-                " | Title: " + t.getTitle() +
-                " | Status: " + t.getStatus()
-            );
+        int testProblemId = 8; // đổi sang ID có thật, status = NEW
+
+        Problems before = dao.getProblemById(testProblemId);
+        System.out.println("===== BEFORE =====");
+        System.out.println("Status: " + before.getStatus());
+
+        boolean result = dao.startInvestigation(testProblemId);
+
+        if (result) {
+            System.out.println("✅ Start Investigation SUCCESS");
+        } else {
+            System.out.println("❌ Start Investigation FAILED");
         }
+
+        Problems after = dao.getProblemById(testProblemId);
+        System.out.println("===== AFTER =====");
+        System.out.println("Status: " + after.getStatus());
     }
-}
+    
+//    public static void main(String[] args) {
+//    ProblemDao dao = new ProblemDao(); // hoặc DAO bạn đang dùng
+//
+//    int testProblemId = 3; // đổi ID có thật trong DB
+//    List<Tickets> tickets = dao.viewRelatedTicket(testProblemId);
+//
+//    if (tickets.isEmpty()) {
+//        System.out.println("No ticket linked with problemId = " + testProblemId);
+//    } else {
+//        System.out.println("✅ list Problem Linked:");
+//        for (Tickets t : tickets) {
+//            System.out.println(
+//                "ID: " + t.getId() +
+//                " | Number: " + t.getTicketNumber() +
+//                " | Title: " + t.getTitle() +
+//                " | Status: " + t.getStatus()
+//            );
+//        }
+//    }
+//}
 
 
 }

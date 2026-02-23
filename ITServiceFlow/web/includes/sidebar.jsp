@@ -15,17 +15,6 @@
         </div>
         <div class="navbar-content scroll-div">
             <ul class="nav pcoded-inner-navbar">
-                <li class="nav-item pcoded-menu-caption">
-                    <label>Navigation</label>
-                </li>
-                <li class="nav-item">
-                    <a href="AdminDashboard.jsp" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
-                </li>
-                <li class="nav-item">
-                    <a href="ProblemList" class="nav-link"><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Problem List</span></a>
-                </li>
-
-                <!-- Menu chỉ dành cho Admin -->
                 <c:if test="${role == 'Admin'}">
                     <li class="nav-item pcoded-menu-caption">
                         <label>Quản trị hệ thống</label>
@@ -45,6 +34,12 @@
                     </li>
                     <li class="nav-item">
                         <a href="Reports" class="nav-link"><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Xem báo cáo</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="AdminDashboard.jsp" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="ProblemList" class="nav-link"><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Problem List</span></a>
                     </li>
                 </c:if>
 

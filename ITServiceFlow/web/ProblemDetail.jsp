@@ -18,6 +18,9 @@
         notifications = notificationDao.getAllNotifications();
     }
     request.setAttribute("notifications", notifications);
+    String role = (String) session.getAttribute("role");
+    String problemListUrl = "IT Support".equals(role) ? "ITProblemListController" : "ProblemList";
+    request.setAttribute("problemListUrl", problemListUrl);
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -82,7 +85,7 @@
                                             </div>
                                             <ul class="breadcrumb">
                                                 <li class="breadcrumb-item"><a href="index.html"><i class="feather icon-home"></i></a></li>
-                                                <li class="breadcrumb-item"><a href="ProblemList">Problem List</a></li>
+                                                <li class="breadcrumb-item"><a href="${problemListUrl}">Problem List</a></li>
                                                 <li class="breadcrumb-item"><a href="#!">Problem Detail</a></li>
                                             </ul>
                                         </div>
@@ -97,7 +100,7 @@
                                         <div class="card-header">
                                             <h5>Problem Details</h5>
                                             <div class="card-header-right">
-                                                <a href="ProblemList" class="btn btn-sm btn-secondary">
+                                                <a href="${problemListUrl}" class="btn btn-sm btn-secondary">
                                                     <i class="feather icon-arrow-left"></i> Back to List
                                                 </a>
                                             </div>
@@ -107,7 +110,7 @@
                                                 <div class="alert alert-danger">
                                                     <h4>Error</h4>
                                                     <p>${error}</p>
-                                                    <a href="ProblemList" class="btn btn-primary">Back to Problem List</a>
+                                                    <a href="${problemListUrl}" class="btn btn-primary">Back to Problem List</a>
                                                 </div>
                                             </c:if>
                                             <c:if test="${empty error}">
@@ -116,7 +119,7 @@
                                                         <div class="alert alert-warning">
                                                             <h4>Problem not found</h4>
                                                             <p>The problem you are looking for does not exist or has been deleted.</p>
-                                                            <a href="ProblemList" class="btn btn-primary">Back to Problem List</a>
+                                                            <a href="${problemListUrl}" class="btn btn-primary">Back to Problem List</a>
                                                         </div>
                                                     </c:when>
                                                     <c:otherwise>
