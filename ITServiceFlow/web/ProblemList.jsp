@@ -105,15 +105,44 @@
                                              Problem list is empty
                                             </div>
                                         </c:if>
-                                            <form action="ProblemList" method="get" class="mb-3">
-                                                <div class="input-group">
-                                                    <input type="text" name="keyword" class="form-control" placeholder="Search by Title or Ticket Number..."
-                                                           value="${filterKeyword != null ? filterKeyword : ''}">
-                                                    <div class="input-group-append">
-                                                        <button type="submit" class="btn btn-primary">Search</button>
+                                        <form action="ProblemList" method="get" class="mb-3">
+                                            <div class="row mb-2">
+                                                <div class="col-md-8">
+                                                    <div class="input-group">
+                                                        <input type="text" name="keyword" class="form-control"
+                                                               placeholder="Search by Title or Ticket Number..."
+                                                               value="${filterKeyword != null ? filterKeyword : ''}">
+                                                        <div class="input-group-append">
+                                                            <button type="submit" class="btn btn-primary">Search</button>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </form>
+                                            </div>
+                                            <div class="row align-items-end">
+                                                <div class="col-md-2">
+                                                    <label class="mb-1 small text-muted">Status</label>
+                                                    <select name="filterStatus" class="form-control">
+                                                        <option value="">-- All --</option>
+                                                        <option value="NEW" ${filterStatus == 'NEW' ? 'selected' : ''}>NEW</option>
+                                                        <option value="UNDER_INVESTIGATION" ${filterStatus == 'UNDER_INVESTIGATION' ? 'selected' : ''}>UNDER_INVESTIGATION</option>
+                                                        <option value="RESOLVED" ${filterStatus == 'RESOLVED' ? 'selected' : ''}>RESOLVED</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="mb-1 small text-muted">From Date</label>
+                                                    <input type="date" name="fromDate" class="form-control"
+                                                           value="${filterFromDate != null ? filterFromDate : ''}">
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="mb-1 small text-muted">To Date</label>
+                                                    <input type="date" name="toDate" class="form-control"
+                                                           value="${filterToDate != null ? filterToDate : ''}">
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <button type="submit" class="btn btn-secondary">Filter</button>
+                                                </div>
+                                            </div>
+                                        </form>
                                         <div class="table-responsive">
                                             <table class="table table-hover">
                                                 <thead class="thead-dark">
