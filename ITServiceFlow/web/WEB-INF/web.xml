@@ -18,6 +18,10 @@
         <servlet-name>ProblemAdd</servlet-name>
         <servlet-class>controller.Problems.ProblemAdd</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>CreateTicket</servlet-name>
+        <servlet-class>controller.ticket.CreateTicketController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Login</servlet-name>
         <url-pattern>/Login</url-pattern>
@@ -70,6 +74,10 @@
     <servlet-mapping>
         <servlet-name>ProblemAdd</servlet-name>
         <url-pattern>/ProblemAdd</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateTicket</servlet-name>
+        <url-pattern>/CreateTicket</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>

@@ -493,6 +493,130 @@ public class ProblemDao extends DbContext{
             return false;
         }
     }
+    
+    public List<Problems> filterByStatus(String status) {
+        List<Problems> list = new ArrayList<>();
+
+        String sql = "SELECT p.Id, p.TicketNumber, p.Title, p.Description, " +
+                     "p.RootCause, p.Workaround, p.Status, p.CreatedBy, " +
+                     "u.FullName AS CreatedByName, p.AssignedTo, u2.FullName AS AssignedToName, p.CreatedAt " +
+                     "FROM dbo.Problems p " +
+                     "LEFT JOIN dbo.Users u ON p.CreatedBy = u.Id " +
+                     "LEFT JOIN dbo.Users u2 ON p.AssignedTo = u2.Id " +
+                     "WHERE p.Status = ?";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, status);
+
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Problems pro = new Problems();
+                pro.setId(rs.getInt("Id"));
+                pro.setTicketNumber(rs.getString("TicketNumber"));
+                pro.setTitle(rs.getString("Title"));
+                pro.setDescription(rs.getString("Description"));
+                pro.setRootCause(rs.getString("RootCause"));
+                pro.setWorkaround(rs.getString("Workaround"));
+                pro.setStatus(rs.getString("Status"));
+                pro.setCreatedBy(rs.getInt("CreatedBy"));
+                pro.setCreatedByName(rs.getString("CreatedByName"));
+                pro.setAssignedTo(rs.getInt("AssignedTo"));
+                pro.setAssignedToName(rs.getString("AssignedToName"));
+                pro.setCreatedAt(rs.getDate("CreatedAt"));
+                list.add(pro);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public List<Problems> filterByDateRange(Date fromDate, Date toDate) {
+        List<Problems> list = new ArrayList<>();
+
+        String sql = "SELECT p.Id, p.TicketNumber, p.Title, p.Description, " +
+                     "p.RootCause, p.Workaround, p.Status, p.CreatedBy, " +
+                     "u.FullName AS CreatedByName, p.AssignedTo, u2.FullName AS AssignedToName, p.CreatedAt " +
+                     "FROM dbo.Problems p " +
+                     "LEFT JOIN dbo.Users u ON p.CreatedBy = u.Id " +
+                     "LEFT JOIN dbo.Users u2 ON p.AssignedTo = u2.Id " +
+                     "WHERE p.CreatedAt BETWEEN ? AND ?";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setDate(1, fromDate);
+            stm.setDate(2, toDate);
+
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Problems pro = new Problems();
+                pro.setId(rs.getInt("Id"));
+                pro.setTicketNumber(rs.getString("TicketNumber"));
+                pro.setTitle(rs.getString("Title"));
+                pro.setDescription(rs.getString("Description"));
+                pro.setRootCause(rs.getString("RootCause"));
+                pro.setWorkaround(rs.getString("Workaround"));
+                pro.setStatus(rs.getString("Status"));
+                pro.setCreatedBy(rs.getInt("CreatedBy"));
+                pro.setCreatedByName(rs.getString("CreatedByName"));
+                pro.setAssignedTo(rs.getInt("AssignedTo"));
+                pro.setAssignedToName(rs.getString("AssignedToName"));
+                pro.setCreatedAt(rs.getDate("CreatedAt"));
+                list.add(pro);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    
+    public List<Problems> searchAssignedProblem(int UserId,String keyword)
+    {
+        List<Problems> list = new ArrayList<>();
+        try
+        {
+            String sql = "SELECT p.Id, p.TicketNumber, p.Title, p.Description, " +
+             "p.RootCause, p.Workaround, p.Status, p.CreatedBy, " +
+             "u.FullName AS CreatedByName, p.AssignedTo, u2.FullName AS AssignedToName, p.CreatedAt " +
+             "FROM dbo.Problems p " +
+             "LEFT JOIN dbo.Users u ON p.CreatedBy = u.Id " +
+             "LEFT JOIN dbo.Users u2 ON p.AssignedTo = u2.Id " +
+             "WHERE p.AssignedTo = ? " +
+             "AND (p.Title LIKE ? OR p.TicketNumber LIKE ?)";
+            
+            PreparedStatement stm = connection.prepareStatement(sql);
+            String searchValue = "%" + keyword + "%";
+            stm.setInt(1, UserId);
+            stm.setString(2, searchValue);
+            stm.setString(3, searchValue);
+            
+            ResultSet rs = stm.executeQuery();
+            while(rs.next())
+            {
+               Problems pro = new Problems();
+               pro.setId(rs.getInt("Id"));
+               pro.setTicketNumber(rs.getString("TicketNumber"));
+               pro.setTitle(rs.getString("Title"));
+               pro.setDescription(rs.getString("Description"));
+               pro.setRootCause(rs.getString("RootCause"));
+               pro.setWorkaround(rs.getString("Workaround"));
+               pro.setStatus(rs.getString("Status"));
+               pro.setCreatedBy(rs.getInt("CreatedBy"));
+               pro.setCreatedByName(rs.getString("CreatedByName"));
+               pro.setAssignedTo(rs.getInt("AssignedTo"));
+               pro.setAssignedToName(rs.getString("AssignedToName"));
+               pro.setCreatedAt(rs.getDate("CreatedAt"));
+               list.add(pro);
+            }
+            
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return list;
+    }
 
 //    public static void main(String[] args) {
 //
@@ -624,28 +748,28 @@ public class ProblemDao extends DbContext{
 //        }
 //    }
     
-    public static void main(String[] args) {
-
-        ProblemDao dao = new ProblemDao();
-
-        int testProblemId = 8; // đổi sang ID có thật, status = NEW
-
-        Problems before = dao.getProblemById(testProblemId);
-        System.out.println("===== BEFORE =====");
-        System.out.println("Status: " + before.getStatus());
-
-        boolean result = dao.startInvestigation(testProblemId);
-
-        if (result) {
-            System.out.println("✅ Start Investigation SUCCESS");
-        } else {
-            System.out.println("❌ Start Investigation FAILED");
-        }
-
-        Problems after = dao.getProblemById(testProblemId);
-        System.out.println("===== AFTER =====");
-        System.out.println("Status: " + after.getStatus());
-    }
+//    public static void main(String[] args) {
+//
+//        ProblemDao dao = new ProblemDao();
+//
+//        int testProblemId = 8; // đổi sang ID có thật, status = NEW
+//
+//        Problems before = dao.getProblemById(testProblemId);
+//        System.out.println("===== BEFORE =====");
+//        System.out.println("Status: " + before.getStatus());
+//
+//        boolean result = dao.startInvestigation(testProblemId);
+//
+//        if (result) {
+//            System.out.println("✅ Start Investigation SUCCESS");
+//        } else {
+//            System.out.println("❌ Start Investigation FAILED");
+//        }
+//
+//        Problems after = dao.getProblemById(testProblemId);
+//        System.out.println("===== AFTER =====");
+//        System.out.println("Status: " + after.getStatus());
+//    }
     
 //    public static void main(String[] args) {
 //    ProblemDao dao = new ProblemDao(); // hoặc DAO bạn đang dùng
@@ -667,7 +791,37 @@ public class ProblemDao extends DbContext{
 //        }
 //    }
 //}
-
+    
+//    public static void main(String[] args) {
+//
+//        ProblemDao dao = new ProblemDao();
+//
+//        int userId = 3;          // ID người được assign
+//        String keyword = "003";  // từ khóa tìm kiếm
+//
+//        List<Problems> list = dao.searchAssignedProblem(userId, keyword);
+//
+//        if (list.isEmpty()) {
+//            System.out.println("Errored");
+//            return;
+//        }
+//
+//        for (Problems p : list) {
+//            System.out.println("Id          : " + p.getId());
+//            System.out.println("TicketNumber: " + p.getTicketNumber());
+//            System.out.println("Title       : " + p.getTitle());
+//            System.out.println("Description : " + p.getDescription());
+//            System.out.println("RootCause   : " + p.getRootCause());
+//            System.out.println("Workaround  : " + p.getWorkaround());
+//            System.out.println("Status      : " + p.getStatus());
+//            System.out.println("CreatedBy   : " + p.getCreatedBy());
+//            System.out.println("AssignedTo  : " + p.getAssignedTo());
+//            System.out.println("CreatedAt   : " + p.getCreatedAt());
+//            System.out.println("--------------------------------------");
+//        }
+//    }
+//
+//    
 
     // Lưu log thời gian mới
 public boolean addTimeLog(int problemId, int userId, double hours) {

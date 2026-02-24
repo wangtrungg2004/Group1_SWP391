@@ -67,6 +67,12 @@ public class ProblemList extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        List<Problems> problems = new ArrayList<>();
+
+        String status = request.getParameter("filterStatus");
+        String fromDate = request.getParameter("fromDate");
+        String toDate = request.getParameter("toDate");
+
         String keyword = request.getParameter("keyword");
         if (keyword == null) {
             keyword = "";
@@ -98,12 +104,54 @@ public class ProblemList extends HttpServlet {
             page = 1;
         }
 
-        List<Problems> problems;
-        int totalRecords;
-        int totalPages;
+        int totalRecords = 0;
+        int totalPages = 1;
 
-        if (!keyword.isEmpty()) {
+        boolean hasStatus = status != null && !status.trim().isEmpty();
+        boolean hasFrom   = fromDate != null && !fromDate.isEmpty();
+        boolean hasTo     = toDate != null && !toDate.isEmpty();
+        boolean usedFilter = false;
+
+        if (keyword != null && !keyword.isEmpty()) {
             problems = problemService.searchProblem(keyword);
+            usedFilter = true;
+
+        } else if (hasStatus && hasFrom && hasTo) {
+            try {
+                java.sql.Date fromStr = java.sql.Date.valueOf(fromDate);
+                java.sql.Date toStr   = java.sql.Date.valueOf(toDate);
+
+                List<Problems> tmp = problemService.filterByStatus(status.trim());
+                List<Problems> filtered = new ArrayList<>();
+
+                for (Problems p : tmp) {
+                    if (p.getCreatedAt() == null) continue;
+                    java.sql.Date created = new java.sql.Date(p.getCreatedAt().getTime());
+                    if (!created.before(fromStr) && !created.after(toStr)) {
+                        filtered.add(p);
+                    }
+                }
+
+                problems = filtered;
+                usedFilter = true;
+            } catch (Exception e) {
+            }
+
+        } else if (hasStatus) {
+            problems = problemService.filterByStatus(status.trim());
+            usedFilter = true;
+
+        } else if (hasFrom && hasTo) {
+            try {
+                java.sql.Date fromStr = java.sql.Date.valueOf(fromDate);
+                java.sql.Date toStr   = java.sql.Date.valueOf(toDate);
+                problems = problemService.filterByDateRange(fromStr, toStr);
+                usedFilter = true;
+            } catch (Exception e) {
+            }
+        }
+
+        if (usedFilter) {
             totalRecords = problems.size();
             totalPages = 1;
             page = 1;
@@ -122,7 +170,10 @@ public class ProblemList extends HttpServlet {
         request.setAttribute("totalRecords", totalRecords);
         request.setAttribute("pageSize", pageSize);
         request.setAttribute("filterKeyword", keyword);
-
+        request.setAttribute("filterStatus", status);
+        request.setAttribute("filterFromDate", fromDate);
+        request.setAttribute("filterToDate", toDate);
+        
         request.getRequestDispatcher("ProblemList.jsp").forward(request, response);
     }
 

@@ -120,5 +120,11 @@ public class Users {
         this.LocationId = LocationId;
     }
     
+    // Thêm vào class Users
+private int SupportLevel; // 1=L1, 2=L2, 3=L3
+
+public int getSupportLevel() { return SupportLevel; }
+public void setSupportLevel(int SupportLevel) { this.SupportLevel = SupportLevel; }
+    
     
 }

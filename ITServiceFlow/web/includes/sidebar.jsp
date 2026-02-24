@@ -42,6 +42,21 @@
                         <a href="ProblemList" class="nav-link"><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Problem List</span></a>
                     </li>
                 </c:if>
+                    
+                    <c:if test="${role == 'User'}">
+    <li class="nav-item pcoded-menu-caption">
+        <label>D?ch v? CNTT</label>
+    </li>
+    <li class="nav-item">
+        <a href="UserDashboard.jsp" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
+    </li>
+    <li class="nav-item">
+        <a href="CreateTicket" class="nav-link"><span class="pcoded-micon"><i class="feather icon-plus-circle"></i></span><span class="pcoded-mtext">T?o Ticket m?i</span></a>
+    </li>
+    <li class="nav-item">
+        <a href="Tickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-list"></i></span><span class="pcoded-mtext">Tickets c?a tôi</span></a>
+    </li>
+</c:if>
 
                 <!-- Menu cho IT Support -->
                 <c:if test="${role == 'IT Support'}">

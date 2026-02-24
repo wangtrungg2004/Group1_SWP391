@@ -84,6 +84,8 @@ public class ProblemUpdate extends HttpServlet {
             request.setAttribute("relatedTickets", relatedTickets);
             request.setAttribute("problem", pro);
             request.setAttribute("assignees", userService.getAllUser());
+            Object roleObj = request.getSession().getAttribute("role");
+            request.setAttribute("role", roleObj != null ? roleObj : "");
             request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
         }
         catch(Exception ex)
@@ -116,31 +118,36 @@ public class ProblemUpdate extends HttpServlet {
         
         try {
             int id = Integer.parseInt(request.getParameter("Id"));
-
-        Problems pro = problemService.getProblemById(id);
-
-            pro.setTitle(request.getParameter("Title"));
-            pro.setDescription(request.getParameter("Description"));
-            pro.setRootCause(request.getParameter("RootCause"));
-            pro.setWorkaround(request.getParameter("Workaround"));
-            pro.setStatus(request.getParameter("Status"));
-            
-        String assignedToStr = request.getParameter("AssignedTo");
-        if (assignedToStr != null && !assignedToStr.isEmpty()) {
-            pro.setAssignedTo(Integer.parseInt(assignedToStr));
-        }
-
-        boolean success = problemService.updateProblem(pro);
-
-        if (success) {
-            response.sendRedirect("ProblemDetail?Id=" + id);
-        } else {
-            request.setAttribute("error", "Update failed");
-            request.setAttribute("problem", pro);
-            request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
-        }
+            Problems pro = problemService.getProblemById(id);
+            if (pro == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Problem not found");
+                return;
+            }
+            String role = (String) request.getSession().getAttribute("role");
+            if ("IT Support".equals(role)) {
+                pro.setRootCause(request.getParameter("RootCause"));
+                pro.setWorkaround(request.getParameter("Workaround"));
+            } else {
+                pro.setTitle(request.getParameter("Title"));
+                pro.setDescription(request.getParameter("Description"));
+                pro.setRootCause(request.getParameter("RootCause"));
+                pro.setWorkaround(request.getParameter("Workaround"));
+                pro.setStatus(request.getParameter("Status"));
+                String assignedToStr = request.getParameter("AssignedTo");
+                if (assignedToStr != null && !assignedToStr.isEmpty()) {
+                    pro.setAssignedTo(Integer.parseInt(assignedToStr));
+                }
+            }
+            boolean success = problemService.updateProblem(pro);
+            if (success) {
+                response.sendRedirect("ProblemDetail?Id=" + id);
+            } else {
+                request.setAttribute("error", "Update failed");
+                request.setAttribute("problem", pro);
+                request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
+            }
         } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid UserId format");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid Id format");
         }
     }
 
