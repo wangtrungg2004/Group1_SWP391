@@ -67,6 +67,42 @@
     <link rel="stylesheet" href="assets/css/style.css">
     
     <title>IT Support Dashboard - ITServiceFlow</title>
+    
+            <style>
+    /* === FORCE FULL WIDTH – KILL BOXED LAYOUT === */
+
+    /* ông nội */
+    .pcoded-wrapper {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+    }
+
+    /* cha */
+    .pcoded-main-container {
+        width: 100% !important;
+        margin-left: 264px !important;
+    }
+
+    /* khi sidebar collapse */
+    .pcoded-navbar.navbar-collapsed ~ .pcoded-main-container {
+        margin-left: 80px !important;
+    }
+
+    /* con cháu */
+    .pcoded-content,
+    .pcoded-inner-content,
+    .main-body,
+    .page-wrapper {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    /* tránh scroll ngang ảo */
+    body {
+        overflow-x: hidden;
+    }
+    </style>
 </head>
 
 <body class="">
@@ -119,10 +155,10 @@
                                              Problem list is empty
                                             </div>
                                         </c:if>
-                                            <form action="ProblemList" method="get" class="mb-3">
+                                            <form action="ITProblemListController" method="get" class="mb-3">
                                                 <div class="input-group">
                                                     <input type="text" name="keyword" class="form-control" placeholder="Search by Title or Ticket Number..."
-                                                           value="${filterKeyword != null ? filterKeyword : ''}">
+                                                           value="${keyword != null ? keyword : ''}">
                                                     <div class="input-group-append">
                                                         <button type="submit" class="btn btn-primary">Search</button>
                                                     </div>
@@ -168,16 +204,6 @@
                                                                            href="ProblemDetail?Id=${p.id}">
                                                                             Detail
                                                                         </a>
-                                                                            <c:if test="${p.status eq 'NEW'}">
-                                                                                <form action="ITProblemListController" method="post" style="display:inline;">
-                                                                                    <input type="hidden" name="problemId" value="${p.id}">
-                                                                                    <button type="submit"
-                                                                                            class="btn btn-sm btn-warning"
-                                                                                            onclick="return confirm('Start investigation for this problem?');">
-                                                                                        Start Investigation
-                                                                                    </button>
-                                                                                </form>
-                                                                            </c:if>
                                                                     </td>
                                                                     
                                                                 </tr>

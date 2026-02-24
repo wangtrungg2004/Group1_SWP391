@@ -12172,3 +12172,34 @@ body {
     align-items: center;
     gap: 8px;
 }
+
+/* ===============================
+   FULL WIDTH PAGES (custom)
+================================ */
+
+.full-width-page .pcoded-wrapper {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+.full-width-page .pcoded-main-container {
+    width: 100% !important;
+    margin-left: 264px !important;
+}
+
+.full-width-page .pcoded-navbar.navbar-collapsed ~ .pcoded-main-container {
+    margin-left: 80px !important;
+}
+
+.full-width-page .pcoded-content,
+.full-width-page .pcoded-inner-content,
+.full-width-page .main-body,
+.full-width-page .page-wrapper {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+.full-width-page body {
+    overflow-x: hidden;
+}

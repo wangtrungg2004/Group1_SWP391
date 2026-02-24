@@ -21,6 +21,7 @@
     String role = (String) session.getAttribute("role");
     String problemListUrl = "IT Support".equals(role) ? "ITProblemListController" : "ProblemList";
     request.setAttribute("problemListUrl", problemListUrl);
+    request.setAttribute("role", role != null ? role : "");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -50,11 +51,44 @@
         <!-- animation css -->
         <link rel="stylesheet" href="assets/plugins/animation/css/animate.min.css">
 
-        <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
+	<!-- vendor css -->
+	<link rel="stylesheet" href="assets/css/style.css">
+        <style>
+    /* === FORCE FULL WIDTH – KILL BOXED LAYOUT === */
 
-        <!-- vendor css -->
-        <link rel="stylesheet" href="assets/css/style.css">
+    /* ông nội */
+    .pcoded-wrapper {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+    }
+
+    /* cha */
+    .pcoded-main-container {
+        width: 100% !important;
+        margin-left: 264px !important;
+    }
+
+    /* khi sidebar collapse */
+    .pcoded-navbar.navbar-collapsed ~ .pcoded-main-container {
+        margin-left: 80px !important;
+    }
+
+    /* con cháu */
+    .pcoded-content,
+    .pcoded-inner-content,
+    .main-body,
+    .page-wrapper {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    /* tránh scroll ngang ảo */
+    body {
+        overflow-x: hidden;
+    }
+    </style>
+</head>
 
     </head>
 
@@ -92,64 +126,43 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- [ breadcrumb ] end -->
-                                <!-- [ Main Content ] start -->
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="card">
-                                            <div class="card">
-                                                <div class="card-header d-flex justify-content-between align-items-center">
-                                                    <h5>Problem Details</h5>
-                                                    <div class="card-header-right d-flex gap-2">
-                                                        <!-- Chỉ hiển thị cho IT Support -->
-                                                        <c:if test="${role eq 'IT Support' and not empty problem}">
-                                                            <!-- Nút Start Investigation + Bắt đầu timer (khi status = NEW) -->
-                                                            <c:if test="${problem.status eq 'NEW'}">
-                                                                <form action="ProblemDetail" method="post" style="display:inline;">
-                                                                    <input type="hidden" name="action" value="startInvestigation">
-                                                                    <input type="hidden" name="problemId" value="${problem.id}">
-                                                                    <button type="submit" class="btn btn-sm btn-warning"
-                                                                            onclick="return confirm('Bắt đầu điều tra và chạy timer?');">
-                                                                        <i class="feather icon-play-circle"></i> Start Investigation
-                                                                    </button>
-                                                                </form>
-                                                            </c:if>
-
-                                                            <!-- Nút Stop Timer / Hoàn thành phiên (khi đang UNDER_INVESTIGATION và có timer chạy) -->
-                                                            <c:if test="${problem.status eq 'UNDER_INVESTIGATION'}">
-                                                                <c:set var="activeTimeLogId" value="${sessionScope['activeTimeLogId_'.concat(problem.id)]}" />
-                                                                <c:if test="${activeTimeLogId != null}">
-                                                                    <form action="ProblemDetail" method="post" style="display:inline;">
-                                                                        <input type="hidden" name="action" value="stopTimer">
-                                                                        <input type="hidden" name="problemId" value="${problem.id}">
-                                                                        <input type="hidden" name="timeLogId" value="${activeTimeLogId}">
-                                                                        <button type="submit" class="btn btn-sm btn-success"
-                                                                                onclick="return confirm('Dừng timer và ghi nhận thời gian cho phiên này?');">
-                                                                            <i class="feather icon-stop-circle"></i> Stop Timer / Hoàn thành
-                                                                        </button>
-                                                                    </form>
-                                                                </c:if>
-
-                                                                <!-- Nếu status UNDER_INVESTIGATION nhưng không có timer chạy (session mất) -->
-                                                                <c:if test="${activeTimeLogId == null}">
-                                                                    <span class="text-muted small">Phiên timer đã kết thúc hoặc chưa bắt đầu</span>
-                                                                </c:if>
-                                                            </c:if>
-
-                                                            <!-- Nút Update (khi status không phải NEW) -->
-                                                            <c:if test="${problem.status ne 'NEW'}">
-                                                                <a href="ProblemUpdate?Id=${problem.id}" class="btn btn-sm btn-primary">
-                                                                    <i class="feather icon-edit-2"></i> Update
-                                                                </a>
-                                                            </c:if>
-                                                        </c:if>
-
-                                                        <!-- Nút Back to List luôn hiển thị -->
-                                                        <a href="${problemListUrl}" class="btn btn-sm btn-secondary">
-                                                            <i class="feather icon-arrow-left"></i> Back to List
-                                                        </a>
-                                                    </div>
+                            </div>
+                            <!-- [ breadcrumb ] end -->
+                            <!-- [ Main Content ] start -->
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>Problem Details</h5>
+                                            <div class="card-header-right d-flex align-items-center gap-2">
+                                                <c:if test="${role eq 'IT Support' and not empty problem and problem.status eq 'NEW'}">
+                                                    <form action="ITProblemListController" method="post" style="display:inline;">
+                                                        <input type="hidden" name="problemId" value="${problem.id}">
+                                                        <input type="hidden" name="fromDetail" value="1">
+                                                        <button type="submit" class="btn btn-sm btn-warning"
+                                                                onclick="return confirm('Start investigation for this problem?');">
+                                                            <i class="feather icon-play-circle"></i> Start Investigation
+                                                        </button>
+                                                    </form>
+                                                </c:if>
+                                                <c:if test="${role eq 'IT Support' and not empty problem and problem.status ne 'NEW'}">
+                                                    <a href="ProblemUpdate?Id=${problem.id}" class="btn btn-sm btn-primary">
+                                                        <i class="feather icon-edit-2"></i> Update
+                                                    </a>
+                                                </c:if>
+                                                <a href="${problemListUrl}" class="btn btn-sm btn-secondary">
+                                                    <i class="feather icon-arrow-left"></i> Back to List
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <c:if test="${not empty error}">
+                                                <div class="alert alert-danger">
+                                                    <h4>Error</h4>
+                                                    <p>${error}</p>
+                                                    <a href="${problemListUrl}" class="btn btn-primary">Back to Problem List</a>
                                                 </div>
+                                            </c:if>
                                                 <div class="card-body">
                                                     <c:if test="${not empty error}">
                                                         <div class="alert alert-danger">

@@ -50,7 +50,41 @@
 
 	<!-- vendor css -->
 	<link rel="stylesheet" href="assets/css/style.css">
+            <style>
+    /* === FORCE FULL WIDTH – KILL BOXED LAYOUT === */
 
+    /* ông nội */
+    .pcoded-wrapper {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+    }
+
+    /* cha */
+    .pcoded-main-container {
+        width: 100% !important;
+        margin-left: 264px !important;
+    }
+
+    /* khi sidebar collapse */
+    .pcoded-navbar.navbar-collapsed ~ .pcoded-main-container {
+        margin-left: 80px !important;
+    }
+
+    /* con cháu */
+    .pcoded-content,
+    .pcoded-inner-content,
+    .main-body,
+    .page-wrapper {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    /* tránh scroll ngang ảo */
+    body {
+        overflow-x: hidden;
+    }
+    </style>
 </head>
 
 <body class="">
@@ -79,9 +113,9 @@
                                                 <h5 class="m-b-10">Form Elements</h5>
                                             </div>
                                             <ul class="breadcrumb">
-                                                <li class="breadcrumb-item"><a href="index.html"><i class="feather icon-home"></i></a></li>
-                                                <li class="breadcrumb-item"><a href="#!">Form Components</a></li>
-                                                <li class="breadcrumb-item"><a href="#!">Form Elements</a></li>
+                                                <li class="breadcrumb-item"><a href="ProblemList"><i class="feather icon-home"></i></a></li>
+                                                <li class="breadcrumb-item"><a href="#!">Problem List</a></li>
+                                                <li class="breadcrumb-item"><a href="#!">Problem List</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -105,15 +139,44 @@
                                              Problem list is empty
                                             </div>
                                         </c:if>
-                                            <form action="ProblemList" method="get" class="mb-3">
-                                                <div class="input-group">
-                                                    <input type="text" name="keyword" class="form-control" placeholder="Search by Title or Ticket Number..."
-                                                           value="${filterKeyword != null ? filterKeyword : ''}">
-                                                    <div class="input-group-append">
-                                                        <button type="submit" class="btn btn-primary">Search</button>
+                                        <form action="ProblemList" method="get" class="mb-3">
+                                            <div class="row mb-2">
+                                                <div class="col-md-8">
+                                                    <div class="input-group">
+                                                        <input type="text" name="keyword" class="form-control"
+                                                               placeholder="Search by Title or Ticket Number..."
+                                                               value="${filterKeyword != null ? filterKeyword : ''}">
+                                                        <div class="input-group-append">
+                                                            <button type="submit" class="btn btn-primary">Search</button>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </form>
+                                            </div>
+                                            <div class="row align-items-end">
+                                                <div class="col-md-2">
+                                                    <label class="mb-1 small text-muted">Status</label>
+                                                    <select name="filterStatus" class="form-control">
+                                                        <option value="">-- All --</option>
+                                                        <option value="NEW" ${filterStatus == 'NEW' ? 'selected' : ''}>NEW</option>
+                                                        <option value="UNDER_INVESTIGATION" ${filterStatus == 'UNDER_INVESTIGATION' ? 'selected' : ''}>UNDER_INVESTIGATION</option>
+                                                        <option value="RESOLVED" ${filterStatus == 'RESOLVED' ? 'selected' : ''}>RESOLVED</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="mb-1 small text-muted">From Date</label>
+                                                    <input type="date" name="fromDate" class="form-control"
+                                                           value="${filterFromDate != null ? filterFromDate : ''}">
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="mb-1 small text-muted">To Date</label>
+                                                    <input type="date" name="toDate" class="form-control"
+                                                           value="${filterToDate != null ? filterToDate : ''}">
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <button type="submit" class="btn btn-secondary">Filter</button>
+                                                </div>
+                                            </div>
+                                        </form>
                                         <div class="table-responsive">
                                             <table class="table table-hover">
                                                 <thead class="thead-dark">
