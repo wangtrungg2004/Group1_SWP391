@@ -65,32 +65,42 @@ public class ITProblemListController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Integer userId = (Integer) session.getAttribute("userId");
-        
-        int pageSize = 10;
-        int page = 1;
+    Integer userId = (Integer) session.getAttribute("userId");
+    String role = (String) session.getAttribute("role");
 
-        String pageStr = request.getParameter("page");
-        if (pageStr != null) {
+    // Kiểm tra login và quyền
+    if (userId == null || !"IT Support".equals(role)) {
+        // Chưa login hoặc không phải IT Support → redirect về login hoặc trang lỗi
+        response.sendRedirect(request.getContextPath() + "/Login");  // thay bằng URL login của bạn
+        return;
+    }
+
+    // Từ đây userId chắc chắn != null
+    int pageSize = 10;
+    int page = 1;
+    String pageStr = request.getParameter("page");
+    try {
+        if (pageStr != null && !pageStr.isEmpty()) {
             page = Integer.parseInt(pageStr);
         }
+        if (page < 1) page = 1;
+    } catch (NumberFormatException e) {
+        page = 1;
+    }
 
+    int totalRecords = problemService.getTotalAssignProblem(userId);
+    int totalPages = (totalRecords + pageSize - 1) / pageSize;
+    if (totalPages < 1) totalPages = 1;
+    if (page > totalPages) page = totalPages;
 
-        int totalRecords = problemService.getTotalAssignProblem(userId);
-        int totalPages = totalRecords / pageSize;
-        if (totalRecords % pageSize != 0) {
-            totalPages++;
-        }
+    List<Problems> problems = problemService.getAssignProblemWithPage(userId, page, pageSize);
 
-        List<Problems> problems =
-                problemService.getAssignProblemWithPage(userId, page, pageSize);
+    request.setAttribute("problem", problems);
+    request.setAttribute("currentPage", page);
+    request.setAttribute("totalPages", totalPages);
+    request.setAttribute("totalRecords", totalRecords);
 
-        request.setAttribute("problem", problems);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("totalRecords", totalRecords);
-
-        request.getRequestDispatcher("ITSupportProblemList.jsp").forward(request, response);
+    request.getRequestDispatcher("ITSupportProblemList.jsp").forward(request, response);
 
     }
 

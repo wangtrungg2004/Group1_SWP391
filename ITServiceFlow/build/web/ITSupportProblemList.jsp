@@ -168,15 +168,18 @@
                                                                            href="ProblemDetail?Id=${p.id}">
                                                                             Detail
                                                                         </a>
-<!--                                                                        <form action="ProblemList" method="post"
-                                                                                onsubmit="return confirm('Delete this Problem?');"
-                                                                                style="display:inline;">
-                                                                              <input type="hidden" name="Id" value="${p.id}">
-                                                                              <button type="submit" class="btn btn-sm btn-danger">
-                                                                                  Delete
-                                                                              </button>
-                                                                          </form>-->
+                                                                            <c:if test="${p.status eq 'NEW'}">
+                                                                                <form action="ITProblemListController" method="post" style="display:inline;">
+                                                                                    <input type="hidden" name="problemId" value="${p.id}">
+                                                                                    <button type="submit"
+                                                                                            class="btn btn-sm btn-warning"
+                                                                                            onclick="return confirm('Start investigation for this problem?');">
+                                                                                        Start Investigation
+                                                                                    </button>
+                                                                                </form>
+                                                                            </c:if>
                                                                     </td>
+                                                                    
                                                                 </tr>
                                                             </c:forEach>
                                                         </c:otherwise>
@@ -188,15 +191,15 @@
                                                     <nav aria-label="Page navigation" class="mt-3">
                                                         <ul class="pagination justify-content-center flex-wrap">
                                                             <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                                                <a class="page-link" href="ProblemList?page=${currentPage - 1}<c:if test='${not empty filterKeyword}'>&keyword=${filterKeyword}</c:if>">Previous</a>
+                                                                <a class="page-link" href="ITProblemListController?page=${currentPage - 1}">Previous</a>
                                                             </li>
                                                             <c:forEach begin="1" end="${totalPages}" var="i">
                                                                 <li class="page-item ${i == currentPage ? 'active' : ''}">
-                                                                    <a class="page-link" href="ProblemList?page=${i}<c:if test='${not empty filterKeyword}'>&keyword=${filterKeyword}</c:if>">${i}</a>
+                                                                    <a class="page-link" href="ITProblemListController?page=${i}">${i}</a>
                                                                 </li>
                                                             </c:forEach>
                                                             <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                                                <a class="page-link" href="ProblemList?page=${currentPage + 1}<c:if test='${not empty filterKeyword}'>&keyword=${filterKeyword}</c:if>">Next</a>
+                                                                <a class="page-link" href="ITProblemListController?page=${currentPage + 1}">Next</a>
                                                             </li>
                                                         </ul>
                                                     </nav>

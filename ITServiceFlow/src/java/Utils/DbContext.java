@@ -19,8 +19,8 @@ public class DbContext {
             // Load SQL Server JDBC Driver
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             
-            String user = "sa";
-            String pass = "123";
+            String user = "pvchiu";
+            String pass = "123456";
             String url = "jdbc:sqlserver://localhost:1433;"
            + "databaseName=ITServiceFlow;"
            + "encrypt=true;"

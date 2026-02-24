@@ -3,14 +3,20 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/web/ProblemList.jsp</file>
-            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/dao/ProblemDao.java</file>
-            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/web/Login.jsp</file>
-            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/controller/Login.java</file>
-            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/controller/Problems/ProblemList.java</file>
-            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/web/AdminDashboard.jsp</file>
-            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/web/assets/js/pcoded.min.js</file>
-            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/dao/UserDao.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/includes/sidebar.jsp</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/model/ChangeRequests.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/SubmitChangeRequest.jsp</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/model/ChangeApproval.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/Service/SubmitChangeRequest.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/ManagerChangeApprovals.jsp</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/service/ApprovalService.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/ITSupportProblemList.jsp</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/ManagerDashboard.jsp</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/dao/ChangeRequestDao.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/Service/ManagerChangeApprovals.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/Service/MyChangeRequests.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/MyChangeRequests.jsp</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/ITDashboard.jsp</file>
         </group>
     </open-files>
 </project-private>

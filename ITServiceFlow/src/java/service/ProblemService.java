@@ -8,6 +8,7 @@ import java.sql.Date;
 import java.util.List;
 import model.Problems;
 import model.Tickets;
+import model.TimeLog;
 /**
  *
  * @author DELL
@@ -81,4 +82,28 @@ public class ProblemService {
     {
         return dao.startInvestigation(Id);
     }
+    
+    
+    public boolean logTime(int problemId, int userId, double hours) {
+    if (hours <= 0) return false;
+    return dao.addTimeLog(problemId, userId, hours);
+}
+
+public List<TimeLog> getTimeLogs(int problemId) {
+    return dao.getTimeLogsByProblemId(problemId);
+}
+
+public double getTotalTimeSpent(int problemId) {
+    return dao.getTotalHoursByProblem(problemId);
+}
+
+public int startTimer(int problemId, int userId) {
+    return dao.startTimer(problemId, userId);
+}
+
+public boolean stopTimer(int timeLogId) {
+    return dao.stopTimer(timeLogId);
+}
+    
+    
 }

@@ -10,6 +10,7 @@ import model.Problems;
 import Utils.DbContext;
 import java.time.Year;
 import model.Tickets;
+import model.TimeLog;
 /**
  *
  * @author DELL
@@ -668,4 +669,104 @@ public class ProblemDao extends DbContext{
 //}
 
 
+    // Lưu log thời gian mới
+public boolean addTimeLog(int problemId, int userId, double hours) {
+    String sql = "INSERT INTO TimeLogs (TicketId, UserId, Hours, LogDate) " +
+                 "VALUES (?, ?, ?, CONVERT(date, GETDATE()))";
+    try (PreparedStatement stm = connection.prepareStatement(sql)) {
+        stm.setInt(1, problemId);
+        stm.setInt(2, userId);
+        stm.setDouble(3, hours);
+        return stm.executeUpdate() > 0;
+    } catch (Exception ex) {
+        ex.printStackTrace();
+        return false;
+    }
+}
+
+
+
+// Tính tổng giờ cho 1 problem
+public double getTotalHoursByProblem(int problemId) {
+    String sql = "SELECT ISNULL(SUM(Hours), 0) FROM TimeLogs WHERE TicketId = ?";
+    try (PreparedStatement stm = connection.prepareStatement(sql)) {
+        stm.setInt(1, problemId);
+        ResultSet rs = stm.executeQuery();
+        if (rs.next()) {
+            return rs.getDouble(1);
+        }
+    } catch (Exception ex) {
+        ex.printStackTrace();
+    }
+    return 0.0;
+}
+    
+    // Bắt đầu timer (chỉ insert StartTime)
+public int startTimer(int problemId, int userId) {
+    String sql = "INSERT INTO TimeLogs (TicketId, UserId, StartTime, LogDate) " +
+                 "VALUES (?, ?, GETDATE(), CONVERT(date, GETDATE()))";
+    try (PreparedStatement stm = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        stm.setInt(1, problemId);
+        stm.setInt(2, userId);
+        int rows = stm.executeUpdate();
+        System.out.println("startTimer: inserted " + rows + " rows for problem " + problemId);
+        
+        ResultSet rs = stm.getGeneratedKeys();
+        if (rs.next()) {
+            int newId = rs.getInt(1);
+            System.out.println("New TimeLog ID: " + newId);
+            return newId;
+        }
+    } catch (Exception ex) {
+        System.err.println("LỖI startTimer: " + ex.getMessage());
+        ex.printStackTrace();
+    }
+    return -1;
+}
+
+// Kết thúc timer (update EndTime và Hours)
+public boolean stopTimer(int timeLogId) {
+    String sql = "UPDATE TimeLogs " +
+                 "SET EndTime = GETDATE(), " +
+                 "    Hours = DATEDIFF(SECOND, StartTime, GETDATE()) / 3600.0 " +
+                 "WHERE Id = ? AND EndTime IS NULL";
+    try (PreparedStatement stm = connection.prepareStatement(sql)) {
+        stm.setInt(1, timeLogId);
+        return stm.executeUpdate() > 0;
+    } catch (Exception ex) {
+        ex.printStackTrace();
+        return false;
+    }
+}
+
+// Lấy tất cả time logs (đã có từ trước, nhưng cập nhật query để join fullName)
+public List<TimeLog> getTimeLogsByProblemId(int problemId) {
+    List<TimeLog> list = new ArrayList<>();
+    String sql = "SELECT tl.Id, tl.TicketId, tl.UserId, tl.StartTime, tl.EndTime, tl.Hours, tl.LogDate, " +
+                 "       u.FullName " +
+                 "FROM TimeLogs tl " +
+                 "LEFT JOIN Users u ON tl.UserId = u.Id " +
+                 "WHERE tl.TicketId = ? " +
+                 "ORDER BY tl.StartTime DESC";
+    try (PreparedStatement stm = connection.prepareStatement(sql)) {
+        stm.setInt(1, problemId);
+        ResultSet rs = stm.executeQuery();
+        while (rs.next()) {
+            TimeLog log = new TimeLog();
+            log.setId(rs.getInt("Id"));
+            log.setTicketId(rs.getInt("TicketId"));
+            log.setUserId(rs.getInt("UserId"));
+            log.setStartTime(rs.getTimestamp("StartTime"));
+            log.setEndTime(rs.getTimestamp("EndTime"));
+            log.setHours(rs.getDouble("Hours"));
+            log.setLogDate(rs.getDate("LogDate"));
+            log.setFullName(rs.getString("FullName"));
+            list.add(log);
+        }
+    } catch (Exception ex) {
+        ex.printStackTrace();
+    }
+    return list;
+}
+    
 }
