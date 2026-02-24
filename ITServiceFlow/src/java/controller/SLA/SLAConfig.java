@@ -145,7 +145,7 @@ public class SLAConfig extends HttpServlet {
                     e.printStackTrace();
                 }
             }
-        } else if ("toggleStatus".equals(action)) {
+        } else if ("togg leStatus".equals(action)) {
             String idRaw = request.getParameter("id");
             String currentStatus = request.getParameter("currentStatus");
             if (idRaw != null) {
@@ -155,34 +155,12 @@ public class SLAConfig extends HttpServlet {
                     if (rule != null) {
                         String newStatus = "Active".equals(currentStatus) ? "Inactive" : "Active";
                         rule.setStatus(newStatus);
-                        // If activating, we might want to check for conflicts, but
-                        // SLARuleDao.addSLARule handles it.
-                        // For updateSLARule, we need to ensure Dao handles deactivation of other rules
-                        // if this one becomes active.
-                        // Let's rely on updateSLARule to be improved or handle logic here.
-                        // Actually better to use existing service method or improve dao.
-                        // For now simply update. Ideally validation should be here.
 
-                        // We need to call addSLARule logic-alike or simply update.
-                        // Let's just update and let Service/DAO handle logic if implemented,
-                        // BUT wait, updateSLARule in DAO currently just updates. It does not
-                        // auto-deactivate others.
-                        // We should probably deactivate others if setting to Active.
-                        // Let's modify updateSLARule in DAO later or handled it manually here?
-                        // Better to keep logic in DAO.
-
-                        // Let's assume for now we just toggle. The user requirement said: "Allows
-                        // enabling/disabling"
                         slaRuleService.updateSLARule(rule);
 
-                        // If we are enabling, we should probably ensure no other rule matches.
+                       
                         if ("Active".equals(newStatus)) {
-                            // Re-save logic might be needed to deactivate others?
-                            // The quick fix is to call addSLARule logic's
-                            // "deactivateRulesByTypeAndPriority" separately
-                            // or make updateSLARule handle it.
-                            // Given the timeframe, let's trust the manager knows what they are doing OR
-                            // we can improve DAO later. For now, basic toggle.
+
                         }
                         session.setAttribute("successMessage", "SLA Rule status updated.");
                         response.sendRedirect("SLAConfig?action=detail&id=" + id);
