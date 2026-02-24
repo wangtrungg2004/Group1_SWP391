@@ -62,9 +62,9 @@ public class UserDao extends DbContext{
         return list;
     }
     
-    public Users login(String username, String password) {
+    public Users login(String username, String passwordHash) {
     // Kiểm tra null hoặc empty
-    if (username == null || password == null || username.trim().isEmpty() || password.trim().isEmpty()) {
+    if (username == null || passwordHash == null || username.trim().isEmpty() || passwordHash.trim().isEmpty()) {
         return null;
     }
     
@@ -76,7 +76,7 @@ public class UserDao extends DbContext{
     
     // Trim để loại bỏ khoảng trắng
     username = username.trim();
-    password = password.trim();
+    passwordHash = passwordHash.trim();
     
     String sql = """
         SELECT Id, Username, FullName, Role, IsActive
@@ -88,7 +88,7 @@ public class UserDao extends DbContext{
 
     try (PreparedStatement ps = connection.prepareStatement(sql)) {
         ps.setString(1, username);
-        ps.setString(2, password); 
+        ps.setString(2, passwordHash); 
         
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
@@ -104,6 +104,186 @@ public class UserDao extends DbContext{
     }
     return null;
 }
+
+    public boolean resetPassword(String username, String email, String newPasswordHash) {
+        if (username == null || email == null || newPasswordHash == null) {
+            return false;
+        }
+        if (connection == null) {
+            System.err.println("Database connection is null. Cannot reset password.");
+            return false;
+        }
+
+        String sql = """
+            UPDATE Users
+            SET PasswordHash = ?
+            WHERE Username = ?
+              AND Email = ?
+              AND IsActive = 1
+        """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, newPasswordHash.trim());
+            ps.setString(2, username.trim());
+            ps.setString(3, email.trim());
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public int getDefaultLocationId() {
+        if (connection == null) {
+            return -1;
+        }
+        String sql = "SELECT TOP 1 Id FROM Locations ORDER BY Id";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("Id");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public boolean createUser(String username, String email, String passwordHash, String fullName, String role, Integer departmentId, int locationId) {
+        if (connection == null) {
+            return false;
+        }
+        String sql = """
+                INSERT INTO Users (Username, Email, PasswordHash, FullName, Role, DepartmentId, LocationId, IsActive, CreatedAt)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 1, GETDATE())
+                """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ps.setString(2, email);
+            ps.setString(3, passwordHash);
+            ps.setString(4, fullName);
+            ps.setString(5, role);
+            if (departmentId == null) {
+                ps.setNull(6, Types.INTEGER);
+            } else {
+                ps.setInt(6, departmentId);
+            }
+            ps.setInt(7, locationId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public Users getUserByEmail(String email) {
+        if (connection == null || email == null || email.trim().isEmpty()) {
+            return null;
+        }
+        String sql = """
+            SELECT Id, Username, Email, FullName, Role, IsActive
+            FROM Users
+            WHERE Email = ?
+              AND IsActive = 1
+        """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, email.trim());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Users u = new Users();
+                u.setId(rs.getInt("Id"));
+                u.setUsername(rs.getString("Username"));
+                u.setEmail(rs.getString("Email"));
+                u.setFullName(rs.getString("FullName"));
+                u.setRole(rs.getString("Role"));
+                u.setIsActive(rs.getBoolean("IsActive"));
+                return u;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean savePasswordResetToken(int userId, String token, Timestamp expiresAt) {
+        if (connection == null || token == null || expiresAt == null) {
+            return false;
+        }
+        String sql = """
+            INSERT INTO PasswordResetTokens (UserId, Token, ExpiresAt, IsUsed)
+            VALUES (?, ?, ?, 0)
+        """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setString(2, token);
+            ps.setTimestamp(3, expiresAt);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public Integer getValidUserIdByToken(String token) {
+        if (connection == null || token == null || token.trim().isEmpty()) {
+            return null;
+        }
+        String sql = """
+            SELECT TOP 1 UserId
+            FROM PasswordResetTokens
+            WHERE Token = ?
+              AND IsUsed = 0
+              AND ExpiresAt > GETDATE()
+        """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, token.trim());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("UserId");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean markTokenUsed(String token) {
+        if (connection == null || token == null || token.trim().isEmpty()) {
+            return false;
+        }
+        String sql = """
+            UPDATE PasswordResetTokens
+            SET IsUsed = 1
+            WHERE Token = ?
+        """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, token.trim());
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updatePasswordByUserId(int userId, String newPasswordHash) {
+        if (connection == null || newPasswordHash == null || newPasswordHash.trim().isEmpty()) {
+            return false;
+        }
+        String sql = """
+            UPDATE Users
+            SET PasswordHash = ?
+            WHERE Id = ?
+              AND IsActive = 1
+        """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, newPasswordHash.trim());
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     
 //    public static void main(String[] args) {
