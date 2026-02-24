@@ -188,4 +188,63 @@ public class TicketDao extends DbContext {
             );
         }
     }
+    
+    
+     // This method returns the generated ID for SLA tracking
+    public int createTicket2(Tickets ticket) {
+        String sql = "INSERT INTO [dbo].[Tickets] (TicketNumber, TicketType, Title, Description, CategoryId, LocationId, Impact, Urgency, PriorityId, ServiceCatalogId, RequiresApproval, Status, CreatedBy, CreatedAt) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE())";
+        try {
+            PreparedStatement stm = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            stm.setString(1, ticket.getTicketNumber());
+            stm.setString(2, ticket.getTicketType());
+            stm.setString(3, ticket.getTitle());
+            stm.setString(4, ticket.getDescription());
+            stm.setInt(5, ticket.getCategoryId());
+            stm.setInt(6, ticket.getLocationId());
+
+            if (ticket.getImpact() > 0)
+                stm.setInt(7, ticket.getImpact());
+            else
+                stm.setNull(7, java.sql.Types.INTEGER);
+            if (ticket.getUrgency() > 0)
+                stm.setInt(8, ticket.getUrgency());
+            else
+                stm.setNull(8, java.sql.Types.INTEGER);
+            if (ticket.getPriorityId() > 0)
+                stm.setInt(9, ticket.getPriorityId());
+            else
+                stm.setNull(9, java.sql.Types.INTEGER);
+            if (ticket.getServiceCatalogId() > 0)
+                stm.setInt(10, ticket.getServiceCatalogId());
+            else
+                stm.setNull(10, java.sql.Types.INTEGER);
+
+            if (ticket.getRequiresApproval() != null)
+                stm.setBoolean(11, ticket.getRequiresApproval());
+            else
+                stm.setNull(11, java.sql.Types.BIT);
+            stm.setString(12, ticket.getStatus());
+            stm.setInt(13, ticket.getCreatedBy());
+
+            int affectedRows = stm.executeUpdate();
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = stm.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        return generatedKeys.getInt(1);
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return -1;
+    }
+
+    // Helper to generate Ticket Number
+    public String getNextTicketNumber(String type) {
+        String prefix = type.equals("Incident") ? "INC-" : "SR-";
+        // Simple logic for demo, better use DB sequence or Max check
+        return prefix + System.currentTimeMillis();
+    }
 }
