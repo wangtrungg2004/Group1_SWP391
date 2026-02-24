@@ -64,12 +64,12 @@ public class ITProblemListController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        List<Problems> problems;
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
-        
+
         int pageSize = 10;
         int page = 1;
-
         String pageStr = request.getParameter("page");
         try {
             if (pageStr != null && !pageStr.isEmpty()) {
@@ -80,22 +80,32 @@ public class ITProblemListController extends HttpServlet {
             page = 1;
         }
 
-        int totalRecords = problemService.getTotalAssignProblem(userId);
-        int totalPages = (totalRecords + pageSize - 1) / pageSize;
-        if (totalPages < 1) totalPages = 1;
-        if (page > totalPages) page = totalPages;
+        String keyword = request.getParameter("keyword");
 
-        List<Problems> problems =
-                problemService.getAssignProblemWithPage(userId, page, pageSize);
+        int totalRecords;
+        int totalPages;
 
+        if (keyword != null && !keyword.isEmpty()) {
+            problems = problemService.searchAssignedProblems(userId, keyword);
+            totalRecords = problems.size();
+            totalPages = 1;
+            page = 1;
+        } else {
+            totalRecords = problemService.getTotalAssignProblem(userId);
+            totalPages = (totalRecords + pageSize - 1) / pageSize;
+            if (totalPages < 1) totalPages = 1;
+            if (page > totalPages) page = totalPages;
+            problems = problemService.getAssignProblemWithPage(userId, page, pageSize);
+        }
+
+        request.setAttribute("keyword", keyword);
         request.setAttribute("problem", problems);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalRecords", totalRecords);
 
         request.getRequestDispatcher("ITSupportProblemList.jsp").forward(request, response);
-
-    }
+            }
 
     /**
      * Handles the HTTP <code>POST</code> method.

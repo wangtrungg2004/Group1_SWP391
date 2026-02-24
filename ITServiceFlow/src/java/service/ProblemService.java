@@ -88,4 +88,9 @@ public class ProblemService {
     public List<Problems> filterByDateRange(Date fromDate, Date toDate) {
         return dao.filterByDateRange(fromDate, toDate);
     }
+    
+    public List<Problems> searchAssignedProblems(int id, String keyword)
+    {
+        return dao.searchAssignedProblem(id, keyword);
+    }
 }

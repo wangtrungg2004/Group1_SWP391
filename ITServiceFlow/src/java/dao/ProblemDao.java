@@ -569,6 +569,53 @@ public class ProblemDao extends DbContext{
 
         return list;
     }
+    
+    public List<Problems> searchAssignedProblem(int UserId,String keyword)
+    {
+        List<Problems> list = new ArrayList<>();
+        try
+        {
+            String sql = "SELECT p.Id, p.TicketNumber, p.Title, p.Description, " +
+             "p.RootCause, p.Workaround, p.Status, p.CreatedBy, " +
+             "u.FullName AS CreatedByName, p.AssignedTo, u2.FullName AS AssignedToName, p.CreatedAt " +
+             "FROM dbo.Problems p " +
+             "LEFT JOIN dbo.Users u ON p.CreatedBy = u.Id " +
+             "LEFT JOIN dbo.Users u2 ON p.AssignedTo = u2.Id " +
+             "WHERE p.AssignedTo = ? " +
+             "AND (p.Title LIKE ? OR p.TicketNumber LIKE ?)";
+            
+            PreparedStatement stm = connection.prepareStatement(sql);
+            String searchValue = "%" + keyword + "%";
+            stm.setInt(1, UserId);
+            stm.setString(2, searchValue);
+            stm.setString(3, searchValue);
+            
+            ResultSet rs = stm.executeQuery();
+            while(rs.next())
+            {
+               Problems pro = new Problems();
+               pro.setId(rs.getInt("Id"));
+               pro.setTicketNumber(rs.getString("TicketNumber"));
+               pro.setTitle(rs.getString("Title"));
+               pro.setDescription(rs.getString("Description"));
+               pro.setRootCause(rs.getString("RootCause"));
+               pro.setWorkaround(rs.getString("Workaround"));
+               pro.setStatus(rs.getString("Status"));
+               pro.setCreatedBy(rs.getInt("CreatedBy"));
+               pro.setCreatedByName(rs.getString("CreatedByName"));
+               pro.setAssignedTo(rs.getInt("AssignedTo"));
+               pro.setAssignedToName(rs.getString("AssignedToName"));
+               pro.setCreatedAt(rs.getDate("CreatedAt"));
+               list.add(pro);
+            }
+            
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return list;
+    }
 
 //    public static void main(String[] args) {
 //
@@ -743,7 +790,36 @@ public class ProblemDao extends DbContext{
 //        }
 //    }
 //}
-
     
+//    public static void main(String[] args) {
+//
+//        ProblemDao dao = new ProblemDao();
+//
+//        int userId = 3;          // ID người được assign
+//        String keyword = "003";  // từ khóa tìm kiếm
+//
+//        List<Problems> list = dao.searchAssignedProblem(userId, keyword);
+//
+//        if (list.isEmpty()) {
+//            System.out.println("Errored");
+//            return;
+//        }
+//
+//        for (Problems p : list) {
+//            System.out.println("Id          : " + p.getId());
+//            System.out.println("TicketNumber: " + p.getTicketNumber());
+//            System.out.println("Title       : " + p.getTitle());
+//            System.out.println("Description : " + p.getDescription());
+//            System.out.println("RootCause   : " + p.getRootCause());
+//            System.out.println("Workaround  : " + p.getWorkaround());
+//            System.out.println("Status      : " + p.getStatus());
+//            System.out.println("CreatedBy   : " + p.getCreatedBy());
+//            System.out.println("AssignedTo  : " + p.getAssignedTo());
+//            System.out.println("CreatedAt   : " + p.getCreatedAt());
+//            System.out.println("--------------------------------------");
+//        }
+//    }
+//
+//    
 
 }
