@@ -89,4 +89,103 @@ public class TicketDao extends DbContext {
         }
         return list;
     }
+    
+    public List<Tickets> getAllTickets()
+    {
+        List<Tickets> list = new ArrayList<>();
+        String sql = "SELECT [Id]\n" +
+            "      ,[TicketNumber]\n" +
+            "      ,[TicketType]\n" +
+            "      ,[Title]\n" +
+            "      ,[Description]\n" +
+            "      ,[CategoryId]\n" +
+            "      ,[LocationId]\n" +
+            "      ,[Impact]\n" +
+            "      ,[Urgency]\n" +
+            "      ,[PriorityId]\n" +
+            "      ,[ServiceCatalogId]\n" +
+            "      ,[RequiresApproval]\n" +
+            "      ,[ApprovedBy]\n" +
+            "      ,[ApprovedAt]\n" +
+            "      ,[Status]\n" +
+            "      ,[CreatedBy]\n" +
+            "      ,[AssignedTo]\n" +
+            "      ,[ParentTicketId]\n" +
+            "      ,[ResolvedAt]\n" +
+            "      ,[ClosedAt]\n" +
+            "      ,[CreatedAt]\n" +
+            "      ,[UpdatedAt]\n" +
+            "      ,[CurrentLevel]\n" +
+            "  FROM [dbo].[Tickets]";
+        try 
+        {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            ResultSet rs = stm.executeQuery();
+            while(rs.next())
+            {
+                Tickets t = new Tickets();
+                t.setId(rs.getInt("Id"));
+                t.setTicketNumber(rs.getString("TicketNumber"));
+                t.setTicketType(rs.getString("TicketType"));
+                t.setTitle(rs.getString("Title"));
+                t.setDescription(rs.getString("Description"));
+
+                t.setCategoryId(rs.getInt("CategoryId"));
+                t.setLocationId(rs.getInt("LocationId"));
+
+                t.setImpact((Integer) rs.getObject("Impact"));
+                t.setUrgency((Integer) rs.getObject("Urgency"));
+                t.setPriorityId((Integer) rs.getObject("PriorityId"));
+                t.setServiceCatalogId((Integer) rs.getObject("ServiceCatalogId"));
+
+                t.setRequiresApproval((Boolean) rs.getObject("RequiresApproval"));
+                t.setApprovedBy((Integer) rs.getObject("ApprovedBy"));
+                t.setApprovedAt(rs.getTimestamp("ApprovedAt"));
+
+                t.setStatus(rs.getString("Status"));
+                t.setCreatedBy(rs.getInt("CreatedBy"));
+                t.setAssignedTo((Integer) rs.getObject("AssignedTo"));
+                t.setParentTicketId((Integer) rs.getObject("ParentTicketId"));
+
+                t.setResolvedAt(rs.getTimestamp("ResolvedAt"));
+                t.setClosedAt(rs.getTimestamp("ClosedAt"));
+                t.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                t.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
+
+                t.setCurrentLevel((Integer) rs.getObject("CurrentLevel"));
+
+                list.add(t);
+            }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+    
+    public static void main(String[] args) {
+
+        TicketDao dao = new TicketDao();
+        List<Tickets> tickets = dao.getAllTickets();
+
+        if (tickets.isEmpty()) {
+            System.out.println("❌ Không có ticket nào!");
+            return;
+        }
+
+        System.out.println("===== DANH SÁCH TICKETS =====");
+
+        for (Tickets t : tickets) {
+            System.out.println(
+                "ID: " + t.getId()
+                + " | TicketNumber: " + t.getTicketNumber()
+                + " | Title: " + t.getTitle()
+                + " | Status: " + t.getStatus()
+                + " | AssignedTo: " + t.getAssignedTo()
+                + " | Level: " + t.getCurrentLevel()
+                + " | CreatedAt: " + t.getCreatedAt()
+            );
+        }
+    }
 }

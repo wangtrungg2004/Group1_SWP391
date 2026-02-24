@@ -5,6 +5,7 @@
 package controller.Problems;
 
 import dao.NotificationDao;
+import dao.TicketDao;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -15,6 +16,7 @@ import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import service.ProblemService;
 import model.Users;
+import model.Tickets;
 import service.UserService;
 /**
  *
@@ -59,6 +61,7 @@ public class ProblemAdd extends HttpServlet {
      */
     ProblemService problemService = new ProblemService();
     NotificationDao notificationDao = new NotificationDao();
+    TicketDao ticketService = new TicketDao();
     UserService userService = new UserService();
     
     private String trimOrNull(String value) {
@@ -69,6 +72,8 @@ public class ProblemAdd extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         List<Users> assignees = userService.getAllUser();
+        List<Tickets> Ticket = ticketService.getAllTickets();
+        request.setAttribute("Ticket", Ticket);
         request.setAttribute("assignees", assignees);
         request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
     }
