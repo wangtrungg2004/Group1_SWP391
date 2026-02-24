@@ -119,39 +119,30 @@
 					<li class="nav-item">
 						<a href="map-google.html" class="nav-link"><span class="pcoded-micon"><i class="feather icon-map"></i></span><span class="pcoded-mtext">Maps</span></a>
 					</li>
-					<!-- Menu chỉ dành cho Admin -->
 					<c:if test="${role == 'Admin'}">
 						<li class="nav-item pcoded-menu-caption">
-							<label>Quản trị hệ thống</label>
+							<label>Quan tri he thong</label>
 						</li>
 						<li class="nav-item">
-							<a href="UserManagement" class="nav-link"><span class="pcoded-micon"><i class="feather icon-users"></i></span><span class="pcoded-mtext">Quản lý User</span></a>
-						</li>
-						<li class="nav-item">
-							<a href="SystemSettings" class="nav-link"><span class="pcoded-micon"><i class="feather icon-settings"></i></span><span class="pcoded-mtext">Cài đặt hệ thống</span></a>
+							<a href="UserCreate" class="nav-link"><span class="pcoded-micon"><i class="feather icon-user-plus"></i></span><span class="pcoded-mtext">Tao User</span></a>
 						</li>
 					</c:if>
-					
-					<!-- Menu cho Manager và Admin -->
 					<c:if test="${role == 'Admin' || role == 'Manager'}">
 						<li class="nav-item pcoded-menu-caption">
-							<label>Báo cáo</label>
+							<label>Bao cao</label>
 						</li>
 						<li class="nav-item">
-							<a href="Reports" class="nav-link"><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Xem báo cáo</span></a>
+							<a href="Reports" class="nav-link"><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Xem bao cao</span></a>
 						</li>
 					</c:if>
-					
-					<!-- Menu cho IT Support và Admin -->
 					<c:if test="${role == 'IT Support' || role == 'Admin'}">
 						<li class="nav-item pcoded-menu-caption">
-							<label>Hỗ trợ</label>
+							<label>Ho tro</label>
 						</li>
 						<li class="nav-item">
-							<a href="Tickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-help-circle"></i></span><span class="pcoded-mtext">Quản lý Ticket</span></a>
+							<a href="Tickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-help-circle"></i></span><span class="pcoded-mtext">Quan ly Ticket</span></a>
 						</li>
 					</c:if>
-					
 					<li class="nav-item pcoded-menu-caption">
 						<label>Pages</label>
 					</li>

@@ -4,6 +4,7 @@
  */
 package controller;
 
+import Utils.GoogleAuthUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -61,7 +62,7 @@ public class Login extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("Login.jsp").forward(request, response);
+        forwardLogin(request, response);
     }
 
     /**
@@ -91,7 +92,7 @@ public class Login extends HttpServlet {
 
             if (user == null) {
                 request.setAttribute("error", "Invalid username or password. Please check your credentials or contact administrator if database connection fails.");
-                request.getRequestDispatcher("Login.jsp").forward(request, response);
+                forwardLogin(request, response);
                 return;
             }
 
@@ -118,20 +119,26 @@ public class Login extends HttpServlet {
                     break;
                 default:
                     request.setAttribute("error", "Role không hợp lệ. Vui lòng liên hệ quản trị viên.");
-                    request.getRequestDispatcher("Login.jsp").forward(request, response);
+                    forwardLogin(request, response);
                     return;
             }
         } else {
             request.setAttribute("error", "Không thể xác định role. Vui lòng đăng nhập lại.");
-            request.getRequestDispatcher("Login.jsp").forward(request, response);
+            forwardLogin(request, response);
         }
         } catch (Exception e) {
             // Log lỗi và hiển thị thông báo cho user
             System.err.println("Login error: " + e.getMessage());
             e.printStackTrace();
             request.setAttribute("error", "Database connection error. Please contact administrator.");
-            request.getRequestDispatcher("Login.jsp").forward(request, response);
+            forwardLogin(request, response);
         }
+    }
+
+    private void forwardLogin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.setAttribute("googleClientId", GoogleAuthUtil.getGoogleClientId());
+        request.getRequestDispatcher("Login.jsp").forward(request, response);
     }
 
     /**

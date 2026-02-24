@@ -54,7 +54,7 @@
         <a href="CreateTicket" class="nav-link"><span class="pcoded-micon"><i class="feather icon-plus-circle"></i></span><span class="pcoded-mtext">T?o Ticket m?i</span></a>
     </li>
     <li class="nav-item">
-        <a href="Tickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-list"></i></span><span class="pcoded-mtext">Tickets c?a tôi</span></a>
+        <a href="Tickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-list"></i></span><span class="pcoded-mtext">Tickets c?a tï¿½i</span></a>
     </li>
 </c:if>
 
@@ -67,27 +67,27 @@
                         <a href="ITDashboard.jsp" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
                     </li>
                     <li class="nav-item pcoded-menu-caption">
-                        <label>H? tr?</label>
+                        <label>Ho tro</label>
                     </li>
                     <li class="nav-item">
-                        <a href="Tickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-help-circle"></i></span><span class="pcoded-mtext">Qu?n lï¿½ Tickets</span></a>
+                        <a href="Tickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-help-circle"></i></span><span class="pcoded-mtext">Quan ly Tickets</span></a>
                     </li>
                     <li class="nav-item">
-                        <a href="AssignedTickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-user-check"></i></span><span class="pcoded-mtext">Tickets ???c giao</span></a>
+                        <a href="AssignedTickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-user-check"></i></span><span class="pcoded-mtext">Tickets duoc giao</span></a>
                     </li>
                     <li class="nav-item">
-                        <a href="PendingTickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-clock"></i></span><span class="pcoded-mtext">Tickets ?ang ch?</span></a>
+                        <a href="PendingTickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-clock"></i></span><span class="pcoded-mtext">Tickets dang cho</span></a>
                     </li>
                     <li class="nav-item">
                         <a href="ITProblemListController" class="nav-link"><span class="pcoded-micon"><i class="feather icon-clock"></i></span><span class="pcoded-mtext">Problem List</span></a>
                     </li>
                 </c:if>
-                <!-- Menu cho IT Support: G?i Yêu c?u Thay ??i -->
+                <!-- Menu cho IT Support: G?i Yï¿½u c?u Thay ??i -->
                 <c:if test="${role eq 'IT Support'}">
                     <li class="nav-item">
                         <a class="nav-link" href="SubmitChangeRequest">
                             <span class="pcoded-micon"><i class="feather icon-plus-square"></i></span>
-                            <span class="pcoded-mtext">Send Change Request</span>
+                            <span class="pcoded-mtext">Send Change Request</span>z
                         </a>
                     </li>
                 </c:if>
@@ -100,7 +100,7 @@
                     </li>
                 </c:if>
 
-                <!-- Menu cho Manager: Duy?t Yêu c?u Thay ??i -->
+                <!-- Menu cho Manager: Duy?t Yï¿½u c?u Thay ??i -->
                 <c:if test="${role eq 'Manager'}">
                     <li class="nav-item">
                         <a class="nav-link" href="ManagerChangeApprovals">
