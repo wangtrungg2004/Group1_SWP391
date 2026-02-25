@@ -24,8 +24,8 @@
         <div class="loader-track"><div class="loader-fill"></div></div>
     </div>
 
-    <jsp:include page="../includes/sidebar.jsp"/>
-    <jsp:include page="../includes/header.jsp"/>
+    <jsp:include page="slidebar.jsp" />
+    <jsp:include page="header.jsp" />
 
     <div class="pcoded-main-container">
         <div class="pcoded-wrapper">
@@ -88,11 +88,11 @@
                                                     <div class="form-group mb-3">
                                                         <label>Danh mục (Category)</label>
                                                         <select name="categoryId" class="form-control incident-field" required>
-                                                            <option value="">-- Chọn danh mục --</option>
-                                                            <option value="1">Hardware (Phần cứng)</option>
-                                                            <option value="2">Software (Phần mềm)</option>
-                                                            <option value="3">Network (Mạng)</option>
-                                                        </select>
+    <option value="">-- Chọn danh mục lỗi --</option>
+    <c:forEach items="${categoryList}" var="cat">
+        <option value="${cat.id}">${cat.name}</option>
+    </c:forEach>
+</select>
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-md-6 form-group">
@@ -120,11 +120,13 @@
                                                     <div class="form-group mb-3">
                                                         <label>Danh mục dịch vụ (Service Catalog)</label>
                                                         <select name="serviceCatalogId" class="form-control request-field">
-                                                            <option value="">-- Chọn dịch vụ cần cấp --</option>
-                                                            <option value="1">Xin cấp Laptop mới</option>
-                                                            <option value="2">Yêu cầu cài đặt phần mềm</option>
-                                                            <option value="3">Yêu cầu cấp quyền ERP</option>
-                                                        </select>
+    <option value="">-- Chọn dịch vụ cần cấp --</option>
+    <c:forEach items="${serviceList}" var="svc">
+        <c:if test="${svc.isActive}">
+            <option value="${svc.id}">${svc.name}</option>
+        </c:if>
+    </c:forEach>
+</select>
                                                     </div>
                                                 </div>
 

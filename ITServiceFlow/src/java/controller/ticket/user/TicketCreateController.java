@@ -1,9 +1,23 @@
-package controller.ticket;
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package controller.ticket.user;
 
+/**
+ *
+ * @author Dumb Trung
+ */
+
+import dao.CategoryDao;
+import dao.ServiceCatalogDao;
 import dao.TicketDao;
+import model.Category;
+import model.ServiceCatalog;
 import model.Tickets;
 import model.Users;
 import java.io.IOException;
+import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,12 +26,25 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 
-public class CreateTicketController extends HttpServlet {
+public class TicketCreateController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // TODO: Gọi MasterDataDao để lấy List<Categories> và List<ServiceCatalog>
+        
+        // 1. Khởi tạo DAO
+        CategoryDao catDao = new CategoryDao();
+        ServiceCatalogDao svcDao = new ServiceCatalogDao();
+        
+        // 2. Kéo dữ liệu từ DB
+        List<Category> categoryList = catDao.getAllCategories();
+        List<ServiceCatalog> serviceList = svcDao.getAllServices();
+        
+        // 3. Đẩy sang JSP
+        request.setAttribute("categoryList", categoryList);
+        request.setAttribute("serviceList", serviceList);
+        
+        // 4. Chuyển hướng tới file JSP của Dev 2
         request.getRequestDispatcher("/ticket/create.jsp").forward(request, response);
     }
 
@@ -29,59 +56,42 @@ public class CreateTicketController extends HttpServlet {
         Users currentUser = (Users) session.getAttribute("user");
         
         if (currentUser == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            response.sendRedirect("Login.jsp");
             return;
         }
 
-        String ticketType = request.getParameter("ticketType"); // "Incident" hoặc "ServiceRequest"
+        String ticketType = request.getParameter("ticketType");
         
         Tickets t = new Tickets();
-        // Sinh mã ngẫu nhiên tạm thời (Thực tế có thể dùng Format TKT-YYYYMMDD-XXX)
         t.setTicketNumber("TKT-" + System.currentTimeMillis()); 
         t.setTicketType(ticketType);
         t.setTitle(request.getParameter("title"));
         t.setDescription(request.getParameter("description"));
         t.setCreatedBy(currentUser.getId());
-        t.setLocationId(currentUser.getLocationId()); // Lấy Location của người tạo
+        // Tránh null location nếu User chưa cập nhật Location
+        t.setLocationId(currentUser.getLocationId() > 0 ? currentUser.getLocationId() : 1); 
 
         if ("Incident".equals(ticketType)) {
             t.setCategoryId(Integer.parseInt(request.getParameter("categoryId")));
             t.setImpact(Integer.parseInt(request.getParameter("impact")));
             t.setUrgency(Integer.parseInt(request.getParameter("urgency")));
-            
-            // TODO: Viết hàm tính PriorityId dựa trên ma trận Impact x Urgency
-            // Tạm thời hardcode
-            t.setPriorityId(1); 
-            
-            t.setServiceCatalogId(null);
-            t.setRequiresApproval(false);
+            t.setPriorityId(1); // Tạm fix Priority 1 để demo
             
         } else if ("ServiceRequest".equals(ticketType)) {
             int serviceId = Integer.parseInt(request.getParameter("serviceCatalogId"));
             t.setServiceCatalogId(serviceId);
-            
-            // Gán default category cho Request nếu form không có
-            t.setCategoryId(Integer.parseInt(request.getParameter("categoryId"))); 
-            
-            t.setImpact(null);
-            t.setUrgency(null);
-            t.setPriorityId(null);
-            
-            // TODO: Check bảng ServiceCatalog xem dịch vụ này có cần duyệt không (RequiresApproval)
-            // Tạm thời set false
-            t.setRequiresApproval(false); 
+            t.setCategoryId(1); // Default category
         }
 
         TicketDao dao = new TicketDao();
         boolean isCreated = dao.createTicket(t);
 
         if (isCreated) {
-            // Thành công -> chuyển về danh sách hoặc trang báo thành công
-            response.sendRedirect(request.getContextPath() + "/ticket/list"); 
+            // Chuyển hướng tới trang "Tickets của tôi" sau khi tạo thành công
+            response.sendRedirect(request.getContextPath() + "/MyTickets"); 
         } else {
-            // Thất bại -> báo lỗi
-            request.setAttribute("errorMessage", "Hệ thống gặp lỗi, không thể tạo Ticket.");
-            request.getRequestDispatcher("/ticket/create.jsp").forward(request, response);
+            request.setAttribute("errorMessage", "Lỗi hệ thống! Không thể tạo Ticket.");
+            doGet(request, response); // Load lại form với dữ liệu động
         }
     }
 }
