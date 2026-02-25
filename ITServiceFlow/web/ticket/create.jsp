@@ -24,7 +24,7 @@
         <div class="loader-track"><div class="loader-fill"></div></div>
     </div>
 
-    <jsp:include page="slidebar.jsp" />
+    <jsp:include page="sidebar.jsp" />
     <jsp:include page="header.jsp" />
 
     <div class="pcoded-main-container">

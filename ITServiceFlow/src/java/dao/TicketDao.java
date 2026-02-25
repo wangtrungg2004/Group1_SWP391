@@ -188,4 +188,34 @@ public class TicketDao extends DbContext {
             );
         }
     }
+    
+    // 3. Lấy danh sách Ticket cho End-User (My Tickets)
+    public List<Tickets> getTicketsByCreator(int userId) {
+        List<Tickets> list = new ArrayList<>();
+        // Query cơ bản, sắp xếp vé mới tạo lên đầu
+        String sql = "SELECT Id, TicketNumber, TicketType, Title, Status, CreatedAt "
+                   + "FROM [dbo].[Tickets] "
+                   + "WHERE CreatedBy = ? "
+                   + "ORDER BY CreatedAt DESC";
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                Tickets t = new Tickets();
+                t.setId(rs.getInt("Id"));
+                t.setTicketNumber(rs.getString("TicketNumber"));
+                t.setTicketType(rs.getString("TicketType"));
+                t.setTitle(rs.getString("Title"));
+                t.setStatus(rs.getString("Status"));
+                t.setCreatedAt(rs.getDate("CreatedAt"));
+                list.add(t);
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi khi lấy danh sách My Tickets: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
