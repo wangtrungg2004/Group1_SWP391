@@ -9,122 +9,130 @@ import java.util.Date;
  * @author DELL
  */
 public class Problems {
-    private int id;
-    private String ticketNumber;
-    private String title;
-    private String description;
-    private String rootCause;
-    private String workaround;
-    private String status;
-    private int createdBy;
-    private String createdByName;
-    private int assignedTo;
-    private Date createdAt;
+    private int Id;
+    private String TicketNumber;
+    private String Title;
+    private String Description;
+    private String RootCause;
+    private String Workaround;
+    private String Status;
+    private int CreatedBy;
+    private String CreatedByName;
+    private int AssignedTo;
+    private String AssignedToName;
+    private Date CreatedAt;
 
-    public Problems(int id, String ticketNumber, String title, String description, String rootCause, String workaround, String status, int createdBy, String createdByName, int assignedTo, Date createdAt) {
-        this.id = id;
-        this.ticketNumber = ticketNumber;
-        this.title = title;
-        this.description = description;
-        this.rootCause = rootCause;
-        this.workaround = workaround;
-        this.status = status;
-        this.createdBy = createdBy;
-        this.createdByName = createdByName;
-        this.assignedTo = assignedTo;
-        this.createdAt = createdAt;
+    public Problems(int Id, String TicketNumber, String Title, String Description, String RootCause, String Workaround, String Status, int CreatedBy, String CreatedByName, int AssignedTo, String AssignedToName, Date CreatedAt) {
+        this.Id = Id;
+        this.TicketNumber = TicketNumber;
+        this.Title = Title;
+        this.Description = Description;
+        this.RootCause = RootCause;
+        this.Workaround = Workaround;
+        this.Status = Status;
+        this.CreatedBy = CreatedBy;
+        this.CreatedByName = CreatedByName;
+        this.AssignedTo = AssignedTo;
+        this.AssignedToName = AssignedToName;
+        this.CreatedAt = CreatedAt;
     }
 
     public Problems() {
     }
 
-    public int getAssignedTo() {
-        return assignedTo;
+    public String getAssignedToName() {
+        return AssignedToName;
     }
 
-    public void setAssignedTo(int assignedTo) {
-        this.assignedTo = assignedTo;
+    public void setAssignedToName(String AssignedToName) {
+        this.AssignedToName = AssignedToName;
+    }
+    
+    public int getAssignedTo() {
+        return AssignedTo;
+    }
+
+    public void setAssignedTo(int AssignedTo) {
+        this.AssignedTo = AssignedTo;
     }
 
     public int getId() {
-        return id;
+        return Id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(int Id) {
+        this.Id = Id;
     }
 
     public String getTicketNumber() {
-        return ticketNumber;
+        return TicketNumber;
     }
 
-    public void setTicketNumber(String ticketNumber) {
-        this.ticketNumber = ticketNumber;
+    public void setTicketNumber(String TicketNumber) {
+        this.TicketNumber = TicketNumber;
     }
 
     public String getTitle() {
-        return title;
+        return Title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setTitle(String Title) {
+        this.Title = Title;
     }
 
     public String getDescription() {
-        return description;
+        return Description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDescription(String Description) {
+        this.Description = Description;
     }
 
     public String getRootCause() {
-        return rootCause;
+        return RootCause;
     }
 
-    public void setRootCause(String rootCause) {
-        this.rootCause = rootCause;
+    public void setRootCause(String RootCause) {
+        this.RootCause = RootCause;
     }
 
     public String getWorkaround() {
-        return workaround;
+        return Workaround;
     }
 
-    public void setWorkaround(String workaround) {
-        this.workaround = workaround;
+    public void setWorkaround(String Workaround) {
+        this.Workaround = Workaround;
     }
 
     public String getStatus() {
-        return status;
+        return Status;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setStatus(String Status) {
+        this.Status = Status;
     }
 
     public int getCreatedBy() {
-        return createdBy;
+        return CreatedBy;
     }
 
-    public void setCreatedBy(int createdBy) {
-        this.createdBy = createdBy;
+    public void setCreatedBy(int CreatedBy) {
+        this.CreatedBy = CreatedBy;
     }
 
     public Date getCreatedAt() {
-        return createdAt;
+        return CreatedAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+    public void setCreatedAt(Date CreatedAt) {
+        this.CreatedAt = CreatedAt;
     }
 
     public String getCreatedByName() {
-        return createdByName;
+        return CreatedByName;
     }
 
-    public void setCreatedByName(String createdByName) {
-        this.createdByName = createdByName;
+    public void setCreatedByName(String CreatedByName) {
+        this.CreatedByName = CreatedByName;
     }
-    
-    
 }

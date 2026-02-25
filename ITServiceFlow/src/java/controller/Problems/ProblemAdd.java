@@ -5,7 +5,7 @@
 package controller.Problems;
 
 import dao.NotificationDao;
-import dao.TicketDao;
+import dao.TicketDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -61,7 +61,7 @@ public class ProblemAdd extends HttpServlet {
      */
     ProblemService problemService = new ProblemService();
     NotificationDao notificationDao = new NotificationDao();
-    TicketDao ticketService = new TicketDao();
+    TicketDAO ticketService = new TicketDAO();
     UserService userService = new UserService();
     
     private String trimOrNull(String value) {
