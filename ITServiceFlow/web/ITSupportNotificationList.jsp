@@ -147,12 +147,12 @@
                                 <div class="col-sm-12">
                                     <div class="card">
                                         <div class="card-header d-flex justify-content-between align-items-center">
-                                            <h5 class="m-0">Problem List</h5>
+                                            <h5 class="m-0">Notification List</h5>
                                         </div>
                                         <div class="card-body table-border-style">
-                                        <c:if test="${empty problem}">
+                                        <c:if test="${empty notifications}">
                                             <div class="alert alert-warning">
-                                             Problem list is empty
+                                             Notification list is empty
                                             </div>
                                         </c:if>
                                             <form action="ITProblemListController" method="get" class="mb-3">
@@ -169,36 +169,32 @@
                                                 <thead class="thead-dark">
                                                     <tr>
                                                         <th>ID</th>
-                                                        <th>Ticket Number</th>
                                                         <th>Title</th>
-                                                        <th>Status</th>
-                                                        <th>Created By</th>
+                                                        <th>Type</th>
+                                                        <th>Message</th>
                                                         <th>Created At</th>
+                                                        <th>Is Read</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <c:choose>
-                                                        <c:when test="${empty problem}">
+                                                        <c:when test="${empty notifications}">
                                                             <tr>
                                                                 <td colspan="6" class="text-center text-muted">
-                                                                    <i>No problems found</i>
+                                                                    <i>No notifications found</i>
                                                                 </td>
                                                             </tr>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <c:forEach items="${problem}" var="p">
+                                                            <c:forEach items="${notifications}" var="n">
                                                                 <tr>
-                                                                    <td>${p.id}</td>
-                                                                    <td>${p.ticketNumber}</td>
-                                                                    <td>${p.title}</td>
-                                                                    <td>
-                                                                        <span class="badge badge-status" data-status="${p.status}">
-                                                                            ${p.status}
-                                                                        </span>
-                                                                    </td>
-                                                                    <td>${p.createdByName != null ? p.createdByName : p.createdBy}</td>
-                                                                    <td>${p.createdAt}</td>
+                                                                    <td>${n.id}</td>
+                                                                    <td>${n.title}</td>
+                                                                    <td>${n.type}</td>
+                                                                    <td>${n.message}</td>
+                                                                    <td>${n.createdAt}</td>
+                                                                    <td>${n.isRead != null ? n.isRead : n.isRead}</td>
                                                                     <td class="d-flex gap-1">
                                                                         <a class="btn btn-sm btn-primary"
                                                                            href="ProblemDetail?Id=${p.id}">

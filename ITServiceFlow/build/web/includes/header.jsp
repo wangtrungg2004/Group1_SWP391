@@ -5,8 +5,15 @@
 --%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
+
 <!-- [ Header ] start -->
 <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed">
+    <style>
+        .noti-body {
+        /*max-height: 300px;*/   
+        overflow-y: auto;
+    }
+    </style>
     <div class="m-header">
         <a class="mobile-menu" id="mobile-collapse1" href="#!"><span></span></a>
         <a href="AdminDashboard.jsp" class="b-brand">
@@ -71,9 +78,19 @@
                                 </c:otherwise>
                             </c:choose>
                         </ul>
-                        <div class="noti-footer">
-                            <a href="#!">show all</a>
-                        </div>
+                        <c:choose>
+                            <c:when test="${role eq 'IT Support'}">
+                                <div class="noti-footer">
+                                    <a href="ITSupportNotificationList.jsp">show all</a>
+                                </div>
+                            </c:when>
+
+                            <c:when test="${role eq 'Manager'}">
+                                <div class="noti-footer">
+                                    <a href="#!">show all</a>
+                                </div>
+                            </c:when>
+                        </c:choose>
                     </div>
                 </div>
             </li>

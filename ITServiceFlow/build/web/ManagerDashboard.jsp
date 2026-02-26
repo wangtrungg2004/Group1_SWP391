@@ -72,68 +72,8 @@
 		</div>
 	</div>
 	<!-- [ Pre-loader ] End -->
-
-	<!-- [ navigation menu ] start -->
-	<nav class="pcoded-navbar menupos-fixed menu-light brand-blue ">
-		<div class="navbar-wrapper ">
-			<div class="navbar-brand header-logo">
-				<a href="ManagerDashboard.jsp" class="b-brand">
-<!--					<img src="assets/images/logo.svg" alt="" class="logo images">
-					<img src="assets/images/logo-icon.svg" alt="" class="logo-thumb images">-->
-				</a>
-				<a class="mobile-menu" id="mobile-collapse" href="#!"><span></span></a>
-			</div>
-			<div class="navbar-content scroll-div">
-				<ul class="nav pcoded-inner-navbar">
-					<li class="nav-item pcoded-menu-caption">
-						<label>Navigation</label>
-					</li>
-					<li class="nav-item">
-						<a href="AdminDashboard.jsp" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
-					</li>
-					
-					<li class="nav-item pcoded-menu-caption">
-						<label>Forms &amp; table</label>
-					</li>
-					<li class="nav-item">
-						<a href="ProblemList" class="nav-link"><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Problem List</span></a>
-					</li>
-					<!-- Menu chỉ dành cho Admin -->
-					<c:if test="${role == 'Admin'}">
-						<li class="nav-item pcoded-menu-caption">
-							<label>Quản trị hệ thống</label>
-						</li>
-						<li class="nav-item">
-							<a href="UserManagement" class="nav-link"><span class="pcoded-micon"><i class="feather icon-users"></i></span><span class="pcoded-mtext">Quản lý User</span></a>
-						</li>
-						<li class="nav-item">
-							<a href="SystemSettings" class="nav-link"><span class="pcoded-micon"><i class="feather icon-settings"></i></span><span class="pcoded-mtext">Cài đặt hệ thống</span></a>
-						</li>
-					</c:if>
-					
-					<!-- Menu cho Manager và Admin -->
-					<c:if test="${role == 'Admin' || role == 'Manager'}">
-						<li class="nav-item pcoded-menu-caption">
-							<label>Báo cáo</label>
-						</li>
-						<li class="nav-item">
-							<a href="Reports" class="nav-link"><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Xem báo cáo</span></a>
-						</li>
-					</c:if>
-					
-					<!-- Menu cho IT Support và Admin -->
-					<c:if test="${role == 'IT Support' || role == 'Admin'}">
-						<li class="nav-item pcoded-menu-caption">
-							<label>Hỗ trợ</label>
-						</li>
-						<li class="nav-item">
-							<a href="Tickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-help-circle"></i></span><span class="pcoded-mtext">Quản lý Ticket</span></a>
-						</li>
-					</c:if>
-				</ul>
-			</div>
-		</div>
-	</nav>
+    <jsp:include page="includes/sidebar.jsp"/>
+    <jsp:include page="includes/header.jsp"/>
 	<!-- [ navigation menu ] end -->
 
 	<!-- [ Header ] start -->

@@ -104,8 +104,8 @@ public class ProblemList extends HttpServlet {
             page = 1;
         }
 
-        int totalRecords = 0;
-        int totalPages = 1;
+        int totalRecords;
+        int totalPages;
 
         boolean hasStatus = status != null && !status.trim().isEmpty();
         boolean hasFrom   = fromDate != null && !fromDate.isEmpty();
@@ -116,28 +116,36 @@ public class ProblemList extends HttpServlet {
             problems = problemService.searchProblem(keyword);
             usedFilter = true;
 
-        } else if (hasStatus && hasFrom && hasTo) {
+        }
+        else if (hasStatus && hasFrom && hasTo) {
             try {
                 java.sql.Date fromStr = java.sql.Date.valueOf(fromDate);
                 java.sql.Date toStr   = java.sql.Date.valueOf(toDate);
 
-                List<Problems> tmp = problemService.filterByStatus(status.trim());
+                List<Problems> byStatus = problemService.filterByStatus(status.trim());
                 List<Problems> filtered = new ArrayList<>();
 
-                for (Problems p : tmp) {
+                for (Problems p : byStatus) {
                     if (p.getCreatedAt() == null) continue;
-                    java.sql.Date created = new java.sql.Date(p.getCreatedAt().getTime());
-                    if (!created.before(fromStr) && !created.after(toStr)) {
+
+                    long createdTime = p.getCreatedAt().getTime();
+                    long fromTime = fromStr.getTime();
+                    long toTime = toStr.getTime();
+
+                    // Giữ lại nếu: from <= created <= to
+                    if (createdTime >= fromTime && createdTime <= toTime) {
                         filtered.add(p);
                     }
                 }
 
                 problems = filtered;
                 usedFilter = true;
-            } catch (Exception e) {
+            } catch (Exception e)
+            {
+                e.printStackTrace();
             }
-
-        } else if (hasStatus) {
+        }
+        else if (hasStatus) {
             problems = problemService.filterByStatus(status.trim());
             usedFilter = true;
 

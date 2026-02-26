@@ -193,7 +193,7 @@
                                                                     <td>${p.ticketNumber}</td>
                                                                     <td>${p.title}</td>
                                                                     <td>
-                                                                        <span class="badge badge-info">
+                                                                        <span class="badge badge-status" data-status="${p.status}">
                                                                             ${p.status}
                                                                         </span>
                                                                     </td>

@@ -25,8 +25,10 @@ public class NotificationDao extends DbContext{
             "      ,[RelatedTicketId]\n" +
             "      ,[IsRead]\n" +
             "      ,[CreatedAt]\n" +
-            "  FROM [dbo].[Notifications]";
-        
+            "      ,[Title]\n" +
+            "      ,[Type]\n" +
+            "  FROM [dbo].[Notifications]\n" +
+            "  ORDER BY [CreatedAt] DESC";
         try
         {
             PreparedStatement stm = connection.prepareStatement(sql);
@@ -40,6 +42,8 @@ public class NotificationDao extends DbContext{
                not.setRelatedTicketId(rs.getInt("RelatedTicketId"));
                not.setIsRead(rs.getBoolean("IsRead"));
                not.setCreatedAt(rs.getTimestamp("CreatedAt"));
+               not.setTitle(rs.getString("Title"));
+               not.setType(rs.getString("Type"));
                list.add(not);
             }
         }
@@ -50,36 +54,32 @@ public class NotificationDao extends DbContext{
         return list;
     }
     
-    public boolean addNotification(int UserId, String Message, Integer RelatedTicketId,boolean IsRead)
-    {
-        String sql = "INSERT INTO [dbo].[Notifications]\n" +
-"           ([UserId]\n" +
-"           ,[Message]\n" +
-"           ,[RelatedTicketId]\n" +
-"           ,[IsRead]\n" +
-"           ,[CreatedAt])\n" +
-"     VALUES\n" +
-"           (?\n" +
-"           ,?\n" +
-"           ,?\n" +
-"           ,?\n" +
-"           ,GETDATE())";
-        try
-        {
-            PreparedStatement stm = connection.prepareStatement(sql);
-            stm.setInt(1,UserId);
-            stm.setString(2, Message);
-            if (RelatedTicketId == null) {
+    public boolean addNotification(int userId, String message, Integer relatedTicketId,
+                               boolean isRead, String title, String type) {
+
+        String sql = "INSERT INTO [dbo].[Notifications] " +
+                     "([UserId], [Message], [RelatedTicketId], [IsRead], [CreatedAt], [Title], [Type]) " +
+                     "VALUES (?, ?, ?, ?, GETDATE(), ?, ?)";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+
+            stm.setInt(1, userId);
+            stm.setString(2, message);
+
+            if (relatedTicketId == null) {
                 stm.setNull(3, java.sql.Types.INTEGER);
             } else {
-                stm.setInt(3, RelatedTicketId);
+                stm.setInt(3, relatedTicketId);
             }
-            stm.setBoolean(4, IsRead);
+
+            stm.setBoolean(4, isRead);
+            stm.setString(5, title);
+            stm.setString(6, type);
+
             stm.executeUpdate();
             return true;
-        }
-        catch(Exception ex)
-        {
+
+        } catch (Exception ex) {
             ex.printStackTrace();
             return false;
         }
@@ -87,7 +87,7 @@ public class NotificationDao extends DbContext{
     
         public List<Notifications> getNotificationsByUserId(int userId) {
         List<Notifications> list = new ArrayList<>();
-        String sql = "SELECT [Id], [UserId], [Message], [RelatedTicketId], [IsRead], [CreatedAt]\n"
+        String sql = "SELECT [Id], [UserId], [Message], [RelatedTicketId], [IsRead], [CreatedAt], [Title], [Type]\n"
                 + "  FROM [dbo].[Notifications]\n"
                 + "  WHERE [UserId] = ?\n"
                 + "  ORDER BY [CreatedAt] DESC";
@@ -102,6 +102,8 @@ public class NotificationDao extends DbContext{
                 not.setRelatedTicketId(rs.getInt("RelatedTicketId"));
                 not.setIsRead(rs.getBoolean("IsRead"));
                 not.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                not.setTitle(rs.getString("Title"));
+                not.setType(rs.getString("Type"));
                 list.add(not);
             }
         } catch (Exception ex) {
@@ -118,12 +120,15 @@ public class NotificationDao extends DbContext{
         String message = "Test notification from main";
         Integer relatedTicketId = null;      // Ticket ID (có thể null nếu cho phép)
         boolean isRead = false;
-
+        String title = "add New Problem";
+        String Type = "Problem";
         boolean result = dao.addNotification(
                 userId,
                 message,
                 relatedTicketId,
-                isRead
+                isRead,
+                title,
+                Type
         );
 
         if (result) {

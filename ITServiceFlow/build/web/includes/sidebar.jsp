@@ -55,6 +55,11 @@
                                             class="feather icon-settings"></i></span><span class="pcoded-mtext">SLA
                                         Configuration</span></a>
                             </li>
+                            
+                            <li class="nav-item">
+                                <a href="ProblemList" class="nav-link"><span class="pcoded-micon"><i
+                                            class="feather icon-file-text"></i></span><span class="pcoded-mtext">Problem List</span></a>
+                            </li>
                         </c:if>
 
                         <c:if test="${role == 'Admin' || role == 'Manager'}">

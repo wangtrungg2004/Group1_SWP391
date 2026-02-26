@@ -202,7 +202,7 @@
                                                                                     <tr>
                                                                                         <th>Status</th>
                                                                                         <td>
-                                                                                            <span class="badge badge-info">
+                                                                                            <span class="badge badge-status" data-status="${p.status}"">
                                                                                                 ${problem.status}
                                                                                             </span>
                                                                                         </td>

@@ -15,17 +15,21 @@ public class Notifications {
    private int RelatedTicketId;
    private boolean IsRead;
    private Date CreatedAt;
+   private String Title;
+   private String Type;
 
     public Notifications() {
     }
 
-    public Notifications(int Id, int UserId, String Message, int RelatedTicketId, boolean IsRead, Date CreatedAt) {
+    public Notifications(int Id, int UserId, String Message, int RelatedTicketId, boolean IsRead, Date CreatedAt, String Title, String Type) {
         this.Id = Id;
         this.UserId = UserId;
         this.Message = Message;
         this.RelatedTicketId = RelatedTicketId;
         this.IsRead = IsRead;
         this.CreatedAt = CreatedAt;
+        this.Title = Title;
+        this.Type = Type;
     }
 
     public int getId() {
@@ -74,6 +78,22 @@ public class Notifications {
 
     public void setCreatedAt(Date CreatedAt) {
         this.CreatedAt = CreatedAt;
+    }
+
+    public String getTitle() {
+        return Title;
+    }
+
+    public void setTitle(String Title) {
+        this.Title = Title;
+    }
+
+    public String getType() {
+        return Type;
+    }
+
+    public void setType(String Type) {
+        this.Type = Type;
     }
    
 }

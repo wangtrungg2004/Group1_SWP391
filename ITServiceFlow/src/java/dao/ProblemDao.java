@@ -63,7 +63,7 @@ public class ProblemDao extends DbContext{
                       + "FROM dbo.Problems p "
                       + "LEFT JOIN dbo.Users u ON p.CreatedBy = u.Id "
                       + "LEFT JOIN dbo.Users u2 ON p.AssignedTo = u2.Id "
-                      + "ORDER BY p.Id "
+                      + "ORDER BY p.CreatedAt DESC "
                       + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
             PreparedStatement stm = connection.prepareStatement(sql);
             int offset = (page - 1) * pageSize;
