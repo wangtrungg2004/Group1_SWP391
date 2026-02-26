@@ -61,18 +61,20 @@
                                 <c:otherwise>
                                     <c:forEach items="${notifications}" var="notification">
                                         <li class="notification">
-                                            <div class="media">
-                                                <img class="img-radius" src="assets/images/user/avatar-1.jpg" alt="">
-                                                <div class="media-body">
-                                                    <p>
-                                                        <span class="n-time text-muted">
-                                                            <i class="icon feather icon-clock m-r-10"></i>
-                                                            <fmt:formatDate value="${notification.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
-                                                        </span>
-                                                    </p>
-                                                    <p><c:out value="${notification.message}"/></p>
+                                            <a href="NotificationDetail?Id=${notification.id}" class="d-block text-decoration-none" style="color: inherit;">
+                                                <div class="media">
+                                                    <img class="img-radius" src="assets/images/user/avatar-1.jpg" alt="">
+                                                    <div class="media-body">
+                                                        <p>
+                                                            <span class="n-time text-muted">
+                                                                <i class="icon feather icon-clock m-r-10"></i>
+                                                                <fmt:formatDate value="${notification.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
+                                                            </span>
+                                                        </p>
+                                                        <p><c:out value="${notification.message}"/></p>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            </a>
                                         </li>
                                     </c:forEach>
                                 </c:otherwise>

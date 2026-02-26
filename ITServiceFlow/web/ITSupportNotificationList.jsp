@@ -194,10 +194,10 @@
                                                                     <td>${n.type}</td>
                                                                     <td>${n.message}</td>
                                                                     <td>${n.createdAt}</td>
-                                                                    <td>${n.isRead != null ? n.isRead : n.isRead}</td>
+                                                                    <td>${n.isRead  ? 'Read' : 'UnRead'}</td>
                                                                     <td class="d-flex gap-1">
                                                                         <a class="btn btn-sm btn-primary"
-                                                                           href="ProblemDetail?Id=${p.id}">
+                                                                           href="NotificationDetail?Id=${n.id}">
                                                                             Detail
                                                                         </a>
                                                                     </td>

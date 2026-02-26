@@ -111,30 +111,111 @@ public class NotificationDao extends DbContext{
         }
         return list;
     }
+        
+    public Notifications getNotificationById(int id)
+    {
+        String sql = "SELECT [Id], [UserId], [Message], [RelatedTicketId], [IsRead], " +
+            "       [CreatedAt], [Title], [Type] " +
+            "FROM [dbo].[Notifications] " +
+            "WHERE [Id] = ?";
+        try
+        {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setInt(1, id); 
+            ResultSet rs = stm.executeQuery();
+            while(rs.next())
+            {
+                Notifications not = new Notifications();
+                not.setId(rs.getInt("Id"));
+                not.setUserId(rs.getInt("UserId"));
+                not.setMessage(rs.getString("Message"));
+                not.setRelatedTicketId(rs.getInt("RelatedTicketId"));
+                not.setIsRead(rs.getBoolean("IsRead"));
+                not.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                not.setTitle(rs.getString("Title"));
+                not.setType(rs.getString("Type"));
+                return not;
+            }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+        
+    public boolean readNotificationById(int id) {
+        String sql =
+            "UPDATE [dbo].[Notifications] " +
+            "SET [IsRead] = 1 " +
+            "WHERE [Id] = ? AND [IsRead] = 0";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, id);
+            return stm.executeUpdate() > 0;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
     
+//    public static void main(String[] args) {
+//        NotificationDao dao = new NotificationDao(); // nhớ init connection trong constructor
+//
+//        int testId = 10; // đổi sang Id có thật trong DB
+//        Notifications not = dao.getNotificationById(testId);
+//
+//        if (not != null) {
+//            System.out.println("=== Notification Detail ===");
+//            System.out.println("Id: " + not.getId());
+//            System.out.println("UserId: " + not.getUserId());
+//            System.out.println("Title: " + not.getTitle());
+//            System.out.println("Message: " + not.getMessage());
+//            System.out.println("IsRead: " + not.isIsRead());
+//            System.out.println("CreatedAt: " + not.getCreatedAt());
+//        } else {
+//            System.out.println("❌ Notification not found");
+//        }
+//    }
     
     public static void main(String[] args) {
         NotificationDao dao = new NotificationDao();
 
-        int userId = 1;                 // ID user có trong DB
-        String message = "Test notification from main";
-        Integer relatedTicketId = null;      // Ticket ID (có thể null nếu cho phép)
-        boolean isRead = false;
-        String title = "add New Problem";
-        String Type = "Problem";
-        boolean result = dao.addNotification(
-                userId,
-                message,
-                relatedTicketId,
-                isRead,
-                title,
-                Type
-        );
+        int testId = 10; // Id chưa đọc
+        boolean success = dao.readNotificationById(testId);
 
-        if (result) {
-            System.out.println("✅ Add notification SUCCESS");
+        if (success) {
+            System.out.println("✅ Notification marked as read");
         } else {
-            System.out.println("❌ Add notification FAILED");
+            System.out.println("⚠️ Notification already read or not found");
         }
+
+        // check lại
+        Notifications not = dao.getNotificationById(testId);
+        System.out.println("IsRead after update: " + not.isIsRead());
     }
+//    public static void main(String[] args) {
+//        NotificationDao dao = new NotificationDao();
+//
+//        int userId = 1;                 // ID user có trong DB
+//        String message = "Test notification from main";
+//        Integer relatedTicketId = null;      // Ticket ID (có thể null nếu cho phép)
+//        boolean isRead = false;
+//        String title = "add New Problem";
+//        String Type = "Problem";
+//        boolean result = dao.addNotification(
+//                userId,
+//                message,
+//                relatedTicketId,
+//                isRead,
+//                title,
+//                Type
+//        );
+//
+//        if (result) {
+//            System.out.println("✅ Add notification SUCCESS");
+//        } else {
+//            System.out.println("❌ Add notification FAILED");
+//        }
+//    }
 }
