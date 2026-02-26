@@ -1,3 +1,26 @@
-/Group1_SWP/nbproject/private/
-/Group1_SWP/build/
-/Group1_SWP/dist/
+# NetBeans build directories
+/dist/
+/build/
+/nbproject/private/
+
+# Compiled class files
+*.class
+
+# JAR files (except lib dependencies)
+*.jar
+!/lib/*.jar
+
+# Log files
+*.log
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# IDE specific
+.idea/
+*.iml
+.vscode/
+
+# Database files
+*.sql~
