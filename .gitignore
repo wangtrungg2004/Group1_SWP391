@@ -1,7 +1,10 @@
-# NetBeans build directories
-/dist/
-/build/
-/nbproject/private/
+# NetBeans build directories (root and module)
+build/
+dist/
+nbproject/private/
+ITServiceFlow/build/
+ITServiceFlow/dist/
+ITServiceFlow/nbproject/private/
 
 # Compiled class files
 *.class
