@@ -32,4 +32,11 @@ public class NotificationService {
     {
         return dao.readNotificationById(id);
     }
+    public List<Notifications> getAllNotificationsByUserId(int userId)
+    {
+        return dao.getNotificationsByUserId(userId);
+    }
+    public List<Notifications> getNotificationsByUserIdUnread(int id){
+        return dao.getNotificationsByUserIdUnread(id);
+    }
 }

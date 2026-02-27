@@ -73,7 +73,7 @@ public class NotificationDetail extends HttpServlet {
         String idParam = request.getParameter("Id");
         
         if (idParam == null || idParam.trim().isEmpty()) {
-            response.sendRedirect("ITSupportNotificationList.jsp");
+            response.sendRedirect("ITSupportNotificationList");
             return;
         }
         int id = Integer.parseInt(idParam);
@@ -82,9 +82,9 @@ public class NotificationDetail extends HttpServlet {
         Notifications notification = notificationService.getNotificationsById(id);
 
         request.setAttribute("notification", notification);
-        request.setAttribute("ITSupportNotificationListUrl", "ITSupportNotificationList.jsp");
+        request.setAttribute("ITSupportNotificationListUrl", "ITSupportNotificationList");
         request.setAttribute("role", role != null ? role : "");
-        request.getRequestDispatcher("NotificationDetail.jsp").forward(request, response);
+        request.getRequestDispatcher("NotificationDetail").forward(request, response);
     }
 
     /**

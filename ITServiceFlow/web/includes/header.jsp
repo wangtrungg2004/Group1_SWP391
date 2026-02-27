@@ -3,9 +3,27 @@
     Sử dụng request attribute "notifications" nếu có (tùy chọn).
     Tên user có thể lấy từ session "user" (model.Users) hoặc "userName".
 --%>
+<%@page import="dao.NotificationDao"%>
+<%@page import="model.Notifications"%>
+<%@page import="java.util.List"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
-
+<%
+            if (session != null && session.getAttribute("userId") != null 
+                && request.getAttribute("headerNotifications") == null) 
+        {
+            Integer userId = (Integer) session.getAttribute("userId");
+            String role = (String) session.getAttribute("role");
+            NotificationDao notificationDao = new NotificationDao();
+            List<Notifications> list;
+            if ("Admin".equals(role) || "Manager".equals(role)) {
+                list = notificationDao.getAllNotifications();
+            } else {
+                list = notificationDao.getNotificationsByUserIdUnread(userId);
+            }
+            request.setAttribute("headerNotifications", list);
+        }
+%>
 <!-- [ Header ] start -->
 <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed">
     <style>
@@ -55,11 +73,11 @@
                         </div>
                         <ul class="noti-body">
                             <c:choose>
-                                <c:when test="${empty notifications}">
+                                <c:when test="${empty headerNotifications}">
                                     <li class="notification"><p class="text-muted m-2">No notifications</p></li>
                                 </c:when>
                                 <c:otherwise>
-                                    <c:forEach items="${notifications}" var="notification">
+                                    <c:forEach items="${headerNotifications}" var="notification">
                                         <li class="notification">
                                             <a href="NotificationDetail?Id=${notification.id}" class="d-block text-decoration-none" style="color: inherit;">
                                                 <div class="media">
@@ -83,7 +101,7 @@
                         <c:choose>
                             <c:when test="${role eq 'IT Support'}">
                                 <div class="noti-footer">
-                                    <a href="ITSupportNotificationList.jsp">show all</a>
+                                    <a href="ITSupportNotificationList">show all</a>
                                 </div>
                             </c:when>
 

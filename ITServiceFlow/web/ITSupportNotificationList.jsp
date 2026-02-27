@@ -10,39 +10,12 @@
 <%@ page import="model.Notifications" %>
 <%@ page import="dao.NotificationDao" %>
 <%
-    // 1. Kiểm tra đăng nhập
-    if (session.getAttribute("user") == null) {
-        response.sendRedirect("Login.jsp");
-        return;
-    }
-
-    // 2. Lấy thông tin từ session
-    model.Users user = (model.Users) session.getAttribute("user");
-    Integer userId = (Integer) session.getAttribute("userId");
-    String role = (String) session.getAttribute("role");
-
-    // 3. Kiểm tra quyền truy cập (chỉ IT Support được vào)
-    if (role == null || !role.equals("IT Support")) {
-        response.sendRedirect("Login.jsp");
-        return;
-    }
-
-    // 4. Load notifications (nếu chưa có)
-    if (request.getAttribute("notifications") == null && userId != null) {
-        dao.NotificationDao notificationDao = new dao.NotificationDao();
-        List<Notifications> notifications;
-
-        // Admin & Manager: xem tất cả
-        if ("Admin".equals(role) || "Manager".equals(role)) {
-            notifications = notificationDao.getAllNotifications();
-        } 
-        // Các role khác: chỉ xem của mình
-        else {
-            notifications = notificationDao.getNotificationsByUserId(userId);
+        if (session != null && session.getAttribute("userId") != null 
+                && request.getAttribute("headerNotifications") == null) 
+        {
+            Integer userId = (Integer) session.getAttribute("userId");
+            String role = (String) session.getAttribute("role");
         }
-
-        request.setAttribute("notifications", notifications);
-    }
 %>
 
 <!DOCTYPE html>
@@ -133,8 +106,8 @@
                                             </div>
                                             <ul class="breadcrumb">
                                                 <li class="breadcrumb-item"><a href="index.html"><i class="feather icon-home"></i></a></li>
-                                                <li class="breadcrumb-item"><a href="#!">Form Components</a></li>
-                                                <li class="breadcrumb-item"><a href="#!">Form Elements</a></li>
+                                                <li class="breadcrumb-item"><a href="ITSupportNotificationList">Notification List</a></li>
+                                                <li class="breadcrumb-item"><a href="#!">Notification List</a></li>
                                             </ul>
                                         </div>
                                     </div>

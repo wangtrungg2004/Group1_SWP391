@@ -38,7 +38,7 @@
         } 
         // Các role khác: chỉ xem của mình
         else {
-            notifications = notificationDao.getNotificationsByUserId(userId);
+            notifications = notificationDao.getNotificationsByUserIdUnread(userId);
         }
 
         request.setAttribute("notifications", notifications);

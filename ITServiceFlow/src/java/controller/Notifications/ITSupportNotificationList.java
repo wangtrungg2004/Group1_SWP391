@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import model.Notifications;
+import service.NotificationService;
 
 /**
  *
@@ -57,6 +58,7 @@ public class ITSupportNotificationList extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    NotificationService notificationService = new NotificationService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -76,10 +78,9 @@ public class ITSupportNotificationList extends HttpServlet {
 
             // 4. Load notifications (nếu chưa có)
             if (request.getAttribute("notifications") == null && userId != null) {
-                dao.NotificationDao notificationDao = new dao.NotificationDao();
                 List<Notifications> notifications;
 
-                notifications = notificationDao.getNotificationsByUserId(userId);
+                notifications = notificationService.getAllNotificationsByUserId(userId);
                 
                 request.setAttribute("notifications", notifications);
                 request.getRequestDispatcher("ITSupportNotificationList.jsp").forward(request, response);
