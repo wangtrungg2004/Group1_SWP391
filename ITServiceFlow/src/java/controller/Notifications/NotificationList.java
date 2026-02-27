@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
 import model.Notifications;
 import service.NotificationService;
 
@@ -19,8 +20,8 @@ import service.NotificationService;
  *
  * @author DELL
  */
-@WebServlet(name = "NotificationDetail", urlPatterns = {"/NotificationDetail"})
-public class NotificationDetail extends HttpServlet {
+@WebServlet(name = "NotificationList", urlPatterns = {"/NotificationList"})
+public class NotificationList extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -39,10 +40,10 @@ public class NotificationDetail extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet NotificationDetail</title>");
+            out.println("<title>Servlet NotificationList</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet NotificationDetail at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet NotificationList at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -57,7 +58,7 @@ public class NotificationDetail extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    NotificationService notificationService = new NotificationService();
+    NotificationService NotificationService = new NotificationService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -65,26 +66,18 @@ public class NotificationDetail extends HttpServlet {
         String role = (String) session.getAttribute("role");
         Integer userId = (Integer) session.getAttribute("userId");
         
-        String idParam = request.getParameter("Id");
-        
-        if (idParam == null || idParam.trim().isEmpty()) {
-            response.sendRedirect("ITSupportNotificationList");
+        if (userId == null) {
+            response.sendRedirect("Login.jsp");
             return;
         }
-        int id = Integer.parseInt(idParam);
-        Notifications notification = notificationService.getNotificationsById(id);
-        boolean checkId = (notification.getUserId() ==userId);
-        boolean checkRole = ("User".equals(role) || "IT Support".equals(role));
-        if(checkId && checkRole)
-        {
-            notificationService.readNotification(id);
+        if (!"Manager".equals(role)) {
+            response.sendRedirect("Login.jsp"); 
+            return;
         }
-
-        String notificationListUrl = "Manager".equals(role) ? "NotificationList" : "ITSupportNotificationList";
-        request.setAttribute("notification", notification);
-        request.setAttribute("notificationListUrl", notificationListUrl);
-        request.setAttribute("role", role != null ? role : "");
-        request.getRequestDispatcher("NotificationDetail.jsp").forward(request, response);
+        List<Notifications> notification;
+        notification = NotificationService.getAllNotification();
+        request.setAttribute("notifications", notification);
+        request.getRequestDispatcher("NotificationList.jsp").forward(request, response);
     }
 
     /**

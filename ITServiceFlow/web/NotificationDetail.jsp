@@ -119,7 +119,19 @@
                                                 </div>
                                                 <ul class="breadcrumb">
                                                     <li class="breadcrumb-item"><a href="index.html"><i class="feather icon-home"></i></a></li>
-                                                    <li class="breadcrumb-item"><a href="${ITSupportNotificationListUrl}">Notification List</a></li>
+                                                    <li class="breadcrumb-item">
+                                                        <c:choose>
+                                                            <c:when test="${role eq 'IT Support'}">
+                                                                <a href="ITSupportNotificationList">Notification List</a>
+                                                            </c:when>
+                                                            <c:when test="${role eq 'Manager'}">
+                                                                <a href="NotificationList">Notification List</a>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <a href="${notificationListUrl}">Notification List</a>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </li>
                                                     <li class="breadcrumb-item"><a href="#!">Notification Detail</a></li>
                                                 </ul>
                                             </div>
@@ -135,7 +147,7 @@
                                         <div class="card-header">
                                             <h5>Notification Details</h5>
                                             <div class="card-header-right d-flex align-items-center gap-2">
-                                                <a href="${ITSupportNotificationListUrl}" class="btn btn-sm btn-secondary">
+                                                <a href="${notificationListUrl}" class="btn btn-sm btn-secondary">
                                                     <i class="feather icon-arrow-left"></i> Back to List
                                                 </a>
                                             </div>
@@ -145,7 +157,7 @@
                                                 <div class="alert alert-danger">
                                                     <h4>Error</h4>
                                                     <p>${error}</p>
-                                                    <a href="${ITSupportNotificationListUrl}" class="btn btn-primary">Back to Notification List</a>
+                                                    <a href="${notificationListUrl}" class="btn btn-primary">Back to Notification List</a>
                                                 </div>
                                             </c:if>
                                             <c:if test="${empty error}">
@@ -154,7 +166,7 @@
                                                         <div class="alert alert-warning">
                                                             <h4>Notification not found</h4>
                                                             <p>The notification you are looking for does not exist or has been deleted.</p>
-                                                            <a href="${ITSupportNotificationListUrl}" class="btn btn-primary">Back to Notification List</a>
+                                                            <a href="${notificationListUrl}" class="btn btn-primary">Back to Notification List</a>
                                                         </div>
                                                     </c:when>
                                                     <c:otherwise>

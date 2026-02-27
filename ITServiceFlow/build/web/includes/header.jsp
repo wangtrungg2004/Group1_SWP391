@@ -107,7 +107,7 @@
 
                             <c:when test="${role eq 'Manager'}">
                                 <div class="noti-footer">
-                                    <a href="#!">show all</a>
+                                    <a href="NotificationList">show all</a>
                                 </div>
                             </c:when>
                         </c:choose>
