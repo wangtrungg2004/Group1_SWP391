@@ -37,6 +37,9 @@
                                             class="feather icon-settings"></i></span><span class="pcoded-mtext">Cài ??t
                                         h? th?ng</span></a>
                             </li>
+                            <li class="nav-item">
+                                <a href="CIListServlet" class="nav-link"><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">List Configuration Items</span></a>
+                            </li>
                         </c:if>
 
                         <!-- Menu cho Manager và Admin -->
@@ -99,6 +102,22 @@
                             <li class="nav-item">
                                 <a href="ITProblemListController" class="nav-link"><span class="pcoded-micon"><i
                                             class="feather icon-clock"></i></span><span class="pcoded-mtext">Problem List</span></a>
+                            </li>
+                            <li class="nav-item pcoded-menu-caption">
+                                <label>Knowledge</label>
+                            </li>
+                            <li class="nav-item">
+                                <a href="TicketResolutionReview" class="nav-link"><span class="pcoded-micon"><i class="feather icon-check-square"></i></span><span class="pcoded-mtext">Ticket Resolution Review</span></a>
+                            </li>
+                        </c:if>
+
+                        <!-- Menu cho End User -->
+                        <c:if test="${role == 'User'}">
+                            <li class="nav-item pcoded-menu-caption">
+                                <label>Knowledge Base</label>
+                            </li>
+                            <li class="nav-item">
+                                <a href="KnowledgeSearch" class="nav-link"><span class="pcoded-micon"><i class="feather icon-book-open"></i></span><span class="pcoded-mtext">Knowledge Search</span></a>
                             </li>
                         </c:if>
                     </ul>
