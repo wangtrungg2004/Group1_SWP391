@@ -208,6 +208,75 @@ public class TicketDAO extends DbContext {
         return list;
     }
 
+    // Lấy tất cả Tickets có Status = 'Resolved', lọc theo TicketNumber nếu có
+    public List<Tickets> getResolvedTickets(String keyword) {
+        List<Tickets> list = new ArrayList<>();
+        String sql;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql = "SELECT t.*, c.Name AS CategoryName, l.Name AS LocationName "
+                    + "FROM Tickets t "
+                    + "LEFT JOIN Categories c ON t.CategoryId = c.Id "
+                    + "LEFT JOIN Locations l ON t.LocationId = l.Id "
+                    + "WHERE t.Status = 'Resolved' AND t.TicketNumber LIKE ? "
+                    + "ORDER BY t.ResolvedAt DESC";
+        } else {
+            sql = "SELECT t.*, c.Name AS CategoryName, l.Name AS LocationName "
+                    + "FROM Tickets t "
+                    + "LEFT JOIN Categories c ON t.CategoryId = c.Id "
+                    + "LEFT JOIN Locations l ON t.LocationId = l.Id "
+                    + "WHERE t.Status = 'Resolved' "
+                    + "ORDER BY t.ResolvedAt DESC";
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                ps.setString(1, "%" + keyword.trim() + "%");
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Tickets ticket = mapResultSetToTicket(rs);
+                    try {
+                        ticket.setCategoryName(rs.getString("CategoryName"));
+                    } catch (Exception e) {
+                    }
+                    try {
+                        ticket.setLocationName(rs.getString("LocationName"));
+                    } catch (Exception e) {
+                    }
+                    list.add(ticket);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error getting resolved tickets", e);
+        }
+        return list;
+    }
+
+    // Lấy Ticket theo TicketNumber (VD: INC-0001)
+    public Tickets getTicketByNumber(String ticketNumber) {
+        String sql = "SELECT t.*, c.Name AS CategoryName, l.Name AS LocationName, p.Level AS PriorityLevel "
+                + "FROM Tickets t "
+                + "LEFT JOIN Categories c ON t.CategoryId = c.Id "
+                + "LEFT JOIN Locations l ON t.LocationId = l.Id "
+                + "LEFT JOIN Priorities p ON t.PriorityId = p.Id "
+                + "WHERE t.TicketNumber = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, ticketNumber);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Tickets ticket = mapResultSetToTicket(rs);
+                    ticket.setCategoryName(rs.getString("CategoryName"));
+                    ticket.setLocationName(rs.getString("LocationName"));
+                    ticket.setPriorityLevel(rs.getInt("PriorityLevel"));
+                    return ticket;
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error getting ticket by number: " + ticketNumber, e);
+        }
+        return null;
+    }
+
     // Cập nhật trạng thái Ticket
     public boolean updateTicketStatus(int ticketId, String newStatus) {
         String sql = "UPDATE Tickets SET Status = ?, UpdatedAt = GETDATE() WHERE Id = ?";

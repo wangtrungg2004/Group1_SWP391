@@ -126,6 +126,9 @@
 						<li class="nav-item">
 							<a href="UserCreate" class="nav-link"><span class="pcoded-micon"><i class="feather icon-user-plus"></i></span><span class="pcoded-mtext">Tao User</span></a>
 						</li>
+                                            <li class="nav-item">
+                                                    <a href="CIListServlet" class="nav-link"><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">List Configuration Items</span></a>
+                                            </li>
 					</c:if>
 					<c:if test="${role == 'Admin' || role == 'Manager'}">
 						<li class="nav-item pcoded-menu-caption">
