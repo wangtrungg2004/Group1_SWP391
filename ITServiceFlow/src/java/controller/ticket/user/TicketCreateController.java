@@ -1,13 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller.ticket.user;
-
-/**
- *
- * @author Dumb Trung
- */
 
 import dao.CategoryDao;
 import dao.ServiceCatalogDao;
@@ -25,73 +16,125 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-
+@WebServlet(name = "CreateTicket", urlPatterns = {"/CreateTicket"})
 public class TicketCreateController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        // 1. Khởi tạo DAO
+
         CategoryDao catDao = new CategoryDao();
         ServiceCatalogDao svcDao = new ServiceCatalogDao();
-        
-        // 2. Kéo dữ liệu từ DB
-        List<Category> categoryList = catDao.getAllCategories();
-        List<ServiceCatalog> serviceList = svcDao.getAllServices();
-        
-        // 3. Đẩy sang JSP
-        request.setAttribute("categoryList", categoryList);
-        request.setAttribute("serviceList", serviceList);
-        
-        // 4. Chuyển hướng tới file JSP của Dev 2
+
+        request.setAttribute("categoryList", catDao.getAllCategories());
+        request.setAttribute("serviceList", svcDao.getAllServices());
+
         request.getRequestDispatcher("/ticket/create.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession();
         Users currentUser = (Users) session.getAttribute("user");
-        
+
         if (currentUser == null) {
             response.sendRedirect("Login.jsp");
             return;
         }
 
         String ticketType = request.getParameter("ticketType");
-        
+
         Tickets t = new Tickets();
-        t.setTicketNumber("TKT-" + System.currentTimeMillis()); 
+        t.setTicketNumber("TKT-" + System.currentTimeMillis());
         t.setTicketType(ticketType);
         t.setTitle(request.getParameter("title"));
         t.setDescription(request.getParameter("description"));
         t.setCreatedBy(currentUser.getId());
-        // Tránh null location nếu User chưa cập nhật Location
-        t.setLocationId(currentUser.getLocationId() > 0 ? currentUser.getLocationId() : 1); 
+        t.setLocationId(currentUser.getLocationId() > 0 ? currentUser.getLocationId() : 1);
 
+        // ========================================================
+        // XỬ LÝ NHÁNH 1: INCIDENT (SỰ CỐ)
+        // ========================================================
         if ("Incident".equals(ticketType)) {
-            t.setCategoryId(Integer.parseInt(request.getParameter("categoryId")));
-            t.setImpact(Integer.parseInt(request.getParameter("impact")));
-            t.setUrgency(Integer.parseInt(request.getParameter("urgency")));
-            t.setPriorityId(1); // Tạm fix Priority 1 để demo
-            
+
+            String catStr = request.getParameter("categoryId");
+            String impactStr = request.getParameter("impact");
+            String urgencyStr = request.getParameter("urgency");
+
+            // Check nếu User chưa chọn đến Tầng thứ 3 (Lỗi chi tiết)
+            if (catStr == null || catStr.isEmpty() || "null".equals(catStr)) {
+                request.setAttribute("errorMessage", "Vui lòng chọn đầy đủ đến mục 'Lỗi chi tiết' (Level 3).");
+                doGet(request, response);
+                return;
+            }
+
+            try {
+                t.setCategoryId(Integer.parseInt(catStr));
+                t.setImpact(Integer.parseInt(impactStr));
+                t.setUrgency(Integer.parseInt(urgencyStr));
+                t.setPriorityId(1); 
+                
+                // FIX QUAN TRỌNG: Gán giá trị mặc định để tránh NullPointer trong DAO
+                t.setServiceCatalogId(null); 
+                t.setRequiresApproval(false); 
+                
+            } catch (NumberFormatException e) {
+                request.setAttribute("errorMessage", "Dữ liệu độ khẩn cấp/ảnh hưởng không hợp lệ.");
+                doGet(request, response);
+                return;
+            }
+
+        // ========================================================
+        // XỬ LÝ NHÁNH 2: SERVICE REQUEST (DỊCH VỤ)
+        // ========================================================
         } else if ("ServiceRequest".equals(ticketType)) {
-            int serviceId = Integer.parseInt(request.getParameter("serviceCatalogId"));
-            t.setServiceCatalogId(serviceId);
-            t.setCategoryId(1); // Default category
+
+            String serviceStr = request.getParameter("serviceCatalogId");
+
+            if (serviceStr == null || serviceStr.isEmpty()) {
+                request.setAttribute("errorMessage", "Vui lòng chọn dịch vụ cụ thể.");
+                doGet(request, response);
+                return;
+            }
+
+            try {
+                int serviceId = Integer.parseInt(serviceStr);
+                ServiceCatalogDao svcDao = new ServiceCatalogDao();
+                ServiceCatalog svc = svcDao.getServiceById(serviceId);
+
+                if (svc != null) {
+                    t.setServiceCatalogId(serviceId);
+                    t.setCategoryId(svc.getCategoryId()); // Gán category cha
+                    t.setRequiresApproval(svc.isRequiresApproval());
+                    
+                    // FIX QUAN TRỌNG: Gán null cho các field của Incident để DB không bắt lỗi
+                    t.setImpact(null);
+                    t.setUrgency(null);
+                    t.setPriorityId(null);
+                } else {
+                    request.setAttribute("errorMessage", "Dịch vụ không tồn tại trong hệ thống.");
+                    doGet(request, response);
+                    return;
+                }
+            } catch (Exception e) {
+                request.setAttribute("errorMessage", "Lỗi dữ liệu dịch vụ.");
+                doGet(request, response);
+                return;
+            }
         }
 
+        // GỌI DAO ĐỂ LƯU XUỐNG DB
         TicketDao dao = new TicketDao();
         boolean isCreated = dao.createTicket(t);
 
         if (isCreated) {
-            // Chuyển hướng tới trang "Tickets của tôi" sau khi tạo thành công
-            response.sendRedirect(request.getContextPath() + "/MyTickets"); 
+            response.sendRedirect(request.getContextPath() + "/Tickets");
         } else {
-            request.setAttribute("errorMessage", "Lỗi hệ thống! Không thể tạo Ticket.");
-            doGet(request, response); // Load lại form với dữ liệu động
+            // Hiển thị lỗi rõ ràng thay vì im lặng
+            request.setAttribute("errorMessage", "Lỗi hệ thống: Không thể lưu Ticket vào Database. Vui lòng thử lại.");
+            doGet(request, response);
         }
     }
 }

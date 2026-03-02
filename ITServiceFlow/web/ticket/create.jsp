@@ -1,8 +1,9 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%
+    // Kiểm tra session đăng nhập
     if (session.getAttribute("user") == null) {
-        response.sendRedirect("Login.jsp");
+        response.sendRedirect(request.getContextPath() + "/Login.jsp");
         return;
     }
 %>
@@ -24,8 +25,8 @@
         <div class="loader-track"><div class="loader-fill"></div></div>
     </div>
 
-    <jsp:include page="sidebar.jsp" />
-    <jsp:include page="header.jsp" />
+    <jsp:include page="../includes/header.jsp" />
+    <jsp:include page="../includes/sidebar.jsp" />
 
     <div class="pcoded-main-container">
         <div class="pcoded-wrapper">
@@ -51,18 +52,19 @@
                     <div class="main-body">
                         <div class="page-wrapper">
                             
-                            <div class="row">
-                                <div class="col-sm-12 col-md-10 col-xl-8">
-                                    <div class="card">
+                            <div class="row justify-content-center">
+                                <div class="col-sm-12 col-md-12 col-xl-10">
+                                    <div class="card shadow-sm">
                                         <div class="card-header bg-light">
                                             <h5>Điền thông tin yêu cầu</h5>
                                         </div>
                                         <div class="card-body">
+                                            
                                             <c:if test="${not empty errorMessage}">
                                                 <div class="alert alert-danger">${errorMessage}</div>
                                             </c:if>
 
-                                            <form action="CreateTicket" method="POST" id="ticketForm">
+                                            <form action="${pageContext.request.contextPath}/CreateTicket" method="POST" id="ticketForm">
                                                 
                                                 <div class="form-group mb-3">
                                                     <label class="font-weight-bold">Bạn đang cần gì?</label>
@@ -85,15 +87,28 @@
                                                 <div id="incidentSection">
                                                     <hr>
                                                     <h6 class="text-primary mb-3"><i class="feather icon-alert-triangle"></i> Chi tiết Sự cố</h6>
-                                                    <div class="form-group mb-3">
-                                                        <label>Danh mục (Category)</label>
-                                                        <select name="categoryId" class="form-control incident-field" required>
-    <option value="">-- Chọn danh mục lỗi --</option>
-    <c:forEach items="${categoryList}" var="cat">
-        <option value="${cat.id}">${cat.name}</option>
-    </c:forEach>
-</select>
+                                                    
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-4">
+                                                            <label>1. Lĩnh vực</label>
+                                                            <select id="level1" class="form-control incident-field" onchange="loadLevel2()" required>
+                                                                <option value="">-- Chọn Lĩnh vực --</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <label>2. Nhóm lỗi</label>
+                                                            <select id="level2" class="form-control incident-field" onchange="loadLevel3()" required disabled>
+                                                                <option value="">-- Chọn Nhóm lỗi --</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <label>3. Lỗi chi tiết</label>
+                                                            <select name="categoryId" id="level3" class="form-control incident-field" required disabled>
+                                                                <option value="">-- Chọn Lỗi chi tiết --</option>
+                                                            </select>
+                                                        </div>
                                                     </div>
+                                                    
                                                     <div class="row">
                                                         <div class="col-md-6 form-group">
                                                             <label>Mức độ ảnh hưởng (Impact)</label>
@@ -117,20 +132,26 @@
                                                 <div id="requestSection" style="display: none;">
                                                     <hr>
                                                     <h6 class="text-success mb-3"><i class="feather icon-shopping-cart"></i> Chi tiết Dịch vụ</h6>
-                                                    <div class="form-group mb-3">
-                                                        <label>Danh mục dịch vụ (Service Catalog)</label>
-                                                        <select name="serviceCatalogId" class="form-control request-field">
-    <option value="">-- Chọn dịch vụ cần cấp --</option>
-    <c:forEach items="${serviceList}" var="svc">
-        <c:if test="${svc.isActive}">
-            <option value="${svc.id}">${svc.name}</option>
-        </c:if>
-    </c:forEach>
-</select>
+                                                    
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-6">
+                                                            <label>1. Nhóm dịch vụ</label>
+                                                            <select id="reqCategory" class="form-control request-field" onchange="loadServices()" required>
+                                                                <option value="">-- Chọn Nhóm dịch vụ --</option>
+                                                            </select>
+                                                        </div>
+                                                        
+                                                        <div class="col-md-6">
+                                                            <label>2. Dịch vụ chi tiết</label>
+                                                            <select name="serviceCatalogId" id="reqService" class="form-control request-field" required disabled>
+                                                                <option value="">-- Chọn Dịch vụ --</option>
+                                                            </select>
+                                                        </div>
                                                     </div>
                                                 </div>
 
                                                 <div class="text-right mt-4">
+                                                    <a href="${pageContext.request.contextPath}/Tickets" class="btn btn-secondary mr-2"><i class="feather icon-x"></i> Hủy</a>
                                                     <button type="submit" class="btn btn-primary"><i class="feather icon-save"></i> Gửi Yêu Cầu</button>
                                                 </div>
                                             </form>
@@ -139,17 +160,39 @@
                                     </div>
                                 </div>
                             </div>
-                            </div>
+
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
     <script src="assets/js/vendor-all.min.js"></script>
     <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
     <script src="assets/js/pcoded.min.js"></script>
     
     <script>
+        // ==========================================
+        // 1. DATA TỪ SERVER TRUYỀN XUỐNG
+        // ==========================================
+        var categoryData = [
+            <c:forEach items="${categoryList}" var="cat" varStatus="loop">
+                { id: ${cat.id}, name: "${cat.name}", parentId: ${cat.parentId != null ? cat.parentId : 'null'}, level: ${cat.level} }${!loop.last ? ',' : ''}
+            </c:forEach>
+        ];
+
+        var serviceData = [
+            <c:forEach items="${serviceList}" var="svc" varStatus="loop">
+                { id: ${svc.id}, name: "${svc.name}", categoryId: ${svc.categoryId}, isActive: ${svc.isActive} }${!loop.last ? ',' : ''}
+            </c:forEach>
+        ];
+
+        var serviceCategoryIds = [...new Set(serviceData.filter(s => s.isActive).map(s => s.categoryId))];
+
+        // ==========================================
+        // 2. LOGIC ẨN/HIỆN THEO LOẠI TICKET
+        // ==========================================
         function toggleFormFields() {
             var type = document.getElementById("ticketType").value;
             var incSection = document.getElementById("incidentSection");
@@ -160,20 +203,101 @@
             if (type === "Incident") {
                 incSection.style.display = "block";
                 reqSection.style.display = "none";
+                
                 incFields.forEach(f => f.setAttribute("required", "true"));
                 reqFields.forEach(f => f.removeAttribute("required"));
             } else {
                 incSection.style.display = "none";
                 reqSection.style.display = "block";
+                
                 reqFields.forEach(f => f.setAttribute("required", "true"));
                 incFields.forEach(f => f.removeAttribute("required"));
             }
         }
-        
-        // Chạy khi load trang
-        window.onload = function() {
-            toggleFormFields();
-        };
+
+        // ==========================================
+        // 3. LOGIC XỬ LÝ DROPDOWN INCIDENT (3 CẤP)
+        // ==========================================
+        function initCategoryDropdown() {
+            var level1 = document.getElementById("level1");
+            level1.innerHTML = '<option value="">-- Chọn Lĩnh vực --</option>'; 
+            
+            var incidentRoots = categoryData.filter(c => c.level === 1 && !serviceCategoryIds.includes(c.id));
+            
+            incidentRoots.forEach(c => {
+                level1.add(new Option(c.name, c.id));
+            });
+        }
+
+        function loadLevel2() {
+            var l1Id = document.getElementById("level1").value;
+            var l2 = document.getElementById("level2");
+            var l3 = document.getElementById("level3");
+            
+            l2.innerHTML = '<option value="">-- Chọn Nhóm lỗi --</option>';
+            l3.innerHTML = '<option value="">-- Chọn Lỗi chi tiết --</option>';
+            l3.disabled = true;
+
+            if (l1Id) {
+                l2.disabled = false;
+                categoryData.filter(c => c.parentId == l1Id).forEach(c => l2.add(new Option(c.name, c.id)));
+            } else {
+                l2.disabled = true;
+            }
+        }
+
+        function loadLevel3() {
+            var l2Id = document.getElementById("level2").value;
+            var l3 = document.getElementById("level3");
+            
+            l3.innerHTML = '<option value="">-- Chọn Lỗi chi tiết --</option>';
+
+            if (l2Id) {
+                l3.disabled = false;
+                categoryData.filter(c => c.parentId == l2Id).forEach(c => l3.add(new Option(c.name, c.id)));
+            } else {
+                l3.disabled = true;
+            }
+        }
+
+        // ==========================================
+        // 4. LOGIC XỬ LÝ DROPDOWN SERVICE (CASCADING 2 CẤP)
+        // ==========================================
+        function initServiceDropdown() {
+            var reqCat = document.getElementById("reqCategory");
+            reqCat.innerHTML = '<option value="">-- Chọn Nhóm dịch vụ --</option>';
+            
+            var serviceCategories = categoryData.filter(c => serviceCategoryIds.includes(c.id));
+            
+            serviceCategories.forEach(c => {
+                reqCat.add(new Option(c.name, c.id));
+            });
+            // Đảm bảo không bị disabled
+            reqCat.disabled = false;
+        }
+
+        function loadServices() {
+            var catId = document.getElementById("reqCategory").value;
+            var reqSvc = document.getElementById("reqService");
+            
+            reqSvc.innerHTML = '<option value="">-- Chọn Dịch vụ --</option>';
+
+            if (catId) {
+                reqSvc.disabled = false;
+                serviceData.filter(s => s.categoryId == catId && s.isActive).forEach(s => reqSvc.add(new Option(s.name, s.id)));
+            } else {
+                reqSvc.disabled = true;
+            }
+        }
+
+        // ==========================================
+        // 5. KHỞI TẠO TẤT CẢ KHI TRANG TẢI XONG
+        // ==========================================
+        window.addEventListener('load', function() {
+            toggleFormFields();       
+            initCategoryDropdown();   
+            initServiceDropdown();    
+        });
     </script>
 </body>
 </html>
