@@ -218,4 +218,34 @@ public class TicketDao extends DbContext {
         }
         return list;
     }
+    
+    // 4. Lấy chi tiết 1 Ticket theo ID
+    public Tickets getTicketById(int id) {
+        String sql = "SELECT * FROM [dbo].[Tickets] WHERE Id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Tickets t = new Tickets();
+                t.setId(rs.getInt("Id"));
+                t.setTicketNumber(rs.getString("TicketNumber"));
+                t.setTicketType(rs.getString("TicketType"));
+                t.setTitle(rs.getString("Title"));
+                t.setDescription(rs.getString("Description"));
+                t.setCategoryId(rs.getInt("CategoryId"));
+                t.setLocationId(rs.getInt("LocationId"));
+                t.setImpact((Integer) rs.getObject("Impact"));
+                t.setUrgency((Integer) rs.getObject("Urgency"));
+                t.setPriorityId((Integer) rs.getObject("PriorityId"));
+                t.setServiceCatalogId((Integer) rs.getObject("ServiceCatalogId"));
+                t.setStatus(rs.getString("Status"));
+                t.setCreatedBy(rs.getInt("CreatedBy"));
+                t.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                return t;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
