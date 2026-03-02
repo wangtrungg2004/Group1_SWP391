@@ -46,17 +46,16 @@ public class TicketDetailUserController extends HttpServlet {
         TicketDao ticketDao = new TicketDao();
         Tickets ticket = ticketDao.getTicketById(ticketId);
 
-        // BẢO MẬT: Kiểm tra vé có tồn tại không và User hiện tại có phải là người tạo không?
+        
         if (ticket == null || ticket.getCreatedBy() != currentUser.getId()) {
-            // Nếu không phải vé của mình -> Đá về trang danh sách
+           
             response.sendRedirect(request.getContextPath() + "/MyTickets");
             return;
         }
 
-        // Đẩy Ticket sang JSP
+        
         request.setAttribute("ticket", ticket);
 
-        // Đẩy thêm danh sách Category và Service để map tên thay vì hiển thị số ID
         CategoryDao catDao = new CategoryDao();
         ServiceCatalogDao svcDao = new ServiceCatalogDao();
         request.setAttribute("categories", catDao.getAllCategories());

@@ -123,7 +123,7 @@
                                                             <select name="urgency" class="form-control incident-field" required>
                                                                 <option value="3">Low (Có thể đợi vài ngày)</option>
                                                                 <option value="2">Medium (Cần trong ngày)</option>
-                                                                <option value="1">High (Đang dừng việc, cần ngay!)</option>
+                                                                <option value="1">High (Đang gây trì hoãn công việc)</option>
                                                             </select>
                                                         </div>
                                                     </div>

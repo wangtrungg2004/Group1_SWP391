@@ -59,9 +59,8 @@ public class TicketCreateController extends HttpServlet {
             String impactStr = request.getParameter("impact");
             String urgencyStr = request.getParameter("urgency");
 
-            // Check nếu User chưa chọn đến Tầng thứ 3 (Lỗi chi tiết)
             if (catStr == null || catStr.isEmpty() || "null".equals(catStr)) {
-                request.setAttribute("errorMessage", "Vui lòng chọn đầy đủ đến mục 'Lỗi chi tiết' (Level 3).");
+                request.setAttribute("errorMessage", "Vui lòng chọn đầy đủ đến mục 'Lỗi chi tiết'.");
                 doGet(request, response);
                 return;
             }
@@ -124,7 +123,6 @@ public class TicketCreateController extends HttpServlet {
         if (isCreated) {
             response.sendRedirect(request.getContextPath() + "/Tickets");
         } else {
-            // Hiển thị lỗi rõ ràng thay vì im lặng
             request.setAttribute("errorMessage", "Lỗi hệ thống: Không thể lưu Ticket vào Database. Vui lòng thử lại.");
             doGet(request, response);
         }
