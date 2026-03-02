@@ -20,7 +20,7 @@ public class DbContext {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             
             String user = "sa";
-            String pass = "1234567890";
+            String pass = "123456";
             String url = "jdbc:sqlserver://localhost:1433;"
            + "databaseName=ITServiceFlow;"
            + "encrypt=true;"

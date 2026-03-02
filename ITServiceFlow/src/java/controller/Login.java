@@ -88,6 +88,7 @@ public class Login extends HttpServlet {
                 password = password.trim();
             }
 
+            // [PASSWORD_HASH] userService.login sẽ hash password rồi so sánh với DB; khi bỏ hash chỉ cần đổi bên UserService/UserDao
             Users user = userService.login(username, password);
 
             if (user == null) {

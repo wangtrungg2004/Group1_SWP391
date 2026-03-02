@@ -26,23 +26,6 @@
         response.sendRedirect("Login.jsp");
         return;
     }
-
-    // 4. Load notifications (nếu chưa có)
-    if (request.getAttribute("notifications") == null && userId != null) {
-        dao.NotificationDao notificationDao = new dao.NotificationDao();
-        List<Notifications> notifications;
-
-        // Admin & Manager: xem tất cả
-        if ("Admin".equals(role) || "Manager".equals(role)) {
-            notifications = notificationDao.getAllNotifications();
-        } 
-        // Các role khác: chỉ xem của mình
-        else {
-            notifications = notificationDao.getNotificationsByUserId(userId);
-        }
-
-        request.setAttribute("notifications", notifications);
-    }
 %>
 
 <!DOCTYPE html>

@@ -111,7 +111,6 @@ public class ProblemAdd extends HttpServlet {
             }
         }
 
-        // Validate bắt buộc cho Title (NOT NULL trên DB)
         if (Title == null) {
             request.setAttribute("error", "Title is required.");
             request.setAttribute("assignees", userService.getAllUser());
@@ -141,10 +140,11 @@ public class ProblemAdd extends HttpServlet {
             int newProblemId = problemService.getLatestProblemId();
             if (newProblemId > 0) {
                 String message = "New problem: " + Title + " (Status: " + defaultStatus + ")";
-
+                String notificationTitle = "New problem: " + Title;
+                String type = "Problem";
                 // Gửi notification cho người được assign (nếu có)
                 if (assignedTo > 0) {
-                    notificationDao.addNotification(assignedTo, message, null, false);
+                    notificationDao.addNotification(assignedTo, message, null, false, notificationTitle, type);
                 }
             }
             response.sendRedirect("ProblemList?success=Problem added successfully!");

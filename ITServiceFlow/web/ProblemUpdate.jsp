@@ -116,7 +116,7 @@
                                             <ul class="breadcrumb">
                                                 <li class="breadcrumb-item"><a href="index.html"><i class="feather icon-home"></i></a></li>
                                                 <li class="breadcrumb-item"><a href="ProblemList">Problem List</a></li>
-                                                <li class="breadcrumb-item"><a href="ProblemDetail?Id=${problem.id}">Problem Detail</a></li>
+                                                <li class="breadcrumb-item"><a href="ProblemUpdate?Id=${problem.id}">Problem Update</a></li>
                                                 <li class="breadcrumb-item"><a href="#!">Update Problem</a></li>
                                             </ul>
                                         </div>
@@ -253,24 +253,35 @@
                                                             <div class="col-md-12">
                                                                 <div class="form-group">
                                                                     <label for="RootCause"><strong>Root Cause</strong></label>
-                                                                    <textarea name="RootCause" id="RootCause" 
-                                                                              class="form-control" rows="3" 
-                                                                              placeholder="Enter root cause analysis">${problem.rootCause}</textarea>
+                                                                    <c:if test="${role eq 'IT Support'}">
+                                                                        <textarea name="RootCause" id="RootCause" 
+                                                                                  class="form-control" rows="3" 
+                                                                                  placeholder="Enter root cause analysis">${problem.rootCause}</textarea>
+                                                                    </c:if>
+                                                                    <c:if test="${role ne 'IT Support'}">
+                                                                        <textarea id="RootCause" class="form-control" rows="3" readonly
+                                                                                  style="background-color: #f8f9fa;">${problem.rootCause != null ? problem.rootCause : ''}</textarea>
+                                                                    </c:if>
                                                                 </div>
                                                             </div>
                                                         </div>
-
                                                         <div class="row">
                                                             <div class="col-md-12">
                                                                 <div class="form-group">
                                                                     <label for="Workaround"><strong>Workaround</strong></label>
-                                                                    <textarea name="Workaround" id="Workaround" 
-                                                                              class="form-control" rows="3" 
-                                                                              placeholder="Enter workaround solution">${problem.workaround}</textarea>
+                                                                    <c:if test="${role eq 'IT Support'}">
+                                                                        <textarea name="Workaround" id="Workaround" 
+                                                                                  class="form-control" rows="3" 
+                                                                                  placeholder="Enter workaround solution">${problem.workaround}</textarea>
+                                                                    </c:if>
+                                                                    <c:if test="${role ne 'IT Support'}">
+                                                                        <textarea id="Workaround" class="form-control" rows="3" readonly
+                                                                                  style="background-color: #f8f9fa;">${problem.workaround != null ? problem.workaround : ''}</textarea>
+                                                                    </c:if>
                                                                 </div>
                                                             </div>
                                                         </div>
-
+                                                        <hr>                                                     
                                                         <hr>
 
                                                         <div class="row">

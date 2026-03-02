@@ -78,6 +78,7 @@ public class UserDao extends DbContext{
     username = username.trim();
     passwordHash = passwordHash.trim();
     
+    // [PASSWORD_HASH] so sánh với cột PasswordHash; khi bỏ hash: đổi tham số thành password (plain), cột thành Password
     String sql = """
         SELECT Id, Username, FullName, Role, IsActive
         FROM Users
@@ -114,6 +115,7 @@ public class UserDao extends DbContext{
             return false;
         }
 
+        // [PASSWORD_HASH] ghi PasswordHash vào DB; khi bỏ hash: tham số thành newPassword (plain), cột thành Password
         String sql = """
             UPDATE Users
             SET PasswordHash = ?
@@ -153,6 +155,7 @@ public class UserDao extends DbContext{
         if (connection == null) {
             return false;
         }
+        // [PASSWORD_HASH] insert cột PasswordHash; khi bỏ hash: tham số thành password (plain), cột DB thành Password
         String sql = """
                 INSERT INTO Users (Username, Email, PasswordHash, FullName, Role, DepartmentId, LocationId, IsActive, CreatedAt)
                 VALUES (?, ?, ?, ?, ?, ?, ?, 1, GETDATE())
@@ -269,6 +272,7 @@ public class UserDao extends DbContext{
         if (connection == null || newPasswordHash == null || newPasswordHash.trim().isEmpty()) {
             return false;
         }
+        // [PASSWORD_HASH] update cột PasswordHash; khi bỏ hash: tham số thành newPassword (plain), cột thành Password
         String sql = """
             UPDATE Users
             SET PasswordHash = ?

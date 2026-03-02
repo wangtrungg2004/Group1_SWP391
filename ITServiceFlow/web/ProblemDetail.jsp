@@ -162,6 +162,7 @@
                                                     <p>${error}</p>
                                                     <a href="${problemListUrl}" class="btn btn-primary">Back to Problem List</a>
                                                 </div>
+                                            </c:if>
                                                 <div class="card-body">
                                                     <c:if test="${not empty error}">
                                                         <div class="alert alert-danger">
@@ -201,7 +202,7 @@
                                                                                     <tr>
                                                                                         <th>Status</th>
                                                                                         <td>
-                                                                                            <span class="badge badge-info">
+                                                                                            <span class="badge badge-status" data-status="${p.status}"">
                                                                                                 ${problem.status}
                                                                                             </span>
                                                                                         </td>
