@@ -3,12 +3,10 @@ package controller.ticket.user;
 import dao.CategoryDao;
 import dao.ServiceCatalogDao;
 import dao.TicketDao;
-import model.Category;
 import model.ServiceCatalog;
 import model.Tickets;
 import model.Users;
 import java.io.IOException;
-import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -54,9 +52,7 @@ public class TicketCreateController extends HttpServlet {
         t.setCreatedBy(currentUser.getId());
         t.setLocationId(currentUser.getLocationId() > 0 ? currentUser.getLocationId() : 1);
 
-        // ========================================================
-        // XỬ LÝ NHÁNH 1: INCIDENT (SỰ CỐ)
-        // ========================================================
+
         if ("Incident".equals(ticketType)) {
 
             String catStr = request.getParameter("categoryId");
@@ -76,7 +72,7 @@ public class TicketCreateController extends HttpServlet {
                 t.setUrgency(Integer.parseInt(urgencyStr));
                 t.setPriorityId(1); 
                 
-                // FIX QUAN TRỌNG: Gán giá trị mặc định để tránh NullPointer trong DAO
+           
                 t.setServiceCatalogId(null); 
                 t.setRequiresApproval(false); 
                 
@@ -86,9 +82,7 @@ public class TicketCreateController extends HttpServlet {
                 return;
             }
 
-        // ========================================================
-        // XỬ LÝ NHÁNH 2: SERVICE REQUEST (DỊCH VỤ)
-        // ========================================================
+
         } else if ("ServiceRequest".equals(ticketType)) {
 
             String serviceStr = request.getParameter("serviceCatalogId");
@@ -106,10 +100,9 @@ public class TicketCreateController extends HttpServlet {
 
                 if (svc != null) {
                     t.setServiceCatalogId(serviceId);
-                    t.setCategoryId(svc.getCategoryId()); // Gán category cha
+                    t.setCategoryId(svc.getCategoryId()); 
                     t.setRequiresApproval(svc.isRequiresApproval());
                     
-                    // FIX QUAN TRỌNG: Gán null cho các field của Incident để DB không bắt lỗi
                     t.setImpact(null);
                     t.setUrgency(null);
                     t.setPriorityId(null);
@@ -125,7 +118,6 @@ public class TicketCreateController extends HttpServlet {
             }
         }
 
-        // GỌI DAO ĐỂ LƯU XUỐNG DB
         TicketDao dao = new TicketDao();
         boolean isCreated = dao.createTicket(t);
 
