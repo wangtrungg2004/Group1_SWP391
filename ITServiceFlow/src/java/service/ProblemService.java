@@ -96,6 +96,10 @@ public class ProblemService {
         return dao.searchAssignedProblem(id, keyword);
     }
     
+    public List<Problems> getProblemsPending(int page, int pageSize)
+    {
+        return dao.getProblemsPendingWithPages(page, pageSize);
+    }
     public boolean logTime(int problemId, int userId, double hours) {
     if (hours <= 0) return false;
     return dao.addTimeLog(problemId, userId, hours);

@@ -56,9 +56,24 @@
                                         Configuration</span></a>
                             </li>
                             
-                            <li class="nav-item">
+<!--                            <li class="nav-item">
                                 <a href="ProblemList" class="nav-link"><span class="pcoded-micon"><i
                                             class="feather icon-file-text"></i></span><span class="pcoded-mtext">Problem List</span></a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a href="ProblemPendingList" class="nav-link"><span class="pcoded-micon"><i
+                                            class="feather icon-file-text"></i></span><span class="pcoded-mtext">Problem Pending List</span></a>
+                            </li>-->
+                            <li class="nav-item pcoded-hasmenu">
+				<a href="#!" class="nav-link"><span class="pcoded-micon"><i class="feather icon-box"></i></span><span class="pcoded-mtext">PROBLEMS</span></a>
+                                    <ul class="pcoded-submenu">
+                                        <li class=""><a href="ProblemPendingList" class="nav-link"><span class="pcoded-micon"><i
+                                            class="feather icon-file-text"></i></span><span class="pcoded-mtext">Problem Pending List</span></a></li>
+					<li class=""><a href="ProblemList" class="nav-link"><span class="pcoded-micon"><i
+                                            class="feather icon-file-text"></i></span><span class="pcoded-mtext">Problem List</span></a></li>
+					
+                                    </ul>
                             </li>
                         </c:if>
 

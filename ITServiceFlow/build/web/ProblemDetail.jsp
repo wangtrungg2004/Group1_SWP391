@@ -135,6 +135,20 @@
                                         <div class="card-header">
                                             <h5>Problem Details</h5>
                                             <div class="card-header-right d-flex align-items-center gap-2">
+                                                <c:if test="${role eq 'IT Support' and not empty problem and problem.status eq 'UNDER_INVESTIGATION'}">
+                                                    <c:set var="hasRca" value="${not empty problem.rootCause and problem.rootCause.trim() ne ''}"/>
+                                                    <c:set var="hasWorkaround" value="${not empty problem.workaround and problem.workaround.trim() ne ''}"/>
+                                                    <c:if test="${hasRca and hasWorkaround}">
+                                                        <form action="ProblemDetail" method="post" style="display:inline;">
+                                                            <input type="hidden" name="problemId" value="${problem.id}">
+                                                            <input type="hidden" name="action" value="submitForApproval">
+                                                            <button type="submit" class="btn btn-sm btn-success"
+                                                                    onclick="return confirm('Gửi problem này cho Manager duyệt?');">
+                                                                <i class="feather icon-send"></i> Submit for approval
+                                                            </button>
+                                                        </form>
+                                                    </c:if>
+                                                </c:if>
                                                 <c:if test="${role eq 'IT Support' and not empty problem and problem.status eq 'NEW'}">
                                                     <form action="ITProblemListController" method="post" style="display:inline;">
                                                         <input type="hidden" name="problemId" value="${problem.id}">

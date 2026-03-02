@@ -132,23 +132,21 @@ public class ITProblemListController extends HttpServlet {
         try {
             int id = Integer.parseInt(ProblemId);
             
-            // Kiểm tra user có tồn tại không
             Problems pro = problemService.getProblemById(id);
             if (pro == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Problem not found");
                 return;
             }
             
-            // Thực hiện start investigation
             boolean startInvestigation = problemService.updateAssignStatus(id);
             if (!startInvestigation) {
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to start investigation");
                 return;
-            }
+            }   
             
-            // Nếu gọi từ trang detail thì quay lại ProblemDetail, không thì về danh sách
             String fromDetail = request.getParameter("fromDetail");
-            if ("1".equals(fromDetail)) {
+
+            if (fromDetail != null) {
                 response.sendRedirect("ProblemDetail?Id=" + id);
             } else {
                 response.sendRedirect("ITProblemListController");
