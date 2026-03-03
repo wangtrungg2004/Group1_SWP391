@@ -67,12 +67,17 @@ public class ProblemDetail extends HttpServlet {
             throws ServletException, IOException {
         String ProblemId = request.getParameter("Id");
 
-        // Kiểm tra null trước khi parse
-//        if (ProblemId == null || ProblemId.trim().isEmpty()) {
-//            request.setAttribute("error", "Problem ID is required");
-//            request.getRequestDispatcher("ProblemDetail.jsp").forward(request, response);
-//            return;
-//        }
+        if (ProblemId == null || ProblemId.trim().isEmpty()) {
+            String redirectUrl = "ProblemList";
+            if (request.getSession(false) != null) {
+                String role = (String) request.getSession().getAttribute("role");
+                if ("IT Support".equals(role)) {
+                    redirectUrl = "ITProblemListController";
+                }
+            }
+            response.sendRedirect(redirectUrl);
+            return;
+        }
         try {
             int id = Integer.parseInt(ProblemId);
 
@@ -93,6 +98,18 @@ public class ProblemDetail extends HttpServlet {
             request.setAttribute("relatedTickets", relatedTickets);
             request.setAttribute("timeLogs", timeLogs);
             request.setAttribute("totalTime", totalTime);
+
+            HttpSession sess = request.getSession(false);
+            if (sess != null) {
+                Object flash = sess.getAttribute("problemDetailFlash");
+                if (flash != null && flash.toString().startsWith("success:")) {
+                    request.setAttribute("success", flash.toString().substring(8));
+                    sess.removeAttribute("problemDetailFlash");
+                } else if (flash != null && flash.toString().startsWith("error:")) {
+                    request.setAttribute("error", flash.toString().substring(6));
+                    sess.removeAttribute("problemDetailFlash");
+                }
+            }
 
             request.getRequestDispatcher("ProblemDetail.jsp").forward(request, response);
         } catch (NumberFormatException e) {
@@ -117,8 +134,8 @@ public class ProblemDetail extends HttpServlet {
         String role = (String) session.getAttribute("role");
 
         if (userIdObj == null || !"IT Support".equals(role)) {
-            request.setAttribute("error", "Vui lòng đăng nhập với quyền IT Support");
-            doGet(request, response);
+            if (session != null) session.setAttribute("problemDetailFlash", "error:Vui lòng đăng nhập với quyền IT Support");
+            response.sendRedirect("IT Support".equals(role) ? "ITProblemListController" : "ProblemList");
             return;
         }
         int userId = userIdObj.intValue();
@@ -127,8 +144,8 @@ public class ProblemDetail extends HttpServlet {
         String problemIdStr = request.getParameter("problemId");
 
         if (problemIdStr == null || problemIdStr.trim().isEmpty()) {
-            request.setAttribute("error", "Thiếu problemId");
-            doGet(request, response);
+            session.setAttribute("problemDetailFlash", "error:Thiếu problemId");
+            response.sendRedirect("ITProblemListController");
             return;
         }
 
@@ -136,29 +153,26 @@ public class ProblemDetail extends HttpServlet {
         try {
             problemId = Integer.parseInt(problemIdStr);
         } catch (NumberFormatException e) {
-            request.setAttribute("error", "problemId không hợp lệ");
-            doGet(request, response);
+            session.setAttribute("problemDetailFlash", "error:problemId không hợp lệ");
+            response.sendRedirect("ITProblemListController");
             return;
         }
 
         if ("startInvestigation".equals(action)) {
-            // 1. Chuyển status
             boolean statusUpdated = problemService.updateAssignStatus(problemId);
-
-            // 2. Bắt đầu timer
             int timeLogId = problemService.startTimer(problemId, userId);
 
             if (statusUpdated && timeLogId > 0) {
                 session.setAttribute("activeTimeLogId_" + problemId, timeLogId);
-                request.setAttribute("success", "Đã bắt đầu điều tra và timer (ID: " + timeLogId + ")");
+                session.setAttribute("problemDetailFlash", "success:Đã bắt đầu điều tra và timer");
             } else {
-                request.setAttribute("error", "Lỗi khi bắt đầu: status=" + statusUpdated + ", timerId=" + timeLogId);
+                session.setAttribute("problemDetailFlash", "error:Lỗi khi bắt đầu điều tra");
             }
         } else if ("stopTimer".equals(action)) {
             String timeLogIdStr = request.getParameter("timeLogId");
             if (timeLogIdStr == null) {
-                request.setAttribute("error", "Thiếu timeLogId");
-                doGet(request, response);
+                session.setAttribute("problemDetailFlash", "error:Thiếu timeLogId");
+                response.sendRedirect("ProblemDetail?Id=" + problemId);
                 return;
             }
 
@@ -166,23 +180,58 @@ public class ProblemDetail extends HttpServlet {
             try {
                 timeLogId = Integer.parseInt(timeLogIdStr);
             } catch (NumberFormatException e) {
-                request.setAttribute("error", "timeLogId không hợp lệ");
-                doGet(request, response);
+                session.setAttribute("problemDetailFlash", "error:timeLogId không hợp lệ");
+                response.sendRedirect("ProblemDetail?Id=" + problemId);
                 return;
             }
 
             boolean stopped = problemService.stopTimer(timeLogId);
             if (stopped) {
                 session.removeAttribute("activeTimeLogId_" + problemId);
-                request.setAttribute("success", "Đã dừng timer và ghi nhận thời gian");
+                session.setAttribute("problemDetailFlash", "success:Đã dừng timer và ghi nhận thời gian");
             } else {
-                request.setAttribute("error", "Không dừng được timer (có thể đã dừng trước đó)");
+                session.setAttribute("problemDetailFlash", "error:Không dừng được timer");
+            }
+        } else if ("markResolved".equals(action)) {
+            // Lấy timeLogId từ param hoặc từ session
+            String timeLogIdStr = request.getParameter("timeLogId");
+            Integer timeLogId = null;
+
+            if (timeLogIdStr != null && !timeLogIdStr.trim().isEmpty()) {
+                try {
+                    timeLogId = Integer.parseInt(timeLogIdStr);
+                } catch (NumberFormatException e) {
+                    request.setAttribute("error", "timeLogId không hợp lệ");
+                    doGet(request, response);
+                    return;
+                }
+            } else {
+                Object sessionLogId = session.getAttribute("activeTimeLogId_" + problemId);
+                if (sessionLogId instanceof Integer) {
+                    timeLogId = (Integer) sessionLogId;
+                }
+            }
+
+            if (timeLogId == null) {
+                session.setAttribute("problemDetailFlash", "error:Không tìm thấy phiên timer đang chạy");
+                response.sendRedirect("ProblemDetail?Id=" + problemId);
+                return;
+            }
+
+            boolean stopped = problemService.stopTimer(timeLogId);
+            boolean statusUpdated = problemService.updateStatusProblem(problemId, "RESOLVED");
+
+            if (stopped && statusUpdated) {
+                session.removeAttribute("activeTimeLogId_" + problemId);
+                session.setAttribute("problemDetailFlash", "success:Đã dừng timer và đánh dấu RESOLVED");
+            } else {
+                session.setAttribute("problemDetailFlash", "error:Lỗi khi đánh dấu resolved");
             }
         } else {
-            request.setAttribute("error", "Action không hợp lệ: " + action);
+            session.setAttribute("problemDetailFlash", "error:Action không hợp lệ");
         }
 
-        doGet(request, response);  // reload trang detail
+        response.sendRedirect("ProblemDetail?Id=" + problemId);
     }
 
     /**

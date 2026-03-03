@@ -915,9 +915,9 @@ public class ProblemDao extends DbContext{
     
     
 
-    // Lưu log thời gian mới
+    // Lưu log thời gian mới (dùng ProblemTimeLogs cho Problem)
 public boolean addTimeLog(int problemId, int userId, double hours) {
-    String sql = "INSERT INTO TimeLogs (TicketId, UserId, Hours, LogDate) " +
+    String sql = "INSERT INTO ProblemTimeLogs (ProblemId, UserId, Hours, LogDate) " +
                  "VALUES (?, ?, ?, CONVERT(date, GETDATE()))";
     try (PreparedStatement stm = connection.prepareStatement(sql)) {
         stm.setInt(1, problemId);
@@ -934,7 +934,7 @@ public boolean addTimeLog(int problemId, int userId, double hours) {
 
 // Tính tổng giờ cho 1 problem
 public double getTotalHoursByProblem(int problemId) {
-    String sql = "SELECT ISNULL(SUM(Hours), 0) FROM TimeLogs WHERE TicketId = ?";
+    String sql = "SELECT ISNULL(SUM(Hours), 0) FROM ProblemTimeLogs WHERE ProblemId = ?";
     try (PreparedStatement stm = connection.prepareStatement(sql)) {
         stm.setInt(1, problemId);
         ResultSet rs = stm.executeQuery();
@@ -947,9 +947,9 @@ public double getTotalHoursByProblem(int problemId) {
     return 0.0;
 }
     
-    // Bắt đầu timer (chỉ insert StartTime)
+    // Bắt đầu timer (chỉ insert StartTime) - dùng ProblemTimeLogs
 public int startTimer(int problemId, int userId) {
-    String sql = "INSERT INTO TimeLogs (TicketId, UserId, StartTime, LogDate) " +
+    String sql = "INSERT INTO ProblemTimeLogs (ProblemId, UserId, StartTime, LogDate) " +
                  "VALUES (?, ?, GETDATE(), CONVERT(date, GETDATE()))";
     try (PreparedStatement stm = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
         stm.setInt(1, problemId);
@@ -970,9 +970,9 @@ public int startTimer(int problemId, int userId) {
     return -1;
 }
 
-// Kết thúc timer (update EndTime và Hours)
+// Kết thúc timer (update EndTime và Hours) - dùng ProblemTimeLogs
 public boolean stopTimer(int timeLogId) {
-    String sql = "UPDATE TimeLogs " +
+    String sql = "UPDATE ProblemTimeLogs " +
                  "SET EndTime = GETDATE(), " +
                  "    Hours = DATEDIFF(SECOND, StartTime, GETDATE()) / 3600.0 " +
                  "WHERE Id = ? AND EndTime IS NULL";
@@ -985,14 +985,14 @@ public boolean stopTimer(int timeLogId) {
     }
 }
 
-// Lấy tất cả time logs (đã có từ trước, nhưng cập nhật query để join fullName)
+// Lấy tất cả time logs - dùng ProblemTimeLogs
 public List<TimeLog> getTimeLogsByProblemId(int problemId) {
     List<TimeLog> list = new ArrayList<>();
-    String sql = "SELECT tl.Id, tl.TicketId, tl.UserId, tl.StartTime, tl.EndTime, tl.Hours, tl.LogDate, " +
+    String sql = "SELECT tl.Id, tl.ProblemId AS TicketId, tl.UserId, tl.StartTime, tl.EndTime, tl.Hours, tl.LogDate, " +
                  "       u.FullName " +
-                 "FROM TimeLogs tl " +
+                 "FROM ProblemTimeLogs tl " +
                  "LEFT JOIN Users u ON tl.UserId = u.Id " +
-                 "WHERE tl.TicketId = ? " +
+                 "WHERE tl.ProblemId = ? " +
                  "ORDER BY tl.StartTime DESC";
     try (PreparedStatement stm = connection.prepareStatement(sql)) {
         stm.setInt(1, problemId);
