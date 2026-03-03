@@ -5,7 +5,18 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="Utils.GoogleAuthUtil"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%
+    String resolvedGoogleClientId = (String) request.getAttribute("googleClientId");
+    if (resolvedGoogleClientId == null || resolvedGoogleClientId.isBlank()) {
+        resolvedGoogleClientId = GoogleAuthUtil.getGoogleClientId();
+    }
+    if (resolvedGoogleClientId == null) {
+        resolvedGoogleClientId = "";
+    }
+    request.setAttribute("googleClientId", resolvedGoogleClientId);
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,6 +24,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Corporate Login Form</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
     <div class="login-container">
@@ -27,6 +39,11 @@
                     <c:if test="${not empty error}">
                         <div class="login-error">
                             <strong>Error:</strong> ${error}
+                        </div>
+                    </c:if>
+                    <c:if test="${not empty message}">
+                        <div class="login-error" style="background:#e8f5e9;color:#2e7d32;border-left:4px solid #2e7d32;">
+                            <strong>Success:</strong> ${message}
                         </div>
                     </c:if>
                     <div class="input-wrapper">
@@ -57,13 +74,29 @@
                             Keep me signed in
                         </label>
                     </div>
-                    <a href="#" class="forgot-password">Forgot password</a>
+                    <a href="ForgotPassword" class="forgot-password">Forgot password</a>
                 </div>
 
                 <button type="submit" class="login-btn">
                     <span class="btn-text">Sign In</span>
                     <span class="btn-loader"></span>
                 </button>
+            </form>
+
+            <form id="googleLoginForm" method="post" action="GoogleLogin" style="margin-top: 16px;">
+                <input type="hidden" id="googleCredential" name="credential">
+                <div id="g_id_onload"
+                     data-client_id="${googleClientId}"
+                     data-callback="handleGoogleCredential"
+                     data-auto_prompt="false"></div>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-shape="pill"
+                     data-theme="outline"
+                     data-text="sign_in_with"
+                     data-size="large"
+                     data-logo_alignment="left"
+                     data-width="100%"></div>
             </form>
 
             <div class="success-message" id="successMessage">
@@ -76,5 +109,14 @@
     </div>
 
     <script src="assets/js/login.js"></script>
+    <script>
+        function handleGoogleCredential(response) {
+            if (!response || !response.credential) {
+                return;
+            }
+            document.getElementById("googleCredential").value = response.credential;
+            document.getElementById("googleLoginForm").submit();
+        }
+    </script>
 </body>
 </html>
