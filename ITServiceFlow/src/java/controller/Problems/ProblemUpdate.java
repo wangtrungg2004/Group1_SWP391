@@ -80,6 +80,13 @@ public class ProblemUpdate extends HttpServlet {
                 request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
                 return;
             }
+            
+            if(pro.getStatus().equals("PENDING") || pro.getStatus().equals("APPROVAL") )
+            {
+                response.sendRedirect("ProblemDetail?Id="+pro.getId()+ "&error=cannot_edit");
+                return;
+            }
+            
             List<Tickets> relatedTickets = problemService.getRelatedTicket(id);
             request.setAttribute("relatedTickets", relatedTickets);
             request.setAttribute("problem", pro);

@@ -123,6 +123,14 @@
                                 </div>
                             </div>
                             <!-- [ breadcrumb ] end -->
+                            <c:if test="${param.error == 'cannot_edit'}">
+                                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                    <strong>Thông báo:</strong> Không thể chỉnh sửa. Problem đang chờ duyệt hoặc đã được xử lý.
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            </c:if>
                             <!-- [ Main Content ] start -->
                             <div class="row">
                                 <div class="col-sm-12">
