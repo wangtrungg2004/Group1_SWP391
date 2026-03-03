@@ -78,6 +78,11 @@ public class SubmitApproval extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        HttpSession session = request.getSession();
+        String role = (String) session.getAttribute("role");
+        Integer userId = (Integer) session.getAttribute("userId");
+        
         String problemId = request.getParameter("problemId");
         String status = request.getParameter("status");
         
@@ -88,7 +93,14 @@ public class SubmitApproval extends HttpServlet {
         int id = Integer.parseInt(problemId);
         boolean pro = problemService.updateStatusProblem(id, status);
         
-        response.sendRedirect("ITProblemListController");
+        if("IT Support".equals(role))
+        {
+            response.sendRedirect("ITProblemListController");
+        }
+        else if("Manager".equals(role))
+        {
+            response.sendRedirect("ProblemPendingList");
+        }
     }
 
     /**

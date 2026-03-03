@@ -162,6 +162,31 @@
                                                         </button>
                                                     </form>
                                                 </c:if>
+                                                
+                                                
+                                                <c:if test="${role eq 'Manager' and not empty problem and problem.status eq 'PENDING'}">
+                                                    <form action="SubmitApproval" method="post" style="display:inline;">
+                                                        <input type="hidden" name="problemId" value="${problem.id}">
+                                                        <input type="hidden" name="status" value="APPROVED">
+                                                        <button type="submit" class="btn btn-sm btn-outline-success"
+                                                                onclick="return confirm('APPROVED this Problems?');">
+                                                            <i class="feather icon-play-circle"></i> APPROVED
+                                                        </button>
+                                                    </form>
+                                                </c:if>
+                                                
+                                                <c:if test="${role eq 'Manager' and not empty problem and problem.status eq 'PENDING'}">
+                                                    <form action="SubmitApproval" method="post" style="display:inline;">
+                                                        <input type="hidden" name="problemId" value="${problem.id}">
+                                                        <input type="hidden" name="status" value="REJECTED">
+                                                        <button type="submit" class="btn btn-sm btn-gradient-danger"
+                                                                onclick="return confirm('REJECTED this Problems?');">
+                                                            <i class="feather icon-play-circle"></i> REJECTED
+                                                        </button>
+                                                    </form>
+                                                </c:if>
+                                                
+                                                
                                                 <c:if test="${role eq 'IT Support' and not empty problem and problem.status ne 'NEW'}">
                                                     <a href="ProblemUpdate?Id=${problem.id}" class="btn btn-sm btn-primary">
                                                         <i class="feather icon-edit-2"></i> Update

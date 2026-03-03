@@ -5,6 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
 <%@ page import="dao.NotificationDao" %>
 <%@ page import="model.Notifications" %>
 <%@ page import="java.util.List" %>
