@@ -440,20 +440,20 @@ public class ProblemDao extends DbContext{
             ResultSet rs = stm.executeQuery();
             while(rs.next())
             {
-                            Problems pro = new Problems();
-            pro.setId(rs.getInt("Id"));
-            pro.setTicketNumber(rs.getString("TicketNumber"));
-            pro.setTitle(rs.getString("Title"));
-            pro.setDescription(rs.getString("Description"));
-            pro.setRootCause(rs.getString("RootCause"));
-            pro.setWorkaround(rs.getString("Workaround"));
-            pro.setStatus(rs.getString("Status"));
-            pro.setCreatedBy(rs.getInt("CreatedBy"));
-            pro.setCreatedByName(rs.getString("CreatedByName"));
-            pro.setAssignedTo(rs.getInt("AssignedTo"));
-            pro.setAssignedToName(rs.getString("AssignedToName"));
-            pro.setCreatedAt(rs.getDate("CreatedAt"));
-            list.add(pro);
+                Problems pro = new Problems();
+                pro.setId(rs.getInt("Id"));
+                pro.setTicketNumber(rs.getString("TicketNumber"));
+                pro.setTitle(rs.getString("Title"));
+                pro.setDescription(rs.getString("Description"));
+                pro.setRootCause(rs.getString("RootCause"));
+                pro.setWorkaround(rs.getString("Workaround"));
+                pro.setStatus(rs.getString("Status"));
+                pro.setCreatedBy(rs.getInt("CreatedBy"));
+                pro.setCreatedByName(rs.getString("CreatedByName"));
+                pro.setAssignedTo(rs.getInt("AssignedTo"));
+                pro.setAssignedToName(rs.getString("AssignedToName"));
+                pro.setCreatedAt(rs.getDate("CreatedAt"));
+                list.add(pro);
             }
         }
         catch(Exception ex)
@@ -656,6 +656,27 @@ public class ProblemDao extends DbContext{
         }
         return list;
     }
+    
+    public boolean updateProblemStatus(int problemId, String status)
+    {
+        String sql = "UPDATE [dbo].[Problems]\n" +
+                    "   SET [Status] = ?\n" +
+                    "   WHERE Id =?";
+        try
+        {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setString(1, status);
+            stm.setInt(2, problemId);
+            stm.executeUpdate();
+            return true;
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+    
 //    public static void main(String[] args) {
 //
 //        ProblemDao dao = new ProblemDao(); // constructor đã mở connection

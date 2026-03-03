@@ -100,6 +100,12 @@ public class ProblemService {
     {
         return dao.getProblemsPendingWithPages(page, pageSize);
     }
+    
+    public boolean updateStatusProblem(int problemId, String status)
+    {
+        return dao.updateProblemStatus(problemId, status);
+    }
+    
     public boolean logTime(int problemId, int userId, double hours) {
     if (hours <= 0) return false;
     return dao.addTimeLog(problemId, userId, hours);

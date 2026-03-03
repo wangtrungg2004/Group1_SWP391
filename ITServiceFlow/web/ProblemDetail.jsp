@@ -13,11 +13,6 @@
 <%
     List<Notifications> notifications = new java.util.ArrayList<>();
     Integer userId = (Integer) session.getAttribute("userId");
-    if (userId != null) {
-        NotificationDao notificationDao = new NotificationDao();
-        notifications = notificationDao.getAllNotifications();
-    }
-    request.setAttribute("notifications", notifications);
     String role = (String) session.getAttribute("role");
     String problemListUrl = "IT Support".equals(role) ? "ITProblemListController" : "ProblemList";
     request.setAttribute("problemListUrl", problemListUrl);
@@ -139,9 +134,9 @@
                                                     <c:set var="hasRca" value="${not empty problem.rootCause and problem.rootCause.trim() ne ''}"/>
                                                     <c:set var="hasWorkaround" value="${not empty problem.workaround and problem.workaround.trim() ne ''}"/>
                                                     <c:if test="${hasRca and hasWorkaround}">
-                                                        <form action="ProblemDetail" method="post" style="display:inline;">
+                                                        <form action="SubmitApproval" method="post" style="display:inline;">
                                                             <input type="hidden" name="problemId" value="${problem.id}">
-                                                            <input type="hidden" name="action" value="submitForApproval">
+                                                            <input type="hidden" name="status" value="PENDING">
                                                             <button type="submit" class="btn btn-sm btn-success"
                                                                     onclick="return confirm('Gửi problem này cho Manager duyệt?');">
                                                                 <i class="feather icon-send"></i> Submit for approval
