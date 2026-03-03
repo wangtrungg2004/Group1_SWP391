@@ -104,6 +104,52 @@ public class ProblemList extends HttpServlet {
 
         if (!keyword.isEmpty()) {
             problems = problemService.searchProblem(keyword);
+            usedFilter = true;
+
+        }
+        else if (hasStatus && hasFrom && hasTo) {
+            try {
+                java.sql.Date fromStr = java.sql.Date.valueOf(fromDate);
+                java.sql.Date toStr   = java.sql.Date.valueOf(toDate);
+
+                List<Problems> byStatus = problemService.filterByStatus(status.trim());
+                List<Problems> filtered = new ArrayList<>();
+
+                for (Problems p : byStatus) {
+                    if (p.getCreatedAt() == null) continue;
+
+                    long createdTime = p.getCreatedAt().getTime();
+                    long fromTime = fromStr.getTime();
+                    long toTime = toStr.getTime();
+
+                    // Giữ lại nếu: from <= created <= to
+                    if (createdTime >= fromTime && createdTime <= toTime) {
+                        filtered.add(p);
+                    }
+                }
+
+                problems = filtered;
+                usedFilter = true;
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else if (hasStatus) {
+            problems = problemService.filterByStatus(status.trim());
+            usedFilter = true;
+
+        } else if (hasFrom && hasTo) {
+            try {
+                java.sql.Date fromStr = java.sql.Date.valueOf(fromDate);
+                java.sql.Date toStr   = java.sql.Date.valueOf(toDate);
+                problems = problemService.filterByDateRange(fromStr, toStr);
+                usedFilter = true;
+            } catch (Exception e) {
+            }
+        }
+
+        if (usedFilter) {
             totalRecords = problems.size();
             totalPages = 1;
             page = 1;

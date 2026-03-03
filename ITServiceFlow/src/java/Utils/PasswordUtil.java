@@ -3,6 +3,7 @@ package Utils;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
+/** [PASSWORD_HASH] Util dùng cho login/create/reset password. Khi bỏ hash có thể không dùng class này nữa. */
 public class PasswordUtil {
 
     private PasswordUtil() {

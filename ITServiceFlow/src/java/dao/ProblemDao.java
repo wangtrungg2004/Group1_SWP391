@@ -63,7 +63,7 @@ public class ProblemDao extends DbContext{
                       + "FROM dbo.Problems p "
                       + "LEFT JOIN dbo.Users u ON p.CreatedBy = u.Id "
                       + "LEFT JOIN dbo.Users u2 ON p.AssignedTo = u2.Id "
-                      + "ORDER BY p.Id "
+                      + "ORDER BY p.CreatedAt DESC "
                       + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
             PreparedStatement stm = connection.prepareStatement(sql);
             int offset = (page - 1) * pageSize;
@@ -440,20 +440,20 @@ public class ProblemDao extends DbContext{
             ResultSet rs = stm.executeQuery();
             while(rs.next())
             {
-                            Problems pro = new Problems();
-            pro.setId(rs.getInt("Id"));
-            pro.setTicketNumber(rs.getString("TicketNumber"));
-            pro.setTitle(rs.getString("Title"));
-            pro.setDescription(rs.getString("Description"));
-            pro.setRootCause(rs.getString("RootCause"));
-            pro.setWorkaround(rs.getString("Workaround"));
-            pro.setStatus(rs.getString("Status"));
-            pro.setCreatedBy(rs.getInt("CreatedBy"));
-            pro.setCreatedByName(rs.getString("CreatedByName"));
-            pro.setAssignedTo(rs.getInt("AssignedTo"));
-            pro.setAssignedToName(rs.getString("AssignedToName"));
-            pro.setCreatedAt(rs.getDate("CreatedAt"));
-            list.add(pro);
+                Problems pro = new Problems();
+                pro.setId(rs.getInt("Id"));
+                pro.setTicketNumber(rs.getString("TicketNumber"));
+                pro.setTitle(rs.getString("Title"));
+                pro.setDescription(rs.getString("Description"));
+                pro.setRootCause(rs.getString("RootCause"));
+                pro.setWorkaround(rs.getString("Workaround"));
+                pro.setStatus(rs.getString("Status"));
+                pro.setCreatedBy(rs.getInt("CreatedBy"));
+                pro.setCreatedByName(rs.getString("CreatedByName"));
+                pro.setAssignedTo(rs.getInt("AssignedTo"));
+                pro.setAssignedToName(rs.getString("AssignedToName"));
+                pro.setCreatedAt(rs.getDate("CreatedAt"));
+                list.add(pro);
             }
         }
         catch(Exception ex)
@@ -617,7 +617,66 @@ public class ProblemDao extends DbContext{
         }
         return list;
     }
-
+    
+    public List<Problems> getProblemsPendingWithPages(int page, int pageSize) {
+        List<Problems> list = new ArrayList<>();
+        try {
+            String sql = "SELECT p.Id, p.TicketNumber, p.Title, p.Description, "
+                      + "p.RootCause, p.Workaround, p.Status, p.CreatedBy, "
+                      + "u.FullName AS CreatedByName, p.AssignedTo, u2.FullName AS AssignedToName, p.CreatedAt "
+                      + "FROM dbo.Problems p "
+                      + "LEFT JOIN dbo.Users u ON p.CreatedBy = u.Id "
+                      + "LEFT JOIN dbo.Users u2 ON p.AssignedTo = u2.Id "
+                      + "WHERE p.Status = 'PENDING' "
+                      + "ORDER BY p.CreatedAt DESC "
+                      + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            int offset = (page - 1) * pageSize;
+            stm.setInt(1, offset);
+            stm.setInt(2, pageSize);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Problems pro = new Problems();
+                pro.setId(rs.getInt("Id"));
+                pro.setTicketNumber(rs.getString("TicketNumber"));
+                pro.setTitle(rs.getString("Title"));
+                pro.setDescription(rs.getString("Description"));
+                pro.setRootCause(rs.getString("RootCause"));
+                pro.setWorkaround(rs.getString("Workaround"));
+                pro.setStatus(rs.getString("Status"));
+                pro.setCreatedBy(rs.getInt("CreatedBy"));
+                pro.setCreatedByName(rs.getString("CreatedByName"));
+                pro.setAssignedTo(rs.getInt("AssignedTo"));
+                pro.setAssignedToName(rs.getString("AssignedToName"));
+                pro.setCreatedAt(rs.getDate("CreatedAt"));
+                list.add(pro);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+    
+    public boolean updateProblemStatus(int problemId, String status)
+    {
+        String sql = "UPDATE [dbo].[Problems]\n" +
+                    "   SET [Status] = ?\n" +
+                    "   WHERE Id =?";
+        try
+        {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setString(1, status);
+            stm.setInt(2, problemId);
+            stm.executeUpdate();
+            return true;
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+    
 //    public static void main(String[] args) {
 //
 //        ProblemDao dao = new ProblemDao(); // constructor đã mở connection
@@ -822,6 +881,39 @@ public class ProblemDao extends DbContext{
 //    }
 //
 //    
+    
+    
+    public static void main(String[] args) {
+        // Khởi tạo DAO
+        ProblemDao dao = new ProblemDao();
+
+        // Test phân trang
+        int page = 1;
+        int pageSize = 5;
+
+        List<Problems> list = dao.getProblemsPendingWithPages(page, pageSize);
+
+        // In kết quả ra console
+        if (list.isEmpty()) {
+            System.out.println("Không có problem nào ở trạng thái PENDING.");
+        } else {
+            System.out.println("Danh sách Problems (PENDING):");
+            for (Problems p : list) {
+                System.out.println("-----------------------------");
+                System.out.println("ID: " + p.getId());
+                System.out.println("Ticket: " + p.getTicketNumber());
+                System.out.println("Title: " + p.getTitle());
+                System.out.println("Status: " + p.getStatus());
+                System.out.println("Created By: " + p.getCreatedByName());
+                System.out.println("Assigned To: " + p.getAssignedToName());
+                System.out.println("Created At: " + p.getCreatedAt());
+            }
+        }
+    }
+    
+    
+    
+    
 
     // Lưu log thời gian mới
 public boolean addTimeLog(int problemId, int userId, double hours) {

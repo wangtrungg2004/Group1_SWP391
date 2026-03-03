@@ -83,6 +83,28 @@ public class ProblemService {
         return dao.startInvestigation(Id);
     }
     
+        public List<Problems> filterByStatus(String status) {
+        return dao.filterByStatus(status);
+    }
+
+    public List<Problems> filterByDateRange(Date fromDate, Date toDate) {
+        return dao.filterByDateRange(fromDate, toDate);
+    }
+    
+    public List<Problems> searchAssignedProblems(int id, String keyword)
+    {
+        return dao.searchAssignedProblem(id, keyword);
+    }
+    
+    public List<Problems> getProblemsPending(int page, int pageSize)
+    {
+        return dao.getProblemsPendingWithPages(page, pageSize);
+    }
+    
+    public boolean updateStatusProblem(int problemId, String status)
+    {
+        return dao.updateProblemStatus(problemId, status);
+    }
     
     public boolean logTime(int problemId, int userId, double hours) {
     if (hours <= 0) return false;

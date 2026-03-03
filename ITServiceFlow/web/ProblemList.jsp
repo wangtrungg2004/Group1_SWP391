@@ -5,18 +5,12 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
 <%@ page import="dao.NotificationDao" %>
 <%@ page import="model.Notifications" %>
 <%@ page import="java.util.List" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
-<%
-    if (request.getAttribute("notifications") == null) {
-        NotificationDao notificationDao = new NotificationDao();
-        List<Notifications> notifications = notificationDao.getAllNotifications();
-        request.setAttribute("notifications", notifications);
-    }
-%>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -114,8 +108,8 @@
                                             </div>
                                             <ul class="breadcrumb">
                                                 <li class="breadcrumb-item"><a href="ProblemList"><i class="feather icon-home"></i></a></li>
-                                                <li class="breadcrumb-item"><a href="#!">Problem List</a></li>
-                                                <li class="breadcrumb-item"><a href="#!">Problem List</a></li>
+                                                <li class="breadcrumb-item"><a href="#!">Problem Pending List</a></li>
+                                                <li class="breadcrumb-item"><a href="#!">Problem Pending List</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -127,12 +121,6 @@
                                 <!-- [ form-element ] start -->
                                 <div class="col-sm-12">
                                     <div class="card">
-                                        <div class="card-header d-flex justify-content-between align-items-center">
-                                            <h5 class="m-0">Problem List</h5>
-                                            <a href="ProblemAdd" class="btn btn-primary">
-                                                <i class="feather icon-plus"></i> Add New Problem
-                                            </a>
-                                        </div>
                                         <div class="card-body table-border-style">
                                         <c:if test="${empty problem}">
                                             <div class="alert alert-warning">
@@ -157,9 +145,9 @@
                                                     <label class="mb-1 small text-muted">Status</label>
                                                     <select name="filterStatus" class="form-control">
                                                         <option value="">-- All --</option>
-                                                        <option value="NEW" ${filterStatus == 'NEW' ? 'selected' : ''}>NEW</option>
-                                                        <option value="UNDER_INVESTIGATION" ${filterStatus == 'UNDER_INVESTIGATION' ? 'selected' : ''}>UNDER_INVESTIGATION</option>
-                                                        <option value="RESOLVED" ${filterStatus == 'RESOLVED' ? 'selected' : ''}>RESOLVED</option>
+                                                        <option value="APPROVED" ${filterStatus == 'NEW' ? 'selected' : ''}>NEW</option>
+                                                        <option value="REJECTED" ${filterStatus == 'UNDER_INVESTIGATION' ? 'selected' : ''}>UNDER_INVESTIGATION</option>
+                                                        <!--<option value="RESOLVED" ${filterStatus == 'RESOLVED' ? 'selected' : ''}>RESOLVED</option>-->
                                                     </select>
                                                 </div>
                                                 <div class="col-md-2">
@@ -207,7 +195,7 @@
                                                                     <td>${p.ticketNumber}</td>
                                                                     <td>${p.title}</td>
                                                                     <td>
-                                                                        <span class="badge badge-info">
+                                                                        <span class="badge badge-status" data-status="${p.status}">
                                                                             ${p.status}
                                                                         </span>
                                                                     </td>

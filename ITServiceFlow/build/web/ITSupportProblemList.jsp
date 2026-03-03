@@ -38,7 +38,7 @@
         } 
         // Các role khác: chỉ xem của mình
         else {
-            notifications = notificationDao.getNotificationsByUserId(userId);
+            notifications = notificationDao.getNotificationsByUserIdUnread(userId);
         }
 
         request.setAttribute("notifications", notifications);
@@ -67,6 +67,42 @@
     <link rel="stylesheet" href="assets/css/style.css">
     
     <title>IT Support Dashboard - ITServiceFlow</title>
+    
+            <style>
+    /* === FORCE FULL WIDTH – KILL BOXED LAYOUT === */
+
+    /* ông nội */
+    .pcoded-wrapper {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+    }
+
+    /* cha */
+    .pcoded-main-container {
+        width: 100% !important;
+        margin-left: 264px !important;
+    }
+
+    /* khi sidebar collapse */
+    .pcoded-navbar.navbar-collapsed ~ .pcoded-main-container {
+        margin-left: 80px !important;
+    }
+
+    /* con cháu */
+    .pcoded-content,
+    .pcoded-inner-content,
+    .main-body,
+    .page-wrapper {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    /* tránh scroll ngang ảo */
+    body {
+        overflow-x: hidden;
+    }
+    </style>
 </head>
 
 <body class="">
@@ -157,7 +193,7 @@
                                                                     <td>${p.ticketNumber}</td>
                                                                     <td>${p.title}</td>
                                                                     <td>
-                                                                        <span class="badge badge-info">
+                                                                        <span class="badge badge-status" data-status="${p.status}">
                                                                             ${p.status}
                                                                         </span>
                                                                     </td>

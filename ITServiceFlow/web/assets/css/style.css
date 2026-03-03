@@ -12203,3 +12203,12 @@ body {
 .full-width-page body {
     overflow-x: hidden;
 }
+
+.badge-status[data-status="NEW"]                    { background-color: #0d6efd; color: #fff; }
+.badge-status[data-status="UNDER_INVESTIGATION"]   { background-color: #fd7e14; color: #fff; }
+.badge-status[data-status="Pending"]               { background-color: #ffc107; color: #212529; }
+.badge-status[data-status="PENDING"]               { background-color: #ffc107; color: #212529; }
+.badge-status[data-status="Approved"]               { background-color: #198754; color: #fff; }
+.badge-status[data-status="APPROVED"]               { background-color: #198754; color: #fff; }
+.badge-status[data-status="Rejected"]               { background-color: #dc3545; color: #fff; }
+.badge-status[data-status="REJECTED"]               { background-color: #dc3545; color: #fff; }

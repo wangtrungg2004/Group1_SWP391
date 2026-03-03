@@ -113,22 +113,25 @@ public class ITProblemListController extends HttpServlet {
         try {
             int id = Integer.parseInt(ProblemId);
             
-            // Kiểm tra user có tồn tại không
             Problems pro = problemService.getProblemById(id);
             if (pro == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Problem not found");
                 return;
             }
             
-            // Thực hiện delete
             boolean startInvestigation = problemService.updateAssignStatus(id);
             if (!startInvestigation) {
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to start investigation");
                 return;
-            }
+            }   
             
-            // Redirect về danh sách users sau khi delete thành công
-            response.sendRedirect("ITProblemListController");
+            String fromDetail = request.getParameter("fromDetail");
+
+            if (fromDetail != null) {
+                response.sendRedirect("ProblemDetail?Id=" + id);
+            } else {
+                response.sendRedirect("ITProblemListController");
+            }
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ProblemId format");
         } catch (NullPointerException e) {

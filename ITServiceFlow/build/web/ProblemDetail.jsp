@@ -13,11 +13,6 @@
 <%
     List<Notifications> notifications = new java.util.ArrayList<>();
     Integer userId = (Integer) session.getAttribute("userId");
-    if (userId != null) {
-        NotificationDao notificationDao = new NotificationDao();
-        notifications = notificationDao.getAllNotifications();
-    }
-    request.setAttribute("notifications", notifications);
     String role = (String) session.getAttribute("role");
     String problemListUrl = "IT Support".equals(role) ? "ITProblemListController" : "ProblemList";
     request.setAttribute("problemListUrl", problemListUrl);
@@ -128,6 +123,14 @@
                                 </div>
                             </div>
                             <!-- [ breadcrumb ] end -->
+                            <c:if test="${param.error == 'cannot_edit'}">
+                                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                    <strong>Thông báo:</strong> Không thể chỉnh sửa. Problem đang chờ duyệt hoặc đã được xử lý.
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            </c:if>
                             <!-- [ Main Content ] start -->
                             <div class="row">
                                 <div class="col-sm-12">
@@ -135,6 +138,20 @@
                                         <div class="card-header">
                                             <h5>Problem Details</h5>
                                             <div class="card-header-right d-flex align-items-center gap-2">
+                                                <c:if test="${role eq 'IT Support' and not empty problem and problem.status eq 'UNDER_INVESTIGATION'}">
+                                                    <c:set var="hasRca" value="${not empty problem.rootCause and problem.rootCause.trim() ne ''}"/>
+                                                    <c:set var="hasWorkaround" value="${not empty problem.workaround and problem.workaround.trim() ne ''}"/>
+                                                    <c:if test="${hasRca and hasWorkaround}">
+                                                        <form action="SubmitApproval" method="post" style="display:inline;">
+                                                            <input type="hidden" name="problemId" value="${problem.id}">
+                                                            <input type="hidden" name="status" value="PENDING">
+                                                            <button type="submit" class="btn btn-sm btn-success"
+                                                                    onclick="return confirm('Gửi problem này cho Manager duyệt?');">
+                                                                <i class="feather icon-send"></i> Submit for approval
+                                                            </button>
+                                                        </form>
+                                                    </c:if>
+                                                </c:if>
                                                 <c:if test="${role eq 'IT Support' and not empty problem and problem.status eq 'NEW'}">
                                                     <form action="ITProblemListController" method="post" style="display:inline;">
                                                         <input type="hidden" name="problemId" value="${problem.id}">
@@ -145,6 +162,31 @@
                                                         </button>
                                                     </form>
                                                 </c:if>
+                                                
+                                                
+                                                <c:if test="${role eq 'Manager' and not empty problem and problem.status eq 'PENDING'}">
+                                                    <form action="SubmitApproval" method="post" style="display:inline;">
+                                                        <input type="hidden" name="problemId" value="${problem.id}">
+                                                        <input type="hidden" name="status" value="APPROVED">
+                                                        <button type="submit" class="btn btn-sm btn-outline-success"
+                                                                onclick="return confirm('APPROVED this Problems?');">
+                                                            <i class="feather icon-play-circle"></i> APPROVED
+                                                        </button>
+                                                    </form>
+                                                </c:if>
+                                                
+                                                <c:if test="${role eq 'Manager' and not empty problem and problem.status eq 'PENDING'}">
+                                                    <form action="SubmitApproval" method="post" style="display:inline;">
+                                                        <input type="hidden" name="problemId" value="${problem.id}">
+                                                        <input type="hidden" name="status" value="REJECTED">
+                                                        <button type="submit" class="btn btn-sm btn-gradient-danger"
+                                                                onclick="return confirm('REJECTED this Problems?');">
+                                                            <i class="feather icon-play-circle"></i> REJECTED
+                                                        </button>
+                                                    </form>
+                                                </c:if>
+                                                
+                                                
                                                 <c:if test="${role eq 'IT Support' and not empty problem and problem.status ne 'NEW'}">
                                                     <a href="ProblemUpdate?Id=${problem.id}" class="btn btn-sm btn-primary">
                                                         <i class="feather icon-edit-2"></i> Update
@@ -162,6 +204,7 @@
                                                     <p>${error}</p>
                                                     <a href="${problemListUrl}" class="btn btn-primary">Back to Problem List</a>
                                                 </div>
+                                            </c:if>
                                                 <div class="card-body">
                                                     <c:if test="${not empty error}">
                                                         <div class="alert alert-danger">
@@ -201,7 +244,7 @@
                                                                                     <tr>
                                                                                         <th>Status</th>
                                                                                         <td>
-                                                                                            <span class="badge badge-info">
+                                                                                            <span class="badge badge-status" data-status="${p.status}"">
                                                                                                 ${problem.status}
                                                                                             </span>
                                                                                         </td>

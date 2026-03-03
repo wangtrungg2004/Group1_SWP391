@@ -28,18 +28,16 @@ public class UserService {
 //        String passwordHash = PasswordUtil.sha256(RawPassword.trim());
 //        return dao.login(Username, passwordHash);
         if (Username == null || RawPassword == null) return null;
-    
-    // Bỏ hash tạm thời để khớp với DB đang lưu plain text
-    // String passwordHash = PasswordUtil.sha256(RawPassword.trim());
-    String passwordToCheck = RawPassword.trim();   // ← thay đổi ở đây
-    
-    return dao.login(Username, passwordToCheck);
+        // [PASSWORD_HASH] hash trước khi so sánh với DB; khi bỏ hash: gọi dao.login(Username, RawPassword.trim()) và đổi UserDao.login so sánh cột Password (plain)
+        String passwordHash = PasswordUtil.sha256(RawPassword.trim());
+        return dao.login(Username, passwordHash);
     }
     
     public boolean resetPassword(String username, String email, String rawNewPassword) {
         if (username == null || email == null || rawNewPassword == null) {
             return false;
         }
+        // [PASSWORD_HASH] hash trước khi lưu; khi bỏ hash: truyền rawNewPassword.trim() và đổi UserDao dùng cột Password
         String newPasswordHash = PasswordUtil.sha256(rawNewPassword.trim());
         return dao.resetPassword(username, email, newPasswordHash);
     }
@@ -52,6 +50,7 @@ public class UserService {
         if (locationId <= 0) {
             return false;
         }
+        // [PASSWORD_HASH] hash trước khi insert; khi bỏ hash: truyền rawPassword.trim() và đổi UserDao/DB dùng cột Password
         String passwordHash = PasswordUtil.sha256(rawPassword.trim());
         return dao.createUser(
                 username.trim(),
@@ -98,6 +97,7 @@ public class UserService {
         if (userId == null) {
             return false;
         }
+        // [PASSWORD_HASH] hash trước khi update; khi bỏ hash: truyền rawNewPassword.trim() và đổi UserDao/DB dùng cột Password
         String newPasswordHash = PasswordUtil.sha256(rawNewPassword.trim());
         boolean updated = dao.updatePasswordByUserId(userId, newPasswordHash);
         if (!updated) {
