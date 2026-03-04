@@ -9,7 +9,7 @@
     
     // Kiểm tra quyền truy cập
     String role = (String) session.getAttribute("role");
-    if (role == null || (!role.equals("User"))) {
+    if (role == null || (!role.equals("Manager") && !role.equals("User"))) {
         response.sendRedirect("Login.jsp");
         return;
     }
@@ -36,9 +36,9 @@
         <div class="loader-track">
             <div class="loader-fill"></div>
         </div>
-    </div>  
-    <jsp:include page="includes/sidebar.jsp"/>
-    <jsp:include page="includes/header.jsp"/>
+    </div>
+    <jsp:include page="includes/sidebar.jsp" />
+    <jsp:include page="includes/header.jsp" />
 
     <div class="pcoded-main-container">
         <div class="pcoded-wrapper">

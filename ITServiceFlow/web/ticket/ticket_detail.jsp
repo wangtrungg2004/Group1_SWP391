@@ -89,7 +89,7 @@
                                             <div class="desc-box">${ticket.description}</div>
                                             
                                             <div class="mt-4">
-                                                <a href="${pageContext.request.contextPath}/MyTickets" class="btn btn-outline-secondary"><i class="feather icon-arrow-left"></i> Quay lại danh sách</a>
+                                                <a href="${pageContext.request.contextPath}/Tickets" class="btn btn-outline-secondary"><i class="feather icon-arrow-left"></i> Quay lại danh sách</a>
                                             </div>
                                         </div>
                                     </div>

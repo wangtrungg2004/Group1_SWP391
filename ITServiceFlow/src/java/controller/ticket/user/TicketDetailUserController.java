@@ -38,7 +38,7 @@ public class TicketDetailUserController extends HttpServlet {
 
         String idParam = request.getParameter("id");
         if (idParam == null || idParam.isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/MyTickets");
+            response.sendRedirect(request.getContextPath() + "/Tickets");
             return;
         }
 
@@ -49,7 +49,7 @@ public class TicketDetailUserController extends HttpServlet {
         
         if (ticket == null || ticket.getCreatedBy() != currentUser.getId()) {
            
-            response.sendRedirect(request.getContextPath() + "/MyTickets");
+            response.sendRedirect(request.getContextPath() + "/Tickets");
             return;
         }
 
