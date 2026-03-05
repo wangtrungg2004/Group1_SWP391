@@ -83,7 +83,7 @@ public class ProblemService {
         return dao.startInvestigation(Id);
     }
     
-        public List<Problems> filterByStatus(String status) {
+    public List<Problems> filterByStatus(String status) {
         return dao.filterByStatus(status);
     }
 
@@ -114,6 +114,11 @@ public class ProblemService {
     public boolean unlinkProblemTicket(int problemId, int ticketId)
     {
         return dao.unlinkProblemTicket(problemId, ticketId);
+    }
+    
+    public boolean unlinkAllProblemTickets(int problemId)
+    {
+        return dao.unlinkAllProblemTickets(problemId);
     }
     
     public boolean logTime(int problemId, int userId, double hours) {

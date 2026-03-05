@@ -4,6 +4,7 @@
  */
 package controller.Problems;
 
+import dao.TicketDao;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -11,6 +12,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 import model.Problems;
 import model.Tickets;
@@ -60,6 +62,7 @@ public class ProblemUpdate extends HttpServlet {
      */
     ProblemService problemService = new ProblemService();
     UserService userService = new UserService();
+    TicketDao ticketService = new TicketDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -87,7 +90,10 @@ public class ProblemUpdate extends HttpServlet {
                 return;
             }
             
+            List<Tickets> tickets = ticketService.getAllTickets();
             List<Tickets> relatedTickets = problemService.getRelatedTicket(id);
+            
+            request.setAttribute("tickets", tickets);
             request.setAttribute("relatedTickets", relatedTickets);
             request.setAttribute("problem", pro);
             request.setAttribute("assignees", userService.getAllUser());
@@ -130,6 +136,24 @@ public class ProblemUpdate extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Problem not found");
                 return;
             }
+            
+            List<Integer> ticketIds = new ArrayList<>();
+            String[] arr = request.getParameterValues("ticketIds");
+            if (arr != null) {
+                for (String s : arr) {
+                    if (s == null || s.trim().isEmpty()) continue;
+                    try {
+                        ticketIds.add(Integer.parseInt(s.trim()));
+                    } catch (NumberFormatException e) {
+                    }
+                }
+            }
+            problemService.unlinkAllProblemTickets(id);
+            if (!ticketIds.isEmpty()) {
+                problemService.linkProblemTicket(id, ticketIds);
+            }
+            
+            
             String role = (String) request.getSession().getAttribute("role");
             if ("IT Support".equals(role)) {
                 pro.setRootCause(request.getParameter("RootCause"));
