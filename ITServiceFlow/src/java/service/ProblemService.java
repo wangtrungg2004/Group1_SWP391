@@ -106,6 +106,16 @@ public class ProblemService {
         return dao.updateProblemStatus(problemId, status);
     }
     
+    public boolean linkProblemTicket(int problemId, List<Integer> tickets)
+    {
+        return dao.addProblemTickets(problemId, tickets);
+    }
+    
+    public boolean unlinkProblemTicket(int problemId, int ticketId)
+    {
+        return dao.unlinkProblemTicket(problemId, ticketId);
+    }
+    
     public boolean logTime(int problemId, int userId, double hours) {
     if (hours <= 0) return false;
     return dao.addTimeLog(problemId, userId, hours);

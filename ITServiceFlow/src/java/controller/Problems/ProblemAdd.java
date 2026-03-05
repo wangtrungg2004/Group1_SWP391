@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 import service.ProblemService;
 import model.Users;
@@ -137,8 +138,31 @@ public class ProblemAdd extends HttpServlet {
         );
 
         if (success) {
+            
+            List<Integer> relatedTickets = new ArrayList<>();
+            String[] ticketArray = request.getParameterValues("ticketIds");
+            if(ticketArray != null)
+            {
+                for (String RLTicket : ticketArray) {
+                    if(RLTicket != null && !RLTicket.trim().isEmpty())
+                    {
+                        try{
+                            relatedTickets.add(Integer.parseInt(RLTicket.trim()));
+                        }
+                        catch(NumberFormatException ex)
+                        {
+                        }
+                    }
+                }
+            }
+            
             int newProblemId = problemService.getLatestProblemId();
             if (newProblemId > 0) {
+                    // Link ticket đã chọn vào problem
+                if (!relatedTickets.isEmpty()) {
+                    problemService.linkProblemTicket(newProblemId, relatedTickets);
+                    // hoặc: problemService.addProblemTickets(newProblemId, relatedTickets);
+                }
                 String message = "New problem: " + Title + " (Status: " + defaultStatus + ")";
                 String notificationTitle = "New problem: " + Title;
                 String type = "Problem";
@@ -146,6 +170,8 @@ public class ProblemAdd extends HttpServlet {
                 if (assignedTo > 0) {
                     notificationDao.addNotification(assignedTo, message, null, false, notificationTitle, type);
                 }
+                
+                
             }
             response.sendRedirect("ProblemList?success=Problem added successfully!");
         } else {
