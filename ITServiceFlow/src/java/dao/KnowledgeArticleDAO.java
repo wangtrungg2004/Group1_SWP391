@@ -76,7 +76,7 @@ public class KnowledgeArticleDAO extends DbContext {
     // ── Update ticket resolution fields (Title, Description, ResolutionNotes) ──
     public boolean updateTicketResolution(int ticketId, String title,
                                           String description, String resolutionNotes) {
-        // Try updating ResolutionNotes column first; fall back to Description if column absent
+       
         String sql = "UPDATE Tickets SET Title = ?, Description = ?, " +
                      "ResolutionNotes = ?, UpdatedAt = GETDATE() WHERE Id = ? AND Status = 'Resolved'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -111,7 +111,7 @@ public class KnowledgeArticleDAO extends DbContext {
         }
     }
 
-    // ── Helper: map ResultSet row → KnowledgeArticles ─────────────────────
+   
     private KnowledgeArticles mapRow(ResultSet rs) throws SQLException {
         KnowledgeArticles a = new KnowledgeArticles();
         a.setId(rs.getInt("Id"));

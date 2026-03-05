@@ -3,6 +3,8 @@ package model;
 import java.util.Date;
 
 public class TicketAttachments {
+    // Shared file metadata id (points to SharedFiles table)
+    private Integer fileId;
     private int id;
     private int ticketId;
     private int uploadedBy;
@@ -14,9 +16,9 @@ public class TicketAttachments {
     public TicketAttachments() {
     }
 
-    public TicketAttachments(int id, int ticketId, int uploadedBy, 
-                             String fileName, String filePath, 
-                             String fileType, Date uploadedAt) {
+    public TicketAttachments(int id, int ticketId, int uploadedBy,
+            String fileName, String filePath,
+            String fileType, Date uploadedAt) {
         this.id = id;
         this.ticketId = ticketId;
         this.uploadedBy = uploadedBy;
@@ -24,6 +26,14 @@ public class TicketAttachments {
         this.filePath = filePath;
         this.fileType = fileType;
         this.uploadedAt = uploadedAt;
+    }
+
+    public Integer getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(Integer fileId) {
+        this.fileId = fileId;
     }
 
     public int getId() {

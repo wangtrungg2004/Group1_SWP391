@@ -161,6 +161,20 @@
                                                                 <c:out value="${article.content}" />
                                                             </div>
 
+                                                            <c:if test="${not empty attachments}">
+                                                                <hr />
+                                                                <h6 class="mb-2"><i class="feather icon-paperclip mr-1"></i> Đính kèm</h6>
+                                                                <ul class="list-unstyled mb-3">
+                                                                    <c:forEach items="${attachments}" var="att">
+                                                                        <li class="mb-1">
+                                                                            <i class="feather icon-file mr-1 text-muted"></i>
+                                                                            <a href="${att.storagePath}" target="_blank">${att.originalName}</a>
+                                                                            <small class="text-muted">(${att.mimeType})</small>
+                                                                        </li>
+                                                                    </c:forEach>
+                                                                </ul>
+                                                            </c:if>
+
                                                             <hr class="mt-4" />
                                                             <div
                                                                 class="d-flex justify-content-between align-items-center flex-wrap pt-2">
@@ -170,7 +184,7 @@
                                                                     <i class="feather icon-arrow-left mr-1"></i> Quay
                                                                     lại tìm kiếm
                                                                 </a>
-                                                                <a href="CreateTicket" class="btn btn-primary btn-sm"
+                                                                <a href="CreateTicket.jsp" class="btn btn-primary btn-sm"
                                                                     id="btn-create-ticket">
                                                                     <i class="feather icon-plus-circle mr-1"></i> Vẫn
                                                                     cần hỗ trợ? Tạo Ticket
