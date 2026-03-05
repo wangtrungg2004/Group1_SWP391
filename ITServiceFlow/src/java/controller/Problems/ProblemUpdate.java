@@ -84,7 +84,7 @@ public class ProblemUpdate extends HttpServlet {
                 return;
             }
             
-            if(pro.getStatus().equals("PENDING") || pro.getStatus().equals("APPROVAL") )
+            if(pro.getStatus().equals("PENDING") || pro.getStatus().equals("APPROVED") )
             {
                 response.sendRedirect("ProblemDetail?Id="+pro.getId()+ "&error=cannot_edit");
                 return;

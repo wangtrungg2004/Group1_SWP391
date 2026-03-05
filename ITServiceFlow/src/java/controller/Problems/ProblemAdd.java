@@ -73,7 +73,7 @@ public class ProblemAdd extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         List<Users> assignees = userService.getAllUser();
-        List<Tickets> Ticket = ticketService.getAllTickets();
+        List<Tickets> Ticket = ticketService.getIncidentsNotInProblem();
         request.setAttribute("Ticket", Ticket);
         request.setAttribute("assignees", assignees);
         request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);

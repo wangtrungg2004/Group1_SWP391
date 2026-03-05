@@ -152,7 +152,23 @@
                                                         </form>
                                                     </c:if>
                                                 </c:if>
-                                                <c:if test="${role eq 'IT Support' and not empty problem and problem.status eq 'NEW'}">
+                                                
+                                                <c:if test="${role eq 'IT Support' 
+                                                    and not empty problem 
+                                                    and problem.status eq 'REJECTED'
+                                                    and not empty problem.rootCause
+                                                    and not empty problem.workaround}">
+                                                        <form action="SubmitApproval" method="post" style="display:inline;">
+                                                            <input type="hidden" name="problemId" value="${problem.id}">
+                                                            <input type="hidden" name="status" value="PENDING">
+                                                            <button type="submit" class="btn btn-sm btn-success"
+                                                                    onclick="return confirm('RESUBMIT problem???');">
+                                                                <i class="feather icon-send"></i> ReSubmit
+                                                            </button>
+                                                        </form>
+                                                </c:if>
+                                                
+                                                <c:if test="${role eq 'IT Support' and not empty problem and problem.status eq 'NEW' }">
                                                     <form action="ITProblemListController" method="post" style="display:inline;">
                                                         <input type="hidden" name="problemId" value="${problem.id}">
                                                         <input type="hidden" name="fromDetail" value="1">

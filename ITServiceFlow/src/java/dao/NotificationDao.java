@@ -178,6 +178,7 @@ public class NotificationDao extends DbContext{
                 not.setTitle(rs.getString("Title"));
                 not.setType(rs.getString("Type"));
                 list.add(not);
+                
             }
         } catch (Exception ex) {
             ex.printStackTrace();
