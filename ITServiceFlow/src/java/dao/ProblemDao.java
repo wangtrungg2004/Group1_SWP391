@@ -108,24 +108,14 @@ public class ProblemDao extends DbContext{
     
     public Problems getProblemById(int ProblemId)
     {
-        String sql = """
-                        SELECT p.[Id],
-                               p.[TicketNumber],
-                               p.[Title],
-                               p.[Description],
-                               p.[RootCause],
-                               p.[Workaround],
-                               p.[Status],
-                               p.[CreatedBy],
-                               u1.[FullName] AS CreatedByName,
-                               p.[AssignedTo],
-                               u2.[FullName] AS AssignedToName,
-                               p.[CreatedAt]
-                        FROM [dbo].[Problems] p
-                        LEFT JOIN [dbo].[Users] u1 ON p.CreatedBy = u1.Id
-                        LEFT JOIN [dbo].[Users] u2 ON p.AssignedTo = u2.Id
-                        WHERE p.Id = ?
-                    """;
+        String sql = "SELECT p.[Id], p.[TicketNumber], p.[Title], p.[Description], " +
+             "p.[RootCause], p.[Workaround], p.[Status], p.[RejectedReason], " +
+             "p.[CreatedBy], u1.[FullName] AS CreatedByName, " +
+             "p.[AssignedTo], u2.[FullName] AS AssignedToName, p.[CreatedAt] " +
+             "FROM [dbo].[Problems] p " +
+             "LEFT JOIN [dbo].[Users] u1 ON p.CreatedBy = u1.Id " +
+             "LEFT JOIN [dbo].[Users] u2 ON p.AssignedTo = u2.Id " +
+             "WHERE p.Id = ?";
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, ProblemId);
             try (ResultSet rs = stm.executeQuery()) {
@@ -144,6 +134,7 @@ public class ProblemDao extends DbContext{
                     p.setAssignedTo(rs.getInt("AssignedTo"));
                     p.setAssignedToName(rs.getString("AssignedToName"));
                     p.setCreatedAt(rs.getDate("CreatedAt"));
+                    p.setRejectedReason(rs.getString("RejectedReason"));
                     return p;
                 }
             }
@@ -164,6 +155,7 @@ public class ProblemDao extends DbContext{
             "      ,[Workaround] = ?\n" +
             "      ,[Status] = ?\n" +
             "      ,[AssignedTo] = ?\n" +
+            "      ,[RejectedReason] = ?\n" +   
             " WHERE Id = ?";
             try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setString(1,p.getTicketNumber());
@@ -177,7 +169,8 @@ public class ProblemDao extends DbContext{
             } else {
                 stm.setNull(7, java.sql.Types.INTEGER);
             }
-            stm.setInt(8, p.getId());
+            stm.setString(8, p.getRejectedReason());
+            stm.setInt(9, p.getId());
 
             return stm.executeUpdate() > 0;
         }

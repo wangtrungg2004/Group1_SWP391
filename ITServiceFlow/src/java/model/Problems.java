@@ -21,8 +21,9 @@ public class Problems {
     private int AssignedTo;
     private String AssignedToName;
     private Date CreatedAt;
+    private String RejectedReason;
 
-    public Problems(int Id, String TicketNumber, String Title, String Description, String RootCause, String Workaround, String Status, int CreatedBy, String CreatedByName, int AssignedTo, String AssignedToName, Date CreatedAt) {
+    public Problems(int Id, String TicketNumber, String Title, String Description, String RootCause, String Workaround, String Status, int CreatedBy, String CreatedByName, int AssignedTo, String AssignedToName, Date CreatedAt, String RejectedReason) {
         this.Id = Id;
         this.TicketNumber = TicketNumber;
         this.Title = Title;
@@ -35,8 +36,9 @@ public class Problems {
         this.AssignedTo = AssignedTo;
         this.AssignedToName = AssignedToName;
         this.CreatedAt = CreatedAt;
+        this.RejectedReason = RejectedReason;
     }
-
+    
     public Problems() {
     }
 
@@ -135,4 +137,14 @@ public class Problems {
     public void setCreatedByName(String CreatedByName) {
         this.CreatedByName = CreatedByName;
     }
+
+    public String getRejectedReason() {
+        return RejectedReason;
+    }
+
+    public void setRejectedReason(String RejectedReason) {
+        this.RejectedReason = RejectedReason;
+    }
+    
+    
 }
