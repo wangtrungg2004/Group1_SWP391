@@ -64,7 +64,13 @@ public class ProblemAdd extends HttpServlet {
     NotificationDao notificationDao = new NotificationDao();
     TicketDao ticketService = new TicketDao();
     UserService userService = new UserService();
-    
+
+//    /** Giới hạn số ký tự (nên trùng với DB hoặc nhỏ hơn). */
+//    private static final int TITLE_MAX = 300;
+//    private static final int DESCRIPTION_MAX = 2000;
+//    private static final int ROOT_CAUSE_MAX = 2000;
+//    private static final int WORKAROUND_MAX = 2000;
+
     private String trimOrNull(String value) {
         return (value == null || value.trim().isEmpty()) ? null : value.trim();
     }
@@ -118,7 +124,7 @@ public class ProblemAdd extends HttpServlet {
             request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
             return;
         }
-
+        
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
         int createdBy = (userId != null) ? userId : 1;

@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package controller.Problems;
+package controller.KnowErrors;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -17,15 +17,15 @@ import java.util.List;
 import model.Notifications;
 import model.Problems;
 import model.KnowErrors;
-import service.KnowErrorService;
 import service.ProblemService;
 import service.NotificationService;
+import service.KnowErrorService;
 /**
  *
  * @author DELL
  */
-@WebServlet(name = "SubmitApproval", urlPatterns = {"/SubmitApproval"})
-public class SubmitApproval extends HttpServlet {
+@WebServlet(name = "KnowErrorList", urlPatterns = {"/KnowErrorList"})
+public class KnowErrorList extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -44,10 +44,10 @@ public class SubmitApproval extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet SubmitApproval</title>");
+            out.println("<title>Servlet KnowErrorList</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet SubmitApproval at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet KnowErrorList at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -62,14 +62,20 @@ public class SubmitApproval extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    ProblemService problemService = new ProblemService();
-    KnowErrorService knownErrorService = new KnowErrorService();
+    KnowErrorService knowErrorService = new KnowErrorService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        HttpSession session = request.getSession();
+        String role = (String) session.getAttribute("role");
+        Integer userId = (Integer) session.getAttribute("userId");
+        
+        List<KnowErrors> knowError = knowErrorService.getAllActiveKnowError();
+        
+        request.setAttribute("knowError", knowError);
+        request.getRequestDispatcher("KnowErrorList.jsp").forward(request, response);
     }
-
+    
     /**
      * Handles the HTTP <code>POST</code> method.
      *
@@ -81,57 +87,7 @@ public class SubmitApproval extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        HttpSession session = request.getSession();
-        String role = (String) session.getAttribute("role");
-        Integer userId = (Integer) session.getAttribute("userId");
-        
-        String problemId = request.getParameter("problemId");
-        String status = request.getParameter("status");
-        
-        if(problemId == null)
-        {
-            return;
-        }
-        int id = Integer.parseInt(problemId);
-        if(status.equals("REJECTED"))
-        {
-            String rejectedReason = request.getParameter("rejectedReason");
-            if (rejectedReason != null) {
-                rejectedReason = rejectedReason.trim();
-            }
-            Problems pro = problemService.getProblemById(id);
-            if (pro != null) {
-                pro.setStatus("REJECTED");
-                pro.setRejectedReason(rejectedReason);
-                problemService.updateProblem(pro);
-            }
-        }
-        if(status.equals("APPROVED"))
-        {
-//            problemService.updateStatusProblem(id, status);
-            
-            Problems pro = problemService.getProblemById(id);
-            
-            if(pro != null)
-            {
-                KnowErrors kn = knownErrorService.findKnowErrorByProblemId(id);
-                if(kn == null)
-                {
-                    knownErrorService.addKnowError(pro.getId(), pro.getTitle(), pro.getWorkaround());
-                }
-            }
-        }
-        boolean pro = problemService.updateStatusProblem(id, status);
-        
-        if("IT Support".equals(role))
-        {
-            response.sendRedirect("ITProblemListController");
-        }
-        else if("Manager".equals(role))
-        {
-            response.sendRedirect("ProblemPendingList");
-        }
+        processRequest(request, response);
     }
 
     /**

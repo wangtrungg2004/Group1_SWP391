@@ -217,14 +217,16 @@
                                                                            href="ProblemUpdate?Id=${p.id}">
                                                                             Update
                                                                         </a>
-                                                                        <form action="ProblemList" method="post"
-                                                                                onsubmit="return confirm('Delete this Problem?');"
-                                                                                style="display:inline;">
-                                                                              <input type="hidden" name="Id" value="${p.id}">
-                                                                              <button type="submit" class="btn btn-sm btn-danger">
-                                                                                  Delete
-                                                                              </button>
-                                                                          </form>
+                                                                           <c:if test="${(role eq 'Manager' or role eq 'IT Support') and (p.status eq 'NEW')}">
+                                                                               <form action="ProblemList" method="post"
+                                                                                        onsubmit="return confirm('Delete this Problem?');"
+                                                                                        style="display:inline;">
+                                                                                      <input type="hidden" name="Id" value="${p.id}">
+                                                                                      <button type="submit" class="btn btn-sm btn-danger">
+                                                                                          Delete
+                                                                                      </button>
+                                                                                  </form>
+                                                                           </c:if>
                                                                     </td>
                                                                 </tr>
                                                             </c:forEach>

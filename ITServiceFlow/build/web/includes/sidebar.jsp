@@ -120,6 +120,10 @@
                                 <a href="ITProblemListController" class="nav-link"><span class="pcoded-micon"><i
                                             class="feather icon-clock"></i></span><span class="pcoded-mtext">Problem List</span></a>
                             </li>
+                            <li class="nav-item">
+                                <a href="KnowErrorList" class="nav-link"><span class="pcoded-micon"><i
+                                            class="feather icon-clock"></i></span><span class="pcoded-mtext">Know Error List</span></a>
+                            </li>
                         </c:if>
                     </ul>
                 </div>

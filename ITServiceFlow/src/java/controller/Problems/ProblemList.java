@@ -208,6 +208,19 @@ public class ProblemList extends HttpServlet {
                 return;
             }
             
+//            // --- Điều kiện 1: Chỉ Manager (hoặc IT Support) mới được xóa ---
+//            String role = (String) request.getSession().getAttribute("role");
+//            if (role == null || !("Manager".equals(role) || "IT Support".equals(role))) {
+//                response.sendRedirect("ProblemList?error=no_permission");
+//                return;
+//            }
+//            // --- Điều kiện 2: Chỉ xóa khi status = NEW (hoặc thêm ASSIGNED nếu cho phép) ---
+//            String status = pro.getStatus();
+//            if (status == null || !("NEW".equals(status) || "ASSIGNED".equals(status))) {
+//                response.sendRedirect("ProblemList?error=cannot_delete_status&id=" + id);
+//                return;
+//            }
+            
             // Thực hiện delete
             boolean deleted = problemService.deleteProblem(id);
             if (!deleted) {
