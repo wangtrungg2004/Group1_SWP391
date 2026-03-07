@@ -75,6 +75,14 @@ filter. --%>
 
                         </ul>
                     </li>
+                    <c:if test="${role eq 'Manager'}">
+                        <li class="nav-item">
+                            <a class="nav-link" href="ManagerChangeApprovals">
+                                <span class="pcoded-micon"><i class="feather icon-check-square"></i></span>
+                                <span class="pcoded-mtext">Approve Change Request</span>
+                            </a>
+                        </li>
+                    </c:if>
                 </c:if>
 
                 <c:if test="${role == 'Admin' || role == 'Manager'}">
@@ -135,14 +143,7 @@ filter. --%>
                     </c:if>
 
                     <!-- Menu cho Manager: Duy?t Y?u c?u Thay ??i -->
-                    <c:if test="${role eq 'Manager'}">
-                        <li class="nav-item">
-                            <a class="nav-link" href="ManagerChangeApprovals">
-                                <span class="pcoded-micon"><i class="feather icon-check-square"></i></span>
-                                <span class="pcoded-mtext">Approve Change Request</span>
-                            </a>
-                        </li>
-                    </c:if>
+                    
 
                     <li class="nav-item">
                         <a href="ITProblemListController" class="nav-link"><span class="pcoded-micon"><i
