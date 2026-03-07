@@ -327,6 +327,39 @@ public class TicketDao extends DbContext {
         }
         return -1;
     }
+    
+    // 6. Lấy thống kê KPI cho Dashboard của người dùng
+    public java.util.Map<String, Integer> getUserTicketKPIs(int userId) {
+        java.util.Map<String, Integer> kpis = new java.util.HashMap<>();
+        kpis.put("open", 0);
+        kpis.put("inProgress", 0);
+        kpis.put("awaiting", 0);
+        kpis.put("resolved7d", 0);
+
+        // Gộp 4 phép tính vào 1 câu query duy nhất để tối ưu tốc độ
+        String sql = "SELECT "
+                   + "SUM(CASE WHEN Status = 'New' THEN 1 ELSE 0 END) AS OpenCount, "
+                   + "SUM(CASE WHEN Status = 'In Progress' THEN 1 ELSE 0 END) AS InProgressCount, "
+                   + "SUM(CASE WHEN RequiresApproval = 1 AND ApprovedBy IS NULL AND Status NOT IN ('Closed', 'Resolved') THEN 1 ELSE 0 END) AS AwaitingCount, "
+                   + "SUM(CASE WHEN Status = 'Resolved' AND CreatedAt >= DATEADD(day, -7, GETDATE()) THEN 1 ELSE 0 END) AS Resolved7dCount "
+                   + "FROM [dbo].[Tickets] WHERE CreatedBy = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                kpis.put("open", rs.getInt("OpenCount"));
+                kpis.put("inProgress", rs.getInt("InProgressCount"));
+                kpis.put("awaiting", rs.getInt("AwaitingCount"));
+                kpis.put("resolved7d", rs.getInt("Resolved7dCount"));
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi khi tính KPI: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return kpis;
+    }
 
     // Helper to generate Ticket Number
     public String getNextTicketNumber(String type) {

@@ -94,25 +94,37 @@
                             <div class="row mb-2">
                                 <div class="col-md-3 col-sm-6">
                                     <div class="kpi-card">
-                                        <div class="kpi-info"><h6>Open Requests</h6><h3>12</h3></div>
+                                        <div class="kpi-info">
+                                            <h6>Open Requests</h6>
+                                            <h3>${not empty kpis.open ? kpis.open : 0}</h3>
+                                        </div>
                                         <i class="feather icon-folder kpi-icon"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-sm-6">
                                     <div class="kpi-card kpi-warning">
-                                        <div class="kpi-info"><h6>In Progress</h6><h3>4</h3></div>
+                                        <div class="kpi-info">
+                                            <h6>In Progress</h6>
+                                            <h3>${not empty kpis.inProgress ? kpis.inProgress : 0}</h3>
+                                        </div>
                                         <i class="feather icon-loader kpi-icon text-warning"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-sm-6">
                                     <div class="kpi-card kpi-danger">
-                                        <div class="kpi-info"><h6>Awaiting Action</h6><h3>2</h3></div>
+                                        <div class="kpi-info">
+                                            <h6>Pending User</h6>
+                                            <h3>${not empty kpis.awaiting ? kpis.awaiting : 0}</h3>
+                                        </div>
                                         <i class="feather icon-alert-circle kpi-icon text-danger"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-sm-6">
                                     <div class="kpi-card kpi-success">
-                                        <div class="kpi-info"><h6>Resolved (Last 7d)</h6><h3>8</h3></div>
+                                        <div class="kpi-info">
+                                            <h6>Resolved (Last 7d)</h6>
+                                            <h3>${not empty kpis.resolved7d ? kpis.resolved7d : 0}</h3>
+                                        </div>
                                         <i class="feather icon-check-circle kpi-icon text-success"></i>
                                     </div>
                                 </div>

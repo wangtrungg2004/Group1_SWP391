@@ -20,6 +20,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.Map;
 
 @WebServlet(name = "MyTickets", urlPatterns = {"/Tickets"})
 public class MyTicketsController extends HttpServlet {
@@ -38,6 +39,9 @@ public class MyTicketsController extends HttpServlet {
 
         TicketDao ticketDao = new TicketDao();
         List<Tickets> myTicketList = ticketDao.getTicketsByCreator(currentUser.getId());
+        
+        Map<String, Integer> kpis = ticketDao.getUserTicketKPIs(currentUser.getId());
+        request.setAttribute("kpis", kpis);
         
         request.setAttribute("myTicketList", myTicketList);
         
