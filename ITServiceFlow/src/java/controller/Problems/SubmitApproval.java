@@ -91,6 +91,19 @@ public class SubmitApproval extends HttpServlet {
             return;
         }
         int id = Integer.parseInt(problemId);
+        if(status.equals("REJECTED"))
+        {
+            String rejectedReason = request.getParameter("rejectedReason");
+            if (rejectedReason != null) {
+                rejectedReason = rejectedReason.trim();
+            }
+            Problems pro = problemService.getProblemById(id);
+            if (pro != null) {
+                pro.setStatus("REJECTED");
+                pro.setRejectedReason(rejectedReason);
+                problemService.updateProblem(pro);
+            }
+        }
         boolean pro = problemService.updateStatusProblem(id, status);
         
         if("IT Support".equals(role))

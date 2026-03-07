@@ -164,30 +164,30 @@ public class TicketDao extends DbContext {
         return list;
     }
     
-    public static void main(String[] args) {
-
-        TicketDao dao = new TicketDao();
-        List<Tickets> tickets = dao.getAllTickets();
-
-        if (tickets.isEmpty()) {
-            System.out.println("❌ Không có ticket nào!");
-            return;
-        }
-
-        System.out.println("===== DANH SÁCH TICKETS =====");
-
-        for (Tickets t : tickets) {
-            System.out.println(
-                "ID: " + t.getId()
-                + " | TicketNumber: " + t.getTicketNumber()
-                + " | Title: " + t.getTitle()
-                + " | Status: " + t.getStatus()
-                + " | AssignedTo: " + t.getAssignedTo()
-                + " | Level: " + t.getCurrentLevel()
-                + " | CreatedAt: " + t.getCreatedAt()
-            );
-        }
-    }
+//    public static void main(String[] args) {
+//
+//        TicketDao dao = new TicketDao();
+//        List<Tickets> tickets = dao.getAllTickets();
+//
+//        if (tickets.isEmpty()) {
+//            System.out.println("❌ Không có ticket nào!");
+//            return;
+//        }
+//
+//        System.out.println("===== DANH SÁCH TICKETS =====");
+//
+//        for (Tickets t : tickets) {
+//            System.out.println(
+//                "ID: " + t.getId()
+//                + " | TicketNumber: " + t.getTicketNumber()
+//                + " | Title: " + t.getTitle()
+//                + " | Status: " + t.getStatus()
+//                + " | AssignedTo: " + t.getAssignedTo()
+//                + " | Level: " + t.getCurrentLevel()
+//                + " | CreatedAt: " + t.getCreatedAt()
+//            );
+//        }
+//    }
     
     
      // This method returns the generated ID for SLA tracking
@@ -246,5 +246,58 @@ public class TicketDao extends DbContext {
         String prefix = type.equals("Incident") ? "INC-" : "SR-";
         // Simple logic for demo, better use DB sequence or Max check
         return prefix + System.currentTimeMillis();
+    }
+    
+    
+    public List<Tickets> getIncidentsNotInProblem() {
+        List<Tickets> list = new ArrayList<>();
+
+        String sql = "SELECT t.Id, t.TicketNumber, t.Title, t.Status " +
+                     "FROM Tickets t " +
+                     "WHERE t.TicketType = 'INCIDENT' " +
+                     "AND NOT EXISTS ( " +
+                     "    SELECT 1 FROM ProblemTickets pt " +
+                     "    WHERE pt.TicketId = t.Id" +
+                     ")";
+
+        try {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            ResultSet rs = stm.executeQuery();
+
+            while (rs.next()) {
+                Tickets t = new Tickets();
+                t.setId(rs.getInt("Id"));
+                t.setTicketNumber(rs.getString("TicketNumber"));
+                t.setTitle(rs.getString("Title"));
+                t.setStatus(rs.getString("Status"));
+
+                list.add(t);
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return list;
+    }
+    
+    
+    public static void main(String[] args) {
+
+        TicketDao dao = new TicketDao();
+
+        List<Tickets> list = dao.getIncidentsNotInProblem();
+
+        System.out.println("Danh sach incident chua gan vao problem:");
+
+        for (Tickets t : list) {
+            System.out.println(
+                t.getId() + " | " +
+                t.getTicketNumber() + " | " +
+                t.getTitle() + " | " +
+                t.getStatus()
+            );
+        }
+
     }
 }

@@ -167,16 +167,37 @@
                                                         </form>
                                                     </c:if>
                                                 </c:if>
-                                                <c:if test="${role eq 'IT Support' and not empty problem and problem.status eq 'NEW'}">
-                                                    <form action="ProblemDetail" method="post" style="display:inline;">
-                                                        <input type="hidden" name="action" value="startInvestigation">
-                                                        <input type="hidden" name="problemId" value="${problem.id}">
-                                                        <button type="submit" class="btn btn-sm btn-warning"
-                                                                onclick="return confirm('Start investigation for this problem?');">
-                                                            <i class="feather icon-play-circle"></i> Start Investigation
-                                                        </button>
-                                                    </form>
-                                                </c:if>
+
+                                                <c:if test="${role eq 'IT Support' 
+    and not empty problem 
+    and problem.status eq 'REJECTED'
+    and not empty problem.rootCause
+    and not empty problem.workaround}">
+    
+    <form action="SubmitApproval" method="post" style="display:inline;">
+        <input type="hidden" name="problemId" value="${problem.id}">
+        <input type="hidden" name="status" value="PENDING">
+        <button type="submit" class="btn btn-sm btn-success"
+                onclick="return confirm('RESUBMIT problem???');">
+            <i class="feather icon-send"></i> ReSubmit
+        </button>
+    </form>
+
+</c:if>
+
+
+<c:if test="${role eq 'IT Support' and not empty problem and problem.status eq 'NEW'}">
+
+    <form action="ProblemDetail" method="post" style="display:inline;">
+        <input type="hidden" name="action" value="startInvestigation">
+        <input type="hidden" name="problemId" value="${problem.id}">
+        <button type="submit" class="btn btn-sm btn-warning"
+                onclick="return confirm('Start investigation for this problem?');">
+            <i class="feather icon-play-circle"></i> Start Investigation
+        </button>
+    </form>
+
+</c:if>
                                                 
                                                 <c:if test="${role eq 'IT Support' 
                                                              and not empty problem 
@@ -206,14 +227,36 @@
                                                 </c:if>
                                                 
                                                 <c:if test="${role eq 'Manager' and not empty problem and problem.status eq 'PENDING'}">
-                                                    <form action="SubmitApproval" method="post" style="display:inline;">
-                                                        <input type="hidden" name="problemId" value="${problem.id}">
-                                                        <input type="hidden" name="status" value="REJECTED">
-                                                        <button type="submit" class="btn btn-sm btn-gradient-danger"
-                                                                onclick="return confirm('REJECTED this Problems?');">
-                                                            <i class="feather icon-play-circle"></i> REJECTED
-                                                        </button>
-                                                    </form>
+                                                    <button type="button" class="btn btn-sm btn-gradient-danger" data-toggle="modal" data-target="#modalReject">
+                                                        <i class="feather icon-play-circle"></i> REJECTED
+                                                    </button>
+
+                                                    <div class="modal fade" id="modalReject" tabindex="-1">
+                                                        <div class="modal-dialog modal-dialog-centered">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title">Rejected Problem</h5>
+                                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                                </div>
+                                                                <form action="SubmitApproval" method="post">
+                                                                    <div class="modal-body">
+                                                                        <input type="hidden" name="problemId" value="${problem.id}">
+                                                                        <input type="hidden" name="status" value="REJECTED">
+                                                                        <label>Lý do từ chối (tùy chọn)</label>
+                                                                        <textarea name="rejectedReason" class="form-control" rows="3" 
+                                                                                  placeholder="Nhập lý do từ chối..." maxlength="2000"></textarea>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                                                                        <button type="submit" class="btn btn-danger"
+                                                                                onclick="return confirm('Xác nhận từ chối?');">
+                                                                            Xác nhận từ chối
+                                                                        </button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </c:if>
                                                 
                                                 
@@ -236,6 +279,16 @@
                                                 </div>
                                             </c:if>
                                                 <div class="card-body">
+                                                    <c:if test="${not empty problem and problem.status eq 'REJECTED' and not empty problem.rejectedReason}">
+                                                        <div class="card border-danger mt-2">
+                                                            <div class="card-header bg-danger text-white">
+                                                                <i class="feather icon-alert-triangle"></i> Rejected Reason
+                                                            </div>
+                                                            <div class="card-body">
+                                                                ${problem.rejectedReason}
+                                                            </div>
+                                                        </div>
+                                                    </c:if>
                                                     <c:if test="${not empty error}">
                                                         <div class="alert alert-danger">
                                                             <h4>Error</h4>
@@ -319,6 +372,7 @@
                                                                                         <th>Created At</th>
                                                                                         <td>${problem.createdAt}</td>
                                                                                     </tr>
+                                                                                    
                                                                                 </tbody>
                                                                             </table>
                                                                         </div>
