@@ -192,10 +192,15 @@ public class TicketDao extends DbContext {
     // 3. Lấy danh sách Ticket cho End-User (My Tickets)
     public List<Tickets> getTicketsByCreator(int userId) {
         List<Tickets> list = new ArrayList<>();
-        String sql = "SELECT Id, TicketNumber, TicketType, Title, Status, CreatedAt "
-                   + "FROM [dbo].[Tickets] "
-                   + "WHERE CreatedBy = ? "
-                   + "ORDER BY CreatedAt DESC";
+        // Dùng LEFT JOIN để lấy luôn tên Priority, Assignee và Category
+        String sql = "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.CreatedAt, t.UpdatedAt, "
+                   + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName "
+                   + "FROM [dbo].[Tickets] t "
+                   + "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id "
+                   + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
+                   + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
+                   + "WHERE t.CreatedBy = ? "
+                   + "ORDER BY t.CreatedAt DESC";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, userId);
@@ -208,7 +213,14 @@ public class TicketDao extends DbContext {
                 t.setTicketType(rs.getString("TicketType"));
                 t.setTitle(rs.getString("Title"));
                 t.setStatus(rs.getString("Status"));
-                t.setCreatedAt(rs.getDate("CreatedAt"));
+                t.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                t.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
+                
+                // Set các trường hiển thị mới thêm
+                t.setPriorityLevel(rs.getString("PriorityLevel"));
+                t.setAssigneeName(rs.getString("AssigneeName"));
+                t.setCategoryName(rs.getString("CategoryName"));
+                
                 list.add(t);
             }
         } catch (Exception e) {
@@ -218,9 +230,18 @@ public class TicketDao extends DbContext {
         return list;
     }
     
-    // 4. Lấy chi tiết 1 Ticket theo ID
+   // 4. Lấy chi tiết 1 Ticket theo ID - ĐÃ NÂNG CẤP JOIN
     public Tickets getTicketById(int id) {
-        String sql = "SELECT * FROM [dbo].[Tickets] WHERE Id = ?";
+        String sql = "SELECT t.*, "
+                   + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, "
+                   + "c.Name AS CategoryName, s.Name AS ServiceName "
+                   + "FROM [dbo].[Tickets] t "
+                   + "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id "
+                   + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
+                   + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
+                   + "LEFT JOIN [dbo].[ServiceCatalog] s ON t.ServiceCatalogId = s.Id "
+                   + "WHERE t.Id = ?";
+                   
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
@@ -240,6 +261,14 @@ public class TicketDao extends DbContext {
                 t.setStatus(rs.getString("Status"));
                 t.setCreatedBy(rs.getInt("CreatedBy"));
                 t.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                t.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
+                
+                // Set các trường hiển thị
+                t.setPriorityLevel(rs.getString("PriorityLevel"));
+                t.setAssigneeName(rs.getString("AssigneeName"));
+                t.setCategoryName(rs.getString("CategoryName"));
+                t.setServiceName(rs.getString("ServiceName"));
+                
                 return t;
             }
         } catch (Exception e) {

@@ -5,13 +5,13 @@
 <%@ page import="model.Tickets" %>
 <%@ page import="java.util.List" %>
 <%
-    // Kiểm tra đăng nhập [cite: 1, 2]
+    // Check login
     if (session.getAttribute("user") == null) {
         response.sendRedirect(request.getContextPath() + "/Login.jsp");
         return;
     }
     
-    // Kiểm tra quyền truy cập [cite: 3, 4]
+    // Check access rights
     String role = (String) session.getAttribute("role");
     if (role == null || (!role.equals("Manager") && !role.equals("User"))) {
         response.sendRedirect(request.getContextPath() + "/Login.jsp");
@@ -20,7 +20,7 @@
     
     model.Users user = (model.Users) session.getAttribute("user");
 
-    // Lấy 5 Ticket gần nhất của User này để hiển thị trên Dashboard
+    // Get the 5 most recent tickets of this User to display on the Dashboard
     TicketDao ticketDao = new TicketDao();
     List<Tickets> recentTickets = ticketDao.getTicketsByCreator(user.getId());
     request.setAttribute("recentTickets", recentTickets);
@@ -31,7 +31,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Cổng Dịch Vụ - ITServiceFlow</title>
+    <title>Service Portal - ITServiceFlow</title>
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/fonts/fontawesome/css/fontawesome-all.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/plugins/bootstrap/css/bootstrap.min.css">
@@ -104,12 +104,12 @@
                             <div class="dashboard-hero">
                                 <i class="feather icon-life-buoy dashboard-hero-bg"></i>
                                 <div class="hero-content">
-                                    <h1 class="hero-title">Xin chào, <%= user.getFullName() %>! 👋</h1>
-                                    <p class="hero-subtitle">Hôm nay bộ phận IT có thể giúp gì cho bạn?</p>
+                                    <h1 class="hero-title">Welcome, <%= user.getFullName() %>! 👋</h1>
+                                    <p class="hero-subtitle">How can the IT department help you today?</p>
                                     
                                     <div class="hero-search">
                                         <i class="feather icon-search"></i>
-                                        <input type="text" placeholder="Tìm kiếm hướng dẫn xử lý lỗi, phần mềm...">
+                                        <input type="text" placeholder="Search for troubleshooting guides, software...">
                                     </div>
                                 </div>
                             </div>
@@ -119,8 +119,8 @@
                                     <a href="${pageContext.request.contextPath}/CreateTicket" class="quick-action-card">
                                         <div class="quick-icon icon-blue"><i class="feather icon-plus-circle"></i></div>
                                         <div class="quick-text">
-                                            <h5>Tạo Yêu Cầu Mới</h5>
-                                            <p>Báo sự cố hoặc xin dịch vụ IT</p>
+                                            <h5>Create New Request</h5>
+                                            <p>Report an issue or request IT service</p>
                                         </div>
                                     </a>
                                 </div>
@@ -128,8 +128,8 @@
                                     <a href="${pageContext.request.contextPath}/Tickets" class="quick-action-card">
                                         <div class="quick-icon icon-purple"><i class="feather icon-list"></i></div>
                                         <div class="quick-text">
-                                            <h5>Vé Của Tôi</h5>
-                                            <p>Quản lý toàn bộ yêu cầu đã tạo</p>
+                                            <h5>My Tickets</h5>
+                                            <p>Manage all created requests</p>
                                         </div>
                                     </a>
                                 </div>
@@ -138,8 +138,8 @@
                                         <a href="#!" class="quick-action-card">
                                             <div class="quick-icon icon-green"><i class="feather icon-check-square"></i></div>
                                             <div class="quick-text">
-                                                <h5>Phê Duyệt</h5>
-                                                <p>Duyệt yêu cầu dịch vụ của NV</p>
+                                                <h5>Approvals</h5>
+                                                <p>Approve employee service requests</p>
                                             </div>
                                         </a>
                                     </c:if>
@@ -147,8 +147,8 @@
                                         <a href="#!" class="quick-action-card">
                                             <div class="quick-icon icon-green"><i class="feather icon-book"></i></div>
                                             <div class="quick-text">
-                                                <h5>Trung Tâm Trợ Giúp</h5>
-                                                <p>Đọc tài liệu tự khắc phục sự cố</p>
+                                                <h5>Help Center</h5>
+                                                <p>Read self-service troubleshooting guides</p>
                                             </div>
                                         </a>
                                     </c:if>
@@ -159,8 +159,8 @@
                                 <div class="col-lg-8">
                                     <div class="panel-card">
                                         <div class="panel-title">
-                                            <span><i class="feather icon-activity text-primary mr-2"></i> Yêu cầu gần đây của bạn</span>
-                                            <a href="${pageContext.request.contextPath}/Tickets" class="btn btn-sm btn-outline-primary" style="font-size: 0.8rem;">Xem tất cả</a>
+                                            <span><i class="feather icon-activity text-primary mr-2"></i> Your recent requests</span>
+                                            <a href="${pageContext.request.contextPath}/Tickets" class="btn btn-sm btn-outline-primary" style="font-size: 0.8rem;">View all</a>
                                         </div>
                                         
                                         <div class="mini-ticket-list">
@@ -168,31 +168,31 @@
                                                 <c:when test="${empty recentTickets}">
                                                     <div class="text-center text-muted py-4">
                                                         <i class="feather icon-inbox d-block mb-2" style="font-size: 2rem; opacity: 0.5;"></i>
-                                                        Bạn chưa có yêu cầu nào.
+                                                        You have no requests.
                                                     </div>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <% int count = 0; %>
                                                     <c:forEach items="${recentTickets}" var="ticket">
                                                         <% if (count < 5) { %> <div class="mini-ticket-item">
-                                                                <div class="ticket-info">
-                                                                    <a href="${pageContext.request.contextPath}/TicketDetailUser?id=${ticket.id}" class="t-key">${ticket.ticketNumber}</a>
-                                                                    <span class="t-title">${ticket.title}</span>
-                                                                    <span class="t-meta">
-                                                                        <i class="feather icon-clock"></i> <fmt:formatDate value="${ticket.createdAt}" pattern="dd/MM/yyyy HH:mm"/> 
-                                                                        &nbsp;|&nbsp; Loại: ${ticket.ticketType == 'Incident' ? 'Báo lỗi' : 'Dịch vụ'}
-                                                                    </span>
-                                                                </div>
-                                                                <div class="ticket-status">
-                                                                    <c:choose>
-                                                                        <c:when test="${ticket.status == 'New'}"><span class="jira-badge badge-new">Pending</span></c:when>
-                                                                        <c:when test="${ticket.status == 'In Progress'}"><span class="jira-badge badge-progress">In Progress</span></c:when>
-                                                                        <c:when test="${ticket.status == 'Resolved'}"><span class="jira-badge badge-resolved">Resolved</span></c:when>
-                                                                        <c:when test="${ticket.status == 'Closed'}"><span class="jira-badge badge-closed">Closed</span></c:when>
-                                                                        <c:otherwise><span class="jira-badge badge-closed">${ticket.status}</span></c:otherwise>
-                                                                    </c:choose>
-                                                                </div>
+                                                            <div class="ticket-info">
+                                                                <a href="${pageContext.request.contextPath}/TicketDetailUser?id=${ticket.id}" class="t-key">${ticket.ticketNumber}</a>
+                                                                <span class="t-title">${ticket.title}</span>
+                                                                <span class="t-meta">
+                                                                    <i class="feather icon-clock"></i> <fmt:formatDate value="${ticket.createdAt}" pattern="dd/MM/yyyy HH:mm"/> 
+                                                                    &nbsp;|&nbsp; Type: ${ticket.ticketType == 'Incident' ? 'Incident' : 'Service'}
+                                                                </span>
                                                             </div>
+                                                            <div class="ticket-status">
+                                                                <c:choose>
+                                                                    <c:when test="${ticket.status == 'New'}"><span class="jira-badge badge-new">Pending</span></c:when>
+                                                                    <c:when test="${ticket.status == 'In Progress'}"><span class="jira-badge badge-progress">In Progress</span></c:when>
+                                                                    <c:when test="${ticket.status == 'Resolved'}"><span class="jira-badge badge-resolved">Resolved</span></c:when>
+                                                                    <c:when test="${ticket.status == 'Closed'}"><span class="jira-badge badge-closed">Closed</span></c:when>
+                                                                    <c:otherwise><span class="jira-badge badge-closed">${ticket.status}</span></c:otherwise>
+                                                                </c:choose>
+                                                            </div>
+                                                        </div>
                                                         <% count++; } %>
                                                     </c:forEach>
                                                 </c:otherwise>
@@ -204,34 +204,34 @@
                                 <div class="col-lg-4">
                                     <div class="panel-card">
                                         <div class="panel-title">
-                                            <span><i class="feather icon-book-open text-warning mr-2"></i> Bài viết phổ biến</span>
+                                            <span><i class="feather icon-book-open text-warning mr-2"></i> Popular Articles</span>
                                         </div>
                                         <div class="kb-list">
                                             <div class="kb-item">
                                                 <i class="feather icon-file-text"></i>
-                                                <a href="#!">Hướng dẫn reset mật khẩu hệ thống ERP nội bộ</a>
+                                                <a href="#!">Guide to reset internal ERP system password</a>
                                             </div>
                                             <div class="kb-item">
                                                 <i class="feather icon-file-text"></i>
-                                                <a href="#!">Cách xử lý lỗi máy in báo Offline trên Windows</a>
+                                                <a href="#!">How to fix printer offline error on Windows</a>
                                             </div>
                                             <div class="kb-item">
                                                 <i class="feather icon-file-text"></i>
-                                                <a href="#!">Quy trình xin cấp phát Laptop cho nhân viên mới</a>
+                                                <a href="#!">Process for requesting a laptop for new employees</a>
                                             </div>
                                             <div class="kb-item">
                                                 <i class="feather icon-file-text"></i>
-                                                <a href="#!">Cài đặt VPN để làm việc từ xa (Work From Home)</a>
+                                                <a href="#!">Setting up VPN for remote work (Work From Home)</a>
                                             </div>
                                         </div>
                                         
                                         <hr class="my-4">
                                         
                                         <div class="panel-title mb-3">
-                                            <span><i class="feather icon-bell text-danger mr-2"></i> Thông báo từ IT</span>
+                                            <span><i class="feather icon-bell text-danger mr-2"></i> IT Announcements</span>
                                         </div>
                                         <div class="alert alert-primary p-2" style="font-size: 0.85rem;">
-                                            <strong><i class="feather icon-info"></i> Bảo trì hệ thống:</strong> Tối thứ 7 tuần này (12/03), hệ thống ERP sẽ tạm ngưng hoạt động từ 22:00 - 02:00 để nâng cấp.
+                                            <strong><i class="feather icon-info"></i> System Maintenance:</strong> This Saturday night (March 12), the ERP system will be temporarily down from 22:00 - 02:00 for an upgrade.
                                         </div>
                                     </div>
                                 </div>
