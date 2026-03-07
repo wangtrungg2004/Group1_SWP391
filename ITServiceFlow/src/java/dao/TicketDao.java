@@ -189,8 +189,95 @@ public class TicketDao extends DbContext {
 //        }
 //    }
     
+    // 3. Lấy danh sách Ticket cho End-User (My Tickets)
+    public List<Tickets> getTicketsByCreator(int userId) {
+        List<Tickets> list = new ArrayList<>();
+        // Dùng LEFT JOIN để lấy luôn tên Priority, Assignee và Category
+        String sql = "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.CreatedAt, t.UpdatedAt, "
+                   + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName "
+                   + "FROM [dbo].[Tickets] t "
+                   + "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id "
+                   + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
+                   + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
+                   + "WHERE t.CreatedBy = ? "
+                   + "ORDER BY t.CreatedAt DESC";
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                Tickets t = new Tickets();
+                t.setId(rs.getInt("Id"));
+                t.setTicketNumber(rs.getString("TicketNumber"));
+                t.setTicketType(rs.getString("TicketType"));
+                t.setTitle(rs.getString("Title"));
+                t.setStatus(rs.getString("Status"));
+                t.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                t.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
+                
+                // Set các trường hiển thị mới thêm
+                t.setPriorityLevel(rs.getString("PriorityLevel"));
+                t.setAssigneeName(rs.getString("AssigneeName"));
+                t.setCategoryName(rs.getString("CategoryName"));
+                
+                list.add(t);
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi khi lấy danh sách My Tickets: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
+    }
     
-     // This method returns the generated ID for SLA tracking
+   // 4. Lấy chi tiết 1 Ticket theo ID - ĐÃ NÂNG CẤP JOIN
+    public Tickets getTicketById(int id) {
+        String sql = "SELECT t.*, "
+                   + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, "
+                   + "c.Name AS CategoryName, s.Name AS ServiceName "
+                   + "FROM [dbo].[Tickets] t "
+                   + "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id "
+                   + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
+                   + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
+                   + "LEFT JOIN [dbo].[ServiceCatalog] s ON t.ServiceCatalogId = s.Id "
+                   + "WHERE t.Id = ?";
+                   
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Tickets t = new Tickets();
+                t.setId(rs.getInt("Id"));
+                t.setTicketNumber(rs.getString("TicketNumber"));
+                t.setTicketType(rs.getString("TicketType"));
+                t.setTitle(rs.getString("Title"));
+                t.setDescription(rs.getString("Description"));
+                t.setCategoryId(rs.getInt("CategoryId"));
+                t.setLocationId(rs.getInt("LocationId"));
+                t.setImpact((Integer) rs.getObject("Impact"));
+                t.setUrgency((Integer) rs.getObject("Urgency"));
+                t.setPriorityId((Integer) rs.getObject("PriorityId"));
+                t.setServiceCatalogId((Integer) rs.getObject("ServiceCatalogId"));
+                t.setStatus(rs.getString("Status"));
+                t.setCreatedBy(rs.getInt("CreatedBy"));
+                t.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                t.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
+                
+                // Set các trường hiển thị
+                t.setPriorityLevel(rs.getString("PriorityLevel"));
+                t.setAssigneeName(rs.getString("AssigneeName"));
+                t.setCategoryName(rs.getString("CategoryName"));
+                t.setServiceName(rs.getString("ServiceName"));
+                
+                return t;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // 5. Tạo ticket và trả về ID sinh ra (cho SLA tracking)
     public int createTicket2(Tickets ticket) {
         String sql = "INSERT INTO [dbo].[Tickets] (TicketNumber, TicketType, Title, Description, CategoryId, LocationId, Impact, Urgency, PriorityId, ServiceCatalogId, RequiresApproval, Status, CreatedBy, CreatedAt) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE())";
@@ -203,19 +290,19 @@ public class TicketDao extends DbContext {
             stm.setInt(5, ticket.getCategoryId());
             stm.setInt(6, ticket.getLocationId());
 
-            if (ticket.getImpact() > 0)
+            if (ticket.getImpact() != null && ticket.getImpact() > 0)
                 stm.setInt(7, ticket.getImpact());
             else
                 stm.setNull(7, java.sql.Types.INTEGER);
-            if (ticket.getUrgency() > 0)
+            if (ticket.getUrgency() != null && ticket.getUrgency() > 0)
                 stm.setInt(8, ticket.getUrgency());
             else
                 stm.setNull(8, java.sql.Types.INTEGER);
-            if (ticket.getPriorityId() > 0)
+            if (ticket.getPriorityId() != null && ticket.getPriorityId() > 0)
                 stm.setInt(9, ticket.getPriorityId());
             else
                 stm.setNull(9, java.sql.Types.INTEGER);
-            if (ticket.getServiceCatalogId() > 0)
+            if (ticket.getServiceCatalogId() != null && ticket.getServiceCatalogId() > 0)
                 stm.setInt(10, ticket.getServiceCatalogId());
             else
                 stm.setNull(10, java.sql.Types.INTEGER);
@@ -244,7 +331,6 @@ public class TicketDao extends DbContext {
     // Helper to generate Ticket Number
     public String getNextTicketNumber(String type) {
         String prefix = type.equals("Incident") ? "INC-" : "SR-";
-        // Simple logic for demo, better use DB sequence or Max check
         return prefix + System.currentTimeMillis();
     }
     

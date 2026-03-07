@@ -34,10 +34,18 @@
         <servlet-name>ProblemAdd</servlet-name>
         <servlet-class>controller.Problems.ProblemAdd</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>CreateTicket</servlet-name>
-        <servlet-class>controller.ticket.CreateTicketController</servlet-class>
-    </servlet>
+<servlet>
+    <servlet-name>MyTickets</servlet-name>
+    <servlet-class>controller.ticket.user.MyTicketsController</servlet-class>
+</servlet>
+<servlet>
+    <servlet-name>CreateTicket</servlet-name>
+    <servlet-class>controller.ticket.user.TicketCreateController</servlet-class>
+</servlet>
+<servlet>
+    <servlet-name>TicketDetailUser</servlet-name>
+    <servlet-class>controller.ticket.user.TicketDetailUserController</servlet-class>
+</servlet>
     <servlet-mapping>
         <servlet-name>Login</servlet-name>
         <url-pattern>/Login</url-pattern>
@@ -160,9 +168,17 @@
         <url-pattern>/ProblemAdd</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>CreateTicket</servlet-name>
-        <url-pattern>/CreateTicket</url-pattern>
-    </servlet-mapping>
+    <servlet-name>MyTickets</servlet-name>
+    <url-pattern>/Tickets</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+    <servlet-name>CreateTicket</servlet-name>
+    <url-pattern>/CreateTicket</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+    <servlet-name>TicketDetailUser</servlet-name>
+    <url-pattern>/TicketDetailUser</url-pattern>
+</servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>

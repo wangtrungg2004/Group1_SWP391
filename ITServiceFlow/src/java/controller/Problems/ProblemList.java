@@ -4,7 +4,6 @@
  */
 package controller.Problems;
 
-import com.sun.nio.sctp.Notification;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -67,12 +66,6 @@ public class ProblemList extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        List<Problems> problems = new ArrayList<>();
-
-        String status = request.getParameter("filterStatus");
-        String fromDate = request.getParameter("fromDate");
-        String toDate = request.getParameter("toDate");
-
         String keyword = request.getParameter("keyword");
         if (keyword == null) {
             keyword = "";
@@ -104,20 +97,22 @@ public class ProblemList extends HttpServlet {
             page = 1;
         }
 
+        String status = request.getParameter("status");
+        String fromDate = request.getParameter("fromDate");
+        String toDate = request.getParameter("toDate");
+        boolean hasStatus = status != null && !status.trim().isEmpty();
+        boolean hasFrom = fromDate != null && !fromDate.trim().isEmpty();
+        boolean hasTo = toDate != null && !toDate.trim().isEmpty();
+        boolean usedFilter = false;
+
+        List<Problems> problems = new ArrayList<>();
         int totalRecords;
         int totalPages;
 
-        boolean hasStatus = status != null && !status.trim().isEmpty();
-        boolean hasFrom   = fromDate != null && !fromDate.isEmpty();
-        boolean hasTo     = toDate != null && !toDate.isEmpty();
-        boolean usedFilter = false;
-
-        if (keyword != null && !keyword.isEmpty()) {
+        if (!keyword.isEmpty()) {
             problems = problemService.searchProblem(keyword);
             usedFilter = true;
-
-        }
-        else if (hasStatus && hasFrom && hasTo) {
+        } else if (hasStatus && hasFrom && hasTo) {
             try {
                 java.sql.Date fromStr = java.sql.Date.valueOf(fromDate);
                 java.sql.Date toStr   = java.sql.Date.valueOf(toDate);
@@ -132,7 +127,6 @@ public class ProblemList extends HttpServlet {
                     long fromTime = fromStr.getTime();
                     long toTime = toStr.getTime();
 
-                    // Giữ lại nếu: from <= created <= to
                     if (createdTime >= fromTime && createdTime <= toTime) {
                         filtered.add(p);
                     }
@@ -140,15 +134,12 @@ public class ProblemList extends HttpServlet {
 
                 problems = filtered;
                 usedFilter = true;
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-        else if (hasStatus) {
+        } else if (hasStatus) {
             problems = problemService.filterByStatus(status.trim());
             usedFilter = true;
-
         } else if (hasFrom && hasTo) {
             try {
                 java.sql.Date fromStr = java.sql.Date.valueOf(fromDate);
@@ -178,10 +169,7 @@ public class ProblemList extends HttpServlet {
         request.setAttribute("totalRecords", totalRecords);
         request.setAttribute("pageSize", pageSize);
         request.setAttribute("filterKeyword", keyword);
-        request.setAttribute("filterStatus", status);
-        request.setAttribute("filterFromDate", fromDate);
-        request.setAttribute("filterToDate", toDate);
-        
+
         request.getRequestDispatcher("ProblemList.jsp").forward(request, response);
     }
 

@@ -64,57 +64,38 @@ public class ITProblemListController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<Problems> problems;
         HttpSession session = request.getSession();
-    Integer userId = (Integer) session.getAttribute("userId");
-    String role = (String) session.getAttribute("role");
+        Integer userId = (Integer) session.getAttribute("userId");
+        
+        int pageSize = 10;
+        int page = 1;
 
-    // Kiểm tra login và quyền
-    if (userId == null || !"IT Support".equals(role)) {
-        // Chưa login hoặc không phải IT Support → redirect về login hoặc trang lỗi
-        response.sendRedirect(request.getContextPath() + "/Login");  // thay bằng URL login của bạn
-        return;
-    }
-
-    // Từ đây userId chắc chắn != null
-    int pageSize = 10;
-    int page = 1;
-    String pageStr = request.getParameter("page");
-    try {
-        if (pageStr != null && !pageStr.isEmpty()) {
-            page = Integer.parseInt(pageStr);
-        }
-        if (page < 1) page = 1;
-    } catch (NumberFormatException e) {
-        page = 1;
-    }
-
-        String keyword = request.getParameter("keyword");
-
-        int totalRecords;
-        int totalPages;
-
-        if (keyword != null && !keyword.isEmpty()) {
-            problems = problemService.searchAssignedProblems(userId, keyword);
-            totalRecords = problems.size();
-            totalPages = 1;
+        String pageStr = request.getParameter("page");
+        try {
+            if (pageStr != null && !pageStr.isEmpty()) {
+                page = Integer.parseInt(pageStr);
+            }
+            if (page < 1) page = 1;
+        } catch (NumberFormatException e) {
             page = 1;
-        } else {
-            totalRecords = problemService.getTotalAssignProblem(userId);
-            totalPages = (totalRecords + pageSize - 1) / pageSize;
-            if (totalPages < 1) totalPages = 1;
-            if (page > totalPages) page = totalPages;
-            problems = problemService.getAssignProblemWithPage(userId, page, pageSize);
         }
 
-        request.setAttribute("keyword", keyword);
+        int totalRecords = problemService.getTotalAssignProblem(userId);
+        int totalPages = (totalRecords + pageSize - 1) / pageSize;
+        if (totalPages < 1) totalPages = 1;
+        if (page > totalPages) page = totalPages;
+
+        List<Problems> problems =
+                problemService.getAssignProblemWithPage(userId, page, pageSize);
+
         request.setAttribute("problem", problems);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalRecords", totalRecords);
 
         request.getRequestDispatcher("ITSupportProblemList.jsp").forward(request, response);
-            }
+
+    }
 
     /**
      * Handles the HTTP <code>POST</code> method.
@@ -137,15 +118,14 @@ public class ITProblemListController extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Problem not found");
                 return;
             }
-            
+
             boolean startInvestigation = problemService.updateAssignStatus(id);
             if (!startInvestigation) {
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to start investigation");
                 return;
-            }   
-            
-            String fromDetail = request.getParameter("fromDetail");
+            }
 
+            String fromDetail = request.getParameter("fromDetail");
             if (fromDetail != null) {
                 response.sendRedirect("ProblemDetail?Id=" + id);
             } else {

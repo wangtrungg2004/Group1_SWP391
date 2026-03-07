@@ -34,6 +34,11 @@ public class Tickets {
     private Date CreatedAt;
     private Date UpdatedAt;
     private Integer CurrentLevel;
+    // --- CÁC TRƯỜNG BỔ SUNG ĐỂ HIỂN THỊ LÊN VIEW (JSP) ---
+    private String priorityLevel; // Lấy từ bảng Priorities
+    private String assigneeName;  // Lấy từ bảng Users
+    private String categoryName;  // Lấy từ bảng Categories
+    private String serviceName;   // Lấy từ bảng ServiceCatalog
 
     public Tickets() {
     }
@@ -247,5 +252,39 @@ public class Tickets {
     public void setCurrentLevel(Integer CurrentLevel) {
         this.CurrentLevel = CurrentLevel;
     }
+
+    public String getPriorityLevel() {
+        return priorityLevel;
+    }
+
+    public void setPriorityLevel(String priorityLevel) {
+        this.priorityLevel = priorityLevel;
+    }
+
+    public String getAssigneeName() {
+        return assigneeName;
+    }
+
+    public void setAssigneeName(String assigneeName) {
+        this.assigneeName = assigneeName;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+    
+    
 
 }
