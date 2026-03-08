@@ -12,17 +12,20 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
+import model.Notifications;
 import model.Problems;
-import service.NotificationService;
+import model.KnowErrors;
+import service.KnowErrorService;
 import service.ProblemService;
-
+import service.NotificationService;
 /**
  *
  * @author DELL
  */
-@WebServlet(name = "ITProblemListController", urlPatterns = {"/ITProblemListController"})
-public class ITProblemListController extends HttpServlet {
+@WebServlet(name = "SubmitApproval", urlPatterns = {"/SubmitApproval"})
+public class SubmitApproval extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -41,10 +44,10 @@ public class ITProblemListController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ITProblemListController</title>");
+            out.println("<title>Servlet SubmitApproval</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ITProblemListController at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet SubmitApproval at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -60,41 +63,11 @@ public class ITProblemListController extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     ProblemService problemService = new ProblemService();
-    NotificationService notificationService = new NotificationService();
+    KnowErrorService knownErrorService = new KnowErrorService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        Integer userId = (Integer) session.getAttribute("userId");
-        
-        int pageSize = 10;
-        int page = 1;
-
-        String pageStr = request.getParameter("page");
-        try {
-            if (pageStr != null && !pageStr.isEmpty()) {
-                page = Integer.parseInt(pageStr);
-            }
-            if (page < 1) page = 1;
-        } catch (NumberFormatException e) {
-            page = 1;
-        }
-
-        int totalRecords = problemService.getTotalAssignProblem(userId);
-        int totalPages = (totalRecords + pageSize - 1) / pageSize;
-        if (totalPages < 1) totalPages = 1;
-        if (page > totalPages) page = totalPages;
-
-        List<Problems> problems =
-                problemService.getAssignProblemWithPage(userId, page, pageSize);
-
-        request.setAttribute("problem", problems);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("totalRecords", totalRecords);
-
-        request.getRequestDispatcher("ITSupportProblemList.jsp").forward(request, response);
-
+        processRequest(request, response);
     }
 
     /**
@@ -108,33 +81,56 @@ public class ITProblemListController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String ProblemId = request.getParameter("problemId");
         
-        try {
-            int id = Integer.parseInt(ProblemId);
+        HttpSession session = request.getSession();
+        String role = (String) session.getAttribute("role");
+        Integer userId = (Integer) session.getAttribute("userId");
+        
+        String problemId = request.getParameter("problemId");
+        String status = request.getParameter("status");
+        
+        if(problemId == null)
+        {
+            return;
+        }
+        int id = Integer.parseInt(problemId);
+        if(status.equals("REJECTED"))
+        {
+            String rejectedReason = request.getParameter("rejectedReason");
+            if (rejectedReason != null) {
+                rejectedReason = rejectedReason.trim();
+            }
+            Problems pro = problemService.getProblemById(id);
+            if (pro != null) {
+                pro.setStatus("REJECTED");
+                pro.setRejectedReason(rejectedReason);
+                problemService.updateProblem(pro);
+            }
+        }
+        if(status.equals("APPROVED"))
+        {
+//            problemService.updateStatusProblem(id, status);
             
             Problems pro = problemService.getProblemById(id);
-            if (pro == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Problem not found");
-                return;
+            
+            if(pro != null)
+            {
+                KnowErrors kn = knownErrorService.findKnowErrorByProblemId(id);
+                if(kn == null)
+                {
+                    knownErrorService.addKnowError(pro.getId(), pro.getTitle(), pro.getWorkaround());
+                }
             }
-
-            boolean startInvestigation = problemService.updateAssignStatus(id);
-            if (!startInvestigation) {
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to start investigation");
-                return;
-            }
-
-            String fromDetail = request.getParameter("fromDetail");
-            if (fromDetail != null) {
-                response.sendRedirect("ProblemDetail?Id=" + id);
-            } else {
-                response.sendRedirect("ITProblemListController");
-            }
-        } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ProblemId format");
-        } catch (NullPointerException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ProblemId parameter is missing");
+        }
+        boolean pro = problemService.updateStatusProblem(id, status);
+        
+        if("IT Support".equals(role))
+        {
+            response.sendRedirect("ITProblemListController");
+        }
+        else if("Manager".equals(role))
+        {
+            response.sendRedirect("ProblemPendingList");
         }
     }
 

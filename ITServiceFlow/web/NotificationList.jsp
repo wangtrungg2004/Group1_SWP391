@@ -10,39 +10,12 @@
 <%@ page import="model.Notifications" %>
 <%@ page import="dao.NotificationDao" %>
 <%
-    // 1. Kiểm tra đăng nhập
-    if (session.getAttribute("user") == null) {
-        response.sendRedirect("Login.jsp");
-        return;
-    }
-
-    // 2. Lấy thông tin từ session
-    model.Users user = (model.Users) session.getAttribute("user");
-    Integer userId = (Integer) session.getAttribute("userId");
-    String role = (String) session.getAttribute("role");
-
-    // 3. Kiểm tra quyền truy cập (chỉ IT Support được vào)
-    if (role == null || !role.equals("IT Support")) {
-        response.sendRedirect("Login.jsp");
-        return;
-    }
-
-    // 4. Load notifications (nếu chưa có)
-    if (request.getAttribute("notifications") == null && userId != null) {
-        dao.NotificationDao notificationDao = new dao.NotificationDao();
-        List<Notifications> notifications;
-
-        // Admin & Manager: xem tất cả
-        if ("Admin".equals(role) || "Manager".equals(role)) {
-            notifications = notificationDao.getAllNotifications();
-        } 
-        // Các role khác: chỉ xem của mình
-        else {
-            notifications = notificationDao.getNotificationsByUserIdUnread(userId);
+        if (session != null && session.getAttribute("userId") != null 
+                && request.getAttribute("headerNotifications") == null) 
+        {
+            Integer userId = (Integer) session.getAttribute("userId");
+            String role = (String) session.getAttribute("role");
         }
-
-        request.setAttribute("notifications", notifications);
-    }
 %>
 
 <!DOCTYPE html>
@@ -66,7 +39,7 @@
     <!-- vendor css -->
     <link rel="stylesheet" href="assets/css/style.css">
     
-    <title>IT Support Dashboard - ITServiceFlow</title>
+    <title>Manager Dashboard - ITServiceFlow</title>
     
             <style>
     /* === FORCE FULL WIDTH – KILL BOXED LAYOUT === */
@@ -133,8 +106,8 @@
                                             </div>
                                             <ul class="breadcrumb">
                                                 <li class="breadcrumb-item"><a href="index.html"><i class="feather icon-home"></i></a></li>
-                                                <li class="breadcrumb-item"><a href="#!">Form Components</a></li>
-                                                <li class="breadcrumb-item"><a href="#!">Form Elements</a></li>
+                                                <li class="breadcrumb-item"><a href="ITSupportNotificationList">Notification List</a></li>
+                                                <li class="breadcrumb-item"><a href="#!">Notification List</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -147,12 +120,12 @@
                                 <div class="col-sm-12">
                                     <div class="card">
                                         <div class="card-header d-flex justify-content-between align-items-center">
-                                            <h5 class="m-0">Problem List</h5>
+                                            <h5 class="m-0">Notification List</h5>
                                         </div>
                                         <div class="card-body table-border-style">
-                                        <c:if test="${empty problem}">
+                                        <c:if test="${empty notifications}">
                                             <div class="alert alert-warning">
-                                             Problem list is empty
+                                             Notification list is empty
                                             </div>
                                         </c:if>
                                             <form action="ITProblemListController" method="get" class="mb-3">
@@ -169,39 +142,33 @@
                                                 <thead class="thead-dark">
                                                     <tr>
                                                         <th>ID</th>
-                                                        <th>Ticket Number</th>
                                                         <th>Title</th>
-                                                        <th>Status</th>
-                                                        <th>Created By</th>
+                                                        <th>Type</th>
+                                                        <th>Message</th>
                                                         <th>Created At</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <c:choose>
-                                                        <c:when test="${empty problem}">
+                                                        <c:when test="${empty notifications}">
                                                             <tr>
                                                                 <td colspan="6" class="text-center text-muted">
-                                                                    <i>No problems found</i>
+                                                                    <i>No notifications found</i>
                                                                 </td>
                                                             </tr>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <c:forEach items="${problem}" var="p">
+                                                            <c:forEach items="${notifications}" var="n">
                                                                 <tr>
-                                                                    <td>${p.id}</td>
-                                                                    <td>${p.ticketNumber}</td>
-                                                                    <td>${p.title}</td>
-                                                                    <td>
-                                                                        <span class="badge badge-status" data-status="${p.status}">
-                                                                            ${p.status}
-                                                                        </span>
-                                                                    </td>
-                                                                    <td>${p.createdByName != null ? p.createdByName : p.createdBy}</td>
-                                                                    <td>${p.createdAt}</td>
+                                                                    <td>${n.id}</td>
+                                                                    <td>${n.title}</td>
+                                                                    <td>${n.type}</td>
+                                                                    <td>${n.message}</td>
+                                                                    <td>${n.createdAt}</td>
                                                                     <td class="d-flex gap-1">
                                                                         <a class="btn btn-sm btn-primary"
-                                                                           href="ProblemDetail?Id=${p.id}">
+                                                                           href="NotificationDetail?Id=${n.id}">
                                                                             Detail
                                                                         </a>
                                                                     </td>

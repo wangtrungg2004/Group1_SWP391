@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package controller.Problems;
+package controller.Notifications;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -12,17 +12,15 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.util.List;
-import model.Problems;
+import model.Notifications;
 import service.NotificationService;
-import service.ProblemService;
 
 /**
  *
  * @author DELL
  */
-@WebServlet(name = "ITProblemListController", urlPatterns = {"/ITProblemListController"})
-public class ITProblemListController extends HttpServlet {
+@WebServlet(name = "NotificationDetail", urlPatterns = {"/NotificationDetail"})
+public class NotificationDetail extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -41,10 +39,10 @@ public class ITProblemListController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ITProblemListController</title>");
+            out.println("<title>Servlet NotificationDetail</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ITProblemListController at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet NotificationDetail at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -59,42 +57,34 @@ public class ITProblemListController extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    ProblemService problemService = new ProblemService();
     NotificationService notificationService = new NotificationService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
+        String role = (String) session.getAttribute("role");
         Integer userId = (Integer) session.getAttribute("userId");
         
-        int pageSize = 10;
-        int page = 1;
-
-        String pageStr = request.getParameter("page");
-        try {
-            if (pageStr != null && !pageStr.isEmpty()) {
-                page = Integer.parseInt(pageStr);
-            }
-            if (page < 1) page = 1;
-        } catch (NumberFormatException e) {
-            page = 1;
+        String idParam = request.getParameter("Id");
+        
+        if (idParam == null || idParam.trim().isEmpty()) {
+            response.sendRedirect("ITSupportNotificationList");
+            return;
+        }
+        int id = Integer.parseInt(idParam);
+        Notifications notification = notificationService.getNotificationsById(id);
+        boolean checkId = (notification.getUserId() ==userId);
+        boolean checkRole = ("User".equals(role) || "IT Support".equals(role));
+        if(checkId && checkRole)
+        {
+            notificationService.readNotification(id);
         }
 
-        int totalRecords = problemService.getTotalAssignProblem(userId);
-        int totalPages = (totalRecords + pageSize - 1) / pageSize;
-        if (totalPages < 1) totalPages = 1;
-        if (page > totalPages) page = totalPages;
-
-        List<Problems> problems =
-                problemService.getAssignProblemWithPage(userId, page, pageSize);
-
-        request.setAttribute("problem", problems);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("totalRecords", totalRecords);
-
-        request.getRequestDispatcher("ITSupportProblemList.jsp").forward(request, response);
-
+        String notificationListUrl = "Manager".equals(role) ? "NotificationList" : "ITSupportNotificationList";
+        request.setAttribute("notification", notification);
+        request.setAttribute("notificationListUrl", notificationListUrl);
+        request.setAttribute("role", role != null ? role : "");
+        request.getRequestDispatcher("NotificationDetail.jsp").forward(request, response);
     }
 
     /**
@@ -108,34 +98,7 @@ public class ITProblemListController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String ProblemId = request.getParameter("problemId");
-        
-        try {
-            int id = Integer.parseInt(ProblemId);
-            
-            Problems pro = problemService.getProblemById(id);
-            if (pro == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Problem not found");
-                return;
-            }
-
-            boolean startInvestigation = problemService.updateAssignStatus(id);
-            if (!startInvestigation) {
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to start investigation");
-                return;
-            }
-
-            String fromDetail = request.getParameter("fromDetail");
-            if (fromDetail != null) {
-                response.sendRedirect("ProblemDetail?Id=" + id);
-            } else {
-                response.sendRedirect("ITProblemListController");
-            }
-        } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ProblemId format");
-        } catch (NullPointerException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ProblemId parameter is missing");
-        }
+        processRequest(request, response);
     }
 
     /**

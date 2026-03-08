@@ -11,6 +11,7 @@
 <%@ page import="java.util.List" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -108,8 +109,8 @@
                                             </div>
                                             <ul class="breadcrumb">
                                                 <li class="breadcrumb-item"><a href="ProblemList"><i class="feather icon-home"></i></a></li>
-                                                <li class="breadcrumb-item"><a href="#!">Problem Pending List</a></li>
-                                                <li class="breadcrumb-item"><a href="#!">Problem Pending List</a></li>
+                                                <li class="breadcrumb-item"><a href="#!">Know Error List</a></li>
+                                                <li class="breadcrumb-item"><a href="#!">Know Error List</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -128,9 +129,9 @@
                                             </a>
                                         </div>
                                         <div class="card-body table-border-style">
-                                        <c:if test="${empty problem}">
+                                        <c:if test="${empty knowError}">
                                             <div class="alert alert-warning">
-                                             Problem list is empty
+                                             KnowError list is empty
                                             </div>
                                         </c:if>
                                         <form action="ProblemList" method="get" class="mb-3">
@@ -176,57 +177,53 @@
                                                 <thead class="thead-dark">
                                                     <tr>
                                                         <th>ID</th>
-                                                        <th>Ticket Number</th>
+                                                        <th>Problem Id</th>
                                                         <th>Title</th>
                                                         <th>Status</th>
-                                                        <th>Created By</th>
-                                                        <th>Assign To</th>
                                                         <th>Created At</th>
+                                                        <th>Work Around</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <c:choose>
-                                                        <c:when test="${empty problem}">
+                                                        <c:when test="${empty knowError}">
                                                             <tr>
                                                                 <td colspan="6" class="text-center text-muted">
-                                                                    <i>No problems found</i>
+                                                                    <i>No KnowError found</i>
                                                                 </td>
                                                             </tr>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <c:forEach items="${problem}" var="p">
+                                                            <c:forEach items="${knowError}" var="kn">
                                                                 <tr>
-                                                                    <td>${p.id}</td>
-                                                                    <td>${p.ticketNumber}</td>
-                                                                    <td>${p.title}</td>
+                                                                    <td>${kn.id}</td>
+                                                                    <td>${kn.problemId}</td>
+                                                                    <td>${kn.title}</td>
                                                                     <td>
-                                                                        <span class="badge badge-status" data-status="${p.status}">
-                                                                            ${p.status}
+                                                                        <span class="badge badge-status" data-status="${kn.status}">
+                                                                            ${kn.status}
                                                                         </span>
                                                                     </td>
-                                                                    <td>${p.createdByName != null ? p.createdByName : p.createdBy}</td>
-                                                                    <td>${p.assignedToName != null && p.assignedToName != '' ? p.assignedToName : '-'}</td>
-                                                                    <td>${p.createdAt}</td>
+                                                                    <td>${kn.workAround}</td>
+                                                                    <td><fmt:formatDate value="${kn.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
                                                                     <td class="d-flex gap-1">
                                                                         <a class="btn btn-sm btn-primary"
-                                                                           href="ProblemDetail?Id=${p.id}">
+                                                                           href="KnowErrorDetail?Id=${kn.id}">
                                                                             Detail
                                                                         </a>
-                                                                        <a class="btn btn-sm btn-primary"
-                                                                           href="ProblemUpdate?Id=${p.id}">
+<!--                                                                        <a class="btn btn-sm btn-primary"
+                                                                           href="ProblemUpdate?Id=${kn.id}">
                                                                             Update
                                                                         </a>
-                                                                           <c:if test="${(role eq 'Manager' or role eq 'IT Support') and (p.status eq 'NEW')}">
-                                                                               <form action="ProblemList" method="post"
-                                                                                        onsubmit="return confirm('Delete this Problem?');"
-                                                                                        style="display:inline;">
-                                                                                      <input type="hidden" name="Id" value="${p.id}">
-                                                                                      <button type="submit" class="btn btn-sm btn-danger">
-                                                                                          Delete
-                                                                                      </button>
-                                                                                  </form>
-                                                                           </c:if>
+                                                                        <form action="ProblemList" method="post"
+                                                                                onsubmit="return confirm('Delete this Problem?');"
+                                                                                style="display:inline;">
+                                                                              <input type="hidden" name="Id" value="${kn.id}">
+                                                                              <button type="submit" class="btn btn-sm btn-danger">
+                                                                                  Delete
+                                                                              </button>
+                                                                        </form>-->
                                                                     </td>
                                                                 </tr>
                                                             </c:forEach>

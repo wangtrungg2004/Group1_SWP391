@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 import service.ProblemService;
 import model.Users;
@@ -63,7 +64,13 @@ public class ProblemAdd extends HttpServlet {
     NotificationDao notificationDao = new NotificationDao();
     TicketDAO ticketService = new TicketDAO();
     UserService userService = new UserService();
-    
+
+//    /** Giới hạn số ký tự (nên trùng với DB hoặc nhỏ hơn). */
+//    private static final int TITLE_MAX = 300;
+//    private static final int DESCRIPTION_MAX = 2000;
+//    private static final int ROOT_CAUSE_MAX = 2000;
+//    private static final int WORKAROUND_MAX = 2000;
+
     private String trimOrNull(String value) {
         return (value == null || value.trim().isEmpty()) ? null : value.trim();
     }
@@ -72,7 +79,7 @@ public class ProblemAdd extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         List<Users> assignees = userService.getAllUser();
-        List<Tickets> Ticket = ticketService.getAllTickets();
+        List<Tickets> Ticket = ticketService.getIncidentsNotInProblem();
         request.setAttribute("Ticket", Ticket);
         request.setAttribute("assignees", assignees);
         request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
@@ -111,14 +118,13 @@ public class ProblemAdd extends HttpServlet {
             }
         }
 
-        // Validate bắt buộc cho Title (NOT NULL trên DB)
         if (Title == null) {
             request.setAttribute("error", "Title is required.");
             request.setAttribute("assignees", userService.getAllUser());
             request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
             return;
         }
-
+        
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
         int createdBy = (userId != null) ? userId : 1;
@@ -138,14 +144,40 @@ public class ProblemAdd extends HttpServlet {
         );
 
         if (success) {
+            
+            List<Integer> relatedTickets = new ArrayList<>();
+            String[] ticketArray = request.getParameterValues("ticketIds");
+            if(ticketArray != null)
+            {
+                for (String RLTicket : ticketArray) {
+                    if(RLTicket != null && !RLTicket.trim().isEmpty())
+                    {
+                        try{
+                            relatedTickets.add(Integer.parseInt(RLTicket.trim()));
+                        }
+                        catch(NumberFormatException ex)
+                        {
+                        }
+                    }
+                }
+            }
+            
             int newProblemId = problemService.getLatestProblemId();
             if (newProblemId > 0) {
+                    // Link ticket đã chọn vào problem
+                if (!relatedTickets.isEmpty()) {
+                    problemService.linkProblemTicket(newProblemId, relatedTickets);
+                    // hoặc: problemService.addProblemTickets(newProblemId, relatedTickets);
+                }
                 String message = "New problem: " + Title + " (Status: " + defaultStatus + ")";
-
+                String notificationTitle = "New problem: " + Title;
+                String type = "Problem";
                 // Gửi notification cho người được assign (nếu có)
                 if (assignedTo > 0) {
-                    notificationDao.addNotification(assignedTo, message, null, false);
+                    notificationDao.addNotification(assignedTo, message, null, false, notificationTitle, type);
                 }
+                
+                
             }
             response.sendRedirect("ProblemList?success=Problem added successfully!");
         } else {

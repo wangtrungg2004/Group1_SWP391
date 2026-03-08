@@ -100,6 +100,7 @@
                                     </div>
 
                                     <div class="card-body">
+                                        <form method="post" action="ProblemAdd" id="addProblemForm">
                                         <div class="row no-gutters">
                                             <!-- Left: Add Problem form -->
                                             <div class="col-md-4 col-lg-4 pr-lg-3">
@@ -112,9 +113,6 @@
                                                 <c:if test="${not empty success}">
                                                     <div class="alert alert-success">${success}</div>
                                                 </c:if>
-
-                                                <!-- FORM ADD -->
-                                                <form method="post" action="ProblemAdd" id="addProblemForm">
 
                                                     <!-- Ticket Number -->
                                                     <div class="form-group">
@@ -144,7 +142,7 @@
                                                             <option value="">-- Select assignee --</option>
                                                             <c:forEach items="${assignees}" var="u">
                                                                 <%-- Nếu muốn lọc theo role, ví dụ chỉ IT Support: --%>
-                                                                 <c:if test="${u.role == 'IT Support'}"> 
+                                                                 <c:if test="${u.role == 'IT Support' or u.role == 'Manager'}"> 
                                                                     <option value="${u.id}">
                                                                         ${u.fullName} (${u.username})
                                                                     </option>
@@ -184,7 +182,6 @@
                                                         </a>
                                                     </div>
 
-                                                </form>
                                             </div>
 
                                             <!-- Right: Related Tickets list -->
@@ -205,6 +202,7 @@
                                                                             <th>No.</th>
                                                                             <th>Title</th>
                                                                             <th>Status</th>
+                                                                            <th>Link Ticket</th>
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>
@@ -215,6 +213,9 @@
                                                                                 <td>
                                                                                     <span class="badge badge-info">${t.status}</span>
                                                                                 </td>
+                                                                                <td>
+                                                                                    <input type="checkbox" name="ticketIds" value="${t.id}" id="ticket_${t.id}">
+                                                                                </td>
                                                                             </tr>
                                                                         </c:forEach>
                                                                     </tbody>
@@ -224,7 +225,9 @@
                                                     </div>
                                                 </div>
                                             </div>
+
                                         </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>

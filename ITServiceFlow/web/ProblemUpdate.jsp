@@ -124,6 +124,14 @@
                                 </div>
                             </div>
                             <!-- [ breadcrumb ] end -->
+                            <c:if test="${param.error == 'cannot_edit'}">
+                                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                    <strong>Thông báo:</strong> Không thể chỉnh sửa. Problem đang chờ duyệt hoặc đã được xử lý.
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            </c:if>
                             <!-- [ Main Content ] start -->
                             <div class="row">
                                 <div class="col-sm-12">
@@ -165,10 +173,10 @@
                                                     </div>
                                                 </c:when>
                                                 <c:otherwise>
+                                                    <form method="post" action="ProblemUpdate" id="updateProblemForm">
                                                     <div class="row">
                                                         <!-- Cột trái: Form update -->
                                                         <div class="col-md-6 col-lg-6 pr-lg-3" style="min-width: 0;">
-                                                    <form method="post" action="ProblemUpdate" id="updateProblemForm">
                                                         <!-- ID bắt buộc -->
                                                         <input type="hidden" name="Id" value="${problem.id}">
 
@@ -314,9 +322,9 @@
                                                                 <i class="feather icon-list"></i> Back to List
                                                             </a>
                                                         </div>
-                                                    </form>
                                                         </div>
                                                         <!-- Cột phải: Related Tickets -->
+                                                        <!-- Cột phải: Related Tickets - chọn ticket để link -->
                                                         <div class="col-md-6 col-lg-6 pl-lg-0" style="min-width:0;">
                                                             <div class="card h-100">
                                                                 <div class="card-header">
@@ -324,53 +332,45 @@
                                                                         <i class="feather icon-link"></i> Related Tickets
                                                                     </h5>
                                                                 </div>
-                                                                <div class="card-body p-2">
-                                                            <c:choose>
-                                                                <c:when test="${empty relatedTickets}">
-                                                                    <div class="alert alert-info mb-0">
-                                                                        <i class="feather icon-info"></i>
-                                                                        No related tickets found for this problem.
-                                                                    </div>
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    <div class="table-responsive">
-                                                                        <table class="table table-hover table-sm mb-0">
-                                                                            <thead class="thead-light">
-                                                                                <tr>
-                                                                                    <th>Ticket</th>
-                                                                                    <th>Type</th>
-                                                                                    <!--<th>Status</th>-->
-                                                                                    <th class="text-center">Action</th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody>
-                                                                                <c:forEach items="${relatedTickets}" var="ticket">
+                                                                <div class="card-body p-2" style="max-height: 400px; overflow-y: auto;">
+                                                                    <c:if test="${empty tickets}">
+                                                                        <div class="text-muted"><i>No tickets available</i></div>
+                                                                    </c:if>
+                                                                    <c:if test="${not empty tickets}">
+                                                                        <div class="table-responsive">
+                                                                            <table class="table table-hover table-sm mb-0">
+                                                                                <thead class="thead-light">
                                                                                     <tr>
-                                                                                        <td style="max-width:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                                                                                            <strong>${ticket.ticketNumber}</strong><br/>
-                                                                                            <small class="text-muted">${ticket.title}</small>
-                                                                                        </td>
-                                                                                        <td>
-                                                                                            <span class="badge badge-secondary">${ticket.ticketType}</span>
-                                                                                        </td>
-<!--                                                                                        <td>
-                                                                                            <span class="badge badge-info">${ticket.status}</span>
-                                                                                        </td>-->
-                                                                                        <td class="text-center">
-                                                                                            <a href="TicketDetail?Id=${ticket.id}" class="btn btn-sm btn-primary">
-                                                                                                <i class="feather icon-eye"></i>
-                                                                                            </a>
-                                                                                        </td>
+                                                                                        <th>No.</th>
+                                                                                        <th>Title</th>
+                                                                                        <th>Link</th>
                                                                                     </tr>
-                                                                                </c:forEach>
-                                                                            </tbody>
-                                                                        </table>
-                                                                    </div>
-                                                                </c:otherwise>
-                                                            </c:choose>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    <c:forEach items="${tickets}" var="t">
+                                                                                        <tr>
+                                                                                            <td>${t.ticketNumber}</td>
+                                                                                            <td>${t.title}</td>
+                                                                                            <td>
+                                                                                                <c:set var="isRelated" value="false"/>
+                                                                                                <c:forEach items="${relatedTickets}" var="rt">
+                                                                                                    <c:if test="${rt.id eq t.id}">
+                                                                                                        <c:set var="isRelated" value="true"/>
+                                                                                                    </c:if>
+                                                                                                </c:forEach>
+                                                                                                <input type="checkbox" name="ticketIds" value="${t.id}"
+                                                                                                       id="ticket_${t.id}" ${isRelated ? 'checked' : ''}>
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                    </c:forEach>
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                    </c:if>
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                    </form>
                                                     </div>
                                                 </c:otherwise>
                                             </c:choose>

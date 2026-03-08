@@ -44,4 +44,9 @@ public class TicketService {
         }
         return false;
     }
+    
+    public List<Tickets> getIncidentsNotInProblem()
+    {
+        return ticketDao.getIncidentsNotInProblem();
+    }
 }

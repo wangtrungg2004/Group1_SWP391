@@ -5,12 +5,18 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
 <%@ page import="dao.NotificationDao" %>
 <%@ page import="model.Notifications" %>
 <%@ page import="java.util.List" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
+<%
+    if (request.getAttribute("notifications") == null) {
+        NotificationDao notificationDao = new NotificationDao();
+        List<Notifications> notifications = notificationDao.getAllNotifications();
+        request.setAttribute("notifications", notifications);
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -122,15 +128,12 @@
                                 <div class="col-sm-12">
                                     <div class="card">
                                         <div class="card-header d-flex justify-content-between align-items-center">
-                                            <h5 class="m-0">Problem List</h5>
-                                            <a href="ProblemAdd" class="btn btn-primary">
-                                                <i class="feather icon-plus"></i> Add New Problem
-                                            </a>
+                                            <h5 class="m-0">Problem Pending List</h5>
                                         </div>
                                         <div class="card-body table-border-style">
                                         <c:if test="${empty problem}">
                                             <div class="alert alert-warning">
-                                             Problem list is empty
+                                             Problem Pending list is empty
                                             </div>
                                         </c:if>
                                         <form action="ProblemList" method="get" class="mb-3">
@@ -151,8 +154,8 @@
                                                     <label class="mb-1 small text-muted">Status</label>
                                                     <select name="filterStatus" class="form-control">
                                                         <option value="">-- All --</option>
-                                                        <option value="APPROVED" ${filterStatus == 'NEW' ? 'selected' : ''}>NEW</option>
-                                                        <option value="REJECTED" ${filterStatus == 'UNDER_INVESTIGATION' ? 'selected' : ''}>UNDER_INVESTIGATION</option>
+                                                        <option value="NEW" ${filterStatus == 'NEW' ? 'selected' : ''}>NEW</option>
+                                                        <option value="UNDER_INVESTIGATION" ${filterStatus == 'UNDER_INVESTIGATION' ? 'selected' : ''}>UNDER_INVESTIGATION</option>
                                                         <!--<option value="RESOLVED" ${filterStatus == 'RESOLVED' ? 'selected' : ''}>RESOLVED</option>-->
                                                     </select>
                                                 </div>
@@ -213,20 +216,6 @@
                                                                            href="ProblemDetail?Id=${p.id}">
                                                                             Detail
                                                                         </a>
-                                                                        <a class="btn btn-sm btn-primary"
-                                                                           href="ProblemUpdate?Id=${p.id}">
-                                                                            Update
-                                                                        </a>
-                                                                           <c:if test="${(role eq 'Manager' or role eq 'IT Support') and (p.status eq 'NEW')}">
-                                                                               <form action="ProblemList" method="post"
-                                                                                        onsubmit="return confirm('Delete this Problem?');"
-                                                                                        style="display:inline;">
-                                                                                      <input type="hidden" name="Id" value="${p.id}">
-                                                                                      <button type="submit" class="btn btn-sm btn-danger">
-                                                                                          Delete
-                                                                                      </button>
-                                                                                  </form>
-                                                                           </c:if>
                                                                     </td>
                                                                 </tr>
                                                             </c:forEach>
@@ -235,23 +224,24 @@
                                                 </tbody>
                                             </table>
                                             <%-- Pagination --%>
-                                                <c:if test="${totalPages != null && totalPages > 1}">
-                                                    <nav aria-label="Page navigation" class="mt-3">
-                                                        <ul class="pagination justify-content-center flex-wrap">
-                                                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                                                <a class="page-link" href="ProblemList?page=${currentPage - 1}<c:if test='${not empty filterKeyword}'>&keyword=${filterKeyword}</c:if>">Previous</a>
-                                                            </li>
-                                                            <c:forEach begin="1" end="${totalPages}" var="i">
-                                                                <li class="page-item ${i == currentPage ? 'active' : ''}">
-                                                                    <a class="page-link" href="ProblemList?page=${i}<c:if test='${not empty filterKeyword}'>&keyword=${filterKeyword}</c:if>">${i}</a>
-                                                                </li>
-                                                            </c:forEach>
-                                                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                                                <a class="page-link" href="ProblemList?page=${currentPage + 1}<c:if test='${not empty filterKeyword}'>&keyword=${filterKeyword}</c:if>">Next</a>
-                                                            </li>
-                                                        </ul>
-                                                    </nav>
-                                                </c:if>
+                                                <c:choose>
+                                                    <c:when test="${problem == null || problem.size() == 0}">
+                                                        <div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
+                                                            <h2>Not found</h2>
+                                                        </div>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <nav aria-label="Page navigation example" class="d-flex justify-content-center">
+                                                            <ul class="pagination">
+                                                                <li class="page-item"><a class="page-link" href="home?page=${page-1}">Previous</a></li>
+                                                                <c:forEach begin="1" end="${totalPage}" var="i">
+                                                                    <li class="page-item ${i == page ? 'active' : ''}"><a class="page-link" href="HomeController?page=${i}">${i}</a></li>
+                                                                </c:forEach>
+                                                                <li class="page-item"><a class="page-link" href="HomeController?page=${page+1}">Next</a></li>
+                                                            </ul>
+                                                        </nav>
+                                                    </c:otherwise>
+                                                </c:choose>
                                         </div>
                                     </div>
 
