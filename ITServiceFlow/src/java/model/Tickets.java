@@ -14,7 +14,7 @@ public class Tickets {
     private Integer urgency;
     private Integer priorityId;
     private Integer serviceCatalogId;
-    private boolean requiresApproval;
+    private Boolean requiresApproval;
     private Integer approvedBy;
     private Date approvedAt;
     private String status;
@@ -26,18 +26,20 @@ public class Tickets {
     private Date createdAt;
     private Date updatedAt;
     private Integer currentLevel;
-    private String categoryName;     
-    private String locationName;     
-    private Integer priorityLevel;
+    private String categoryName;
+    private String locationName;
+    private String priorityLevel;
+    private String assigneeName;
+    private String serviceName;
 
     public Tickets() {
     }
 
     public Tickets(int id, String ticketNumber, String ticketType, String title, String description,
-                   int categoryId, int locationId, Integer impact, Integer urgency, Integer priorityId,
-                   Integer serviceCatalogId, boolean requiresApproval, Integer approvedBy, Date approvedAt,
-                   String status, int createdBy, Integer assignedTo, Integer parentTicketId,
-                   Date resolvedAt, Date closedAt, Date createdAt, Date updatedAt, Integer currentLevel) {
+            int categoryId, int locationId, Integer impact, Integer urgency, Integer priorityId,
+            Integer serviceCatalogId, Boolean requiresApproval, Integer approvedBy, Date approvedAt,
+            String status, int createdBy, Integer assignedTo, Integer parentTicketId,
+            Date resolvedAt, Date closedAt, Date createdAt, Date updatedAt, Integer currentLevel) {
         this.id = id;
         this.ticketNumber = ticketNumber;
         this.ticketType = ticketType;
@@ -151,12 +153,17 @@ public class Tickets {
         this.serviceCatalogId = serviceCatalogId;
     }
 
-    public boolean isRequiresApproval() {
+    public Boolean isRequiresApproval() {
         return requiresApproval;
     }
 
-    public void setRequiresApproval(boolean requiresApproval) {
+    public void setRequiresApproval(Boolean requiresApproval) {
         this.requiresApproval = requiresApproval;
+    }
+
+    // Alias getter to match DAO usage
+    public Boolean getRequiresApproval() {
+        return requiresApproval;
     }
 
     public Integer getApprovedBy() {
@@ -263,12 +270,28 @@ public class Tickets {
         this.locationName = locationName;
     }
 
-    public Integer getPriorityLevel() {
+    public String getPriorityLevel() {
         return priorityLevel;
     }
 
-    public void setPriorityLevel(Integer priorityLevel) {
+    public void setPriorityLevel(String priorityLevel) {
         this.priorityLevel = priorityLevel;
     }
-    
+
+    public String getAssigneeName() {
+        return assigneeName;
+    }
+
+    public void setAssigneeName(String assigneeName) {
+        this.assigneeName = assigneeName;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
 }

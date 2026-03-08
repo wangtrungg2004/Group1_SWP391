@@ -3,7 +3,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package model;
+
 import java.util.Date;
+
 /**
  *
  * @author DELL
@@ -16,13 +18,16 @@ public class Problems {
     private String RootCause;
     private String Workaround;
     private String Status;
+    private String RejectedReason;
     private int CreatedBy;
     private String CreatedByName;
     private int AssignedTo;
     private String AssignedToName;
     private Date CreatedAt;
 
-    public Problems(int Id, String TicketNumber, String Title, String Description, String RootCause, String Workaround, String Status, int CreatedBy, String CreatedByName, int AssignedTo, String AssignedToName, Date CreatedAt) {
+    public Problems(int Id, String TicketNumber, String Title, String Description, String RootCause, String Workaround,
+            String Status, String RejectedReason, int CreatedBy, String CreatedByName, int AssignedTo,
+            String AssignedToName, Date CreatedAt) {
         this.Id = Id;
         this.TicketNumber = TicketNumber;
         this.Title = Title;
@@ -30,6 +35,7 @@ public class Problems {
         this.RootCause = RootCause;
         this.Workaround = Workaround;
         this.Status = Status;
+        this.RejectedReason = RejectedReason;
         this.CreatedBy = CreatedBy;
         this.CreatedByName = CreatedByName;
         this.AssignedTo = AssignedTo;
@@ -47,7 +53,7 @@ public class Problems {
     public void setAssignedToName(String AssignedToName) {
         this.AssignedToName = AssignedToName;
     }
-    
+
     public int getAssignedTo() {
         return AssignedTo;
     }
@@ -110,6 +116,14 @@ public class Problems {
 
     public void setStatus(String Status) {
         this.Status = Status;
+    }
+
+    public String getRejectedReason() {
+        return RejectedReason;
+    }
+
+    public void setRejectedReason(String RejectedReason) {
+        this.RejectedReason = RejectedReason;
     }
 
     public int getCreatedBy() {
