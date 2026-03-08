@@ -4,7 +4,7 @@
  */
 package controller.Problems;
 
-import dao.TicketDao;
+import dao.TicketDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -62,7 +62,7 @@ public class ProblemUpdate extends HttpServlet {
      */
     ProblemService problemService = new ProblemService();
     UserService userService = new UserService();
-    TicketDao ticketService = new TicketDao();
+    TicketDAO ticketService = new TicketDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

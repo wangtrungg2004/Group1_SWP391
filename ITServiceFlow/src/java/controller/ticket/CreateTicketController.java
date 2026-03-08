@@ -1,6 +1,6 @@
 package controller.ticket;
 
-import dao.TicketDao;
+import dao.TicketDAO;
 import model.Tickets;
 import model.Users;
 import java.io.IOException;
@@ -72,7 +72,7 @@ public class CreateTicketController extends HttpServlet {
             t.setRequiresApproval(false); 
         }
 
-        TicketDao dao = new TicketDao();
+        TicketDAO dao = new TicketDAO();
         boolean isCreated = dao.createTicket(t);
 
         if (isCreated) {

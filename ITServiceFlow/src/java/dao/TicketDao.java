@@ -6,7 +6,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TicketDao extends DbContext {
+public class TicketDAO extends DbContext {
 
     // 1. Unified Create Ticket (Cho cả Incident và Service Request)
     public boolean createTicket(Tickets t) {
@@ -282,22 +282,5 @@ public class TicketDao extends DbContext {
     }
     
     
-    public static void main(String[] args) {
-
-        TicketDao dao = new TicketDao();
-
-        List<Tickets> list = dao.getIncidentsNotInProblem();
-
-        System.out.println("Danh sach incident chua gan vao problem:");
-
-        for (Tickets t : list) {
-            System.out.println(
-                t.getId() + " | " +
-                t.getTicketNumber() + " | " +
-                t.getTitle() + " | " +
-                t.getStatus()
-            );
-        }
-
-    }
+    
 }
