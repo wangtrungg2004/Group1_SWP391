@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import model.Notifications;
 import model.Problems;
+import model.KnowErrors;
+import service.KnowErrorService;
 import service.ProblemService;
 import service.NotificationService;
 /**
@@ -61,6 +63,7 @@ public class SubmitApproval extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     ProblemService problemService = new ProblemService();
+    KnowErrorService knownErrorService = new KnowErrorService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -102,6 +105,21 @@ public class SubmitApproval extends HttpServlet {
                 pro.setStatus("REJECTED");
                 pro.setRejectedReason(rejectedReason);
                 problemService.updateProblem(pro);
+            }
+        }
+        if(status.equals("APPROVED"))
+        {
+//            problemService.updateStatusProblem(id, status);
+            
+            Problems pro = problemService.getProblemById(id);
+            
+            if(pro != null)
+            {
+                KnowErrors kn = knownErrorService.findKnowErrorByProblemId(id);
+                if(kn == null)
+                {
+                    knownErrorService.addKnowError(pro.getId(), pro.getTitle(), pro.getWorkaround());
+                }
             }
         }
         boolean pro = problemService.updateStatusProblem(id, status);

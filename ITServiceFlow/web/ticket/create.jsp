@@ -62,7 +62,7 @@
                                                 <div class="alert alert-danger">${errorMessage}</div>
                                             </c:if>
 
-                                            <form action="CreateTicket" method="POST" id="ticketForm">
+                                            <form action="ticket/create" method="POST" id="ticketForm" enctype="multipart/form-data">
                                                 
                                                 <div class="form-group mb-3">
                                                     <label class="font-weight-bold">Bạn đang cần gì?</label>
@@ -80,6 +80,15 @@
                                                 <div class="form-group mb-3">
                                                     <label class="font-weight-bold">Mô tả chi tiết</label>
                                                     <textarea name="description" class="form-control" rows="5" placeholder="Vui lòng cung cấp càng nhiều chi tiết càng tốt..." required></textarea>
+                                                </div>
+
+                                                <div class="form-group mb-3">
+                                                    <label class="font-weight-bold">Đính kèm (tối đa 15MB/file)</label>
+                                                    <input type="file" name="attachments" class="form-control-file" multiple>
+                                                    <small class="form-text text-muted">Hỗ trợ: png, jpg, pdf, doc, docx, txt</small>
+                                                    <c:if test="${not empty uploadWarning}">
+                                                        <div class="text-warning mt-1">${uploadWarning}</div>
+                                                    </c:if>
                                                 </div>
 
                                                 <div id="incidentSection">

@@ -138,8 +138,9 @@ public class ITProblemListController extends HttpServlet {
 
             session.setAttribute("activeTimeLogId_" + id, timeLogId);
 
-            String fromDetail = request.getParameter("fromDetail");
+            
 
+            String fromDetail = request.getParameter("fromDetail");
             if (fromDetail != null) {
                 response.sendRedirect("ProblemDetail?Id=" + id);
             } else {

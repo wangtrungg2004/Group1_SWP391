@@ -1,251 +1,297 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
 import java.util.Date;
 
-/**
- *
- * @author DELL
- */
 public class Tickets {
-    private int Id;
-    private String TicketNumber;
-    private String TicketType;
-    private String Title;
-    private String Description;
-    private int CategoryId;
-    private int LocationId;
-    private Integer Impact;
-    private Integer Urgency;
-    private Integer PriorityId;
-    private Integer ServiceCatalogId;
-    private Boolean RequiresApproval;
-    private Integer ApprovedBy;
-    private Date ApprovedAt;
-    private String Status;
-    private int CreatedBy;
-    private Integer AssignedTo;
-    private Integer ParentTicketId;
-    private Date ResolvedAt;
-    private Date ClosedAt;
-    private Date CreatedAt;
-    private Date UpdatedAt;
-    private Integer CurrentLevel;
+    private int id;
+    private String ticketNumber;
+    private String ticketType;
+    private String title;
+    private String description;
+    private int categoryId;
+    private int locationId;
+    private Integer impact;
+    private Integer urgency;
+    private Integer priorityId;
+    private Integer serviceCatalogId;
+    private Boolean requiresApproval;
+    private Integer approvedBy;
+    private Date approvedAt;
+    private String status;
+    private int createdBy;
+    private Integer assignedTo;
+    private Integer parentTicketId;
+    private Date resolvedAt;
+    private Date closedAt;
+    private Date createdAt;
+    private Date updatedAt;
+    private Integer currentLevel;
+    private String categoryName;
+    private String locationName;
+    private String priorityLevel;
+    private String assigneeName;
+    private String serviceName;
 
     public Tickets() {
     }
 
-    public Tickets(int Id, String TicketNumber, String TicketType, String Title, String Description, int CategoryId, int LocationId, Integer Impact, Integer Urgency, Integer PriorityId, Integer ServiceCatalogId, Boolean RequiresApproval, Integer ApprovedBy, Date ApprovedAt, String Status, int CreatedBy, Integer AssignedTo, Integer ParentTicketId, Date ResolvedAt, Date ClosedAt, Date CreatedAt, Date UpdatedAt, Integer CurrentLevel) {
-        this.Id = Id;
-        this.TicketNumber = TicketNumber;
-        this.TicketType = TicketType;
-        this.Title = Title;
-        this.Description = Description;
-        this.CategoryId = CategoryId;
-        this.LocationId = LocationId;
-        this.Impact = Impact;
-        this.Urgency = Urgency;
-        this.PriorityId = PriorityId;
-        this.ServiceCatalogId = ServiceCatalogId;
-        this.RequiresApproval = RequiresApproval;
-        this.ApprovedBy = ApprovedBy;
-        this.ApprovedAt = ApprovedAt;
-        this.Status = Status;
-        this.CreatedBy = CreatedBy;
-        this.AssignedTo = AssignedTo;
-        this.ParentTicketId = ParentTicketId;
-        this.ResolvedAt = ResolvedAt;
-        this.ClosedAt = ClosedAt;
-        this.CreatedAt = CreatedAt;
-        this.UpdatedAt = UpdatedAt;
-        this.CurrentLevel = CurrentLevel;
+    public Tickets(int id, String ticketNumber, String ticketType, String title, String description,
+            int categoryId, int locationId, Integer impact, Integer urgency, Integer priorityId,
+            Integer serviceCatalogId, Boolean requiresApproval, Integer approvedBy, Date approvedAt,
+            String status, int createdBy, Integer assignedTo, Integer parentTicketId,
+            Date resolvedAt, Date closedAt, Date createdAt, Date updatedAt, Integer currentLevel) {
+        this.id = id;
+        this.ticketNumber = ticketNumber;
+        this.ticketType = ticketType;
+        this.title = title;
+        this.description = description;
+        this.categoryId = categoryId;
+        this.locationId = locationId;
+        this.impact = impact;
+        this.urgency = urgency;
+        this.priorityId = priorityId;
+        this.serviceCatalogId = serviceCatalogId;
+        this.requiresApproval = requiresApproval;
+        this.approvedBy = approvedBy;
+        this.approvedAt = approvedAt;
+        this.status = status;
+        this.createdBy = createdBy;
+        this.assignedTo = assignedTo;
+        this.parentTicketId = parentTicketId;
+        this.resolvedAt = resolvedAt;
+        this.closedAt = closedAt;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.currentLevel = currentLevel;
     }
 
     public int getId() {
-        return Id;
+        return id;
     }
 
-    public void setId(int Id) {
-        this.Id = Id;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTicketNumber() {
-        return TicketNumber;
+        return ticketNumber;
     }
 
-    public void setTicketNumber(String TicketNumber) {
-        this.TicketNumber = TicketNumber;
+    public void setTicketNumber(String ticketNumber) {
+        this.ticketNumber = ticketNumber;
     }
 
     public String getTicketType() {
-        return TicketType;
+        return ticketType;
     }
 
-    public void setTicketType(String TicketType) {
-        this.TicketType = TicketType;
+    public void setTicketType(String ticketType) {
+        this.ticketType = ticketType;
     }
 
     public String getTitle() {
-        return Title;
+        return title;
     }
 
-    public void setTitle(String Title) {
-        this.Title = Title;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getDescription() {
-        return Description;
+        return description;
     }
 
-    public void setDescription(String Description) {
-        this.Description = Description;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public int getCategoryId() {
-        return CategoryId;
+        return categoryId;
     }
 
-    public void setCategoryId(int CategoryId) {
-        this.CategoryId = CategoryId;
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
     }
 
     public int getLocationId() {
-        return LocationId;
+        return locationId;
     }
 
-    public void setLocationId(int LocationId) {
-        this.LocationId = LocationId;
+    public void setLocationId(int locationId) {
+        this.locationId = locationId;
     }
 
     public Integer getImpact() {
-        return Impact;
+        return impact;
     }
 
-    public void setImpact(Integer Impact) {
-        this.Impact = Impact;
+    public void setImpact(Integer impact) {
+        this.impact = impact;
     }
 
     public Integer getUrgency() {
-        return Urgency;
+        return urgency;
     }
 
-    public void setUrgency(Integer Urgency) {
-        this.Urgency = Urgency;
+    public void setUrgency(Integer urgency) {
+        this.urgency = urgency;
     }
 
     public Integer getPriorityId() {
-        return PriorityId;
+        return priorityId;
     }
 
-    public void setPriorityId(Integer PriorityId) {
-        this.PriorityId = PriorityId;
+    public void setPriorityId(Integer priorityId) {
+        this.priorityId = priorityId;
     }
 
     public Integer getServiceCatalogId() {
-        return ServiceCatalogId;
+        return serviceCatalogId;
     }
 
-    public void setServiceCatalogId(Integer ServiceCatalogId) {
-        this.ServiceCatalogId = ServiceCatalogId;
+    public void setServiceCatalogId(Integer serviceCatalogId) {
+        this.serviceCatalogId = serviceCatalogId;
     }
 
+    public Boolean isRequiresApproval() {
+        return requiresApproval;
+    }
+
+    public void setRequiresApproval(Boolean requiresApproval) {
+        this.requiresApproval = requiresApproval;
+    }
+
+    // Alias getter to match DAO usage
     public Boolean getRequiresApproval() {
-        return RequiresApproval;
-    }
-
-    public void setRequiresApproval(Boolean RequiresApproval) {
-        this.RequiresApproval = RequiresApproval;
+        return requiresApproval;
     }
 
     public Integer getApprovedBy() {
-        return ApprovedBy;
+        return approvedBy;
     }
 
-    public void setApprovedBy(Integer ApprovedBy) {
-        this.ApprovedBy = ApprovedBy;
+    public void setApprovedBy(Integer approvedBy) {
+        this.approvedBy = approvedBy;
     }
 
     public Date getApprovedAt() {
-        return ApprovedAt;
+        return approvedAt;
     }
 
-    public void setApprovedAt(Date ApprovedAt) {
-        this.ApprovedAt = ApprovedAt;
+    public void setApprovedAt(Date approvedAt) {
+        this.approvedAt = approvedAt;
     }
 
     public String getStatus() {
-        return Status;
+        return status;
     }
 
-    public void setStatus(String Status) {
-        this.Status = Status;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public int getCreatedBy() {
-        return CreatedBy;
+        return createdBy;
     }
 
-    public void setCreatedBy(int CreatedBy) {
-        this.CreatedBy = CreatedBy;
+    public void setCreatedBy(int createdBy) {
+        this.createdBy = createdBy;
     }
 
     public Integer getAssignedTo() {
-        return AssignedTo;
+        return assignedTo;
     }
 
-    public void setAssignedTo(Integer AssignedTo) {
-        this.AssignedTo = AssignedTo;
+    public void setAssignedTo(Integer assignedTo) {
+        this.assignedTo = assignedTo;
     }
 
     public Integer getParentTicketId() {
-        return ParentTicketId;
+        return parentTicketId;
     }
 
-    public void setParentTicketId(Integer ParentTicketId) {
-        this.ParentTicketId = ParentTicketId;
+    public void setParentTicketId(Integer parentTicketId) {
+        this.parentTicketId = parentTicketId;
     }
 
     public Date getResolvedAt() {
-        return ResolvedAt;
+        return resolvedAt;
     }
 
-    public void setResolvedAt(Date ResolvedAt) {
-        this.ResolvedAt = ResolvedAt;
+    public void setResolvedAt(Date resolvedAt) {
+        this.resolvedAt = resolvedAt;
     }
 
     public Date getClosedAt() {
-        return ClosedAt;
+        return closedAt;
     }
 
-    public void setClosedAt(Date ClosedAt) {
-        this.ClosedAt = ClosedAt;
+    public void setClosedAt(Date closedAt) {
+        this.closedAt = closedAt;
     }
 
     public Date getCreatedAt() {
-        return CreatedAt;
+        return createdAt;
     }
 
-    public void setCreatedAt(Date CreatedAt) {
-        this.CreatedAt = CreatedAt;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
     public Date getUpdatedAt() {
-        return UpdatedAt;
+        return updatedAt;
     }
 
-    public void setUpdatedAt(Date UpdatedAt) {
-        this.UpdatedAt = UpdatedAt;
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public Integer getCurrentLevel() {
-        return CurrentLevel;
+        return currentLevel;
     }
 
-    public void setCurrentLevel(Integer CurrentLevel) {
-        this.CurrentLevel = CurrentLevel;
+    public void setCurrentLevel(Integer currentLevel) {
+        this.currentLevel = currentLevel;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
+
+    public String getPriorityLevel() {
+        return priorityLevel;
+    }
+
+    public void setPriorityLevel(String priorityLevel) {
+        this.priorityLevel = priorityLevel;
+    }
+
+    public String getAssigneeName() {
+        return assigneeName;
+    }
+
+    public void setAssigneeName(String assigneeName) {
+        this.assigneeName = assigneeName;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 
 }

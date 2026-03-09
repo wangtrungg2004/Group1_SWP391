@@ -10,31 +10,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Set;
 
 /**
  *
  * @author DELL
  */
-@WebFilter(
-    filterName = "AuthorizationFilter",
-    urlPatterns = {
-        "/AdminDashboard.jsp", "/ManagerDashboard.jsp", "/UserDashboard.jsp", "/ITDashboard.jsp",
-        "/ProblemList", "/ProblemAdd", "/ProblemUpdate", "/ProblemDetail", "/ITProblemListController",
-        "/UserCreate",
-        "/ProblemList.jsp", "/ProblemAdd.jsp", "/ProblemUpdate.jsp", "/ProblemDetail.jsp", "/ITSupportProblemList.jsp",
-        "/UserCreate.jsp",
-        "/admin/*", "/user/*", "/it/*"
-    }
-)
+@WebFilter(filterName = "AuthorizationFilter", urlPatterns = {"/AdminDashboard.jsp", "/UserDashboard.jsp", "/ITDashboard.jsp", "/admin/*", "/user/*", "/it/*"})
 public class AuthorizationFilter implements Filter {
-
-    private static final Set<String> PUBLIC_PATHS = Set.of(
-            "/Login", "/Login.jsp", "/Logout",
-            "/ForgotPassword", "/ForgotPassword.jsp",
-            "/ResetPassword", "/ResetPassword.jsp",
-            "/GoogleLogin"
-    );
     
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -54,7 +36,7 @@ public class AuthorizationFilter implements Filter {
         String path = requestURI.substring(contextPath.length());
         
         // Cho phép truy cập các trang công khai
-        if (PUBLIC_PATHS.contains(path)) {
+        if (path.equals("/Login.jsp") || path.equals("/Login") || path.equals("/Logout")) {
             chain.doFilter(request, response);
             return;
         }
@@ -73,14 +55,20 @@ public class AuthorizationFilter implements Filter {
             return;
         }
         
-        // Admin toàn quyền
-        if ("Admin".equals(role)) {
-            chain.doFilter(request, response);
-            return;
+        // Kiểm tra quyền truy cập theo role
+        boolean hasAccess = false;
+        
+        if (path.contains("AdminDashboard") || path.startsWith("/admin/")) {
+            hasAccess = "Admin".equals(role);
+        } else if (path.contains("UserDashboard") || path.startsWith("/user/")) {
+            // User có thể là Manager hoặc User thông thường
+            hasAccess = "Manager".equals(role) || "User".equals(role);
+        } else if (path.contains("ITDashboard") || path.startsWith("/it/")) {
+            hasAccess = "IT Support".equals(role);
+        } else {
+            // Cho phép truy cập các trang khác nếu đã đăng nhập
+            hasAccess = true;
         }
-
-        // Phân quyền theo role cho các path còn lại
-        boolean hasAccess = hasAccessByRole(role, path);
         
         if (!hasAccess) {
             // Không có quyền truy cập
@@ -94,40 +82,5 @@ public class AuthorizationFilter implements Filter {
     @Override
     public void destroy() {
         // Cleanup
-    }
-
-    private boolean hasAccessByRole(String role, String path) {
-        switch (role) {
-            case "Manager":
-                return path.equals("/ManagerDashboard.jsp")
-                        || path.equals("/UserDashboard.jsp")
-                        || path.equals("/ProblemList")
-                        || path.equals("/ProblemAdd")
-                        || path.equals("/ProblemUpdate")
-                        || path.equals("/ProblemDetail")
-                        || path.equals("/ProblemList.jsp")
-                        || path.equals("/ProblemAdd.jsp")
-                        || path.equals("/ProblemUpdate.jsp")
-                        || path.equals("/ProblemDetail.jsp")
-                        || path.startsWith("/user/");
-            case "User":
-                return path.equals("/UserDashboard.jsp")
-                        || path.equals("/ProblemList")
-                        || path.equals("/ProblemDetail")
-                        || path.equals("/ProblemList.jsp")
-                        || path.equals("/ProblemDetail.jsp")
-                        || path.startsWith("/user/");
-            case "IT Support":
-                return path.equals("/ITDashboard.jsp")
-                        || path.equals("/ITProblemListController")
-                        || path.equals("/ProblemDetail")
-                        || path.equals("/ProblemUpdate")
-                        || path.equals("/ITSupportProblemList.jsp")
-                        || path.equals("/ProblemDetail.jsp")
-                        || path.equals("/ProblemUpdate.jsp")
-                        || path.startsWith("/it/");
-            default:
-                return false;
-        }
     }
 }
