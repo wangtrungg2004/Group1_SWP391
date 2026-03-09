@@ -60,6 +60,35 @@
 
         .btn-action { width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; color: #5e6c84; background: transparent; border: 1px solid transparent; transition: all 0.2s;}
         .btn-action:hover { background: #ebecf0; color: #172b4d; border-color: #dfe1e6; }
+        
+        /* Styling cho phân trang */
+.pagination {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+.page-item .page-link {
+    color: #5e6c84;
+    border: 1px solid #dfe1e6;
+    margin: 0 3px;
+    border-radius: 4px;
+    padding: 6px 12px;
+}
+.page-item.active .page-link {
+    background-color: #0052cc;
+    border-color: #0052cc;
+    color: white;
+}
+.page-item.disabled .page-link {
+    color: #c1c7d0;
+    pointer-events: none;
+    background-color: #fafbfc;
+}
+.page-link:hover {
+    background-color: #ebecf0;
+    color: #172b4d;
+}
+   
     </style>
 </head>
 
@@ -247,6 +276,7 @@
                                                         </c:forEach>
                                                     </tbody>
                                                 </table>
+                                                
                                             </div>
                                         </div>
                                     </div>

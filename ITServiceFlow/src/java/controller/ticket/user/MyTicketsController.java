@@ -8,7 +8,6 @@ package controller.ticket.user;
  *
  * @author Dumb Trung
  */
-
 import dao.TicketDao;
 import model.Tickets;
 import model.Users;
@@ -37,13 +36,29 @@ public class MyTicketsController extends HttpServlet {
             return;
         }
 
+        int page = 1;
+        int pageSize = 10; 
+        
+        String pageStr = request.getParameter("page");
+        if (pageStr != null && !pageStr.isEmpty()) {
+            try {
+                page = Integer.parseInt(pageStr);
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+        
+        int offset = (page - 1) * pageSize;
+
         TicketDao ticketDao = new TicketDao();
-        List<Tickets> myTicketList = ticketDao.getTicketsByCreator(currentUser.getId());
+        
+        List<Tickets> myTicketList = ticketDao.getTicketsByCreator(currentUser.getId(), offset, pageSize);
         
         Map<String, Integer> kpis = ticketDao.getUserTicketKPIs(currentUser.getId());
-        request.setAttribute("kpis", kpis);
         
+        request.setAttribute("kpis", kpis);
         request.setAttribute("myTicketList", myTicketList);
+        request.setAttribute("currentPage", page); 
         
         request.getRequestDispatcher("/ticket/my_tickets.jsp").forward(request, response);
     }

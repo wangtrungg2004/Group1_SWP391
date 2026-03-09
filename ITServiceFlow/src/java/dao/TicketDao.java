@@ -190,45 +190,47 @@ public class TicketDao extends DbContext {
     }
     
     // 3. Lấy danh sách Ticket cho End-User (My Tickets)
-    public List<Tickets> getTicketsByCreator(int userId) {
-        List<Tickets> list = new ArrayList<>();
-        // Dùng LEFT JOIN để lấy luôn tên Priority, Assignee và Category
-        String sql = "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.CreatedAt, t.UpdatedAt, "
-                   + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName "
-                   + "FROM [dbo].[Tickets] t "
-                   + "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id "
-                   + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
-                   + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
-                   + "WHERE t.CreatedBy = ? "
-                   + "ORDER BY t.CreatedAt DESC";
+    public List<Tickets> getTicketsByCreator(int userId, int offset, int limit) {
+    List<Tickets> list = new ArrayList<>();
+    // Dùng LEFT JOIN và thêm cú pháp phân trang của SQL Server
+    String sql = "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.CreatedAt, t.UpdatedAt, "
+               + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName "
+               + "FROM [dbo].[Tickets] t "
+               + "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id "
+               + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
+               + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
+               + "WHERE t.CreatedBy = ? "
+               + "ORDER BY t.CreatedAt DESC "
+               + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"; 
+               
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setInt(1, userId);
+        ps.setInt(2, offset);
+        ps.setInt(3, limit);
+        ResultSet rs = ps.executeQuery();
         
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            Tickets t = new Tickets();
+            t.setId(rs.getInt("Id"));
+            t.setTicketNumber(rs.getString("TicketNumber"));
+            t.setTicketType(rs.getString("TicketType"));
+            t.setTitle(rs.getString("Title"));
+            t.setStatus(rs.getString("Status"));
+            t.setCreatedAt(rs.getTimestamp("CreatedAt"));
+            t.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
             
-            while (rs.next()) {
-                Tickets t = new Tickets();
-                t.setId(rs.getInt("Id"));
-                t.setTicketNumber(rs.getString("TicketNumber"));
-                t.setTicketType(rs.getString("TicketType"));
-                t.setTitle(rs.getString("Title"));
-                t.setStatus(rs.getString("Status"));
-                t.setCreatedAt(rs.getTimestamp("CreatedAt"));
-                t.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
-                
-                // Set các trường hiển thị mới thêm
-                t.setPriorityLevel(rs.getString("PriorityLevel"));
-                t.setAssigneeName(rs.getString("AssigneeName"));
-                t.setCategoryName(rs.getString("CategoryName"));
-                
-                list.add(t);
-            }
-        } catch (Exception e) {
-            System.err.println("Lỗi khi lấy danh sách My Tickets: " + e.getMessage());
-            e.printStackTrace();
+            t.setPriorityLevel(rs.getString("PriorityLevel"));
+            t.setAssigneeName(rs.getString("AssigneeName"));
+            t.setCategoryName(rs.getString("CategoryName"));
+            
+            list.add(t);
         }
-        return list;
+    } catch (Exception e) {
+        System.err.println("Lỗi khi lấy danh sách My Tickets: " + e.getMessage());
+        e.printStackTrace();
     }
+    return list;
+}
     
    // 4. Lấy chi tiết 1 Ticket theo ID - ĐÃ NÂNG CẤP JOIN
     public Tickets getTicketById(int id) {

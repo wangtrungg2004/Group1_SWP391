@@ -22,7 +22,9 @@
 
     // Get the 5 most recent tickets of this User to display on the Dashboard
     TicketDao ticketDao = new TicketDao();
-    List<Tickets> recentTickets = ticketDao.getTicketsByCreator(user.getId());
+    
+    // ĐÃ SỬA: Truyền thêm offset = 0 và limit = 5 để khớp với DAO 3 tham số
+    List<Tickets> recentTickets = ticketDao.getTicketsByCreator(user.getId(), 0, 5);
     request.setAttribute("recentTickets", recentTickets);
 %>
 <!DOCTYPE html>
