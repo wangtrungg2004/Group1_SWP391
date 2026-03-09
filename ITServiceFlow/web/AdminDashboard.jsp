@@ -129,6 +129,12 @@
                                             <li class="nav-item">
                                                     <a href="CIListServlet" class="nav-link"><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">List Configuration Items</span></a>
                                             </li>
+                                            <li class="nav-item">
+                                                    <a href="Long_TicketListServlet" class="nav-link"><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">List Tickets</span></a>
+                                            </li>
+                                            <li class="nav-item">
+                                                    <a href="TicketLinkCIListServlet" class="nav-link"><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">List Tickets Link CI</span></a>
+                                            </li>
 					</c:if>
 					<c:if test="${role == 'Admin' || role == 'Manager'}">
 						<li class="nav-item pcoded-menu-caption">

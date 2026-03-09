@@ -32,45 +32,53 @@ public class TicketLinkCIServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
-        response.setContentType("text/html;charset=UTF-8");
 
         String ticketIdStr = request.getParameter("ticketId");
+        String assetTag = request.getParameter("assetTag");
 
         if (ticketIdStr == null || ticketIdStr.trim().isEmpty()) {
-            request.setAttribute("errorMessage", "Ticket ID is required.");
-            request.getRequestDispatcher("/error.jsp").forward(request, response);
+            response.sendRedirect("Long_TicketListServlet?errorMessage=Ticket+ID+is+required");
             return;
         }
 
         int ticketId;
         try {
             ticketId = Integer.parseInt(ticketIdStr.trim());
-        } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "Invalid Ticket ID format.");
-            request.getRequestDispatcher("/error.jsp").forward(request, response);
+        } catch (NumberFormatException ex) {
+            response.sendRedirect("Long_TicketListServlet?errorMessage=Invalid+Ticket+ID");
+            return;
+        }
+
+        if (assetTag == null || assetTag.trim().isEmpty()) {
+            response.sendRedirect("Long_TicketListServlet?errorMessage=Asset-tag+is+required");
             return;
         }
 
         Tickets ticket = ticketDAO.getTicketById(ticketId);
         if (ticket == null) {
-            request.setAttribute("errorMessage", "Ticket not found with ID: " + ticketId);
-            request.getRequestDispatcher("/error.jsp").forward(request, response);
+            response.sendRedirect("Long_TicketListServlet?errorMessage=Ticket+not+found");
             return;
         }
 
-        List<Assets> linkedCIs = ticketAssetsDAO.getLinkedCIsByTicketId(ticketId);
+        Assets asset = assetsDAO.getAssetByTag(assetTag.trim());
+        if (asset == null) {
+            response.sendRedirect("Long_TicketListServlet?errorMessage=Asset-tag+not+found");
+            return;
+        }
 
-        request.setAttribute("ticket", ticket);
-        request.setAttribute("linkedCIs", linkedCIs);
+        boolean linked = ticketAssetsDAO.addLink(ticketId, asset.getId());
+        if (!linked) {
+            response.sendRedirect("Long_TicketListServlet?errorMessage=Link+failed+or+already+exists");
+            return;
+        }
 
-        request.getRequestDispatcher("/TicketLinkCI.jsp").forward(request, response);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        doGet(request, response);
+        response.sendRedirect("Long_TicketListServlet?successMessage=Linked+ticket+to+asset+successfully");
     }
 }

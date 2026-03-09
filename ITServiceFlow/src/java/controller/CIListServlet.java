@@ -28,37 +28,23 @@ public class CIListServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
-
-        // ── 1. Read & normalize parameters ────────────────────────────────────
+        
         String keywordParam  = request.getParameter("keyword");
         String statusParam   = request.getParameter("status");
-        String ticketIdStr   = request.getParameter("ticketId");
         String pageStr       = request.getParameter("page");
 
         String keyword = (keywordParam == null) ? "" : keywordParam.trim();
 
-        // Status: null / empty / "all" → no status filter in DAO
         String statusForDAO = (statusParam == null
                 || statusParam.trim().isEmpty()
                 || "all".equalsIgnoreCase(statusParam.trim()))
                 ? null
                 : statusParam.trim();
 
-        // Keep "all" as the JSP value when no specific status is selected
         String statusForJSP = (statusForDAO == null) ? "all" : statusForDAO;
 
-        // Optional ticketId (used for CI-to-Ticket linking context)
-        Integer ticketId = null;
-        if (ticketIdStr != null && !ticketIdStr.trim().isEmpty()) {
-            try {
-                ticketId = Integer.parseInt(ticketIdStr.trim());
-            } catch (NumberFormatException ex) {
-                System.err.println("[CIListServlet] Invalid ticketId: " + ticketIdStr);
-            }
-        }
 
         // Page number
         int currentPage = 1;
@@ -71,9 +57,6 @@ public class CIListServlet extends HttpServlet {
         }
         if (currentPage < 1) currentPage = 1;
 
-        // ── 2. Query data from DAO ─────────────────────────────────────────────
-        // filterType is always "all" so searchAssets searches across all fields
-        // (name, type, location, owner, createdAt) simultaneously.
         List<Assets> fullList;
         try {
             boolean hasKeyword     = !keyword.isBlank();
@@ -82,7 +65,6 @@ public class CIListServlet extends HttpServlet {
             if (!hasKeyword && !hasStatusFilter) {
                 fullList = assetsDAO.getAllAssets();
             } else {
-                // Always pass filterType = "all" so the DAO searches all text fields
                 fullList = assetsDAO.searchAssets(keyword, "all", statusForDAO);
             }
         } catch (Exception e) {
@@ -102,17 +84,13 @@ public class CIListServlet extends HttpServlet {
                 ? Collections.emptyList()
                 : fullList.subList(fromIndex, toIndex);
 
-        // ── 4. Set request attributes for JSP ─────────────────────────────────
+        
         request.setAttribute("ciList",      pageList);
         request.setAttribute("keyword",     keyword);
         request.setAttribute("status",      statusForJSP);
         request.setAttribute("totalItems",  totalItems);
         request.setAttribute("currentPage", currentPage);
         request.setAttribute("totalPages",  totalPages);
-        if (ticketId != null) {
-            request.setAttribute("ticketId", ticketId);
-        }
-
         request.getRequestDispatcher("/CIList.jsp").forward(request, response);
     }
 

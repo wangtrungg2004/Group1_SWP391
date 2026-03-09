@@ -33,27 +33,33 @@
             </a>
         </div>
         <div class="navbar-content scroll-div">
-            <ul class="nav pcoded-inner-navbar">
-                <li class="nav-item">
-                    <a href="index.jsp" class="nav-link">
-                        <span class="pcoded-micon"><i class="feather icon-home"></i></span>
-                        <span class="pcoded-mtext">Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="ticket-list.jsp" class="nav-link">
-                        <span class="pcoded-micon"><i class="feather icon-file-text"></i></span>
-                        <span class="pcoded-mtext">Tickets</span>
-                    </a>
-                </li>
-                <li class="nav-item active">
-                    <a href="CIListServlet" class="nav-link">
-                        <span class="pcoded-micon"><i class="feather icon-database"></i></span>
-                        <span class="pcoded-mtext">CMDB / Assets</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
+                    <ul class="nav pcoded-inner-navbar">
+                        <li class="nav-item">
+                            <a href="AdminDashboard.jsp" class="nav-link">
+                                <span class="pcoded-micon"><i class="feather icon-home"></i></span>
+                                <span class="pcoded-mtext">Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item"> 
+                            <a href="TicketLinkCIListServlet" class="nav-link"> 
+                                <span class="pcoded-micon"><i class="feather icon-link"></i></span> 
+                                <span class="pcoded-mtext">Ticket - CI Links</span> 
+                            </a> 
+                        </li> 
+                        <li class="nav-item">
+                            <a href="Long_TicketListServlet" class="nav-link">
+                                <span class="pcoded-micon"><i class="feather icon-file-text"></i></span>
+                                <span class="pcoded-mtext">Tickets</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="CIListServlet" class="nav-link">
+                                <span class="pcoded-micon"><i class="feather icon-file-text"></i></span>
+                                <span class="pcoded-mtext">Assets</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
     </div>
 </nav>
 

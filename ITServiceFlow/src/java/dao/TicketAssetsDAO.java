@@ -5,7 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import model.Assets;
 
 public class TicketAssetsDAO extends DbContext {
@@ -108,6 +110,66 @@ public class TicketAssetsDAO extends DbContext {
             e.printStackTrace();
         }
         return ticketIds;
+    }
+
+    // Lấy danh sách liên kết Ticket - CI, có hỗ trợ tìm kiếm theo keyword
+    public List<Map<String, Object>> getTicketAssetLinks(String keyword) {
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT ta.TicketId, ta.AssetId, "
+                + "t.TicketNumber, t.TicketType, t.Status AS TicketStatus, p.Level AS TicketPriority, "
+                + "a.AssetTag, a.AssetType, l.Name AS LocationName, u.FullName AS OwnerName "
+                + "FROM TicketAssets ta "
+                + "INNER JOIN Tickets t ON ta.TicketId = t.Id "
+                + "INNER JOIN Assets a ON ta.AssetId = a.Id "
+                + "LEFT JOIN Priorities p ON t.PriorityId = p.Id "
+                + "LEFT JOIN Locations l ON a.LocationId = l.Id "
+                + "LEFT JOIN Users u ON a.OwnerId = u.Id "
+                + "WHERE 1=1 "
+        );
+
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        if (hasKeyword) {
+            sql.append(" AND (t.TicketNumber LIKE ? OR t.TicketType LIKE ? OR t.Status LIKE ? OR p.Level LIKE ? OR a.AssetTag LIKE ? OR a.AssetType LIKE ? OR l.Name LIKE ? OR u.FullName LIKE ?) ");
+        }
+
+        sql.append(" ORDER BY t.CreatedAt DESC, a.AssetTag ASC");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            if (hasKeyword) {
+                String term = "%" + keyword.trim() + "%";
+                ps.setString(1, term);
+                ps.setString(2, term);
+                ps.setString(3, term);
+                ps.setString(4, term);
+                ps.setString(5, term);
+                ps.setString(6, term);
+                ps.setString(7, term);
+                ps.setString(8, term);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> row = new HashMap<>();
+                    row.put("ticketId", rs.getInt("TicketId"));
+                    row.put("assetId", rs.getInt("AssetId"));
+                    row.put("ticketNumber", rs.getString("TicketNumber"));
+                    row.put("ticketType", rs.getString("TicketType"));
+                    row.put("ticketStatus", rs.getString("TicketStatus"));
+                    row.put("ticketPriority", rs.getString("TicketPriority"));
+                    row.put("assetTag", rs.getString("AssetTag"));
+                    row.put("assetType", rs.getString("AssetType"));
+                    row.put("locationName", rs.getString("LocationName"));
+                    row.put("ownerName", rs.getString("OwnerName"));
+                    list.add(row);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 
     public void closeConnection() {
