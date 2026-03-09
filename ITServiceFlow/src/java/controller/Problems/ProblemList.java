@@ -4,6 +4,7 @@
  */
 package controller.Problems;
 
+import dao.NotificationDao;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -62,6 +63,7 @@ public class ProblemList extends HttpServlet {
      */
     ProblemService problemService = new ProblemService();
     NotificationService notificationService = new NotificationService();
+    NotificationDao notificationDao = new NotificationDao();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -74,6 +76,15 @@ public class ProblemList extends HttpServlet {
         HttpSession session = request.getSession();
         String role = (String) session.getAttribute("role");
         Integer userId = (Integer) session.getAttribute("userId");
+
+//            if (role == null || userId == null) {
+//                response.sendRedirect("Login.jsp");
+//                return;
+//            }
+//            if (!"Manager".equals(role) && !"Admin".equals(role) && !"IT Support".equals(role)) {
+//                response.sendRedirect("UserDashboard.jsp"); // hoặc Login.jsp / trang 403
+//                return;
+//            }
 
         List<Notifications> notifications = new ArrayList<>();
         if (role != null && userId != null) {
@@ -208,6 +219,10 @@ public class ProblemList extends HttpServlet {
 //                response.sendRedirect("ProblemList?error=cannot_delete_status&id=" + id);
 //                return;
 //            }
+            String problemTitle = pro.getTitle();
+            int assignedTo = pro.getAssignedTo();
+            int createdBy = pro.getCreatedBy();
+
             
             // Thực hiện delete
             boolean deleted = problemService.deleteProblem(id);
@@ -215,6 +230,15 @@ public class ProblemList extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to delete user");
                 return;
             }
+            
+//            String msg = "Problem has been deleted: " + problemTitle;
+//            String notifTitle = "Problem deleted: " + problemTitle;
+//            if (assignedTo > 0) {
+//                notificationDao.addNotification(assignedTo, msg, null, false, notifTitle, "Problem");
+//            }
+//            if (createdBy > 0 && createdBy != assignedTo) {
+//                notificationDao.addNotification(createdBy, msg, null, false, notifTitle, "Problem");
+//            }
             
             // Redirect về danh sách users sau khi delete thành công
             response.sendRedirect("ProblemList");

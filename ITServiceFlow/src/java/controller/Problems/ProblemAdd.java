@@ -125,6 +125,27 @@ public class ProblemAdd extends HttpServlet {
             return;
         }
         
+                // Thu thập ticket đã chọn từ form
+        List<Integer> relatedTickets = new ArrayList<>();
+        String[] ticketArray = request.getParameterValues("ticketIds");
+        if (ticketArray != null) {
+            for (String RLTicket : ticketArray) {
+                if (RLTicket != null && !RLTicket.trim().isEmpty()) {
+                    try {
+                        relatedTickets.add(Integer.parseInt(RLTicket.trim()));
+                    } catch (NumberFormatException ex) { }
+                }
+            }
+        }
+        // Bắt buộc chọn ít nhất 1 ticket
+        if (relatedTickets.isEmpty()) {
+            request.setAttribute("error", "Please select at least one related ticket.");
+            request.setAttribute("assignees", userService.getAllUser());
+            request.setAttribute("Ticket", ticketService.getIncidentsNotInProblem());
+            request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
+            return;
+        }
+        
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
         int createdBy = (userId != null) ? userId : 1;
@@ -144,23 +165,23 @@ public class ProblemAdd extends HttpServlet {
         );
 
         if (success) {
-            
-            List<Integer> relatedTickets = new ArrayList<>();
-            String[] ticketArray = request.getParameterValues("ticketIds");
-            if(ticketArray != null)
-            {
-                for (String RLTicket : ticketArray) {
-                    if(RLTicket != null && !RLTicket.trim().isEmpty())
-                    {
-                        try{
-                            relatedTickets.add(Integer.parseInt(RLTicket.trim()));
-                        }
-                        catch(NumberFormatException ex)
-                        {
-                        }
-                    }
-                }
-            }
+//            
+//            List<Integer> relatedTickets = new ArrayList<>();
+//            String[] ticketArray = request.getParameterValues("ticketIds");
+//            if(ticketArray != null)
+//            {
+//                for (String RLTicket : ticketArray) {
+//                    if(RLTicket != null && !RLTicket.trim().isEmpty())
+//                    {
+//                        try{
+//                            relatedTickets.add(Integer.parseInt(RLTicket.trim()));
+//                        }
+//                        catch(NumberFormatException ex)
+//                        {
+//                        }
+//                    }
+//                }
+//            }
             
             int newProblemId = problemService.getLatestProblemId();
             if (newProblemId > 0) {

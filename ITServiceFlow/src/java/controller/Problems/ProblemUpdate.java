@@ -4,6 +4,7 @@
  */
 package controller.Problems;
 
+import dao.NotificationDao;
 import dao.TicketDao;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -63,7 +64,7 @@ public class ProblemUpdate extends HttpServlet {
     ProblemService problemService = new ProblemService();
     UserService userService = new UserService();
     TicketDao ticketService = new TicketDao();
-
+    NotificationDao notificationDao = new NotificationDao();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -171,6 +172,12 @@ public class ProblemUpdate extends HttpServlet {
             }
             boolean success = problemService.updateProblem(pro);
             if (success) {
+//                 int assignedTo = pro.getAssignedTo();
+//                    if (assignedTo > 0) {
+//                        String msg = "Problem updated: " + pro.getTitle();
+//                        String notifTitle = "Problem updated: " + pro.getTitle();
+//                        notificationDao.addNotification(assignedTo, msg, null, false, notifTitle, "Problem");
+//                    }
                 response.sendRedirect("ProblemDetail?Id=" + id);
             } else {
                 request.setAttribute("error", "Update failed");

@@ -191,6 +191,10 @@
                                                                                 <th>Created At</th>
                                                                                 <td>${knowError.createdAt}</td>
                                                                             </tr>
+<!--                                                                            <tr>
+                                                                                <th>Root Cause</th>
+                                                                                <td>${problems.rootCause}</td>
+                                                                            </tr>-->
                                                                             <tr>
                                                                                 <th>Status</th>
                                                                                 <td><span class="badge badge-info">${knowError.status}</span></td>

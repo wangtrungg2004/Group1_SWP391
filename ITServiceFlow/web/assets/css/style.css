@@ -12212,3 +12212,4 @@ body {
 .badge-status[data-status="APPROVED"]               { background-color: #198754; color: #fff; }
 .badge-status[data-status="Rejected"]               { background-color: #dc3545; color: #fff; }
 .badge-status[data-status="REJECTED"]               { background-color: #dc3545; color: #fff; }
+.badge-status[data-status="Active"]               { background-color: #198754; color: #fff; }

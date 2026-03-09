@@ -79,6 +79,8 @@
     body {
         overflow-x: hidden;
     }
+    
+    .badge-status[data-status="Active"]               { background-color: #198754; color: #fff; }
     </style>
 </head>
 
@@ -105,12 +107,12 @@
                                     <div class="row align-items-center">
                                         <div class="col-md-12">
                                             <div class="page-header-title">
-                                                <h5 class="m-b-10">Form Elements</h5>
+                                                <h5 class="m-b-10">Know Error List</h5>
                                             </div>
                                             <ul class="breadcrumb">
                                                 <li class="breadcrumb-item"><a href="ProblemList"><i class="feather icon-home"></i></a></li>
                                                 <li class="breadcrumb-item"><a href="#!">Know Error List</a></li>
-                                                <li class="breadcrumb-item"><a href="#!">Know Error List</a></li>
+                                                <li class="breadcrumb-item"><a href="KnowErrorList">Know Error List</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -123,10 +125,7 @@
                                 <div class="col-sm-12">
                                     <div class="card">
                                         <div class="card-header d-flex justify-content-between align-items-center">
-                                            <h5 class="m-0">Problem List</h5>
-                                            <a href="ProblemAdd" class="btn btn-primary">
-                                                <i class="feather icon-plus"></i> Add New Problem
-                                            </a>
+                                            <h5 class="m-0">Know Error List</h5>
                                         </div>
                                         <div class="card-body table-border-style">
                                         <c:if test="${empty knowError}">
@@ -178,10 +177,9 @@
                                                     <tr>
                                                         <th>ID</th>
                                                         <th>Problem Id</th>
-                                                        <th>Title</th>
                                                         <th>Status</th>
+                                                        <th>Title</th>
                                                         <th>Created At</th>
-                                                        <th>Work Around</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -198,7 +196,9 @@
                                                             <c:forEach items="${knowError}" var="kn">
                                                                 <tr>
                                                                     <td>${kn.id}</td>
-                                                                    <td>${kn.problemId}</td>
+                                                                    <c:if test="${role eq 'IT Support' and not empty knowError or role eq 'Manager'}">
+                                                                        <td>${kn.problemId}</td>  
+                                                                    </c:if>
                                                                     <td>${kn.title}</td>
                                                                     <td>
                                                                         <span class="badge badge-status" data-status="${kn.status}">

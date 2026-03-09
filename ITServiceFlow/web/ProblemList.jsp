@@ -217,7 +217,7 @@
                                                                            href="ProblemUpdate?Id=${p.id}">
                                                                             Update
                                                                         </a>
-                                                                           <c:if test="${(role eq 'Manager' or role eq 'IT Support') and (p.status eq 'NEW')}">
+                                                                           <c:if test="${(role eq 'Manager' or role eq 'IT Support') and (p.status eq 'NEW' or p.status eq 'APPROVED')}">
                                                                                <form action="ProblemList" method="post"
                                                                                         onsubmit="return confirm('Delete this Problem?');"
                                                                                         style="display:inline;">

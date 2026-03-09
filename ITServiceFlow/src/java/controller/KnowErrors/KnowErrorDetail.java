@@ -13,7 +13,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.KnowErrors;
+import model.Problems;
 import service.KnowErrorService;
+import service.ProblemService;
 
 /**
  *
@@ -59,7 +61,7 @@ public class KnowErrorDetail extends HttpServlet {
      */
     
     KnowErrorService knowErrorService = new KnowErrorService();
-
+    ProblemService problemService = new ProblemService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -75,7 +77,8 @@ public class KnowErrorDetail extends HttpServlet {
             int knId = Integer.parseInt(Id);
             
             KnowErrors knowError = knowErrorService.getKnowErrorById(knId);
-            
+//            Problems problems = problemService.getProblemById(knowError.getProblemId());
+//            request.setAttribute("problems", problems);
             request.setAttribute("knowError", knowError);
             request.getRequestDispatcher("KnowErrorDetail.jsp").forward(request, response);
         }
