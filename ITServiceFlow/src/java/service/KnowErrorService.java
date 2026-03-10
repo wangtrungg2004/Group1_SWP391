@@ -35,4 +35,9 @@ public class KnowErrorService {
     {
         return dao.getKnowErrorById(Id);
     }
+
+    public boolean updateKnowError(int id, String title, String workAround)
+    {
+        return dao.updateKnowError(id, title, workAround);
+    }
 }

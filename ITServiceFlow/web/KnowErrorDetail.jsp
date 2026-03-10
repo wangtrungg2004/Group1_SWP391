@@ -87,10 +87,26 @@
     body {
         overflow-x: hidden;
     }
+    /* Known Error Detail - layout đẹp hơn bảng */
+    .know-error-detail { max-width: 560px; }
+    .know-error-detail .detail-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 0.85rem 0;
+        border-bottom: 1px solid #eee;
+    }
+    .know-error-detail .detail-item:last-child { border-bottom: none; }
+    .know-error-detail .detail-label {
+        font-weight: 600;
+        color: #555;
+        min-width: 130px;
+        flex-shrink: 0;
+    }
+    .know-error-detail .detail-label i { margin-right: 0.35rem; opacity: 0.85; }
+    .know-error-detail .detail-value { color: #222; }
+    .know-error-detail .detail-value--title { font-weight: 600; }
     </style>
 </head>
-
-    </head>
 
     <body class="">
         <!-- [ Pre-loader ] start -->
@@ -115,24 +131,12 @@
                                         <div class="row align-items-center">
                                             <div class="col-md-12">
                                                 <div class="page-header-title">
-                                                    <h5 class="m-b-10">Notification Detail</h5>
+                                                    <h5 class="m-b-10">Known Error Details</h5>
                                                 </div>
                                                 <ul class="breadcrumb">
                                                     <li class="breadcrumb-item"><a href="index.html"><i class="feather icon-home"></i></a></li>
-                                                    <li class="breadcrumb-item">
-                                                        <c:choose>
-                                                            <c:when test="${role eq 'IT Support'}">
-                                                                <a href="ITSupportNotificationList">Notification List</a>
-                                                            </c:when>
-                                                            <c:when test="${role eq 'Manager'}">
-                                                                <a href="NotificationList">Notification List</a>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <a href="${notificationListUrl}">Notification List</a>
-                                                            </c:otherwise>
-                                                        </c:choose>
-                                                    </li>
-                                                    <li class="breadcrumb-item"><a href="#!">Notification Detail</a></li>
+                                                    <li class="breadcrumb-item"><a href="KnowErrorList">Known Error List</a></li>
+                                                    <li class="breadcrumb-item"><a href="#!">Known Error Detail</a></li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -145,9 +149,9 @@
                                 <div class="col-sm-12">
                                     <div class="card">
                                         <div class="card-header">
-                                            <h5>know Error Details</h5>
+                                            <h5>Known Error Details</h5>
                                             <div class="card-header-right d-flex align-items-center gap-2">
-                                                <a href="${notificationListUrl}" class="btn btn-sm btn-secondary">
+                                                <a href="KnowErrorList" class="btn btn-sm btn-secondary">
                                                     <i class="feather icon-arrow-left"></i> Back to List
                                                 </a>
                                             </div>
@@ -157,51 +161,50 @@
                                                 <div class="alert alert-danger">
                                                     <h4>Error</h4>
                                                     <p>${error}</p>
-                                                    <a href="${notificationListUrl}" class="btn btn-primary">Back to Notification List</a>
+                                                    <a href="KnowErrorList" class="btn btn-primary">Back to Known Error List</a>
                                                 </div>
                                             </c:if>
                                             <c:if test="${empty error}">
                                                 <c:choose>
                                                     <c:when test="${empty knowError}">
                                                         <div class="alert alert-warning">
-                                                            <h4>Know Error not found</h4>
-                                                            <p>The Know Error you are looking for does not exist or has been deleted.</p>
-                                                            <a href="${notificationListUrl}" class="btn btn-primary">Back to Notification List</a>
+                                                            <h4>Known Error not found</h4>
+                                                            <p>The Known Error you are looking for does not exist or has been deleted.</p>
+                                                            <a href="KnowErrorList" class="btn btn-primary">Back to Known Error List</a>
                                                         </div>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <div class="row">
-                                                            <div class="col-md-6 col-lg-6 pr-lg-3" style="min-width: 0;">
-                                                                <div class="table-responsive">
-                                                                    <table class="table table-bordered">
-                                                                        <tbody>
-                                                                            <tr>
-                                                                                <th width="200">ID</th>
-                                                                                <td>${knowError.id}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th>Title</th>
-                                                                                <td><strong>${knowError.title}</strong></td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th>Work Around</th>
-                                                                                <td><strong>${knowError.workAround}</strong></td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th>Created At</th>
-                                                                                <td>${knowError.createdAt}</td>
-                                                                            </tr>
-<!--                                                                            <tr>
-                                                                                <th>Root Cause</th>
-                                                                                <td>${problems.rootCause}</td>
-                                                                            </tr>-->
-                                                                            <tr>
-                                                                                <th>Status</th>
-                                                                                <td><span class="badge badge-info">${knowError.status}</span></td>
-                                                                            </tr>
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
+                                                        <div class="know-error-detail">
+                                                            <div class="detail-item">
+                                                                <span class="detail-label"><i class=""></i> ID</span>
+                                                                <span class="detail-value">${knowError.id}</span>
+                                                            </div>
+                                                            <div class="detail-item">
+                                                                <span class="detail-label"><i class="feather "></i> Title</span>
+                                                                <span class="detail-value detail-value--title">${knowError.title}</span>
+                                                            </div>
+                                                            <div class="detail-item">
+                                                                <span class="detail-label"><i class="feather "></i> Work Around</span>
+                                                                <span class="detail-value">${knowError.workAround}</span>
+                                                            </div>
+                                                            <div class="detail-item">
+                                                                <span class="detail-label"><i class="feather "></i> Root Cause</span>
+                                                                <span class="detail-value">${problems.rootCause}</span>
+                                                            </div>
+                                                            <div class="detail-item">
+                                                                <span class="detail-label"><i class="feather "></i> Created At</span>
+                                                                <span class="detail-value">${knowError.createdAt}</span>
+                                                            </div>
+                                                            <div class="detail-item">
+                                                                <span class="detail-label"><i class="feather "></i> Status</span>
+                                                                <c:choose>
+                                                                    <c:when test="${knowError.status == 'Active'}">
+                                                                        <span class="badge badge-success">${knowError.status}</span>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <span class="badge badge-secondary">${knowError.status}</span>
+                                                                    </c:otherwise>
+                                                                </c:choose>
                                                             </div>
                                                         </div>
                                                     </c:otherwise>
@@ -272,12 +275,10 @@
             <script src="assets/js/vendor-all.min.js"></script>
             <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
             <script src="assets/js/pcoded.min.js"></script>
+            <script>
+                $(document).ready(function () {
+                    $('.fixed-button').remove();
+                });
+            </script>
     </body>
-
 </html>
-
-<script>
-                                                                                    $(document).ready(function () {
-                                                                                        $('.fixed-button').remove();
-                                                                                    });
-</script>

@@ -176,9 +176,13 @@
                                                 <thead class="thead-dark">
                                                     <tr>
                                                         <th>ID</th>
-                                                        <th>Problem Id</th>
-                                                        <th>Status</th>
+                                                        <c:if test="${role eq 'IT Support' and not empty knowError or role eq 'Manager'}">
+                                                            <th>Problem Id</th>
+                                                        </c:if>
                                                         <th>Title</th>
+                                                        <c:if test="${role eq 'IT Support' and not empty knowError or role eq 'Manager'}">
+                                                            <th>Status</th>
+                                                        </c:if>
                                                         <th>Created At</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -200,18 +204,27 @@
                                                                         <td>${kn.problemId}</td>  
                                                                     </c:if>
                                                                     <td>${kn.title}</td>
-                                                                    <td>
-                                                                        <span class="badge badge-status" data-status="${kn.status}">
-                                                                            ${kn.status}
-                                                                        </span>
-                                                                    </td>
-                                                                    <td>${kn.workAround}</td>
+                                                                    
+                                                                    <c:if test="${role eq 'IT Support' and not empty knowError or role eq 'Manager'}">
+                                                                        <td>
+                                                                            <span class="badge badge-status" data-status="${kn.status}">
+                                                                                ${kn.status}
+                                                                            </span>
+                                                                        </td>
+                                                                    </c:if>
+                                                                    <!--<td>${kn.workAround}</td>-->
                                                                     <td><fmt:formatDate value="${kn.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
-                                                                    <td class="d-flex gap-1">
+                                                                        <td class="d-flex gap-1">
                                                                         <a class="btn btn-sm btn-primary"
                                                                            href="KnowErrorDetail?Id=${kn.id}">
                                                                             Detail
                                                                         </a>
+                                                                        <c:if test="${role eq 'IT Support' and not empty knowError or role eq 'Manager'}">
+                                                                            <a class="btn btn-sm btn-primary"
+                                                                           href="KnowErrorUpdate?Id=${kn.id}">
+                                                                            Update
+                                                                        </a> 
+                                                                        </c:if>
 <!--                                                                        <a class="btn btn-sm btn-primary"
                                                                            href="ProblemUpdate?Id=${kn.id}">
                                                                             Update

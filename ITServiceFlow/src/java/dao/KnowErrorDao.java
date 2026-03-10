@@ -134,4 +134,40 @@ public class KnowErrorDao extends DbContext{
         }
         return null;
     }
+
+    public boolean updateKnowError(int id, String title, String workAround)
+    {
+        String sql = "UPDATE [dbo].[KnownErrors] SET [Title] = ?, [Workaround] = ? WHERE [Id] = ?";
+        try
+        {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setString(1, title);
+            stm.setString(2, workAround);
+            stm.setInt(3, id);
+            int rows = stm.executeUpdate();
+            return rows > 0;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+    
+    public boolean closedKnowError(int id, String Status)
+    {
+        String sql = "UPDATE [dbo].[KnownErrors] SET [Status] = 'CLOSED' WHERE [Id] = ?";
+        try
+        {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setInt(1, id);
+            int rows = stm.executeUpdate();
+            return rows > 0;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return false;
+        }
+    }
 }

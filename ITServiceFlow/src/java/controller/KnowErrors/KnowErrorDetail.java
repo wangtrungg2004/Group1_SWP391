@@ -77,8 +77,8 @@ public class KnowErrorDetail extends HttpServlet {
             int knId = Integer.parseInt(Id);
             
             KnowErrors knowError = knowErrorService.getKnowErrorById(knId);
-//            Problems problems = problemService.getProblemById(knowError.getProblemId());
-//            request.setAttribute("problems", problems);
+            Problems problems = problemService.getProblemById(knowError.getProblemId());
+            request.setAttribute("problems", problems);
             request.setAttribute("knowError", knowError);
             request.getRequestDispatcher("KnowErrorDetail.jsp").forward(request, response);
         }
