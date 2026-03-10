@@ -5,7 +5,6 @@
 package controller.Problems;
 
 import dao.NotificationDao;
-import dao.TicketDao;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -18,6 +17,7 @@ import java.util.List;
 import service.ProblemService;
 import model.Users;
 import model.Tickets;
+import service.TicketService;
 import service.UserService;
 /**
  *
@@ -62,26 +62,41 @@ public class ProblemAdd extends HttpServlet {
      */
     ProblemService problemService = new ProblemService();
     NotificationDao notificationDao = new NotificationDao();
-    TicketDao ticketService = new TicketDao();
+    TicketService ticketService = new TicketService();
     UserService userService = new UserService();
-
-//    /** Giới hạn số ký tự (nên trùng với DB hoặc nhỏ hơn). */
-//    private static final int TITLE_MAX = 300;
-//    private static final int DESCRIPTION_MAX = 2000;
-//    private static final int ROOT_CAUSE_MAX = 2000;
-//    private static final int WORKAROUND_MAX = 2000;
-
+    
     private String trimOrNull(String value) {
         return (value == null || value.trim().isEmpty()) ? null : value.trim();
     }
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         List<Users> assignees = userService.getAllUser();
-        List<Tickets> Ticket = ticketService.getIncidentsNotInProblem();
+        
+        String ticketKeyword = request.getParameter("ticketKeyword");
+        
+        if (ticketKeyword != null) ticketKeyword = ticketKeyword.trim();
+        List<Tickets> Ticket = (ticketKeyword != null && !ticketKeyword.isEmpty())
+                ? ticketService.searchIncidentsNotProblem(ticketKeyword)
+                : ticketService.getIncidentsNotInProblem();
+        
         request.setAttribute("Ticket", Ticket);
         request.setAttribute("assignees", assignees);
+        request.setAttribute("savedTitle", request.getParameter("Title"));
+        request.setAttribute("savedDescription", request.getParameter("Description"));
+        request.setAttribute("savedAssignedTo", request.getParameter("AssignedTo"));
+        
+        String[] ticketIds = request.getParameterValues("ticketIds");
+        List<Integer> savedTicketIds = new ArrayList<>();
+        if (ticketIds != null) {
+            for (String id : ticketIds) {
+                if (id != null && !id.trim().isEmpty()) {
+                    try { savedTicketIds.add(Integer.parseInt(id.trim())); } catch (NumberFormatException ignored) { }
+                }
+            }
+        }
+        request.setAttribute("savedTicketIds", savedTicketIds);
         request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
     }
 

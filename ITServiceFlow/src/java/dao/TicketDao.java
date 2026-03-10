@@ -5,6 +5,7 @@ import Utils.DbContext;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.tomcat.dbcp.dbcp2.PoolingConnection;
 
 public class TicketDao extends DbContext {
 
@@ -367,6 +368,43 @@ public class TicketDao extends DbContext {
         return list;
     }
     
+    public List<Tickets> searchIncidentsNotInProblem(String search)
+    {
+        List<Tickets> list = new ArrayList<>();
+        String  sql = "SELECT t.Id, t.TicketNumber, t.Title, t.Status " +
+                     "FROM Tickets t " +
+                     "WHERE t.TicketType = 'INCIDENT' " +
+                     "AND NOT EXISTS ( " +
+                     "    SELECT 1 FROM ProblemTickets pt " +
+                     "    WHERE pt.TicketId = t.Id" +
+                     ")" +
+                     " AND (t.TicketNumber LIKE ? OR t.Title LIKE ?)";
+        
+        try
+        {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            String searchValue = "%" + search + "%";
+            stm.setString(1, searchValue);
+            stm.setString(2, searchValue);
+            ResultSet rs = stm.executeQuery();
+            while(rs.next())
+            {
+                Tickets t = new Tickets();
+                t.setId(rs.getInt("Id"));
+                t.setTicketNumber(rs.getString("TicketNumber"));
+                t.setTitle(rs.getString("Title"));
+                t.setStatus(rs.getString("Status"));
+                list.add(t);
+            }
+            return list;
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            return null;
+        }
+        
+    }
     
     public static void main(String[] args) {
 

@@ -49,4 +49,9 @@ public class TicketService {
     {
         return ticketDao.getIncidentsNotInProblem();
     }
+    
+    public List<Tickets> searchIncidentsNotProblem(String keyword)
+    {
+        return ticketDao.searchIncidentsNotInProblem(keyword);
+    }
 }

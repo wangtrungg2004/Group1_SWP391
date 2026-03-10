@@ -100,6 +100,16 @@
                                     </div>
 
                                     <div class="card-body">
+                                        <!-- Search form (GET) - outside POST form to avoid nesting; preserves form data via hidden + JS -->
+                                        <form method="get" action="ProblemAdd" id="searchTicketForm" class="mb-3 d-flex flex-wrap align-items-center gap-2">
+                                            <input type="hidden" name="Title" id="searchSavedTitle" value="${savedTitle}">
+                                            <input type="hidden" name="Description" id="searchSavedDescription" value="${savedDescription}">
+                                            <input type="hidden" name="AssignedTo" id="searchSavedAssignedTo" value="${savedAssignedTo}">
+                                            <span id="searchTicketIdsContainer"></span>
+                                            <input type="text" name="ticketKeyword" class="form-control form-control-sm" placeholder="Search by ticket number or title..." value="${param.ticketKeyword}" style="max-width: 280px;">
+                                            <button type="button" id="btnSearchTickets" class="btn btn-sm btn-primary"><i class="feather icon-search"></i> Search</button>
+                                            <c:if test="${not empty param.ticketKeyword}"><a href="ProblemAdd" class="btn btn-sm btn-outline-secondary">Clear</a></c:if>
+                                        </form>
                                         <form method="post" action="ProblemAdd" id="addProblemForm">
                                         <div class="row no-gutters">
                                             <!-- Left: Add Problem form -->
@@ -125,7 +135,7 @@
                                                     <div class="form-group">
                                                         <label><strong>Title <span class="text-danger">*</span></strong></label>
                                                         <input type="text" name="Title" class="form-control"
-                                                               placeholder="Enter problem title" required>
+                                                               placeholder="Enter problem title" value="${savedTitle}" required>
                                                     </div>
 
                                                     <!-- Status -->
@@ -141,12 +151,11 @@
                                                         <select name="AssignedTo" class="form-control">
                                                             <option value="">-- Select assignee --</option>
                                                             <c:forEach items="${assignees}" var="u">
-                                                                <%-- Nếu muốn lọc theo role, ví dụ chỉ IT Support: --%>
-                                                                 <c:if test="${u.role == 'IT Support' or u.role == 'Manager'}"> 
-                                                                    <option value="${u.id}">
+                                                                 <c:if test="${u.role == 'IT Support' or u.role == 'Manager'}">
+                                                                    <option value="${u.id}" ${u.id == savedAssignedTo ? 'selected' : ''}>
                                                                         ${u.fullName} (${u.username})
                                                                     </option>
-                                                                 </c:if> 
+                                                                 </c:if>
                                                             </c:forEach>
                                                         </select>
                                                     </div>
@@ -155,7 +164,7 @@
                                                     <div class="form-group">
                                                         <label><strong>Description</strong></label>
                                                         <textarea name="Description" class="form-control"
-                                                                  rows="4" placeholder="Problem description"></textarea>
+                                                                  rows="4" placeholder="Problem description"><c:out value="${savedDescription}"/></textarea>
                                                     </div>
 
     <!--                                             Root Cause 
@@ -214,7 +223,9 @@
                                                                                     <span class="badge badge-info">${t.status}</span>
                                                                                 </td>
                                                                                 <td>
-                                                                                    <input type="checkbox" name="ticketIds" value="${t.id}" id="ticket_${t.id}">
+                                                                                    <c:set var="ticketChecked" value="false"/>
+                                                                                    <c:forEach items="${savedTicketIds}" var="sid"><c:if test="${sid == t.id}"><c:set var="ticketChecked" value="true"/></c:if></c:forEach>
+                                                                                    <input type="checkbox" name="ticketIds" value="${t.id}" id="ticket_${t.id}" ${ticketChecked ? 'checked' : ''}>
                                                                                 </td>
                                                                             </tr>
                                                                         </c:forEach>
@@ -253,8 +264,27 @@
             e.preventDefault();
         }
     });
-    
-        $(document).ready(function () {
+
+    $('#btnSearchTickets').on('click', function () {
+        var addForm = document.getElementById('addProblemForm');
+        var searchForm = document.getElementById('searchTicketForm');
+        if (!addForm || !searchForm) return;
+        document.getElementById('searchSavedTitle').value = (addForm.querySelector('input[name="Title"]') || {}).value || '';
+        document.getElementById('searchSavedDescription').value = (addForm.querySelector('textarea[name="Description"]') || {}).value || '';
+        document.getElementById('searchSavedAssignedTo').value = (addForm.querySelector('select[name="AssignedTo"]') || {}).value || '';
+        var container = document.getElementById('searchTicketIdsContainer');
+        container.innerHTML = '';
+        (addForm.querySelectorAll('input[name="ticketIds"]:checked') || []).forEach(function (cb) {
+            var h = document.createElement('input');
+            h.type = 'hidden';
+            h.name = 'ticketIds';
+            h.value = cb.value;
+            container.appendChild(h);
+        });
+        searchForm.submit();
+    });
+
+    $(document).ready(function () {
         $('.fixed-button').remove();
     });
 </script>
