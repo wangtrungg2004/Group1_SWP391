@@ -195,17 +195,20 @@
                                                                 <span class="detail-label"><i class="feather "></i> Created At</span>
                                                                 <span class="detail-value">${knowError.createdAt}</span>
                                                             </div>
-                                                            <div class="detail-item">
-                                                                <span class="detail-label"><i class="feather "></i> Status</span>
-                                                                <c:choose>
-                                                                    <c:when test="${knowError.status == 'Active'}">
-                                                                        <span class="badge badge-success">${knowError.status}</span>
-                                                                    </c:when>
-                                                                    <c:otherwise>
-                                                                        <span class="badge badge-secondary">${knowError.status}</span>
-                                                                    </c:otherwise>
-                                                                </c:choose>
-                                                            </div>
+                                                            <c:if test="${role eq 'IT Support' and not empty knowError or role eq 'Manager'}">
+                                                                <div class="detail-item">
+                                                                    <span class="detail-label"><i class="feather "></i> Status</span>
+                                                                    <c:choose>
+                                                                        <c:when test="${knowError.status == 'Active'}">
+                                                                            <span class="badge badge-success">${knowError.status}</span>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <span class="badge badge-secondary">${knowError.status}</span>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </div> 
+                                                            </c:if>
+                                                            
                                                         </div>
                                                     </c:otherwise>
                                                 </c:choose>

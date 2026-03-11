@@ -99,6 +99,11 @@
                             </c:choose>
                         </ul>
                         <c:choose>
+                            <c:when test="${role eq 'User'}">
+                                <div class="noti-footer">
+                                    <a href="UserNotificationList">show all</a>
+                                </div>
+                            </c:when>
                             <c:when test="${role eq 'IT Support'}">
                                 <div class="noti-footer">
                                     <a href="ITSupportNotificationList">show all</a>
