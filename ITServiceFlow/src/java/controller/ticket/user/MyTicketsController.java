@@ -36,9 +36,15 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
         return;
     }
 
-    // 1. Lấy tham số tìm kiếm và trang hiện tại
+    // 1. Lấy tham số tìm kiếm, bộ lọc và trang hiện tại
     String search = request.getParameter("search");
     if (search == null) search = "";
+    
+    String status = request.getParameter("status");
+    if (status == null) status = "all";
+    
+    String type = request.getParameter("type");
+    if (type == null) type = "all";
     
     int page = 1;
     int pageSize = 10;
@@ -50,17 +56,21 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
     int offset = (page - 1) * pageSize;
     TicketDao ticketDao = new TicketDao();
 
-    // 2. Thực hiện truy vấn Server-side
-    int totalTickets = ticketDao.getTotalTicketsCount(currentUser.getId(), search);
+    // 2. Thực hiện truy vấn Server-side với các tham số bộ lọc
+    int totalTickets = ticketDao.getTotalTicketsCount(currentUser.getId(), search, status, type);
     int totalPages = (int) Math.ceil((double) totalTickets / pageSize);
-    List<Tickets> myTicketList = ticketDao.getTicketsByCreator(currentUser.getId(), offset, pageSize, search);
+    List<Tickets> myTicketList = ticketDao.getTicketsByCreator(currentUser.getId(), offset, pageSize, search, status, type);
     
     // 3. Lấy KPI và đẩy dữ liệu lên View
     request.setAttribute("kpis", ticketDao.getUserTicketKPIs(currentUser.getId()));
     request.setAttribute("myTicketList", myTicketList);
     request.setAttribute("currentPage", page);
     request.setAttribute("totalPages", totalPages);
-    request.setAttribute("search", search); // Giữ lại từ khóa tìm kiếm trên thanh search
+    
+    // Giữ lại trạng thái bộ lọc trên giao diện
+    request.setAttribute("search", search); 
+    request.setAttribute("selectedStatus", status);
+    request.setAttribute("selectedType", type);
     
     request.getRequestDispatcher("/ticket/my_tickets.jsp").forward(request, response);
 }

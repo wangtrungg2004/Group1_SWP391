@@ -1,13 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller.ticket.user;
-
-/**
- *
- * @author Dumb Trung
- */
 
 import dao.TicketDao;
 import model.Tickets;
@@ -33,7 +24,7 @@ public class UserDashboardController extends HttpServlet {
         Users currentUser = (Users) session.getAttribute("user");
         String role = (String) session.getAttribute("role");
 
-        // Kiểm tra bảo mật ngay tại "cửa ngõ" Controller
+        // 1. Kiểm tra bảo mật (Authentication & Authorization)
         if (currentUser == null || role == null || (!role.equals("Manager") && !role.equals("User"))) {
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
@@ -41,13 +32,16 @@ public class UserDashboardController extends HttpServlet {
 
         TicketDao ticketDao = new TicketDao();
         
-        // Lấy 5 vé gần nhất cho Dashboard (Server-side)
-        List<Tickets> recentTickets = ticketDao.getTicketsByCreator(currentUser.getId(), 0, 5, "");
+        // 2. Lấy 5 vé gần nhất (Offset 0, Limit 5)
+        // CẬP NHẬT: Truyền đầy đủ các tham số lọc rỗng ("", "all", "all") để lấy toàn bộ vé mới nhất
+        List<Tickets> recentTickets = ticketDao.getTicketsByCreator(
+            currentUser.getId(), 0, 5, "", "all", "all"
+        );
         
-        // Lấy các con số thống kê KPI
+        // 3. Lấy dữ liệu thống kê cho các thẻ KPI
         Map<String, Integer> kpis = ticketDao.getUserTicketKPIs(currentUser.getId());
 
-        // Đẩy toàn bộ dữ liệu ra request attribute để JSP sử dụng qua EL
+        // 4. Đẩy dữ liệu sang JSP thông qua Request Attribute
         request.setAttribute("recentTickets", recentTickets);
         request.setAttribute("kpis", kpis);
         

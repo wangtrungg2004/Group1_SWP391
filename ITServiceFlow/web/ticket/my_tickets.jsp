@@ -458,17 +458,17 @@
                                                         <nav aria-label="Page navigation" class="mt-4">
                                                             <ul class="pagination justify-content-center">
                                                                 <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                                                    <a class="page-link" href="?page=${currentPage - 1}&search=${search}">Previous</a>
+                                                                    <a class="page-link" href="?page=${currentPage - 1}&search=${search}&status=${selectedStatus}&type=${selectedType}">Previous</a>
                                                                 </li>
 
                                                                 <c:forEach begin="1" end="${totalPages}" var="i">
                                                                     <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                                                        <a class="page-link" href="?page=${i}&search=${search}">${i}</a>
+                                                                       <a class="page-link" href="?page=${i}&search=${search}&status=${selectedStatus}&type=${selectedType}">${i}</a>
                                                                     </li>
                                                                 </c:forEach>
 
                                                                 <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                                                    <a class="page-link" href="?page=${currentPage + 1}&search=${search}">Next</a>
+                                                                    <a class="page-link" href="?page=${currentPage + 1}&search=${search}&status=${selectedStatus}&type=${selectedType}">Next</a>
                                                                 </li>
                                                             </ul>
                                                         </nav>
