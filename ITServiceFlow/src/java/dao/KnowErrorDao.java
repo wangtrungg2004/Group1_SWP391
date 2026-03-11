@@ -201,4 +201,41 @@ public class KnowErrorDao extends DbContext{
             return false;
         }
     }
+    
+    public List<KnowErrors> searchKnowErrors(String keyword, boolean activeOnly) {
+        List<KnowErrors> list = new ArrayList<>();
+        String sql;
+        if (activeOnly) {
+            sql = "SELECT Id, ProblemId, Title, Workaround, Status, ViewCount, CreatedAt "
+                + "FROM [dbo].[KnownErrors] "
+                + "WHERE Status = 'Active' AND (Title LIKE ? OR Workaround LIKE ?) "
+                + "ORDER BY CreatedAt DESC";
+        } else {
+            sql = "SELECT Id, ProblemId, Title, Workaround, Status, ViewCount, CreatedAt "
+                + "FROM [dbo].[KnownErrors] "
+                + "WHERE Title LIKE ? OR Workaround LIKE ? "
+                + "ORDER BY CreatedAt DESC";
+        }
+        try {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            String searchValue = "%" + keyword.trim() + "%";
+            stm.setString(1, searchValue);
+            stm.setString(2, searchValue);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                KnowErrors kn = new KnowErrors();
+                kn.setId(rs.getInt("Id"));
+                kn.setProblemId(rs.getInt("ProblemId"));
+                kn.setTitle(rs.getString("Title"));
+                kn.setWorkAround(rs.getString("Workaround"));
+                kn.setStatus(rs.getString("Status"));
+                kn.setViewCount(rs.getInt("ViewCount"));
+                kn.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                list.add(kn);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return list;
+    }
 }

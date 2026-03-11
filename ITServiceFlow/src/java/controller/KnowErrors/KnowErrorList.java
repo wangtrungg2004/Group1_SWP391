@@ -68,15 +68,20 @@ public class KnowErrorList extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         String role = (String) session.getAttribute("role");
-        Integer userId = (Integer) session.getAttribute("userId");
+        String keyword = request.getParameter("keyword");
+        boolean activeOnly = "User".equals(role);
         
-        if ("User".equals(role)) {
-            List<KnowErrors> knowError = knowErrorService.getAllActiveKnowError();
-            request.setAttribute("knowError", knowError);
-            request.getRequestDispatcher("KnowErrorList.jsp").forward(request, response);
-            return;
+        List<KnowErrors> knowError;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            knowError = knowErrorService.searchKnowError(keyword.trim(), activeOnly);
+            request.setAttribute("filterKeyword", keyword.trim());
+        } else {
+            if (activeOnly) {
+                knowError = knowErrorService.getAllActiveKnowError();
+            } else {
+                knowError = knowErrorService.getAllKnowError();
+            }
         }
-        List<KnowErrors> knowError = knowErrorService.getAllKnowError();
         request.setAttribute("knowError", knowError);
         request.getRequestDispatcher("KnowErrorList.jsp").forward(request, response);
     }

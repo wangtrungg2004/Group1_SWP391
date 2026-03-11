@@ -50,4 +50,9 @@ public class KnowErrorService {
     {
         return dao.getAllKnowErrors();
     }
+    
+    public List<KnowErrors> searchKnowError(String keyword, boolean active)
+    {
+        return dao.searchKnowErrors(keyword,active);
+    }
 }

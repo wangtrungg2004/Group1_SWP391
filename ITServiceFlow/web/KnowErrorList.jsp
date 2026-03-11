@@ -132,7 +132,7 @@
                                              KnowError list is empty
                                             </div>
                                         </c:if>
-                                        <form action="ProblemList" method="get" class="mb-3">
+                                        <form action="KnowErrorList" method="get" class="mb-3">
                                             <div class="row mb-2">
                                                 <div class="col-md-8">
                                                     <div class="input-group">
@@ -145,14 +145,14 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="row align-items-end">
+<!--                                            <div class="row align-items-end">
                                                 <div class="col-md-2">
                                                     <label class="mb-1 small text-muted">Status</label>
                                                     <select name="filterStatus" class="form-control">
                                                         <option value="">-- All --</option>
                                                         <option value="APPROVED" ${filterStatus == 'NEW' ? 'selected' : ''}>NEW</option>
                                                         <option value="REJECTED" ${filterStatus == 'UNDER_INVESTIGATION' ? 'selected' : ''}>UNDER_INVESTIGATION</option>
-                                                        <!--<option value="RESOLVED" ${filterStatus == 'RESOLVED' ? 'selected' : ''}>RESOLVED</option>-->
+                                                        <option value="RESOLVED" ${filterStatus == 'RESOLVED' ? 'selected' : ''}>RESOLVED</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-md-2">
@@ -168,7 +168,7 @@
                                                 <div class="col-md-2">
                                                     <button type="submit" class="btn btn-secondary">Filter</button>
                                                 </div>
-                                            </div>
+                                            </div>-->
                                         </form>
                                         <div class="table-responsive">
                                             <table class="table table-hover">
