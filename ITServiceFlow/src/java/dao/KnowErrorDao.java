@@ -52,6 +52,36 @@ public class KnowErrorDao extends DbContext{
         return list;
     }
     
+    public List<KnowErrors> getAllKnowErrors()
+    {
+        List<KnowErrors> list = new ArrayList<>();
+        String sql = "SELECT Id, ProblemId, Title, Workaround, Status, ViewCount, CreatedAt "
+                + "FROM [dbo].[KnownErrors] "
+                + "ORDER BY CreatedAt DESC";
+        try
+        {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            ResultSet rs = stm.executeQuery();
+            while(rs.next())
+            {
+                KnowErrors kn = new KnowErrors();
+                kn.setId(rs.getInt("Id"));
+                kn.setProblemId(rs.getInt("ProblemId"));
+                kn.setTitle(rs.getString("Title"));
+                kn.setWorkAround(rs.getString("Workaround"));
+                kn.setStatus(rs.getString("Status"));
+                kn.setViewCount(rs.getInt("ViewCount"));
+                kn.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                list.add(kn);
+            }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+    
     public boolean addNewKnowError(int problemId, String title, String workAround)
     {
         String sql = "INSERT INTO [dbo].[KnownErrors] "
@@ -154,13 +184,14 @@ public class KnowErrorDao extends DbContext{
         }
     }
     
-    public boolean closedKnowError(int id, String Status)
+    public boolean closedKnowError(int id, String status)
     {
-        String sql = "UPDATE [dbo].[KnownErrors] SET [Status] = 'CLOSED' WHERE [Id] = ?";
+        String sql = "UPDATE [dbo].[KnownErrors] SET [Status] = ? WHERE [Id] = ?";
         try
         {
             PreparedStatement stm = connection.prepareStatement(sql);
-            stm.setInt(1, id);
+            stm.setString(1, status);
+            stm.setInt(2, id);
             int rows = stm.executeUpdate();
             return rows > 0;
         }

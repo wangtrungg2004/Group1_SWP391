@@ -40,4 +40,14 @@ public class KnowErrorService {
     {
         return dao.updateKnowError(id, title, workAround);
     }
+    
+    public boolean closedKnowError(int id, String status)
+    {
+        return dao.closedKnowError(id, status);
+    }
+    
+    public List<KnowErrors> getAllKnowError()
+    {
+        return dao.getAllKnowErrors();
+    }
 }

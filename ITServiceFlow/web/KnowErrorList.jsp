@@ -11,7 +11,6 @@
 <%@ page import="java.util.List" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
-<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -191,7 +190,7 @@
                                                     <c:choose>
                                                         <c:when test="${empty knowError}">
                                                             <tr>
-                                                                <td colspan="6" class="text-center text-muted">
+                                                                <td colspan="${(role eq 'IT Support' or role eq 'Manager') ? 6 : 4}" class="text-center text-muted">
                                                                     <i>No KnowError found</i>
                                                                 </td>
                                                             </tr>
@@ -221,9 +220,21 @@
                                                                         </a>
                                                                         <c:if test="${role eq 'IT Support' and not empty knowError or role eq 'Manager'}">
                                                                             <a class="btn btn-sm btn-primary"
-                                                                           href="KnowErrorUpdate?Id=${kn.id}">
-                                                                            Update
-                                                                        </a> 
+                                                                                href="KnowErrorUpdate?Id=${kn.id}">
+                                                                                 Update
+                                                                            </a> 
+                                                                            
+                                                                   <form action="KnowErrorList" method="post" style="display:inline;" class="knowerror-status-form">
+                                                                        <input type="hidden" name="Id" value="${kn.id}">
+                                                                        <input type="hidden" name="status" value="${kn.status == 'Active' ? 'Active' : 'CLOSED'}" class="status-value">
+                                                                        <label class="switch">
+                                                                            <input type="checkbox" 
+                                                                                   name="isActive" 
+                                                                                   ${kn.status == 'Active' ? 'checked' : ''} 
+                                                                                   onchange="var f=this.form; var s=f.querySelector('.status-value'); s.value=this.checked?'Active':'CLOSED'; f.submit();">
+                                                                            <span class="cr"></span>
+                                                                        </label>
+                                                                    </form>
                                                                         </c:if>
 <!--                                                                        <a class="btn btn-sm btn-primary"
                                                                            href="ProblemUpdate?Id=${kn.id}">

@@ -70,8 +70,13 @@ public class KnowErrorList extends HttpServlet {
         String role = (String) session.getAttribute("role");
         Integer userId = (Integer) session.getAttribute("userId");
         
-        List<KnowErrors> knowError = knowErrorService.getAllActiveKnowError();
-        
+        if ("User".equals(role)) {
+            List<KnowErrors> knowError = knowErrorService.getAllActiveKnowError();
+            request.setAttribute("knowError", knowError);
+            request.getRequestDispatcher("KnowErrorList.jsp").forward(request, response);
+            return;
+        }
+        List<KnowErrors> knowError = knowErrorService.getAllKnowError();
         request.setAttribute("knowError", knowError);
         request.getRequestDispatcher("KnowErrorList.jsp").forward(request, response);
     }
@@ -87,7 +92,14 @@ public class KnowErrorList extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        String knId = request.getParameter("Id");
+        String Status = request.getParameter("status");
+        if(knId != null)
+        {
+            int id = Integer.parseInt(knId);
+            knowErrorService.closedKnowError(id, Status);
+            response.sendRedirect("KnowErrorList");
+        }
     }
 
     /**
