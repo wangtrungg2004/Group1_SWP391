@@ -190,9 +190,9 @@ public class TicketDao extends DbContext {
     }
     
     // 3. Lấy danh sách Ticket cho End-User (My Tickets)
-    public List<Tickets> getTicketsByCreator(int userId, int offset, int limit) {
+   public List<Tickets> getTicketsByCreator(int userId, int offset, int limit, String search) {
     List<Tickets> list = new ArrayList<>();
-    // Dùng LEFT JOIN và thêm cú pháp phân trang của SQL Server
+    // Thêm điều kiện tìm kiếm vào SQL
     String sql = "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.CreatedAt, t.UpdatedAt, "
                + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName "
                + "FROM [dbo].[Tickets] t "
@@ -200,13 +200,16 @@ public class TicketDao extends DbContext {
                + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
                + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
                + "WHERE t.CreatedBy = ? "
+               + "AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) " // Tìm theo mã hoặc tiêu đề
                + "ORDER BY t.CreatedAt DESC "
                + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"; 
                
     try (PreparedStatement ps = connection.prepareStatement(sql)) {
         ps.setInt(1, userId);
-        ps.setInt(2, offset);
-        ps.setInt(3, limit);
+        ps.setString(2, "%" + search + "%");
+        ps.setString(3, "%" + search + "%");
+        ps.setInt(4, offset);
+        ps.setInt(5, limit);
         ResultSet rs = ps.executeQuery();
         
         while (rs.next()) {
@@ -217,16 +220,12 @@ public class TicketDao extends DbContext {
             t.setTitle(rs.getString("Title"));
             t.setStatus(rs.getString("Status"));
             t.setCreatedAt(rs.getTimestamp("CreatedAt"));
-            t.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
-            
             t.setPriorityLevel(rs.getString("PriorityLevel"));
             t.setAssigneeName(rs.getString("AssigneeName"));
             t.setCategoryName(rs.getString("CategoryName"));
-            
             list.add(t);
         }
     } catch (Exception e) {
-        System.err.println("Lỗi khi lấy danh sách My Tickets: " + e.getMessage());
         e.printStackTrace();
     }
     return list;
@@ -362,6 +361,24 @@ public class TicketDao extends DbContext {
         }
         return kpis;
     }
+    
+    // 7. Đếm tổng số vé để tính tổng số trang
+public int getTotalTicketsCount(int userId, String search) {
+    String sql = "SELECT COUNT(*) FROM [dbo].[Tickets] "
+               + "WHERE CreatedBy = ? AND (TicketNumber LIKE ? OR Title LIKE ?)";
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setInt(1, userId);
+        ps.setString(2, "%" + search + "%");
+        ps.setString(3, "%" + search + "%");
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
 
     // Helper to generate Ticket Number
     public String getNextTicketNumber(String type) {

@@ -113,7 +113,7 @@ public class Login extends HttpServlet {
                     response.sendRedirect("ManagerDashboard.jsp");
                     break;
                 case "User":
-                    response.sendRedirect("UserDashboard.jsp");
+                    response.sendRedirect("UserDashboard");
                     break;
                 case "IT Support":
                     response.sendRedirect("ITDashboard.jsp");

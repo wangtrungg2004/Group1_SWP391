@@ -19,49 +19,51 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.util.Map;
 
 @WebServlet(name = "MyTickets", urlPatterns = {"/Tickets"})
 public class MyTicketsController extends HttpServlet {
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        
-        HttpSession session = request.getSession();
-        Users currentUser = (Users) session.getAttribute("user");
-        
-        if (currentUser == null) {
-            response.sendRedirect(request.getContextPath() + "/Login.jsp");
-            return;
-        }
+    // Trong MyTicketsController.java
 
-        int page = 1;
-        int pageSize = 10; 
-        
-        String pageStr = request.getParameter("page");
-        if (pageStr != null && !pageStr.isEmpty()) {
-            try {
-                page = Integer.parseInt(pageStr);
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-        }
-        
-        int offset = (page - 1) * pageSize;
-
-        TicketDao ticketDao = new TicketDao();
-        
-        List<Tickets> myTicketList = ticketDao.getTicketsByCreator(currentUser.getId(), offset, pageSize);
-        
-        Map<String, Integer> kpis = ticketDao.getUserTicketKPIs(currentUser.getId());
-        
-        request.setAttribute("kpis", kpis);
-        request.setAttribute("myTicketList", myTicketList);
-        request.setAttribute("currentPage", page); 
-        
-        request.getRequestDispatcher("/ticket/my_tickets.jsp").forward(request, response);
+@Override
+protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    
+    HttpSession session = request.getSession();
+    Users currentUser = (Users) session.getAttribute("user");
+    if (currentUser == null) {
+        response.sendRedirect(request.getContextPath() + "/Login.jsp");
+        return;
     }
+
+    // 1. Lấy tham số tìm kiếm và trang hiện tại
+    String search = request.getParameter("search");
+    if (search == null) search = "";
+    
+    int page = 1;
+    int pageSize = 10;
+    String pageStr = request.getParameter("page");
+    if (pageStr != null && !pageStr.isEmpty()) {
+        try { page = Integer.parseInt(pageStr); } catch (Exception e) { page = 1; }
+    }
+    
+    int offset = (page - 1) * pageSize;
+    TicketDao ticketDao = new TicketDao();
+
+    // 2. Thực hiện truy vấn Server-side
+    int totalTickets = ticketDao.getTotalTicketsCount(currentUser.getId(), search);
+    int totalPages = (int) Math.ceil((double) totalTickets / pageSize);
+    List<Tickets> myTicketList = ticketDao.getTicketsByCreator(currentUser.getId(), offset, pageSize, search);
+    
+    // 3. Lấy KPI và đẩy dữ liệu lên View
+    request.setAttribute("kpis", ticketDao.getUserTicketKPIs(currentUser.getId()));
+    request.setAttribute("myTicketList", myTicketList);
+    request.setAttribute("currentPage", page);
+    request.setAttribute("totalPages", totalPages);
+    request.setAttribute("search", search); // Giữ lại từ khóa tìm kiếm trên thanh search
+    
+    request.getRequestDispatcher("/ticket/my_tickets.jsp").forward(request, response);
+}
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
