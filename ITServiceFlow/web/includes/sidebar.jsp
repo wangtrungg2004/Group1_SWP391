@@ -122,7 +122,7 @@
                                 <label>Knowledge Base</label>
                             </li>
                             <li class="nav-item">
-                                <a href="<c:url value='/CreateTicket.jsp'/>" class="nav-link"><span class="pcoded-micon"><i class="feather icon-plus-circle"></i></span><span class="pcoded-mtext">Create Ticket</span></a>
+                                <a href="<c:url value='/CreateTicket'/>" class="nav-link"><span class="pcoded-micon"><i class="feather icon-plus-circle"></i></span><span class="pcoded-mtext">Create Ticket</span></a>
                             </li>
                             <li class="nav-item">
                                 <a href="<c:url value='/KnowledgeSearch'/>" class="nav-link"><span class="pcoded-micon"><i class="feather icon-book-open"></i></span><span class="pcoded-mtext">Knowledge Search</span></a>

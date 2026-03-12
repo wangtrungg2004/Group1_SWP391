@@ -1,7 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
-<%@ page import="dao.TicketDao" %>
+<%@ page import="dao.TicketDAO" %>
 <%@ page import="model.Tickets" %>
 <%@ page import="java.util.List" %>
 <%
@@ -21,7 +21,7 @@
     model.Users user = (model.Users) session.getAttribute("user");
 
     // Get the 5 most recent tickets of this User to display on the Dashboard
-    TicketDao ticketDao = new TicketDao();
+    TicketDAO ticketDao = new TicketDAO();
     List<Tickets> recentTickets = ticketDao.getTicketsByCreator(user.getId());
     request.setAttribute("recentTickets", recentTickets);
 %>
