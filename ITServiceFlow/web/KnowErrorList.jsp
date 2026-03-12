@@ -137,7 +137,7 @@
                                                 <div class="col-md-8">
                                                     <div class="input-group">
                                                         <input type="text" name="keyword" class="form-control"
-                                                               placeholder="Search by Title or Ticket Number..."
+                                                               placeholder="Search by Title or ..."
                                                                value="${filterKeyword != null ? filterKeyword : ''}">
                                                         <div class="input-group-append">
                                                             <button type="submit" class="btn btn-primary">Search</button>
@@ -219,22 +219,24 @@
                                                                             Detail
                                                                         </a>
                                                                         <c:if test="${role eq 'IT Support' and not empty knowError or role eq 'Manager'}">
-                                                                            <a class="btn btn-sm btn-primary"
-                                                                                href="KnowErrorUpdate?Id=${kn.id}">
-                                                                                 Update
-                                                                            </a> 
+                                                                            <c:if test="${(role eq 'IT Support' and not empty knowError or role eq 'Manager') and kn.status ne 'Active'}">
+                                                                                <a class="btn btn-sm btn-primary"
+                                                                                   href="KnowErrorUpdate?Id=${kn.id}">
+                                                                                    Update
+                                                                                </a> 
+                                                                            </c:if>
                                                                             
-                                                                   <form action="KnowErrorList" method="post" style="display:inline;" class="knowerror-status-form">
-                                                                        <input type="hidden" name="Id" value="${kn.id}">
-                                                                        <input type="hidden" name="status" value="${kn.status == 'Active' ? 'Active' : 'CLOSED'}" class="status-value">
-                                                                        <label class="switch">
-                                                                            <input type="checkbox" 
-                                                                                   name="isActive" 
-                                                                                   ${kn.status == 'Active' ? 'checked' : ''} 
-                                                                                   onchange="var f=this.form; var s=f.querySelector('.status-value'); s.value=this.checked?'Active':'CLOSED'; f.submit();">
-                                                                            <span class="cr"></span>
-                                                                        </label>
-                                                                    </form>
+                                                                            <form action="KnowErrorList" method="post" style="display:inline;" class="knowerror-status-form">
+                                                                                 <input type="hidden" name="Id" value="${kn.id}">
+                                                                                 <input type="hidden" name="status" value="${kn.status == 'Active' ? 'Active' : 'CLOSED'}" class="status-value">
+                                                                                 <label class="switch">
+                                                                                     <input type="checkbox" 
+                                                                                            name="isActive" 
+                                                                                            ${kn.status == 'Active' ? 'checked' : ''} 
+                                                                                            onchange="var f=this.form; var s=f.querySelector('.status-value'); s.value=this.checked?'Active':'CLOSED'; f.submit();">
+                                                                                     <span class="cr"></span>
+                                                                                 </label>
+                                                                             </form>
                                                                         </c:if>
 <!--                                                                        <a class="btn btn-sm btn-primary"
                                                                            href="ProblemUpdate?Id=${kn.id}">

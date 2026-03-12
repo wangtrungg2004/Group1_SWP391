@@ -121,6 +121,16 @@ public class ProblemService {
         return dao.unlinkAllProblemTickets(problemId);
     }
     
+    public int getTotalProblemExcludingStatus(String excludeStatus) 
+    {
+        return dao.getTotalProblemExcludingStatus(excludeStatus);
+    }
+
+    public List<Problems> getProblemsWithPagesExcludingStatus(int page, int pageSize, String excludeStatus)
+    {
+        return dao.getProblemsWithPagesExcludingStatus(page, pageSize, excludeStatus);
+    }
+    
     public boolean logTime(int problemId, int userId, double hours) {
     if (hours <= 0) return false;
     return dao.addTimeLog(problemId, userId, hours);

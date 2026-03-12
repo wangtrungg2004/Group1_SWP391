@@ -733,6 +733,62 @@ public class ProblemDao extends DbContext{
              return false;
          }
     }
+    
+    // Đếm số problem, loại trừ một status (vd: PENDING)
+    public int getTotalProblemExcludingStatus(String excludeStatus) {
+        String sql = "SELECT COUNT(Id) FROM dbo.Problems WHERE Status != ?";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, excludeStatus);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return 0;
+    }
+
+    // Lấy danh sách có phân trang, loại trừ một status
+    public List<Problems> getProblemsWithPagesExcludingStatus(int page, int pageSize, String excludeStatus) {
+        List<Problems> list = new ArrayList<>();
+        try {
+            String sql = "SELECT p.Id, p.TicketNumber, p.Title, p.Description, "
+                      + "p.RootCause, p.Workaround, p.Status, p.CreatedBy, "
+                      + "u.FullName AS CreatedByName, p.AssignedTo, u2.FullName AS AssignedToName, p.CreatedAt "
+                      + "FROM dbo.Problems p "
+                      + "LEFT JOIN dbo.Users u ON p.CreatedBy = u.Id "
+                      + "LEFT JOIN dbo.Users u2 ON p.AssignedTo = u2.Id "
+                      + "WHERE p.Status != ? "
+                      + "ORDER BY p.CreatedAt DESC "
+                      + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            int offset = (page - 1) * pageSize;
+            stm.setString(1, excludeStatus);
+            stm.setInt(2, offset);
+            stm.setInt(3, pageSize);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Problems pro = new Problems();
+                pro.setId(rs.getInt("Id"));
+                pro.setTicketNumber(rs.getString("TicketNumber"));
+                pro.setTitle(rs.getString("Title"));
+                pro.setDescription(rs.getString("Description"));
+                pro.setRootCause(rs.getString("RootCause"));
+                pro.setWorkaround(rs.getString("Workaround"));
+                pro.setStatus(rs.getString("Status"));
+                pro.setCreatedBy(rs.getInt("CreatedBy"));
+                pro.setCreatedByName(rs.getString("CreatedByName"));
+                pro.setAssignedTo(rs.getInt("AssignedTo"));
+                pro.setAssignedToName(rs.getString("AssignedToName"));
+                pro.setCreatedAt(rs.getDate("CreatedAt"));
+                list.add(pro);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return list;
+    }
 //    public static void main(String[] args) {
 //
 //        ProblemDao dao = new ProblemDao(); // constructor đã mở connection

@@ -166,11 +166,12 @@ public class ProblemList extends HttpServlet {
             totalPages = 1;
             page = 1;
         } else {
-            totalRecords = problemService.getTotalProblem();
+            String excludeStatus = "PENDING";
+            totalRecords = problemService.getTotalProblemExcludingStatus(excludeStatus);
             totalPages = (totalRecords + pageSize - 1) / pageSize;
             if (totalPages < 1) totalPages = 1;
             if (page > totalPages) page = totalPages;
-            problems = problemService.getProblemsWithPages(page, pageSize);
+            problems = problemService.getProblemsWithPagesExcludingStatus(page, pageSize, excludeStatus);
         }
 
         request.setAttribute("problem", problems);
