@@ -40,10 +40,13 @@ public class TicketService {
             return true;
         }
         return false;
+<<<<<<< HEAD
        
     }
 
     public Tickets getTicketById(int id) {
         return ticketDao.getTicketById(id);
+=======
+>>>>>>> d2154b86978d31b564b8846d8826925bf10e211d
     }
 }

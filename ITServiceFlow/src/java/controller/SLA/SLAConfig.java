@@ -145,7 +145,11 @@ public class SLAConfig extends HttpServlet {
                     e.printStackTrace();
                 }
             }
+<<<<<<< HEAD
         } else if ("toggleStatus".equals(action)) {
+=======
+        } else if ("togg leStatus".equals(action)) {
+>>>>>>> d2154b86978d31b564b8846d8826925bf10e211d
             String idRaw = request.getParameter("id");
             String currentStatus = request.getParameter("currentStatus");
             if (idRaw != null) {
@@ -155,6 +159,7 @@ public class SLAConfig extends HttpServlet {
                     if (rule != null) {
                         String newStatus = "Active".equals(currentStatus) ? "Inactive" : "Active";
                         rule.setStatus(newStatus);
+<<<<<<< HEAD
                         // If activating, we might want to check for conflicts, but
                         // SLARuleDao.addSLARule handles it.
                         // For updateSLARule, we need to ensure Dao handles deactivation of other rules
@@ -183,6 +188,14 @@ public class SLAConfig extends HttpServlet {
                             // or make updateSLARule handle it.
                             // Given the timeframe, let's trust the manager knows what they are doing OR
                             // we can improve DAO later. For now, basic toggle.
+=======
+
+                        slaRuleService.updateSLARule(rule);
+
+                       
+                        if ("Active".equals(newStatus)) {
+
+>>>>>>> d2154b86978d31b564b8846d8826925bf10e211d
                         }
                         session.setAttribute("successMessage", "SLA Rule status updated.");
                         response.sendRedirect("SLAConfig?action=detail&id=" + id);

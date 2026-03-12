@@ -60,11 +60,14 @@
                                             class="feather icon-settings"></i></span><span class="pcoded-mtext">SLA
                                         Configuration</span></a>
                             </li>
+<<<<<<< HEAD
                             <li class="nav-item">
                                 <a href="SLABreachList" class="nav-link"><span class="pcoded-micon"><i
                                             class="feather icon-alert-circle"></i></span><span class="pcoded-mtext">SLA
                                         Breach List</span></a>
                             </li>
+=======
+>>>>>>> d2154b86978d31b564b8846d8826925bf10e211d
                         </c:if>
 
                         <c:if test="${role == 'Admin' || role == 'Manager'}">
