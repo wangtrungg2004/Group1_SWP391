@@ -68,6 +68,7 @@
                                                             <th>ID</th>
                                                             <th>Title</th>
                                                             <th>Type</th>
+                                                            <th>Send to</th>
                                                             <th>Message</th>
                                                             <th>Created At</th>
                                                             <th>Status</th>
@@ -78,7 +79,7 @@
                                                         <c:choose>
                                                             <c:when test="${empty notifications}">
                                                                 <tr>
-                                                                    <td colspan="7" class="text-center text-muted">No notifications found</td>
+                                                                    <td colspan="8" class="text-center text-muted">No notifications found</td>
                                                                 </tr>
                                                             </c:when>
                                                             <c:otherwise>
@@ -87,6 +88,16 @@
                                                                         <td>${n.id}</td>
                                                                         <td>${n.title}</td>
                                                                         <td>${n.type}</td>
+                                                                        <td>
+                                                                            <c:choose>
+                                                                                <c:when test="${n.isBroadcast}">
+                                                                                    <span class="badge badge-success">All (Broadcast)</span>
+                                                                                </c:when>
+                                                                                <c:otherwise>
+                                                                                    User #${n.userId}
+                                                                                </c:otherwise>
+                                                                            </c:choose>
+                                                                        </td>
                                                                         <td>${n.message}</td>
                                                                         <td><fmt:formatDate value="${n.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
                                                                         <td>${n.isRead ? 'Read' : 'Unread'}</td>

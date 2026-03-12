@@ -39,4 +39,27 @@ public class NotificationService {
     public List<Notifications> getNotificationsByUserIdUnread(int id){
         return dao.getNotificationsByUserIdUnread(id);
     }
+    
+    public boolean createNotification(int userId, String message, Integer relatedTicketId,
+                               boolean isRead, String title, String type)
+    {
+        return dao.addNotification(userId, message, relatedTicketId, isRead, title, type);
+    }
+    
+    /** Gui notification cho nhieu user (moi user 1 dong). Dung khi chon "One user" nhap 1 id. */
+    public int addNotificationToUsers(List<Integer> userIds, String message,
+                                  Integer relatedTicketId, String title, String type) {
+        int count = 0;
+        for (Integer userId : userIds) {
+            if (userId != null && dao.addNotification(userId, message, relatedTicketId, false, title, type)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /** Gui 1 notification cho tat ca (broadcast). Chi tao 1 dong trong DB. */
+    public boolean addBroadcastNotification(String message, Integer relatedTicketId, String title, String type) {
+        return dao.addBroadcastNotification(message, relatedTicketId, title, type);
+    }
 }

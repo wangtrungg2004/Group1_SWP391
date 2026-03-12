@@ -10,18 +10,21 @@ import java.util.Date;
  */
 public class Notifications {
    private int Id;
-   private int UserId;
+   /** UserId = null khi la thong bao gui cho tat ca (broadcast) */
+   private Integer UserId;
    private String Message;
    private int RelatedTicketId;
    private boolean IsRead;
    private Date CreatedAt;
    private String Title;
    private String Type;
+   /** true = gui cho tat ca, false = gui cho 1 user */
+   private boolean IsBroadcast;
 
     public Notifications() {
     }
 
-    public Notifications(int Id, int UserId, String Message, int RelatedTicketId, boolean IsRead, Date CreatedAt, String Title, String Type) {
+    public Notifications(int Id, Integer UserId, String Message, int RelatedTicketId, boolean IsRead, Date CreatedAt, String Title, String Type, boolean IsBroadcast) {
         this.Id = Id;
         this.UserId = UserId;
         this.Message = Message;
@@ -30,6 +33,7 @@ public class Notifications {
         this.CreatedAt = CreatedAt;
         this.Title = Title;
         this.Type = Type;
+        this.IsBroadcast = IsBroadcast;
     }
 
     public int getId() {
@@ -40,12 +44,20 @@ public class Notifications {
         this.Id = Id;
     }
 
-    public int getUserId() {
+    public Integer getUserId() {
         return UserId;
     }
 
-    public void setUserId(int UserId) {
+    public void setUserId(Integer UserId) {
         this.UserId = UserId;
+    }
+
+    public boolean isIsBroadcast() {
+        return IsBroadcast;
+    }
+
+    public void setIsBroadcast(boolean IsBroadcast) {
+        this.IsBroadcast = IsBroadcast;
     }
 
     public String getMessage() {

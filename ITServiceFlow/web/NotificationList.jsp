@@ -137,6 +137,9 @@
                                                     </div>
                                                 </div>
                                             </form>
+                                            <a href="CreateNotification" class="btn btn-primary">
+                                                <i class="feather icon-plus"></i> Add New Notification
+                                            </a>
                                         <div class="table-responsive">
                                             <table class="table table-hover">
                                                 <thead class="thead-dark">
@@ -144,6 +147,7 @@
                                                         <th>ID</th>
                                                         <th>Title</th>
                                                         <th>Type</th>
+                                                        <th>Send to</th>
                                                         <th>Message</th>
                                                         <th>Created At</th>
                                                         <th>Action</th>
@@ -153,7 +157,7 @@
                                                     <c:choose>
                                                         <c:when test="${empty notifications}">
                                                             <tr>
-                                                                <td colspan="6" class="text-center text-muted">
+                                                                <td colspan="7" class="text-center text-muted">
                                                                     <i>No notifications found</i>
                                                                 </td>
                                                             </tr>
@@ -164,6 +168,16 @@
                                                                     <td>${n.id}</td>
                                                                     <td>${n.title}</td>
                                                                     <td>${n.type}</td>
+                                                                    <td>
+                                                                        <c:choose>
+                                                                            <c:when test="${n.isBroadcast}">
+                                                                                <span class="badge badge-success">All (Broadcast)</span>
+                                                                            </c:when>
+                                                                            <c:otherwise>
+                                                                                User #${n.userId}
+                                                                            </c:otherwise>
+                                                                        </c:choose>
+                                                                    </td>
                                                                     <td>${n.message}</td>
                                                                     <td>${n.createdAt}</td>
                                                                     <td class="d-flex gap-1">
@@ -172,7 +186,6 @@
                                                                             Detail
                                                                         </a>
                                                                     </td>
-                                                                    
                                                                 </tr>
                                                             </c:forEach>
                                                         </c:otherwise>

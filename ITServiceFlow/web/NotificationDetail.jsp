@@ -195,6 +195,19 @@
                                                                                 <th>Type</th>
                                                                                 <td><span class="badge badge-info">${notification.type}</span></td>
                                                                             </tr>
+                                                                            <tr>
+                                                                                <th>Send to</th>
+                                                                                <td>
+                                                                                    <c:choose>
+                                                                                        <c:when test="${notification.isBroadcast}">
+                                                                                            <span class="badge badge-success">All users (Broadcast)</span>
+                                                                                        </c:when>
+                                                                                        <c:otherwise>
+                                                                                            User #${notification.userId}
+                                                                                        </c:otherwise>
+                                                                                    </c:choose>
+                                                                                </td>
+                                                                            </tr>
                                                                         </tbody>
                                                                     </table>
                                                                 </div>

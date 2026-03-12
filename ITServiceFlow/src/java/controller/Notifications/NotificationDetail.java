@@ -73,10 +73,15 @@ public class NotificationDetail extends HttpServlet {
         }
         int id = Integer.parseInt(idParam);
         Notifications notification = notificationService.getNotificationsById(id);
-        boolean checkId = (notification.getUserId() ==userId);
-        boolean checkRole = ("User".equals(role) || "IT Support".equals(role));
-        if(checkId && checkRole)
-        {
+        if (notification == null) {
+            response.sendRedirect("ITSupportNotificationList");
+            return;
+        }
+        // Chi danh dau da doc voi notification gui rieng (1 user). Broadcast khong danh dau de tranh 1 nguoi danh dau cho tat ca.
+        boolean isBroadcast = notification.isIsBroadcast();
+        boolean isMyNotification = notification.getUserId() != null && notification.getUserId().equals(userId);
+        boolean canMarkRead = ("User".equals(role) || "IT Support".equals(role)) && isMyNotification && !isBroadcast;
+        if (canMarkRead) {
             notificationService.readNotification(id);
         }
 
