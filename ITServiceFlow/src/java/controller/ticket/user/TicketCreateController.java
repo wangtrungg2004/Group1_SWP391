@@ -30,6 +30,20 @@ public class TicketCreateController extends HttpServlet {
         request.getRequestDispatcher("/ticket/create.jsp").forward(request, response);
     }
 
+    private int calculatePriority(int impact, int urgency) {
+        int score = impact + urgency;
+        if (score <= 2) {
+            return 1; 
+        }
+        if (score <= 4) {
+            return 2; 
+        }
+        if (score <= 5) {
+            return 3; 
+        }
+        return 4; 
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -52,12 +66,14 @@ public class TicketCreateController extends HttpServlet {
         t.setCreatedBy(currentUser.getId());
         t.setLocationId(currentUser.getLocationId() > 0 ? currentUser.getLocationId() : 1);
 
-
         if ("Incident".equals(ticketType)) {
 
             String catStr = request.getParameter("categoryId");
-            String impactStr = request.getParameter("impact");
-            String urgencyStr = request.getParameter("urgency");
+
+            int impact = Integer.parseInt(request.getParameter("impact"));
+            int urgency = Integer.parseInt(request.getParameter("urgency"));
+
+            int calculatedPriority = calculatePriority(impact, urgency);
 
             if (catStr == null || catStr.isEmpty() || "null".equals(catStr)) {
                 request.setAttribute("errorMessage", "Vui lòng chọn đầy đủ đến mục 'Lỗi chi tiết'.");
@@ -67,20 +83,18 @@ public class TicketCreateController extends HttpServlet {
 
             try {
                 t.setCategoryId(Integer.parseInt(catStr));
-                t.setImpact(Integer.parseInt(impactStr));
-                t.setUrgency(Integer.parseInt(urgencyStr));
-                t.setPriorityId(1); 
-                
-           
-                t.setServiceCatalogId(null); 
-                t.setRequiresApproval(false); 
-                
+                t.setImpact(impact);
+                t.setUrgency(urgency);
+                t.setPriorityId(calculatedPriority);
+
+                t.setServiceCatalogId(null);
+                t.setRequiresApproval(false);
+
             } catch (NumberFormatException e) {
                 request.setAttribute("errorMessage", "Dữ liệu độ khẩn cấp/ảnh hưởng không hợp lệ.");
                 doGet(request, response);
                 return;
             }
-
 
         } else if ("ServiceRequest".equals(ticketType)) {
 
@@ -99,9 +113,9 @@ public class TicketCreateController extends HttpServlet {
 
                 if (svc != null) {
                     t.setServiceCatalogId(serviceId);
-                    t.setCategoryId(svc.getCategoryId()); 
+                    t.setCategoryId(svc.getCategoryId());
                     t.setRequiresApproval(svc.isRequiresApproval());
-                    
+
                     t.setImpact(null);
                     t.setUrgency(null);
                     t.setPriorityId(null);
@@ -126,5 +140,6 @@ public class TicketCreateController extends HttpServlet {
             request.setAttribute("errorMessage", "Lỗi hệ thống: Không thể lưu Ticket vào Database. Vui lòng thử lại.");
             doGet(request, response);
         }
+
     }
 }

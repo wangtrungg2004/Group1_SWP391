@@ -46,6 +46,10 @@
     <servlet-name>TicketDetailUser</servlet-name>
     <servlet-class>controller.ticket.user.TicketDetailUserController</servlet-class>
 </servlet>
+<servlet>
+    <servlet-name>UserDashboard</servlet-name>
+    <servlet-class>controller.ticket.user.UserDashboardController</servlet-class>
+</servlet>
     <servlet-mapping>
         <servlet-name>Login</servlet-name>
         <url-pattern>/Login</url-pattern>
@@ -178,6 +182,10 @@
 <servlet-mapping>
     <servlet-name>TicketDetailUser</servlet-name>
     <url-pattern>/TicketDetailUser</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+    <servlet-name>UserDashboard</servlet-name>
+    <url-pattern>/UserDashboard</url-pattern>
 </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>

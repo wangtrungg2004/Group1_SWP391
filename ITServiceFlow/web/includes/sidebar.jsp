@@ -26,7 +26,7 @@
                                 <label>IT Service</label>
                             </li>
                             <li class="nav-item">
-                                <a href="UserDashboard.jsp" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
+                                <a href="UserDashboard" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
                             </li>
                             <li class="nav-item">
                                 <a href="CreateTicket" class="nav-link"><span class="pcoded-micon"><i class="feather icon-plus-circle"></i></span><span class="pcoded-mtext">Create New Ticket</span></a>
@@ -35,9 +35,8 @@
                                 <a href="Tickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-list"></i></span><span class="pcoded-mtext">My Ticket History</span></a>
                             </li>
                             <li class="nav-item">
-                                                        <a href="KnowErrorList" class="nav-link"><span class="pcoded-micon"><i
-                                                                    class="feather icon-clock"></i></span><span class="pcoded-mtext">Know Error List</span></a>
-                                                    </li>
+                                <a href="KnowErrorList" class="nav-link"><span class="pcoded-micon"><i class="feather icon-clock"></i></span><span class="pcoded-mtext">Know Error List</span></a>
+                            </li>
                         </c:if>
 
 
