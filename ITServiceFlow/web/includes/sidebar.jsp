@@ -60,17 +60,26 @@
                                             class="feather icon-settings"></i></span><span class="pcoded-mtext">SLA
                                         Configuration</span></a>
                             </li>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> b5f2af4f1f8516f4efa1cf4f2223e16fbcd340f3
                             <li class="nav-item">
                                 <a href="SLABreachList" class="nav-link"><span class="pcoded-micon"><i
                                             class="feather icon-alert-circle"></i></span><span class="pcoded-mtext">SLA
                                         Breach List</span></a>
                             </li>
+<<<<<<< HEAD
                             <li class="nav-item">
                                 <a href="PerformanceDashboard" class="nav-link"><span class="pcoded-micon"><i
                                             class="feather icon-bar-chart-2"></i></span><span
                                         class="pcoded-mtext">Performance
                                         Dashboard</span></a>
                             </li>
+=======
+=======
+>>>>>>> d2154b86978d31b564b8846d8826925bf10e211d
+>>>>>>> b5f2af4f1f8516f4efa1cf4f2223e16fbcd340f3
                         </c:if>
 
                         <c:if test="${role == 'Admin' || role == 'Manager'}">

@@ -63,9 +63,18 @@ public class SLATrackingService {
     public java.util.List<java.util.Map<String, Object>> getNearBreachTickets(int limit) {
         return slaTrackingDao.getNearBreachTickets(limit);
     }
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> b5f2af4f1f8516f4efa1cf4f2223e16fbcd340f3
 
     public java.util.List<java.util.Map<String, Object>> getBreachList(String team, String priority, String agent,
             String status, String sortBy, int offset, int limit) {
         return slaTrackingDao.getBreachList(team, priority, agent, status, sortBy, offset, limit);
     }
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> d2154b86978d31b564b8846d8826925bf10e211d
+>>>>>>> b5f2af4f1f8516f4efa1cf4f2223e16fbcd340f3
 }
