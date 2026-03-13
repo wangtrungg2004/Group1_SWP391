@@ -1,7 +1,7 @@
 package service;
 
 import dao.ProblemDao;
-import dao.TicketDAO;
+import dao.TicketDao;
 import java.sql.Date;
 import java.util.List;
 import model.Problems;
@@ -12,20 +12,18 @@ import model.Tickets;
  */
 public class TicketService {
     
-    private TicketDAO ticketDao;
+    private TicketDao ticketDao;
     private SLATrackingService slaTrackingService;
 
     public TicketService() {
-        this.ticketDao = new TicketDAO();
+        this.ticketDao = new TicketDao();
         this.slaTrackingService = new SLATrackingService();
     }
 
-    // Hàm lấy danh sách ticket (Của Minh)
     public List<Tickets> getAllTicket() {
         return ticketDao.getAllTickets();
     }
 
-    // Hàm tạo ticket mới (Của HoangVN)
     public boolean createTicket(Tickets ticket) {
         // 1. Generate Ticket Number if missing
         if (ticket.getTicketNumber() == null || ticket.getTicketNumber().isEmpty()) {
@@ -43,6 +41,10 @@ public class TicketService {
             return true;
         }
         return false;
+    }
+    
+    public Tickets getTicketById(int id) {
+        return ticketDao.getTicketById(id);
     }
     
     public List<Tickets> getIncidentsNotInProblem()

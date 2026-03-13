@@ -7,13 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.tomcat.dbcp.dbcp2.PoolingConnection;
 
-public class TicketDAO extends DbContext {
+public class TicketDao extends DbContext {
 
     // 1. Unified Create Ticket (Cho cả Incident và Service Request)
     public boolean createTicket(Tickets t) {
-        // Lưu ý: Các trường ngày tháng như CreatedAt, UpdatedAt sẽ để SQL tự sinh bằng
-        // GETDATE()
-        // Status mặc định là 'New', CurrentLevel mặc định là 1
         String sql = "INSERT INTO Tickets ("
                 + "TicketNumber, TicketType, Title, Description, CategoryId, LocationId, "
                 + "Impact, Urgency, PriorityId, ServiceCatalogId, RequiresApproval, "
@@ -28,7 +25,6 @@ public class TicketDAO extends DbContext {
             ps.setInt(5, t.getCategoryId());
             ps.setInt(6, t.getLocationId());
 
-            // Xử lý cẩn thận các trường Integer có thể NULL
             if (t.getImpact() != null)
                 ps.setInt(7, t.getImpact());
             else
@@ -49,11 +45,10 @@ public class TicketDAO extends DbContext {
             else
                 ps.setNull(10, Types.INTEGER);
 
-            // Xử lý Boolean
             if (t.getRequiresApproval() != null)
                 ps.setBoolean(11, t.getRequiresApproval());
             else
-                ps.setBoolean(11, false); // Mặc định không cần duyệt
+                ps.setBoolean(11, false);
 
             ps.setInt(12, t.getCreatedBy());
 
@@ -70,8 +65,6 @@ public class TicketDAO extends DbContext {
     // 2. Load Tickets cho Dashboard (L1, L2, L3)
     public List<Tickets> getTicketsForAgent(int currentAgentId, int currentAgentLevel) {
         List<Tickets> list = new ArrayList<>();
-        // Logic: Lấy ticket assign cho mình, hoặc ticket đang ở Level của mình mà chưa
-        // ai nhận
         String sql = "SELECT * FROM Tickets "
                 + "WHERE AssignedTo = ? OR (CurrentLevel = ? AND Status = 'New' AND AssignedTo IS NULL) "
                 + "ORDER BY CreatedAt DESC";
@@ -89,11 +82,8 @@ public class TicketDAO extends DbContext {
                 t.setTitle(rs.getString("Title"));
                 t.setStatus(rs.getString("Status"));
                 t.setCurrentLevel(rs.getInt("CurrentLevel"));
-
-                // Tránh NullPointerException khi lấy Integer
                 t.setPriorityId((Integer) rs.getObject("PriorityId"));
                 t.setAssignedTo((Integer) rs.getObject("AssignedTo"));
-
                 t.setCreatedAt(rs.getDate("CreatedAt"));
                 list.add(t);
             }
@@ -172,36 +162,10 @@ public class TicketDAO extends DbContext {
         return list;
     }
 
-    // public static void main(String[] args) {
-    //
-    // TicketDao dao = new TicketDao();
-    // List<Tickets> tickets = dao.getAllTickets();
-    //
-    // if (tickets.isEmpty()) {
-    // System.out.println("❌ Không có ticket nào!");
-    // return;
-    // }
-    //
-    // System.out.println("===== DANH SÁCH TICKETS =====");
-    //
-    // for (Tickets t : tickets) {
-    // System.out.println(
-    // "ID: " + t.getId()
-    // + " | TicketNumber: " + t.getTicketNumber()
-    // + " | Title: " + t.getTitle()
-    // + " | Status: " + t.getStatus()
-    // + " | AssignedTo: " + t.getAssignedTo()
-    // + " | Level: " + t.getCurrentLevel()
-    // + " | CreatedAt: " + t.getCreatedAt()
-    // );
-    // }
-    // }
-
     // 3. Lấy danh sách Ticket cho End-User (My Tickets)
    public List<Tickets> getTicketsByCreator(int userId, int offset, int limit, String search, String status, String type) {
         List<Tickets> list = new ArrayList<>();
         
-        // Sử dụng StringBuilder để linh hoạt nối chuỗi SQL
         StringBuilder sql = new StringBuilder(
             "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.CreatedAt, t.UpdatedAt, "
             + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName "
@@ -212,17 +176,14 @@ public class TicketDAO extends DbContext {
             + "WHERE t.CreatedBy = ? "
         );
 
-        // Nối thêm điều kiện tìm kiếm nếu có
         if (search != null && !search.trim().isEmpty()) {
             sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
         }
         
-        // Nối thêm điều kiện Status nếu không phải 'all'
         if (status != null && !status.equals("all")) {
             sql.append("AND t.Status = ? ");
         }
         
-        // Nối thêm điều kiện Type nếu không phải 'all'
         if (type != null && !type.equals("all")) {
             sql.append("AND t.TicketType = ? ");
         }
@@ -233,7 +194,6 @@ public class TicketDAO extends DbContext {
             int paramIndex = 1;
             ps.setInt(paramIndex++, userId);
             
-            // Set params tương ứng với thứ tự nối chuỗi
             if (search != null && !search.trim().isEmpty()) {
                 ps.setString(paramIndex++, "%" + search + "%");
                 ps.setString(paramIndex++, "%" + search + "%");
@@ -270,7 +230,7 @@ public class TicketDAO extends DbContext {
         return list;
     }
 
-    // 3b. Lấy chi tiết ticket theo TicketNumber (dùng cho TicketResolutionReview)
+    // 3b. Lấy chi tiết ticket theo TicketNumber
     public Tickets getTicketByNumber(String ticketNumber) {
         String sql = "SELECT t.*, "
                 + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, "
@@ -322,7 +282,7 @@ public class TicketDAO extends DbContext {
         return null;
     }
 
-    // 4. Lấy chi tiết 1 Ticket theo ID - ĐÃ NÂNG CẤP JOIN
+    // 4. Lấy chi tiết 1 Ticket theo ID
     public Tickets getTicketById(int id) {
         String sql = "SELECT t.*, "
                 + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, "
@@ -354,13 +314,10 @@ public class TicketDAO extends DbContext {
                 t.setCreatedBy(rs.getInt("CreatedBy"));
                 t.setCreatedAt(rs.getTimestamp("CreatedAt"));
                 t.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
-
-                // Set các trường hiển thị
                 t.setPriorityLevel(rs.getString("PriorityLevel"));
                 t.setAssigneeName(rs.getString("AssigneeName"));
                 t.setCategoryName(rs.getString("CategoryName"));
                 t.setServiceName(rs.getString("ServiceName"));
-
                 return t;
             }
         } catch (Exception e) {
@@ -369,7 +326,7 @@ public class TicketDAO extends DbContext {
         return null;
     }
 
-    // Search ticket by ID (support Long_TicketDetailServlet)
+    // Search ticket by ID
     public Tickets searchTicketById(int ticketId) {
         String sql = "SELECT t.*, "
                 + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, "
@@ -403,12 +360,10 @@ public class TicketDAO extends DbContext {
                 t.setCreatedAt(rs.getTimestamp("CreatedAt"));
                 t.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
                 t.setCurrentLevel((Integer) rs.getObject("CurrentLevel"));
-
                 t.setPriorityLevel(rs.getString("PriorityLevel"));
                 t.setAssigneeName(rs.getString("AssigneeName"));
                 t.setCategoryName(rs.getString("CategoryName"));
                 t.setServiceName(rs.getString("ServiceName"));
-
                 return t;
             }
         } catch (Exception e) {
@@ -417,7 +372,7 @@ public class TicketDAO extends DbContext {
         return null;
     }
 
-    // 5. Lấy danh sách ticket đã Resolved (có thể lọc theo keyword TicketNumber)
+    // 5. Lấy danh sách ticket đã Resolved
     public List<Tickets> getResolvedTickets(String keyword) {
         List<Tickets> list = new ArrayList<>();
         String baseSql = "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.ResolvedAt "
@@ -447,7 +402,7 @@ public class TicketDAO extends DbContext {
         return list;
     }
 
-    // 5. Tạo ticket và trả về ID sinh ra (cho SLA tracking)
+    // 5b. Tạo ticket và trả về ID sinh ra (cho SLA tracking)
     public int createTicket2(Tickets ticket) {
         String sql = "INSERT INTO [dbo].[Tickets] (TicketNumber, TicketType, Title, Description, CategoryId, LocationId, Impact, Urgency, PriorityId, ServiceCatalogId, RequiresApproval, Status, CreatedBy, CreatedAt) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE())";
@@ -506,7 +461,6 @@ public class TicketDAO extends DbContext {
         kpis.put("awaiting", 0);
         kpis.put("resolved7d", 0);
 
-        // Gộp 4 phép tính vào 1 câu query duy nhất để tối ưu tốc độ
         String sql = "SELECT "
                    + "SUM(CASE WHEN Status = 'New' THEN 1 ELSE 0 END) AS OpenCount, "
                    + "SUM(CASE WHEN Status = 'In Progress' THEN 1 ELSE 0 END) AS InProgressCount, "
@@ -532,7 +486,7 @@ public class TicketDAO extends DbContext {
     }
     
     // 7. Đếm tổng số vé để tính tổng số trang
-public int getTotalTicketsCount(int userId, String search, String status, String type) {
+    public int getTotalTicketsCount(int userId, String search, String status, String type) {
         StringBuilder sql = new StringBuilder(
             "SELECT COUNT(*) FROM [dbo].[Tickets] WHERE CreatedBy = ? "
         );
@@ -645,24 +599,5 @@ public int getTotalTicketsCount(int userId, String search, String status, String
             ex.printStackTrace();
             return null;
         }
-        
-    }
-    
-    public static void main(String[] args) {
-
-        TicketDAO dao = new TicketDAO();
-
-        List<Tickets> list = dao.getIncidentsNotInProblem();
-
-        System.out.println("Danh sach incident chua gan vao problem:");
-
-        for (Tickets t : list) {
-            System.out.println(
-                    t.getId() + " | " +
-                            t.getTicketNumber() + " | " +
-                            t.getTitle() + " | " +
-                            t.getStatus());
-        }
-
     }
 }

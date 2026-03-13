@@ -75,6 +75,15 @@
                         <a href="SLAConfig" class="nav-link"><span class="pcoded-micon"><i
                                     class="feather icon-settings"></i></span><span class="pcoded-mtext">SLA Configuration</span></a>
                     </li>
+                    <li class="nav-item">
+                        <a href="SLABreachList" class="nav-link"><span class="pcoded-micon"><i
+                                    class="feather icon-alert-circle"></i></span><span class="pcoded-mtext">SLA Breach List</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="PerformanceDashboard" class="nav-link"><span class="pcoded-micon"><i
+                                    class="feather icon-bar-chart-2"></i></span><span
+                                class="pcoded-mtext">Performance Dashboard</span></a>
+                    </li>
                 </c:if>
 
                 <!-- PROBLEM MANAGEMENT (Admin & Manager) -->

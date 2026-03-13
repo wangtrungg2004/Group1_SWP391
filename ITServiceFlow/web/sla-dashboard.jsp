@@ -136,7 +136,7 @@
                                                                         </c:if>
                                                                         <c:forEach items="${nearBreachTickets}" var="t">
                                                                             <tr>
-                                                                                <td>${t['TicketNumber']}</td>
+                                                                                <td><a href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a></td>
                                                                                 <td>${t['Title']}</td>
                                                                                 <td class="text-warning">
                                                                                     <fmt:formatDate
@@ -179,7 +179,7 @@
                                                                         </c:if>
                                                                         <c:forEach items="${breachedTickets}" var="t">
                                                                             <tr>
-                                                                                <td>${t['TicketNumber']}</td>
+                                                                                <td><a href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a></td>
                                                                                 <td>${t['Title']}</td>
                                                                                 <td>${t['Priority']}</td>
                                                                                 <td class="text-danger">

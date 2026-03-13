@@ -145,7 +145,7 @@ public class SLAConfig extends HttpServlet {
                     e.printStackTrace();
                 }
             }
-        } else if ("togg leStatus".equals(action)) {
+        } else if ("toggleStatus".equals(action)) {
             String idRaw = request.getParameter("id");
             String currentStatus = request.getParameter("currentStatus");
             if (idRaw != null) {
@@ -155,12 +155,10 @@ public class SLAConfig extends HttpServlet {
                     if (rule != null) {
                         String newStatus = "Active".equals(currentStatus) ? "Inactive" : "Active";
                         rule.setStatus(newStatus);
-
                         slaRuleService.updateSLARule(rule);
-
-                       
+                        
                         if ("Active".equals(newStatus)) {
-
+                            // Additional logic could be added here if needed
                         }
                         session.setAttribute("successMessage", "SLA Rule status updated.");
                         response.sendRedirect("SLAConfig?action=detail&id=" + id);
