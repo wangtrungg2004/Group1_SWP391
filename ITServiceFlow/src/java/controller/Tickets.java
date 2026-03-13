@@ -12,11 +12,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-<<<<<<< HEAD
-//import model.Tickets;
-=======
-import model.Tickets;
->>>>>>> b5f2af4f1f8516f4efa1cf4f2223e16fbcd340f3
 import service.TicketService;
 
 /**
@@ -63,7 +58,7 @@ public class Tickets extends HttpServlet {
         if (idStr != null && !idStr.isEmpty()) {
             try {
                 int id = Integer.parseInt(idStr);
-                Tickets ticket = ticketService.getTicketById(id);
+                model.Tickets ticket = ticketService.getTicketById(id);
                 if (ticket != null) {
                     request.setAttribute("ticket", ticket);
                     request.getRequestDispatcher("ticket-detail.jsp").forward(request, response);
