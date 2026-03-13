@@ -5,7 +5,7 @@
 package controller.Problems;
 
 import dao.NotificationDao;
-import dao.TicketDao;
+import dao.TicketDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -18,6 +18,7 @@ import java.util.List;
 import model.Problems;
 import model.Tickets;
 import service.ProblemService;
+import service.TicketService;
 import service.UserService;
 
 /**
@@ -65,7 +66,7 @@ public class ProblemUpdate extends HttpServlet {
      */
     ProblemService problemService = new ProblemService();
     UserService userService = new UserService();
-    TicketDao ticketService = new TicketDao();
+    TicketService ticketService = new TicketService();
     NotificationDao notificationDao = new NotificationDao();
 
     @Override
@@ -91,7 +92,7 @@ public class ProblemUpdate extends HttpServlet {
                 return;
             }
 
-            List<Tickets> tickets = ticketService.getAllTickets();
+            List<Tickets> tickets = ticketService.getAllTicket();
             List<Tickets> relatedTickets = problemService.getRelatedTicket(id);
 
             request.setAttribute("tickets", tickets);

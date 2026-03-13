@@ -168,11 +168,12 @@
                                                     </c:if>
                                                 </c:if>
 
-                                                <c:if test="${role eq 'IT Support'
- and not empty problem
- and problem.status eq 'REJECTED'
- and not empty problem.rootCause
- and not empty problem.workaround}">
+                                                <c:if test="${role eq 'IT Support' 
+    and not empty problem 
+    and problem.status eq 'REJECTED'
+    and not empty problem.rootCause
+    and not empty problem.workaround}">
+    
     <form action="SubmitApproval" method="post" style="display:inline;">
         <input type="hidden" name="problemId" value="${problem.id}">
         <input type="hidden" name="status" value="PENDING">
@@ -181,16 +182,21 @@
             <i class="feather icon-send"></i> ReSubmit
         </button>
     </form>
+
 </c:if>
 
+
 <c:if test="${role eq 'IT Support' and not empty problem and problem.status eq 'NEW'}">
-    <form action="ITProblemListController" method="post" style="display:inline;">
+
+    <form action="ProblemDetail" method="post" style="display:inline;">
+        <input type="hidden" name="action" value="startInvestigation">
         <input type="hidden" name="problemId" value="${problem.id}">
         <button type="submit" class="btn btn-sm btn-warning"
                 onclick="return confirm('Start investigation for this problem?');">
             <i class="feather icon-play-circle"></i> Start Investigation
         </button>
     </form>
+
 </c:if>
                                                 
                                                 <c:if test="${role eq 'IT Support' 

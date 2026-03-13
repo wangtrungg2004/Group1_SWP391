@@ -5,6 +5,7 @@ import Utils.DbContext;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.tomcat.dbcp.dbcp2.PoolingConnection;
 
 public class TicketDAO extends DbContext {
 
@@ -197,20 +198,56 @@ public class TicketDAO extends DbContext {
     // }
 
     // 3. Lấy danh sách Ticket cho End-User (My Tickets)
-    public List<Tickets> getTicketsByCreator(int userId) {
+   public List<Tickets> getTicketsByCreator(int userId, int offset, int limit, String search, String status, String type) {
         List<Tickets> list = new ArrayList<>();
-        // Dùng LEFT JOIN để lấy luôn tên Priority, Assignee và Category
-        String sql = "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.CreatedAt, t.UpdatedAt, "
-                + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName "
-                + "FROM [dbo].[Tickets] t "
-                + "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id "
-                + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
-                + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
-                + "WHERE t.CreatedBy = ? "
-                + "ORDER BY t.CreatedAt DESC";
+        
+        // Sử dụng StringBuilder để linh hoạt nối chuỗi SQL
+        StringBuilder sql = new StringBuilder(
+            "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.CreatedAt, t.UpdatedAt, "
+            + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName "
+            + "FROM [dbo].[Tickets] t "
+            + "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id "
+            + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
+            + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
+            + "WHERE t.CreatedBy = ? "
+        );
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, userId);
+        // Nối thêm điều kiện tìm kiếm nếu có
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
+        }
+        
+        // Nối thêm điều kiện Status nếu không phải 'all'
+        if (status != null && !status.equals("all")) {
+            sql.append("AND t.Status = ? ");
+        }
+        
+        // Nối thêm điều kiện Type nếu không phải 'all'
+        if (type != null && !type.equals("all")) {
+            sql.append("AND t.TicketType = ? ");
+        }
+
+        sql.append("ORDER BY t.CreatedAt DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"); 
+                   
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+            ps.setInt(paramIndex++, userId);
+            
+            // Set params tương ứng với thứ tự nối chuỗi
+            if (search != null && !search.trim().isEmpty()) {
+                ps.setString(paramIndex++, "%" + search + "%");
+                ps.setString(paramIndex++, "%" + search + "%");
+            }
+            if (status != null && !status.equals("all")) {
+                ps.setString(paramIndex++, status);
+            }
+            if (type != null && !type.equals("all")) {
+                ps.setString(paramIndex++, type);
+            }
+            
+            ps.setInt(paramIndex++, offset);
+            ps.setInt(paramIndex++, limit);
+            
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -222,16 +259,12 @@ public class TicketDAO extends DbContext {
                 t.setStatus(rs.getString("Status"));
                 t.setCreatedAt(rs.getTimestamp("CreatedAt"));
                 t.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
-
-                // Set các trường hiển thị mới thêm
                 t.setPriorityLevel(rs.getString("PriorityLevel"));
                 t.setAssigneeName(rs.getString("AssigneeName"));
                 t.setCategoryName(rs.getString("CategoryName"));
-
                 list.add(t);
             }
         } catch (Exception e) {
-            System.err.println("Lỗi khi lấy danh sách My Tickets: " + e.getMessage());
             e.printStackTrace();
         }
         return list;
@@ -464,6 +497,80 @@ public class TicketDAO extends DbContext {
         }
         return -1;
     }
+    
+    // 6. Lấy thống kê KPI cho Dashboard của người dùng
+    public java.util.Map<String, Integer> getUserTicketKPIs(int userId) {
+        java.util.Map<String, Integer> kpis = new java.util.HashMap<>();
+        kpis.put("open", 0);
+        kpis.put("inProgress", 0);
+        kpis.put("awaiting", 0);
+        kpis.put("resolved7d", 0);
+
+        // Gộp 4 phép tính vào 1 câu query duy nhất để tối ưu tốc độ
+        String sql = "SELECT "
+                   + "SUM(CASE WHEN Status = 'New' THEN 1 ELSE 0 END) AS OpenCount, "
+                   + "SUM(CASE WHEN Status = 'In Progress' THEN 1 ELSE 0 END) AS InProgressCount, "
+                   + "SUM(CASE WHEN RequiresApproval = 1 AND ApprovedBy IS NULL AND Status NOT IN ('Closed', 'Resolved') THEN 1 ELSE 0 END) AS AwaitingCount, "
+                   + "SUM(CASE WHEN Status = 'Resolved' AND CreatedAt >= DATEADD(day, -7, GETDATE()) THEN 1 ELSE 0 END) AS Resolved7dCount "
+                   + "FROM [dbo].[Tickets] WHERE CreatedBy = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                kpis.put("open", rs.getInt("OpenCount"));
+                kpis.put("inProgress", rs.getInt("InProgressCount"));
+                kpis.put("awaiting", rs.getInt("AwaitingCount"));
+                kpis.put("resolved7d", rs.getInt("Resolved7dCount"));
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi khi tính KPI: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return kpis;
+    }
+    
+    // 7. Đếm tổng số vé để tính tổng số trang
+public int getTotalTicketsCount(int userId, String search, String status, String type) {
+        StringBuilder sql = new StringBuilder(
+            "SELECT COUNT(*) FROM [dbo].[Tickets] WHERE CreatedBy = ? "
+        );
+        
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append("AND (TicketNumber LIKE ? OR Title LIKE ?) ");
+        }
+        if (status != null && !status.equals("all")) {
+            sql.append("AND Status = ? ");
+        }
+        if (type != null && !type.equals("all")) {
+            sql.append("AND TicketType = ? ");
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+            ps.setInt(paramIndex++, userId);
+            
+            if (search != null && !search.trim().isEmpty()) {
+                ps.setString(paramIndex++, "%" + search + "%");
+                ps.setString(paramIndex++, "%" + search + "%");
+            }
+            if (status != null && !status.equals("all")) {
+                ps.setString(paramIndex++, status);
+            }
+            if (type != null && !type.equals("all")) {
+                ps.setString(paramIndex++, type);
+            }
+            
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
     // Helper to generate Ticket Number
     public String getNextTicketNumber(String type) {
@@ -502,7 +609,45 @@ public class TicketDAO extends DbContext {
 
         return list;
     }
-
+    
+    public List<Tickets> searchIncidentsNotInProblem(String search)
+    {
+        List<Tickets> list = new ArrayList<>();
+        String  sql = "SELECT t.Id, t.TicketNumber, t.Title, t.Status " +
+                     "FROM Tickets t " +
+                     "WHERE t.TicketType = 'INCIDENT' " +
+                     "AND NOT EXISTS ( " +
+                     "    SELECT 1 FROM ProblemTickets pt " +
+                     "    WHERE pt.TicketId = t.Id" +
+                     ")" +
+                     " AND (t.TicketNumber LIKE ? OR t.Title LIKE ?)";
+        
+        try
+        {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            String searchValue = "%" + search + "%";
+            stm.setString(1, searchValue);
+            stm.setString(2, searchValue);
+            ResultSet rs = stm.executeQuery();
+            while(rs.next())
+            {
+                Tickets t = new Tickets();
+                t.setId(rs.getInt("Id"));
+                t.setTicketNumber(rs.getString("TicketNumber"));
+                t.setTitle(rs.getString("Title"));
+                t.setStatus(rs.getString("Status"));
+                list.add(t);
+            }
+            return list;
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            return null;
+        }
+        
+    }
+    
     public static void main(String[] args) {
 
         TicketDAO dao = new TicketDAO();
