@@ -17,6 +17,14 @@
     <link rel="stylesheet" href="assets/plugins/animation/css/animate.min.css">
     <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .form-control:invalid {
+            border-color: #f44236 !important;
+        }
+        .was-validated .form-control:invalid {
+            background-image: none;
+        }
+    </style>
 </head>
 
 <body class="">
@@ -62,24 +70,24 @@
                                                 <div class="alert alert-danger">${errorMessage}</div>
                                             </c:if>
 
-                                            <form action="ticket/create" method="POST" id="ticketForm" enctype="multipart/form-data">
+                                            <form action="${pageContext.request.contextPath}/CreateTicket" method="POST" id="ticketForm" enctype="multipart/form-data" class="needs-validation" novalidate>
                                                 
                                                 <div class="form-group mb-3">
                                                     <label class="font-weight-bold">Bạn đang cần gì?</label>
                                                     <select name="ticketType" id="ticketType" class="form-control" onchange="toggleFormFields()" required>
-                                                        <option value="Incident" selected>Báo lỗi (Máy móc, phần mềm bị hỏng)</option>
-                                                        <option value="ServiceRequest">Yêu cầu Dịch vụ (Xin cấp tài khoản, thiết bị mới)</option>
+                                                        <option value="Incident" ${ticketType_val == 'Incident' ? 'selected' : ''}>Báo lỗi (Máy móc, phần mềm bị hỏng)</option>
+                                                        <option value="ServiceRequest" ${ticketType_val == 'ServiceRequest' ? 'selected' : ''}>Yêu cầu Dịch vụ (Xin cấp tài khoản, thiết bị mới)</option>
                                                     </select>
                                                 </div>
 
                                                 <div class="form-group mb-3">
                                                     <label class="font-weight-bold">Tiêu đề (Ngắn gọn)</label>
-                                                    <input type="text" name="title" class="form-control" placeholder="Ví dụ: Không thể in tài liệu..." required maxlength="255">
+                                                    <input type="text" name="title" class="form-control" placeholder="Ví dụ: Không thể in tài liệu..." required minlength="5" maxlength="255" value="${title_val}">
                                                 </div>
 
                                                 <div class="form-group mb-3">
                                                     <label class="font-weight-bold">Mô tả chi tiết</label>
-                                                    <textarea name="description" class="form-control" rows="5" placeholder="Vui lòng cung cấp càng nhiều chi tiết càng tốt..." required></textarea>
+                                                    <textarea name="description" class="form-control" rows="5" placeholder="Vui lòng cung cấp càng nhiều chi tiết càng tốt..." required minlength="10">${description_val}</textarea>
                                                 </div>
 
                                                 <div class="form-group mb-3">
@@ -98,26 +106,26 @@
                                                         <label>Danh mục (Category)</label>
                                                         <select name="categoryId" class="form-control incident-field" required>
                                                             <option value="">-- Chọn danh mục --</option>
-                                                            <option value="1">Hardware (Phần cứng)</option>
-                                                            <option value="2">Software (Phần mềm)</option>
-                                                            <option value="3">Network (Mạng)</option>
+                                                            <c:forEach items="${categoryList}" var="cat">
+                                                                <option value="${cat.id}" ${categoryId_val == cat.id ? 'selected' : ''}>${cat.displayName}</option>
+                                                            </c:forEach>
                                                         </select>
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-md-6 form-group">
                                                             <label>Mức độ ảnh hưởng (Impact)</label>
                                                             <select name="impact" class="form-control incident-field" required>
-                                                                <option value="3">Low (Chỉ mình tôi)</option>
-                                                                <option value="2">Medium (Cả phòng ban)</option>
-                                                                <option value="1">High (Toàn công ty)</option>
+                                                                <option value="3" ${impact_val == '3' ? 'selected' : ''}>Low (Chỉ mình tôi)</option>
+                                                                <option value="2" ${impact_val == '2' ? 'selected' : ''}>Medium (Cả phòng ban)</option>
+                                                                <option value="1" ${impact_val == '1' ? 'selected' : ''}>High (Toàn công ty)</option>
                                                             </select>
                                                         </div>
                                                         <div class="col-md-6 form-group">
                                                             <label>Độ khẩn cấp (Urgency)</label>
                                                             <select name="urgency" class="form-control incident-field" required>
-                                                                <option value="3">Low (Có thể đợi vài ngày)</option>
-                                                                <option value="2">Medium (Cần trong ngày)</option>
-                                                                <option value="1">High (Đang dừng việc, cần ngay!)</option>
+                                                                <option value="3" ${urgency_val == '3' ? 'selected' : ''}>Low (Có thể đợi vài ngày)</option>
+                                                                <option value="2" ${urgency_val == '2' ? 'selected' : ''}>Medium (Cần trong ngày)</option>
+                                                                <option value="1" ${urgency_val == '1' ? 'selected' : ''}>High (Đang dừng việc, cần ngay!)</option>
                                                             </select>
                                                         </div>
                                                     </div>
@@ -130,9 +138,9 @@
                                                         <label>Danh mục dịch vụ (Service Catalog)</label>
                                                         <select name="serviceCatalogId" class="form-control request-field">
                                                             <option value="">-- Chọn dịch vụ cần cấp --</option>
-                                                            <option value="1">Xin cấp Laptop mới</option>
-                                                            <option value="2">Yêu cầu cài đặt phần mềm</option>
-                                                            <option value="3">Yêu cầu cấp quyền ERP</option>
+                                                            <c:forEach items="${serviceList}" var="svc">
+                                                                <option value="${svc.id}" ${serviceCatalogId_val == svc.id ? 'selected' : ''}>${svc.name}</option>
+                                                            </c:forEach>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -180,6 +188,17 @@
         // Chạy khi load trang
         window.onload = function() {
             toggleFormFields();
+            
+            // Bootstrap validation logic
+            var form = document.getElementById('ticketForm');
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    alert("Vui lòng điền đầy đủ các thông tin bắt buộc!");
+                }
+                form.classList.add('was-validated');
+            }, false);
         };
     </script>
 </body>

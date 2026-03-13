@@ -10,7 +10,7 @@ import org.apache.tomcat.dbcp.dbcp2.PoolingConnection;
 public class TicketDAO extends DbContext {
 
     // 1. Unified Create Ticket (Cho cả Incident và Service Request)
-    public boolean createTicket(Tickets t) {
+    public String createTicket(Tickets t) {
         // Lưu ý: Các trường ngày tháng như CreatedAt, UpdatedAt sẽ để SQL tự sinh bằng
         // GETDATE()
         // Status mặc định là 'New', CurrentLevel mặc định là 1
@@ -58,12 +58,12 @@ public class TicketDAO extends DbContext {
             ps.setInt(12, t.getCreatedBy());
 
             int rowsAffected = ps.executeUpdate();
-            return rowsAffected > 0;
+            return rowsAffected > 0 ? "ok" : "Lỗi: Không có dòng nào được tạo.";
 
         } catch (SQLException e) {
             System.err.println("Error creating ticket: " + e.getMessage());
             e.printStackTrace();
-            return false;
+            return "Lỗi SQL: " + e.getMessage();
         }
     }
 
