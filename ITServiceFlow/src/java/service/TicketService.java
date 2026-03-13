@@ -1,7 +1,7 @@
 package service;
 
 import dao.ProblemDao;
-import dao.TicketDao;
+import dao.TicketDAO;
 import java.sql.Date;
 import java.util.List;
 import model.Problems;
@@ -12,11 +12,11 @@ import model.Tickets;
  */
 public class TicketService {
     
-    private TicketDao ticketDao;
+    private TicketDAO ticketDao;
     private SLATrackingService slaTrackingService;
 
     public TicketService() {
-        this.ticketDao = new TicketDao();
+        this.ticketDao = new TicketDAO();
         this.slaTrackingService = new SLATrackingService();
     }
 

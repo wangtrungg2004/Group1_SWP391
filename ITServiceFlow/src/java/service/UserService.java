@@ -26,7 +26,8 @@ public class UserService {
     {
         if (Username == null || RawPassword == null) return null;
         // [PASSWORD_HASH] hash trước khi so sánh với DB; khi bỏ hash: gọi dao.login(Username, RawPassword.trim()) và đổi UserDao.login so sánh cột Password (plain)
-        return dao.login(Username, RawPassword.trim());
+        String passwordHash = PasswordUtil.sha256(RawPassword.trim());
+        return dao.login(Username, passwordHash);
     }
     
     public boolean resetPassword(String username, String email, String rawNewPassword) {
