@@ -9,22 +9,6 @@
         <servlet-name>Logout</servlet-name>
         <servlet-class>controller.Logout</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>ForgotPassword</servlet-name>
-        <servlet-class>controller.ForgotPassword</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ResetPassword</servlet-name>
-        <servlet-class>controller.ResetPassword</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>UserCreate</servlet-name>
-        <servlet-class>controller.UserCreate</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>GoogleLogin</servlet-name>
-        <servlet-class>controller.GoogleLogin</servlet-class>
-    </servlet>
     <!-- Servlet Mapping -->
     <servlet>
         <servlet-name>ProblemUpdate</servlet-name>
@@ -34,22 +18,22 @@
         <servlet-name>ProblemAdd</servlet-name>
         <servlet-class>controller.Problems.ProblemAdd</servlet-class>
     </servlet>
-<servlet>
-    <servlet-name>MyTickets</servlet-name>
-    <servlet-class>controller.ticket.user.MyTicketsController</servlet-class>
-</servlet>
-<servlet>
-    <servlet-name>CreateTicket</servlet-name>
-    <servlet-class>controller.ticket.user.TicketCreateController</servlet-class>
-</servlet>
-<servlet>
-    <servlet-name>TicketDetailUser</servlet-name>
-    <servlet-class>controller.ticket.user.TicketDetailUserController</servlet-class>
-</servlet>
-<servlet>
-    <servlet-name>UserDashboard</servlet-name>
-    <servlet-class>controller.ticket.user.UserDashboardController</servlet-class>
-</servlet>
+    <servlet>
+        <servlet-name>MyTickets</servlet-name>
+        <servlet-class>controller.ticket.user.MyTicketsController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CreateTicket</servlet-name>
+        <servlet-class>controller.ticket.user.TicketCreateController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TicketDetailUser</servlet-name>
+        <servlet-class>controller.ticket.user.TicketDetailUserController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UserDashboard</servlet-name>
+        <servlet-class>controller.ticket.user.UserDashboardController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Login</servlet-name>
         <url-pattern>/Login</url-pattern>
@@ -57,22 +41,6 @@
     <servlet-mapping>
         <servlet-name>Logout</servlet-name>
         <url-pattern>/Logout</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ForgotPassword</servlet-name>
-        <url-pattern>/ForgotPassword</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ResetPassword</servlet-name>
-        <url-pattern>/ResetPassword</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>UserCreate</servlet-name>
-        <url-pattern>/UserCreate</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>GoogleLogin</servlet-name>
-        <url-pattern>/GoogleLogin</url-pattern>
     </servlet-mapping>
     <!-- Filter Declaration -->
     <filter>
@@ -91,58 +59,6 @@
     <filter-mapping>
         <filter-name>AuthorizationFilter</filter-name>
         <url-pattern>/ITDashboard.jsp</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AuthorizationFilter</filter-name>
-        <url-pattern>/ManagerDashboard.jsp</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AuthorizationFilter</filter-name>
-        <url-pattern>/ProblemList</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AuthorizationFilter</filter-name>
-        <url-pattern>/ProblemAdd</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AuthorizationFilter</filter-name>
-        <url-pattern>/ProblemUpdate</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AuthorizationFilter</filter-name>
-        <url-pattern>/ProblemDetail</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AuthorizationFilter</filter-name>
-        <url-pattern>/ITProblemListController</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AuthorizationFilter</filter-name>
-        <url-pattern>/ProblemList.jsp</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AuthorizationFilter</filter-name>
-        <url-pattern>/ProblemAdd.jsp</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AuthorizationFilter</filter-name>
-        <url-pattern>/ProblemUpdate.jsp</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AuthorizationFilter</filter-name>
-        <url-pattern>/ProblemDetail.jsp</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AuthorizationFilter</filter-name>
-        <url-pattern>/ITSupportProblemList.jsp</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AuthorizationFilter</filter-name>
-        <url-pattern>/UserCreate</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AuthorizationFilter</filter-name>
-        <url-pattern>/UserCreate.jsp</url-pattern>
     </filter-mapping>
     <filter-mapping>
         <filter-name>AuthorizationFilter</filter-name>
@@ -172,22 +88,23 @@
         <url-pattern>/ProblemAdd</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-    <servlet-name>MyTickets</servlet-name>
-    <url-pattern>/Tickets</url-pattern>
-</servlet-mapping>
-<servlet-mapping>
-    <servlet-name>CreateTicket</servlet-name>
-    <url-pattern>/CreateTicket</url-pattern>
-</servlet-mapping>
-<servlet-mapping>
-    <servlet-name>TicketDetailUser</servlet-name>
-    <url-pattern>/TicketDetailUser</url-pattern>
-</servlet-mapping>
-<servlet-mapping>
-    <servlet-name>UserDashboard</servlet-name>
-    <url-pattern>/UserDashboard</url-pattern>
-</servlet-mapping>
+        <servlet-name>MyTickets</servlet-name>
+        <url-pattern>/Tickets</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateTicket</servlet-name>
+        <url-pattern>/CreateTicket</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TicketDetailUser</servlet-name>
+        <url-pattern>/TicketDetailUser</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UserDashboard</servlet-name>
+        <url-pattern>/UserDashboard</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
+
 </web-app>

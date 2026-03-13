@@ -7,17 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.tomcat.dbcp.dbcp2.PoolingConnection;
 
-public class TicketDao extends DbContext {
+public class TicketDAO extends DbContext {
 
     // 1. Unified Create Ticket (Cho cả Incident và Service Request)
     public boolean createTicket(Tickets t) {
-        // Lưu ý: Các trường ngày tháng như CreatedAt, UpdatedAt sẽ để SQL tự sinh bằng GETDATE()
+        // Lưu ý: Các trường ngày tháng như CreatedAt, UpdatedAt sẽ để SQL tự sinh bằng
+        // GETDATE()
         // Status mặc định là 'New', CurrentLevel mặc định là 1
         String sql = "INSERT INTO Tickets ("
-                   + "TicketNumber, TicketType, Title, Description, CategoryId, LocationId, "
-                   + "Impact, Urgency, PriorityId, ServiceCatalogId, RequiresApproval, "
-                   + "Status, CreatedBy, CurrentLevel, CreatedAt, UpdatedAt"
-                   + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'New', ?, 1, GETDATE(), GETDATE())";
+                + "TicketNumber, TicketType, Title, Description, CategoryId, LocationId, "
+                + "Impact, Urgency, PriorityId, ServiceCatalogId, RequiresApproval, "
+                + "Status, CreatedBy, CurrentLevel, CreatedAt, UpdatedAt"
+                + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'New', ?, 1, GETDATE(), GETDATE())";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, t.getTicketNumber());
@@ -26,29 +27,39 @@ public class TicketDao extends DbContext {
             ps.setString(4, t.getDescription());
             ps.setInt(5, t.getCategoryId());
             ps.setInt(6, t.getLocationId());
-            
+
             // Xử lý cẩn thận các trường Integer có thể NULL
-            if (t.getImpact() != null) ps.setInt(7, t.getImpact()); 
-            else ps.setNull(7, Types.INTEGER);
-            
-            if (t.getUrgency() != null) ps.setInt(8, t.getUrgency()); 
-            else ps.setNull(8, Types.INTEGER);
-            
-            if (t.getPriorityId() != null) ps.setInt(9, t.getPriorityId()); 
-            else ps.setNull(9, Types.INTEGER);
-            
-            if (t.getServiceCatalogId() != null) ps.setInt(10, t.getServiceCatalogId()); 
-            else ps.setNull(10, Types.INTEGER);
-            
+            if (t.getImpact() != null)
+                ps.setInt(7, t.getImpact());
+            else
+                ps.setNull(7, Types.INTEGER);
+
+            if (t.getUrgency() != null)
+                ps.setInt(8, t.getUrgency());
+            else
+                ps.setNull(8, Types.INTEGER);
+
+            if (t.getPriorityId() != null)
+                ps.setInt(9, t.getPriorityId());
+            else
+                ps.setNull(9, Types.INTEGER);
+
+            if (t.getServiceCatalogId() != null)
+                ps.setInt(10, t.getServiceCatalogId());
+            else
+                ps.setNull(10, Types.INTEGER);
+
             // Xử lý Boolean
-            if (t.getRequiresApproval() != null) ps.setBoolean(11, t.getRequiresApproval());
-            else ps.setBoolean(11, false); // Mặc định không cần duyệt
-            
+            if (t.getRequiresApproval() != null)
+                ps.setBoolean(11, t.getRequiresApproval());
+            else
+                ps.setBoolean(11, false); // Mặc định không cần duyệt
+
             ps.setInt(12, t.getCreatedBy());
 
             int rowsAffected = ps.executeUpdate();
             return rowsAffected > 0;
-            
+
         } catch (SQLException e) {
             System.err.println("Error creating ticket: " + e.getMessage());
             e.printStackTrace();
@@ -59,15 +70,16 @@ public class TicketDao extends DbContext {
     // 2. Load Tickets cho Dashboard (L1, L2, L3)
     public List<Tickets> getTicketsForAgent(int currentAgentId, int currentAgentLevel) {
         List<Tickets> list = new ArrayList<>();
-        // Logic: Lấy ticket assign cho mình, hoặc ticket đang ở Level của mình mà chưa ai nhận
+        // Logic: Lấy ticket assign cho mình, hoặc ticket đang ở Level của mình mà chưa
+        // ai nhận
         String sql = "SELECT * FROM Tickets "
-                   + "WHERE AssignedTo = ? OR (CurrentLevel = ? AND Status = 'New' AND AssignedTo IS NULL) "
-                   + "ORDER BY CreatedAt DESC";
-        
+                + "WHERE AssignedTo = ? OR (CurrentLevel = ? AND Status = 'New' AND AssignedTo IS NULL) "
+                + "ORDER BY CreatedAt DESC";
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, currentAgentId);
             ps.setInt(2, currentAgentLevel);
-            
+
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Tickets t = new Tickets();
@@ -77,11 +89,11 @@ public class TicketDao extends DbContext {
                 t.setTitle(rs.getString("Title"));
                 t.setStatus(rs.getString("Status"));
                 t.setCurrentLevel(rs.getInt("CurrentLevel"));
-                
+
                 // Tránh NullPointerException khi lấy Integer
                 t.setPriorityId((Integer) rs.getObject("PriorityId"));
                 t.setAssignedTo((Integer) rs.getObject("AssignedTo"));
-                
+
                 t.setCreatedAt(rs.getDate("CreatedAt"));
                 list.add(t);
             }
@@ -90,40 +102,37 @@ public class TicketDao extends DbContext {
         }
         return list;
     }
-    
-    public List<Tickets> getAllTickets()
-    {
+
+    public List<Tickets> getAllTickets() {
         List<Tickets> list = new ArrayList<>();
         String sql = "SELECT [Id]\n" +
-            "      ,[TicketNumber]\n" +
-            "      ,[TicketType]\n" +
-            "      ,[Title]\n" +
-            "      ,[Description]\n" +
-            "      ,[CategoryId]\n" +
-            "      ,[LocationId]\n" +
-            "      ,[Impact]\n" +
-            "      ,[Urgency]\n" +
-            "      ,[PriorityId]\n" +
-            "      ,[ServiceCatalogId]\n" +
-            "      ,[RequiresApproval]\n" +
-            "      ,[ApprovedBy]\n" +
-            "      ,[ApprovedAt]\n" +
-            "      ,[Status]\n" +
-            "      ,[CreatedBy]\n" +
-            "      ,[AssignedTo]\n" +
-            "      ,[ParentTicketId]\n" +
-            "      ,[ResolvedAt]\n" +
-            "      ,[ClosedAt]\n" +
-            "      ,[CreatedAt]\n" +
-            "      ,[UpdatedAt]\n" +
-            "      ,[CurrentLevel]\n" +
-            "  FROM [dbo].[Tickets]";
-        try 
-        {
+                "      ,[TicketNumber]\n" +
+                "      ,[TicketType]\n" +
+                "      ,[Title]\n" +
+                "      ,[Description]\n" +
+                "      ,[CategoryId]\n" +
+                "      ,[LocationId]\n" +
+                "      ,[Impact]\n" +
+                "      ,[Urgency]\n" +
+                "      ,[PriorityId]\n" +
+                "      ,[ServiceCatalogId]\n" +
+                "      ,[RequiresApproval]\n" +
+                "      ,[ApprovedBy]\n" +
+                "      ,[ApprovedAt]\n" +
+                "      ,[Status]\n" +
+                "      ,[CreatedBy]\n" +
+                "      ,[AssignedTo]\n" +
+                "      ,[ParentTicketId]\n" +
+                "      ,[ResolvedAt]\n" +
+                "      ,[ClosedAt]\n" +
+                "      ,[CreatedAt]\n" +
+                "      ,[UpdatedAt]\n" +
+                "      ,[CurrentLevel]\n" +
+                "  FROM [dbo].[Tickets]";
+        try {
             PreparedStatement stm = connection.prepareStatement(sql);
             ResultSet rs = stm.executeQuery();
-            while(rs.next())
-            {
+            while (rs.next()) {
                 Tickets t = new Tickets();
                 t.setId(rs.getInt("Id"));
                 t.setTicketNumber(rs.getString("TicketNumber"));
@@ -157,39 +166,37 @@ public class TicketDao extends DbContext {
 
                 list.add(t);
             }
-        }
-        catch(Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return list;
     }
-    
-//    public static void main(String[] args) {
-//
-//        TicketDao dao = new TicketDao();
-//        List<Tickets> tickets = dao.getAllTickets();
-//
-//        if (tickets.isEmpty()) {
-//            System.out.println("❌ Không có ticket nào!");
-//            return;
-//        }
-//
-//        System.out.println("===== DANH SÁCH TICKETS =====");
-//
-//        for (Tickets t : tickets) {
-//            System.out.println(
-//                "ID: " + t.getId()
-//                + " | TicketNumber: " + t.getTicketNumber()
-//                + " | Title: " + t.getTitle()
-//                + " | Status: " + t.getStatus()
-//                + " | AssignedTo: " + t.getAssignedTo()
-//                + " | Level: " + t.getCurrentLevel()
-//                + " | CreatedAt: " + t.getCreatedAt()
-//            );
-//        }
-//    }
-    
+
+    // public static void main(String[] args) {
+    //
+    // TicketDao dao = new TicketDao();
+    // List<Tickets> tickets = dao.getAllTickets();
+    //
+    // if (tickets.isEmpty()) {
+    // System.out.println("❌ Không có ticket nào!");
+    // return;
+    // }
+    //
+    // System.out.println("===== DANH SÁCH TICKETS =====");
+    //
+    // for (Tickets t : tickets) {
+    // System.out.println(
+    // "ID: " + t.getId()
+    // + " | TicketNumber: " + t.getTicketNumber()
+    // + " | Title: " + t.getTitle()
+    // + " | Status: " + t.getStatus()
+    // + " | AssignedTo: " + t.getAssignedTo()
+    // + " | Level: " + t.getCurrentLevel()
+    // + " | CreatedAt: " + t.getCreatedAt()
+    // );
+    // }
+    // }
+
     // 3. Lấy danh sách Ticket cho End-User (My Tickets)
    public List<Tickets> getTicketsByCreator(int userId, int offset, int limit, String search, String status, String type) {
         List<Tickets> list = new ArrayList<>();
@@ -242,7 +249,7 @@ public class TicketDao extends DbContext {
             ps.setInt(paramIndex++, limit);
             
             ResultSet rs = ps.executeQuery();
-            
+
             while (rs.next()) {
                 Tickets t = new Tickets();
                 t.setId(rs.getInt("Id"));
@@ -251,6 +258,7 @@ public class TicketDao extends DbContext {
                 t.setTitle(rs.getString("Title"));
                 t.setStatus(rs.getString("Status"));
                 t.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                t.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
                 t.setPriorityLevel(rs.getString("PriorityLevel"));
                 t.setAssigneeName(rs.getString("AssigneeName"));
                 t.setCategoryName(rs.getString("CategoryName"));
@@ -261,19 +269,71 @@ public class TicketDao extends DbContext {
         }
         return list;
     }
-    
-   // 4. Lấy chi tiết 1 Ticket theo ID - ĐÃ NÂNG CẤP JOIN
+
+    // 3b. Lấy chi tiết ticket theo TicketNumber (dùng cho TicketResolutionReview)
+    public Tickets getTicketByNumber(String ticketNumber) {
+        String sql = "SELECT t.*, "
+                + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, "
+                + "c.Name AS CategoryName, s.Name AS ServiceName "
+                + "FROM [dbo].[Tickets] t "
+                + "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id "
+                + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
+                + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
+                + "LEFT JOIN [dbo].[ServiceCatalog] s ON t.ServiceCatalogId = s.Id "
+                + "WHERE t.TicketNumber = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, ticketNumber);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Tickets t = new Tickets();
+                t.setId(rs.getInt("Id"));
+                t.setTicketNumber(rs.getString("TicketNumber"));
+                t.setTicketType(rs.getString("TicketType"));
+                t.setTitle(rs.getString("Title"));
+                t.setDescription(rs.getString("Description"));
+                t.setCategoryId(rs.getInt("CategoryId"));
+                t.setLocationId(rs.getInt("LocationId"));
+                t.setImpact((Integer) rs.getObject("Impact"));
+                t.setUrgency((Integer) rs.getObject("Urgency"));
+                t.setPriorityId((Integer) rs.getObject("PriorityId"));
+                t.setServiceCatalogId((Integer) rs.getObject("ServiceCatalogId"));
+                t.setRequiresApproval((Boolean) rs.getObject("RequiresApproval"));
+                t.setApprovedBy((Integer) rs.getObject("ApprovedBy"));
+                t.setApprovedAt(rs.getTimestamp("ApprovedAt"));
+                t.setStatus(rs.getString("Status"));
+                t.setCreatedBy(rs.getInt("CreatedBy"));
+                t.setAssignedTo((Integer) rs.getObject("AssignedTo"));
+                t.setParentTicketId((Integer) rs.getObject("ParentTicketId"));
+                t.setResolvedAt(rs.getTimestamp("ResolvedAt"));
+                t.setClosedAt(rs.getTimestamp("ClosedAt"));
+                t.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                t.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
+                t.setCurrentLevel((Integer) rs.getObject("CurrentLevel"));
+                t.setPriorityLevel(rs.getString("PriorityLevel"));
+                t.setAssigneeName(rs.getString("AssigneeName"));
+                t.setCategoryName(rs.getString("CategoryName"));
+                t.setServiceName(rs.getString("ServiceName"));
+                return t;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    // 4. Lấy chi tiết 1 Ticket theo ID - ĐÃ NÂNG CẤP JOIN
     public Tickets getTicketById(int id) {
         String sql = "SELECT t.*, "
-                   + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, "
-                   + "c.Name AS CategoryName, s.Name AS ServiceName "
-                   + "FROM [dbo].[Tickets] t "
-                   + "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id "
-                   + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
-                   + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
-                   + "LEFT JOIN [dbo].[ServiceCatalog] s ON t.ServiceCatalogId = s.Id "
-                   + "WHERE t.Id = ?";
-                   
+                + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, "
+                + "c.Name AS CategoryName, s.Name AS ServiceName "
+                + "FROM [dbo].[Tickets] t "
+                + "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id "
+                + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
+                + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
+                + "LEFT JOIN [dbo].[ServiceCatalog] s ON t.ServiceCatalogId = s.Id "
+                + "WHERE t.Id = ?";
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
@@ -294,19 +354,97 @@ public class TicketDao extends DbContext {
                 t.setCreatedBy(rs.getInt("CreatedBy"));
                 t.setCreatedAt(rs.getTimestamp("CreatedAt"));
                 t.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
-                
+
                 // Set các trường hiển thị
                 t.setPriorityLevel(rs.getString("PriorityLevel"));
                 t.setAssigneeName(rs.getString("AssigneeName"));
                 t.setCategoryName(rs.getString("CategoryName"));
                 t.setServiceName(rs.getString("ServiceName"));
-                
+
                 return t;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    // Search ticket by ID (support Long_TicketDetailServlet)
+    public Tickets searchTicketById(int ticketId) {
+        String sql = "SELECT t.*, "
+                + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, "
+                + "c.Name AS CategoryName, s.Name AS ServiceName "
+                + "FROM [dbo].[Tickets] t "
+                + "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id "
+                + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
+                + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
+                + "LEFT JOIN [dbo].[ServiceCatalog] s ON t.ServiceCatalogId = s.Id "
+                + "WHERE t.Id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, ticketId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Tickets t = new Tickets();
+                t.setId(rs.getInt("Id"));
+                t.setTicketNumber(rs.getString("TicketNumber"));
+                t.setTicketType(rs.getString("TicketType"));
+                t.setTitle(rs.getString("Title"));
+                t.setDescription(rs.getString("Description"));
+                t.setCategoryId(rs.getInt("CategoryId"));
+                t.setLocationId(rs.getInt("LocationId"));
+                t.setImpact((Integer) rs.getObject("Impact"));
+                t.setUrgency((Integer) rs.getObject("Urgency"));
+                t.setPriorityId((Integer) rs.getObject("PriorityId"));
+                t.setServiceCatalogId((Integer) rs.getObject("ServiceCatalogId"));
+                t.setStatus(rs.getString("Status"));
+                t.setCreatedBy(rs.getInt("CreatedBy"));
+                t.setAssignedTo((Integer) rs.getObject("AssignedTo"));
+                t.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                t.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
+                t.setCurrentLevel((Integer) rs.getObject("CurrentLevel"));
+
+                t.setPriorityLevel(rs.getString("PriorityLevel"));
+                t.setAssigneeName(rs.getString("AssigneeName"));
+                t.setCategoryName(rs.getString("CategoryName"));
+                t.setServiceName(rs.getString("ServiceName"));
+
+                return t;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // 5. Lấy danh sách ticket đã Resolved (có thể lọc theo keyword TicketNumber)
+    public List<Tickets> getResolvedTickets(String keyword) {
+        List<Tickets> list = new ArrayList<>();
+        String baseSql = "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.ResolvedAt "
+                + "FROM [dbo].[Tickets] t WHERE t.Status = 'Resolved'";
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        String sql = hasKeyword ? baseSql + " AND t.TicketNumber LIKE ?" : baseSql;
+        sql += " ORDER BY t.ResolvedAt DESC";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            if (hasKeyword) {
+                ps.setString(1, "%" + keyword.trim() + "%");
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Tickets t = new Tickets();
+                t.setId(rs.getInt("Id"));
+                t.setTicketNumber(rs.getString("TicketNumber"));
+                t.setTicketType(rs.getString("TicketType"));
+                t.setTitle(rs.getString("Title"));
+                t.setStatus(rs.getString("Status"));
+                t.setResolvedAt(rs.getTimestamp("ResolvedAt"));
+                list.add(t);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return list;
     }
 
     // 5. Tạo ticket và trả về ID sinh ra (cho SLA tracking)
@@ -439,18 +577,17 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         String prefix = type.equals("Incident") ? "INC-" : "SR-";
         return prefix + System.currentTimeMillis();
     }
-    
-    
+
     public List<Tickets> getIncidentsNotInProblem() {
         List<Tickets> list = new ArrayList<>();
 
         String sql = "SELECT t.Id, t.TicketNumber, t.Title, t.Status " +
-                     "FROM Tickets t " +
-                     "WHERE t.TicketType = 'INCIDENT' " +
-                     "AND NOT EXISTS ( " +
-                     "    SELECT 1 FROM ProblemTickets pt " +
-                     "    WHERE pt.TicketId = t.Id" +
-                     ")";
+                "FROM Tickets t " +
+                "WHERE t.TicketType = 'INCIDENT' " +
+                "AND NOT EXISTS ( " +
+                "    SELECT 1 FROM ProblemTickets pt " +
+                "    WHERE pt.TicketId = t.Id" +
+                ")";
 
         try {
             PreparedStatement stm = connection.prepareStatement(sql);
@@ -513,7 +650,7 @@ public int getTotalTicketsCount(int userId, String search, String status, String
     
     public static void main(String[] args) {
 
-        TicketDao dao = new TicketDao();
+        TicketDAO dao = new TicketDAO();
 
         List<Tickets> list = dao.getIncidentsNotInProblem();
 
@@ -521,11 +658,10 @@ public int getTotalTicketsCount(int userId, String search, String status, String
 
         for (Tickets t : list) {
             System.out.println(
-                t.getId() + " | " +
-                t.getTicketNumber() + " | " +
-                t.getTitle() + " | " +
-                t.getStatus()
-            );
+                    t.getId() + " | " +
+                            t.getTicketNumber() + " | " +
+                            t.getTitle() + " | " +
+                            t.getStatus());
         }
 
     }

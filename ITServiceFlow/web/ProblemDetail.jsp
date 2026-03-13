@@ -17,6 +17,13 @@
     String problemListUrl = "IT Support".equals(role) ? "ITProblemListController" : "ProblemList";
     request.setAttribute("problemListUrl", problemListUrl);
     request.setAttribute("role", role != null ? role : "");
+    
+    model.Problems currentProblem = (model.Problems) request.getAttribute("problem");
+    Integer activeTimeLogId = null;
+    if (currentProblem != null) {
+        activeTimeLogId = (Integer) session.getAttribute("activeTimeLogId_" + currentProblem.getId());
+    }
+    request.setAttribute("activeTimeLogId", activeTimeLogId);
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -131,6 +138,14 @@
                                     </button>
                                 </div>
                             </c:if>
+                            <c:if test="${not empty success}">
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <strong>Thành công:</strong> ${success}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            </c:if>
                             <!-- [ Main Content ] start -->
                             <div class="row">
                                 <div class="col-sm-12">
@@ -152,29 +167,49 @@
                                                         </form>
                                                     </c:if>
                                                 </c:if>
+
+                                                <c:if test="${role eq 'IT Support' 
+    and not empty problem 
+    and problem.status eq 'REJECTED'
+    and not empty problem.rootCause
+    and not empty problem.workaround}">
+    
+    <form action="SubmitApproval" method="post" style="display:inline;">
+        <input type="hidden" name="problemId" value="${problem.id}">
+        <input type="hidden" name="status" value="PENDING">
+        <button type="submit" class="btn btn-sm btn-success"
+                onclick="return confirm('RESUBMIT problem???');">
+            <i class="feather icon-send"></i> ReSubmit
+        </button>
+    </form>
+
+</c:if>
+
+
+<c:if test="${role eq 'IT Support' and not empty problem and problem.status eq 'NEW'}">
+
+    <form action="ProblemDetail" method="post" style="display:inline;">
+        <input type="hidden" name="action" value="startInvestigation">
+        <input type="hidden" name="problemId" value="${problem.id}">
+        <button type="submit" class="btn btn-sm btn-warning"
+                onclick="return confirm('Start investigation for this problem?');">
+            <i class="feather icon-play-circle"></i> Start Investigation
+        </button>
+    </form>
+
+</c:if>
                                                 
                                                 <c:if test="${role eq 'IT Support' 
-                                                    and not empty problem 
-                                                    and problem.status eq 'REJECTED'
-                                                    and not empty problem.rootCause
-                                                    and not empty problem.workaround}">
-                                                        <form action="SubmitApproval" method="post" style="display:inline;">
-                                                            <input type="hidden" name="problemId" value="${problem.id}">
-                                                            <input type="hidden" name="status" value="PENDING">
-                                                            <button type="submit" class="btn btn-sm btn-success"
-                                                                    onclick="return confirm('RESUBMIT problem???');">
-                                                                <i class="feather icon-send"></i> ReSubmit
-                                                            </button>
-                                                        </form>
-                                                </c:if>
-                                                
-                                                <c:if test="${role eq 'IT Support' and not empty problem and problem.status eq 'NEW' }">
-                                                    <form action="ITProblemListController" method="post" style="display:inline;">
+                                                             and not empty problem 
+                                                             and problem.status eq 'UNDER_INVESTIGATION' 
+                                                             and activeTimeLogId != null}">
+                                                    <form action="ProblemDetail" method="post" style="display:inline;">
+                                                        <input type="hidden" name="action" value="markResolved">
                                                         <input type="hidden" name="problemId" value="${problem.id}">
-                                                        <input type="hidden" name="fromDetail" value="1">
-                                                        <button type="submit" class="btn btn-sm btn-warning"
-                                                                onclick="return confirm('Start investigation for this problem?');">
-                                                            <i class="feather icon-play-circle"></i> Start Investigation
+                                                        <input type="hidden" name="timeLogId" value="${activeTimeLogId}">
+                                                        <button type="submit" class="btn btn-sm btn-success"
+                                                                onclick="return confirm('Mark this problem as RESOLVED and stop timer?');">
+                                                            <i class="feather icon-check-circle"></i> Mark Resolved
                                                         </button>
                                                     </form>
                                                 </c:if>
@@ -445,6 +480,12 @@
                                                                                                         <c:when test="${log.hours > 0}">
                                                                                                             <fmt:formatNumber value="${log.hours}" pattern="#.##"/> giờ
                                                                                                         </c:when>
+                                                                                                        <c:when test="${log.endTime == null and log.id == activeTimeLogId}">
+                                                                                                            <span class="badge badge-info">
+                                                                                                                <span id="live-timer"
+                                                                                                                      data-start="${log.startTime.time}">0h 00m 00s</span>
+                                                                                                            </span>
+                                                                                                        </c:when>
                                                                                                         <c:otherwise>-</c:otherwise>
                                                                                                     </c:choose>
                                                                                                 </td>
@@ -535,7 +576,37 @@
 </html>
 
 <script>
-                                                                                    $(document).ready(function () {
-                                                                                        $('.fixed-button').remove();
-                                                                                    });
+    $(document).ready(function () {
+        $('.fixed-button').remove();
+
+        // Live timer cho phiên đang chạy
+        const liveTimerEl = document.getElementById('live-timer');
+        if (liveTimerEl && liveTimerEl.dataset.start) {
+            const startMillis = parseInt(liveTimerEl.dataset.start, 10);
+
+            function formatDuration(ms) {
+                const totalSeconds = Math.floor(ms / 1000);
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+
+                const hh = hours.toString();
+                const mm = minutes.toString().padStart(2, '0');
+                const ss = seconds.toString().padStart(2, '0');
+
+                return `${hh}h ${mm}m ${ss}s`;
+            }
+
+            function updateTimer() {
+                const now = Date.now();
+                const diff = now - startMillis;
+                if (diff >= 0) {
+                    liveTimerEl.textContent = formatDuration(diff);
+                }
+            }
+
+            updateTimer();
+            setInterval(updateTimer, 1000);
+        }
+    });
 </script>

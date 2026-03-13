@@ -108,22 +108,37 @@ public class ITProblemListController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        Integer userIdObj = (Integer) (session != null ? session.getAttribute("userId") : null);
+        String role = session != null ? (String) session.getAttribute("role") : null;
+
+        if (userIdObj == null || role == null || !"IT Support".equals(role)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only IT Support can start investigation");
+            return;
+        }
+
         String ProblemId = request.getParameter("problemId");
-        
+
         try {
             int id = Integer.parseInt(ProblemId);
-            
+
             Problems pro = problemService.getProblemById(id);
             if (pro == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Problem not found");
                 return;
             }
 
-            boolean startInvestigation = problemService.updateAssignStatus(id);
-            if (!startInvestigation) {
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to start investigation");
+            boolean statusUpdated = problemService.updateAssignStatus(id);
+            int timeLogId = problemService.startTimer(id, userIdObj);
+
+            if (!statusUpdated || timeLogId <= 0) {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to start investigation timer");
                 return;
             }
+
+            session.setAttribute("activeTimeLogId_" + id, timeLogId);
+
+            
 
             String fromDetail = request.getParameter("fromDetail");
             if (fromDetail != null) {

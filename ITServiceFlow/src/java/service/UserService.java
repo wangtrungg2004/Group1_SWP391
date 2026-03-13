@@ -24,10 +24,13 @@ public class UserService {
     }
     public Users login(String Username, String RawPassword)
     {
+//        if (Username == null || RawPassword == null) return null;
+//        String passwordHash = PasswordUtil.sha256(RawPassword.trim());
+//        return dao.login(Username, passwordHash);
         if (Username == null || RawPassword == null) return null;
         // [PASSWORD_HASH] hash trước khi so sánh với DB; khi bỏ hash: gọi dao.login(Username, RawPassword.trim()) và đổi UserDao.login so sánh cột Password (plain)
-        String passwordHash = PasswordUtil.sha256(RawPassword.trim());
-        return dao.login(Username, passwordHash);
+//        String passwordHash = PasswordUtil.sha256(RawPassword.trim());
+        return dao.login(Username, RawPassword.trim());
     }
     
     public boolean resetPassword(String username, String email, String rawNewPassword) {

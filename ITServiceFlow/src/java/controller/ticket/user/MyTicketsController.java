@@ -20,21 +20,19 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet(name = "MyTickets", urlPatterns = {"/Tickets"})
+@WebServlet(name = "MyTickets", urlPatterns = { "/Tickets" })
 public class MyTicketsController extends HttpServlet {
 
-    // Trong MyTicketsController.java
-
-@Override
-protected void doGet(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
     
-    HttpSession session = request.getSession();
-    Users currentUser = (Users) session.getAttribute("user");
-    if (currentUser == null) {
-        response.sendRedirect(request.getContextPath() + "/Login.jsp");
-        return;
-    }
+        HttpSession session = request.getSession();
+        Users currentUser = (Users) session.getAttribute("user");
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/Login.jsp");
+            return;
+        }
 
     // 1. Lấy tham số tìm kiếm, bộ lọc và trang hiện tại
     String search = request.getParameter("search");

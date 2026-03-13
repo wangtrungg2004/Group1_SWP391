@@ -2,7 +2,7 @@ package controller.ticket.user;
 
 import dao.CategoryDao;
 import dao.ServiceCatalogDao;
-import dao.TicketDao;
+import dao.TicketDAO;
 import model.ServiceCatalog;
 import model.Tickets;
 import model.Users;
@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet(name = "CreateTicket", urlPatterns = {"/CreateTicket"})
+@WebServlet(name = "CreateTicket", urlPatterns = { "/CreateTicket" })
 public class TicketCreateController extends HttpServlet {
 
     @Override
@@ -131,7 +131,7 @@ public class TicketCreateController extends HttpServlet {
             }
         }
 
-        TicketDao dao = new TicketDao();
+        TicketDAO dao = new TicketDAO();
         boolean isCreated = dao.createTicket(t);
 
         if (isCreated) {

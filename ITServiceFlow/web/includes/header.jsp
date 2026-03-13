@@ -9,28 +9,27 @@
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 <%
-            if (session != null && session.getAttribute("userId") != null 
-                && request.getAttribute("headerNotifications") == null) 
-        {
-            Integer userId = (Integer) session.getAttribute("userId");
-            String role = (String) session.getAttribute("role");
-            NotificationDao notificationDao = new NotificationDao();
-            List<Notifications> list;
-            if ("Admin".equals(role) || "Manager".equals(role)) {
-                list = notificationDao.getAllNotifications();
-            } else {
-                list = notificationDao.getNotificationsByUserIdUnread(userId);
-            }
-            request.setAttribute("headerNotifications", list);
+    if (session != null && session.getAttribute("userId") != null 
+        && request.getAttribute("headerNotifications") == null) 
+    {
+        Integer userId = (Integer) session.getAttribute("userId");
+        String role = (String) session.getAttribute("role");
+        NotificationDao notificationDao = new NotificationDao();
+        List<Notifications> list;
+        if ("Admin".equals(role) || "Manager".equals(role)) {
+            list = notificationDao.getAllNotifications();
+        } else {
+            list = notificationDao.getNotificationsByUserIdUnread(userId);
         }
+        request.setAttribute("headerNotifications", list);
+    }
 %>
 <!-- [ Header ] start -->
 <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed">
     <style>
         .noti-body {
-        /*max-height: 300px;*/   
-        overflow-y: auto;
-    }
+            overflow-y: auto;
+        }
     </style>
     <div class="m-header">
         <a class="mobile-menu" id="mobile-collapse1" href="#!"><span></span></a>
@@ -109,7 +108,6 @@
                                     <a href="ITSupportNotificationList">show all</a>
                                 </div>
                             </c:when>
-
                             <c:when test="${role eq 'Manager'}">
                                 <div class="noti-footer">
                                     <a href="NotificationList">show all</a>
@@ -127,9 +125,18 @@
                     <div class="dropdown-menu dropdown-menu-right profile-notification">
                         <div class="pro-head">
                             <img src="assets/images/user/avatar-1.jpg" class="img-radius" alt="User-Profile-Image">
-                            <span><c:choose><c:when test="${not empty sessionScope.user}"><c:out value="${sessionScope.user.fullName}"/></c:when><c:otherwise>User</c:otherwise></c:choose></span>
+                            <span>
+                                <c:choose>
+                                    <c:when test="${not empty sessionScope.user}">
+                                        <c:out value="${sessionScope.user.fullName}" />
+                                    </c:when>
+                                    <c:otherwise>User</c:otherwise>
+                                </c:choose>
+                            </span>
                             <c:if test="${not empty role}">
-                                <span style="display: block; font-size: 11px; color: #999;"><c:out value="${role}"/></span>
+                                <span style="display: block; font-size: 11px; color: #999;">
+                                    <c:out value="${role}" />
+                                </span>
                             </c:if>
                             <a href="Logout" class="dud-logout" title="Logout">
                                 <i class="feather icon-log-out"></i>

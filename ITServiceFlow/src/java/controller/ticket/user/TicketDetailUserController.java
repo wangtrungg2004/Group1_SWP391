@@ -10,7 +10,7 @@ package controller.ticket.user;
  */
 import dao.CategoryDao;
 import dao.ServiceCatalogDao;
-import dao.TicketDao;
+import dao.TicketDAO;
 import model.Tickets;
 import model.Users;
 import java.io.IOException;
@@ -21,16 +21,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet(name = "TicketDetailUser", urlPatterns = {"/TicketDetailUser"})
+@WebServlet(name = "TicketDetailUser", urlPatterns = { "/TicketDetailUser" })
 public class TicketDetailUserController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession();
         Users currentUser = (Users) session.getAttribute("user");
-        
+
         if (currentUser == null) {
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
@@ -43,17 +43,15 @@ public class TicketDetailUserController extends HttpServlet {
         }
 
         int ticketId = Integer.parseInt(idParam);
-        TicketDao ticketDao = new TicketDao();
+        TicketDAO ticketDao = new TicketDAO();
         Tickets ticket = ticketDao.getTicketById(ticketId);
 
-        
         if (ticket == null || ticket.getCreatedBy() != currentUser.getId()) {
-           
+
             response.sendRedirect(request.getContextPath() + "/Tickets");
             return;
         }
 
-        
         request.setAttribute("ticket", ticket);
 
         CategoryDao catDao = new CategoryDao();
