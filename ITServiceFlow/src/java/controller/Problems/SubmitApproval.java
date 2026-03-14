@@ -139,6 +139,10 @@ public class SubmitApproval extends HttpServlet {
                                                problem.getTitle(),
                                                problem.getWorkaround());
             }
+            KnowErrors newKn = knownErrorService.findKnowErrorByProblemId(id);
+            if (newKn != null) {
+                auditLogService.createAuditLog(userId, "CREATE", "KnowError", newKn.getId());
+            }
 
             auditLogService.createAuditLog(userId,"APPROVED","Problem",id);
         }
