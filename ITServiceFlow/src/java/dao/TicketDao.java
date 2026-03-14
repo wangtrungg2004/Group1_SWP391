@@ -75,6 +75,16 @@ public class TicketDao extends DbContext {
         // Simple logic for demo, better use DB sequence or Max check
         return prefix + System.currentTimeMillis();
     }
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> b5f2af4f1f8516f4efa1cf4f2223e16fbcd340f3
+>>>>>>> 966b29719721540e67a1f1c02a14ac5a25f18dc5
+>>>>>>> d964ee0d9be5877a86f0b424d259db0a76555507
 
     public Tickets getTicketById(int id) {
         String sql = "SELECT * FROM [dbo].[Tickets] WHERE Id = ?";
@@ -109,4 +119,15 @@ public class TicketDao extends DbContext {
         }
         return null;
     }
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> d2154b86978d31b564b8846d8826925bf10e211d
+>>>>>>> b5f2af4f1f8516f4efa1cf4f2223e16fbcd340f3
+>>>>>>> 966b29719721540e67a1f1c02a14ac5a25f18dc5
+>>>>>>> d964ee0d9be5877a86f0b424d259db0a76555507
 }
