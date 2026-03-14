@@ -12,21 +12,18 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.List;
-import model.Notifications;
+import model.AuditLog;
 import model.Problems;
-import model.KnowErrors;
 import service.AuditLogService;
-import service.KnowErrorService;
 import service.ProblemService;
-import service.NotificationService;
+
 /**
  *
  * @author DELL
  */
-@WebServlet(name = "SubmitApproval", urlPatterns = {"/SubmitApproval"})
-public class SubmitApproval extends HttpServlet {
+@WebServlet(name = "ProblemAuditLogList", urlPatterns = {"/ProblemAuditLogList"})
+public class ProblemAuditLogList extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -45,10 +42,10 @@ public class SubmitApproval extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet SubmitApproval</title>");
+            out.println("<title>Servlet ProblemAuditLogList</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet SubmitApproval at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet ProblemAuditLogList at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -64,12 +61,45 @@ public class SubmitApproval extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     ProblemService problemService = new ProblemService();
-    KnowErrorService knownErrorService = new KnowErrorService();
-    AuditLogService auditLogService = new AuditLogService();
+    AuditLogService auditlogService = new AuditLogService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        HttpSession session = request.getSession();
+        String role = (String) session.getAttribute("role");
+        Integer userId = (Integer) session.getAttribute("userId");
+        
+        String idParam = request.getParameter("Id");
+
+        // Check id hợp lệ
+        if (idParam == null || idParam.isEmpty()) {
+            response.sendRedirect("ProblemList");
+            return;
+        }
+
+        int proId;
+        try {
+            proId = Integer.parseInt(idParam);
+        } catch (NumberFormatException e) {
+            response.sendRedirect("ProblemList");
+            return;
+        }
+
+        Problems pro = problemService.getProblemById(proId);
+
+        // Check problem tồn tại
+        if (pro == null) {
+            response.sendRedirect("ProblemList");
+            return;
+        }
+
+        List<AuditLog> auditLogs = auditlogService.viewActivitiesHistory("Problem", proId);
+
+        request.setAttribute("problem", pro);
+        request.setAttribute("auditLogs", auditLogs);
+
+        request.getRequestDispatcher("ProblemAuditLogList.jsp").forward(request, response);
+            
     }
 
     /**
@@ -83,72 +113,7 @@ public class SubmitApproval extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        HttpSession session = request.getSession();
-        String role = (String) session.getAttribute("role");
-        Integer userId = (Integer) session.getAttribute("userId");
-
-        String problemId = request.getParameter("problemId");
-        String status = request.getParameter("status");
-
-        if(problemId == null){
-            response.sendRedirect("ProblemList");
-            return;
-        }
-
-        int id = Integer.parseInt(problemId);
-
-        Problems problem = problemService.getProblemById(id);
-
-        if(problem == null){
-            response.sendRedirect("ProblemList");
-            return;
-        }
-
-        if("PENDING".equals(status)){
-
-            problemService.updateStatusProblem(id, status);
-
-            auditLogService.createAuditLog(userId,"SUBMIT","Problem",id);
-        }
-
-        else if("REJECTED".equals(status)){
-
-            String rejectedReason = request.getParameter("rejectedReason");
-
-            if(rejectedReason != null){
-                rejectedReason = rejectedReason.trim();
-            }
-
-            problem.setStatus("REJECTED");
-            problem.setRejectedReason(rejectedReason);
-
-            problemService.updateProblem(problem);
-
-            auditLogService.createAuditLog(userId,"REJECTED","Problem",id);
-        }
-
-        else if("APPROVED".equals(status)){
-
-            problemService.updateStatusProblem(id,status);
-
-            KnowErrors kn = knownErrorService.findKnowErrorByProblemId(id);
-
-            if(kn == null){
-                knownErrorService.addKnowError(problem.getId(),
-                                               problem.getTitle(),
-                                               problem.getWorkaround());
-            }
-
-            auditLogService.createAuditLog(userId,"APPROVED","Problem",id);
-        }
-
-        if("IT Support".equals(role)){
-            response.sendRedirect("ITProblemListController");
-        }
-        else if("Manager".equals(role)){
-            response.sendRedirect("ProblemPendingList");
-        }
+        processRequest(request, response);
     }
 
     /**

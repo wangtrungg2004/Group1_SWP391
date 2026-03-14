@@ -151,9 +151,10 @@
                                                     <label class="mb-1 small text-muted">Status</label>
                                                     <select name="filterStatus" class="form-control">
                                                         <option value="">-- All --</option>
-                                                        <option value="APPROVED" ${filterStatus == 'NEW' ? 'selected' : ''}>NEW</option>
-                                                        <option value="REJECTED" ${filterStatus == 'UNDER_INVESTIGATION' ? 'selected' : ''}>UNDER_INVESTIGATION</option>
-                                                        <!--<option value="RESOLVED" ${filterStatus == 'RESOLVED' ? 'selected' : ''}>RESOLVED</option>-->
+                                                        <option value="NEW" ${filterStatus == 'NEW' ? 'selected' : ''}>NEW</option>
+                                                        <option value="UNDER_INVESTIGATION" ${filterStatus == 'UNDER_INVESTIGATION' ? 'selected' : ''}>UNDER_INVESTIGATION</option>
+                                                        <option value="APPROVED" ${filterStatus == 'APPROVED' ? 'selected' : ''}>APPROVED</option>
+                                                        <option value="REJECTED" ${filterStatus == 'REJECTED' ? 'selected' : ''}>REJECTED</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-md-2">
