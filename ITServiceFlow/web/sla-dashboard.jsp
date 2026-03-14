@@ -136,9 +136,25 @@
                                                                         </c:if>
                                                                         <c:forEach items="${nearBreachTickets}" var="t">
                                                                             <tr>
+<<<<<<< HEAD
                                                                                 <td><a
                                                                                         href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a>
                                                                                 </td>
+=======
+<<<<<<< HEAD
+                                                                                <td><a
+                                                                                        href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a>
+                                                                                </td>
+=======
+<<<<<<< HEAD
+                                                                                <td><a
+                                                                                        href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a>
+                                                                                </td>
+=======
+                                                                                <td>${t['TicketNumber']}</td>
+>>>>>>> d2154b86978d31b564b8846d8826925bf10e211d
+>>>>>>> b5f2af4f1f8516f4efa1cf4f2223e16fbcd340f3
+>>>>>>> 966b29719721540e67a1f1c02a14ac5a25f18dc5
                                                                                 <td>${t['Title']}</td>
                                                                                 <td class="text-warning">
                                                                                     <fmt:formatDate
@@ -181,9 +197,25 @@
                                                                         </c:if>
                                                                         <c:forEach items="${breachedTickets}" var="t">
                                                                             <tr>
+<<<<<<< HEAD
                                                                                 <td><a
                                                                                         href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a>
                                                                                 </td>
+=======
+<<<<<<< HEAD
+                                                                                <td><a
+                                                                                        href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a>
+                                                                                </td>
+=======
+<<<<<<< HEAD
+                                                                                <td><a
+                                                                                        href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a>
+                                                                                </td>
+=======
+                                                                                <td>${t['TicketNumber']}</td>
+>>>>>>> d2154b86978d31b564b8846d8826925bf10e211d
+>>>>>>> b5f2af4f1f8516f4efa1cf4f2223e16fbcd340f3
+>>>>>>> 966b29719721540e67a1f1c02a14ac5a25f18dc5
                                                                                 <td>${t['Title']}</td>
                                                                                 <td>${t['Priority']}</td>
                                                                                 <td class="text-danger">
