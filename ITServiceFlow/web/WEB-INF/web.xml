@@ -34,6 +34,10 @@
         <servlet-name>UserDashboard</servlet-name>
         <servlet-class>controller.ticket.user.UserDashboardController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AgentQueue</servlet-name>
+        <servlet-class>controller.ticket.agent.AgentQueueController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Login</servlet-name>
         <url-pattern>/Login</url-pattern>
@@ -102,6 +106,10 @@
     <servlet-mapping>
         <servlet-name>UserDashboard</servlet-name>
         <url-pattern>/UserDashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AgentQueue</servlet-name>
+        <url-pattern>/Agent/Queues</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>

@@ -147,18 +147,10 @@
                                 class="pcoded-mtext">Dashboard</span></a>
                     </li>
                     <li class="nav-item">
-                        <a href="Tickets" class="nav-link"><span class="pcoded-micon"><i
-                                    class="feather icon-help-circle"></i></span><span class="pcoded-mtext">Tickets</span></a>
+                        <a href="Agent/Queues" class="nav-link"><span class="pcoded-micon"><i
+                                    class="feather icon-help-circle"></i></span><span class="pcoded-mtext">Ticket Queues</span></a>
                     </li>
-                    <li class="nav-item">
-                        <a href="AssignedTickets" class="nav-link"><span class="pcoded-micon"><i
-                                    class="feather icon-user-check"></i></span><span
-                                class="pcoded-mtext">Assigned Tickets</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="PendingTickets" class="nav-link"><span class="pcoded-micon"><i
-                                    class="feather icon-clock"></i></span><span class="pcoded-mtext">Pending Tickets</span></a>
-                    </li>
+
                     <li class="nav-item">
                         <a href="ITProblemListController" class="nav-link"><span class="pcoded-micon"><i
                                     class="feather icon-alert-circle"></i></span><span class="pcoded-mtext">Problem List</span></a>
