@@ -104,30 +104,32 @@ public class TicketDAO extends DbContext {
 
     public List<Tickets> getAllTickets() {
         List<Tickets> list = new ArrayList<>();
-        String sql = "SELECT [Id]\n" +
-                "      ,[TicketNumber]\n" +
-                "      ,[TicketType]\n" +
-                "      ,[Title]\n" +
-                "      ,[Description]\n" +
-                "      ,[CategoryId]\n" +
-                "      ,[LocationId]\n" +
-                "      ,[Impact]\n" +
-                "      ,[Urgency]\n" +
-                "      ,[PriorityId]\n" +
-                "      ,[ServiceCatalogId]\n" +
-                "      ,[RequiresApproval]\n" +
-                "      ,[ApprovedBy]\n" +
-                "      ,[ApprovedAt]\n" +
-                "      ,[Status]\n" +
-                "      ,[CreatedBy]\n" +
-                "      ,[AssignedTo]\n" +
-                "      ,[ParentTicketId]\n" +
-                "      ,[ResolvedAt]\n" +
-                "      ,[ClosedAt]\n" +
-                "      ,[CreatedAt]\n" +
-                "      ,[UpdatedAt]\n" +
-                "      ,[CurrentLevel]\n" +
-                "  FROM [dbo].[Tickets]";
+        String sql = "SELECT t.[Id]\n"
+                + "      ,t.[TicketNumber]\n"
+                + "      ,t.[TicketType]\n"
+                + "      ,t.[Title]\n"
+                + "      ,t.[Description]\n"
+                + "      ,t.[CategoryId]\n"
+                + "      ,t.[LocationId]\n"
+                + "      ,t.[Impact]\n"
+                + "      ,t.[Urgency]\n"
+                + "      ,t.[PriorityId]\n"
+                + "      ,t.[ServiceCatalogId]\n"
+                + "      ,t.[RequiresApproval]\n"
+                + "      ,t.[ApprovedBy]\n"
+                + "      ,t.[ApprovedAt]\n"
+                + "      ,t.[Status]\n"
+                + "      ,t.[CreatedBy]\n"
+                + "      ,t.[AssignedTo]\n"
+                + "      ,t.[ParentTicketId]\n"
+                + "      ,t.[ResolvedAt]\n"
+                + "      ,t.[ClosedAt]\n"
+                + "      ,t.[CreatedAt]\n"
+                + "      ,t.[UpdatedAt]\n"
+                + "      ,t.[CurrentLevel]\n"
+                + "      ,p.[Level] AS PriorityLevel\n"
+                + "  FROM [dbo].[Tickets] t\n"
+                + "  LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id";
         try {
             PreparedStatement stm = connection.prepareStatement(sql);
             ResultSet rs = stm.executeQuery();
@@ -162,6 +164,9 @@ public class TicketDAO extends DbContext {
                 t.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
 
                 t.setCurrentLevel((Integer) rs.getObject("CurrentLevel"));
+
+                // Level của Priority (Critical/High/Medium/Low)
+                t.setPriorityLevel(rs.getString("PriorityLevel"));
 
                 list.add(t);
             }

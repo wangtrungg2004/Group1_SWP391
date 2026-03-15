@@ -121,7 +121,7 @@
 
                                                         <div class="row">
                                                             <%-- Keyword --%>
-                                                            <div class="col-md-8">
+                                                            <div class="col-md-6">
                                                                 <label class="col-form-label">
                                                                     <i class="feather icon-search mr-1"></i>Search Ticket
                                                                 </label>
@@ -135,7 +135,10 @@
                                                                         <button type="submit" class="btn btn-primary">
                                                                             <i class="feather icon-search"></i> Search
                                                                         </button>
-                                                                        <c:if test="${not empty keyword or (type ne 'all' and not empty type)}">
+                                                                        <c:if test="${not empty keyword 
+                                                                                      or (type ne 'all' and not empty type)
+                                                                                      or (status ne 'all' and not empty status)
+                                                                                      or (priority ne 'all' and not empty priority)}">
                                                                             <a href="Long_TicketListServlet"
                                                                                class="btn btn-outline-secondary" title="Clear filters">
                                                                                 <i class="feather icon-x"></i>
@@ -145,7 +148,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="col-md-4">
+                                                            <div class="col-md-2">
                                                                 <label class="col-form-label">
                                                                     <i class="feather icon-filter mr-1"></i>Filter by Type
                                                                 </label>
@@ -155,6 +158,34 @@
                                                                     <option value="all"             ${type eq 'all' ? 'selected' : ''}>All</option>
                                                                     <option value="Incident"        ${type eq 'Incident' ? 'selected' : ''}>Incident</option>
                                                                     <option value="ServiceRequest"  ${type eq 'ServiceRequest' ? 'selected' : ''}>Service Request</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="col-md-2">
+                                                                <label class="col-form-label">
+                                                                    <i class="feather icon-filter mr-1"></i>Filter by Status
+                                                                </label>
+                                                                <select name="status"
+                                                                        class="form-control"
+                                                                        onchange="document.getElementById('searchForm').submit()">
+                                                                    <option value="all"        ${status eq 'all' ? 'selected' : ''}>All</option>
+                                                                    <option value="New"        ${status eq 'New' ? 'selected' : ''}>New</option>
+                                                                    <option value="Inprogress" ${status eq 'Inprogress' ? 'selected' : ''}>In Progress</option>
+                                                                    <option value="Completed"  ${status eq 'Completed' ? 'selected' : ''}>Completed</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-md-2">
+                                                                <label class="col-form-label">
+                                                                    <i class="feather icon-filter mr-1"></i>Filter by Priority
+                                                                </label>
+                                                                <select name="priority"
+                                                                        class="form-control"
+                                                                        onchange="document.getElementById('searchForm').submit()">
+                                                                    <option value="all"      ${priority eq 'all' ? 'selected' : ''}>All</option>
+                                                                    <option value="Critical" ${priority eq 'Critical' ? 'selected' : ''}>Critical</option>
+                                                                    <option value="High"     ${priority eq 'High' ? 'selected' : ''}>High</option>
+                                                                    <option value="Medium"   ${priority eq 'Medium' ? 'selected' : ''}>Medium</option>
+                                                                    <option value="Low"      ${priority eq 'Low' ? 'selected' : ''}>Low</option>
                                                                 </select>
                                                             </div>
                                                         </div>
@@ -184,7 +215,7 @@
                                                                     <th>Title</th>
                                                                     <th>Status</th>
                                                                     <th>Priority</th>
-                                                                    <th>Created By</th>
+                                                                    <th>Assets</th>
                                                                     <th>Created At</th>
                                                                     <th style="width: 120px">Action</th>
                                                                 </tr>
@@ -205,11 +236,40 @@
                                                                                         <c:otherwise><span class="text-muted">—</span></c:otherwise>
                                                                                     </c:choose>
                                                                                 </td>
-                                                                                <td>${t.createdBy}</td>
+                                                                                <td>
+                                                                                    <c:choose>
+                                                                                        <c:when test="${not empty t.linkedAssets}">
+                                                                                            <c:forEach var="ci" items="${t.linkedAssets}">
+                                                                                                <span class="badge badge-info mr-1">
+                                                                                                    <a href="CIDetailServlet?id=${ci.id}&ticketId=${t.id}"
+                                                                                                       class="text-white"
+                                                                                                       style="text-decoration: underline;">
+                                                                                                        ${ci.assetTag}
+                                                                                                    </a>
+                                                                                                    <form action="TicketUnlinkCIServlet"
+                                                                                                          method="POST"
+                                                                                                          style="display:inline;">
+                                                                                                        <input type="hidden" name="ticketId" value="${t.id}" />
+                                                                                                        <input type="hidden" name="assetId" value="${ci.id}" />
+                                                                                                        <button type="submit"
+                                                                                                                class="btn btn-sm btn-link text-white p-0 ml-1"
+                                                                                                                title="Remove asset link"
+                                                                                                                onclick="return confirm('Remove this asset from ticket?');">
+                                                                                                            ×
+                                                                                                        </button>
+                                                                                                    </form>
+                                                                                                </span>
+                                                                                            </c:forEach>
+                                                                                        </c:when>
+                                                                                        <c:otherwise>
+                                                                                            <span class="text-muted">—</span>
+                                                                                        </c:otherwise>
+                                                                                    </c:choose>
+                                                                                </td>
                                                                                 <td>
                                                                                     <c:choose>
                                                                                         <c:when test="${not empty t.createdAt}">
-                                                                                            <fmt:formatDate value="${t.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
+                                                                                            <fmt:formatDate value="${t.createdAt}" pattern="dd/MM/yyyy"/>
                                                                                         </c:when>
                                                                                         <c:otherwise><span class="text-muted">—</span></c:otherwise>
                                                                                     </c:choose>
