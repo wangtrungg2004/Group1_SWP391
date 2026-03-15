@@ -8,12 +8,18 @@ import model.Tickets;
 import model.Users;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+        maxFileSize = 1024 * 1024 * 15,      // 15MB
+        maxRequestSize = 1024 * 1024 * 50    // 50MB
+)
 @WebServlet(name = "CreateTicket", urlPatterns = { "/CreateTicket" })
 public class TicketCreateController extends HttpServlet {
 
@@ -115,12 +121,21 @@ public class TicketCreateController extends HttpServlet {
         }
 
         TicketDAO dao = new TicketDAO();
-        boolean isCreated = dao.createTicket(t);
+        String isCreated = dao.createTicket(t);
 
-        if (isCreated) {
+        if ("ok".equals(isCreated)) {
             response.sendRedirect(request.getContextPath() + "/Tickets");
         } else {
-            request.setAttribute("errorMessage", "Lỗi hệ thống: Không thể lưu Ticket vào Database. Vui lòng thử lại.");
+            // Preserve form data
+            request.setAttribute("ticketType_val", ticketType);
+            request.setAttribute("title_val", request.getParameter("title"));
+            request.setAttribute("description_val", request.getParameter("description"));
+            request.setAttribute("categoryId_val", request.getParameter("categoryId"));
+            request.setAttribute("impact_val", request.getParameter("impact"));
+            request.setAttribute("urgency_val", request.getParameter("urgency"));
+            request.setAttribute("serviceCatalogId_val", request.getParameter("serviceCatalogId"));
+            
+            request.setAttribute("errorMessage", "Lỗi hệ thống: " + isCreated);
             doGet(request, response);
         }
     }

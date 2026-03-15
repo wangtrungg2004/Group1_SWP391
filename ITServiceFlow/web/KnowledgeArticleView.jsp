@@ -184,7 +184,7 @@
                                                                     <i class="feather icon-arrow-left mr-1"></i> Quay
                                                                     lại tìm kiếm
                                                                 </a>
-                                                                <a href="CreateTicket.jsp" class="btn btn-primary btn-sm"
+                                                                <a href="CreateTicket" class="btn btn-primary btn-sm"
                                                                     id="btn-create-ticket">
                                                                     <i class="feather icon-plus-circle mr-1"></i> Vẫn
                                                                     cần hỗ trợ? Tạo Ticket
