@@ -46,6 +46,10 @@
         <servlet-name>AssignTicket</servlet-name>
         <servlet-class>controller.ticket.agent.AssignTicketController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>UpdateTicketStatus</servlet-name>
+        <servlet-class>controller.ticket.agent.UpdateStatusController</servlet-class>
+    </servlet>
     <servlet>    
         <servlet-name>CsatSurvey</servlet-name>
         <servlet-class>controller.ticket.user.CsatSurveyController</servlet-class>
@@ -130,6 +134,10 @@
     <servlet-mapping>
         <servlet-name>AssignTicket</servlet-name>
         <url-pattern>/AssignTicket</url-pattern>
+    </servlet-mapping>
+     <servlet-mapping>
+        <servlet-name>UpdateTicketStatus</servlet-name>
+        <url-pattern>/UpdateStatus</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
