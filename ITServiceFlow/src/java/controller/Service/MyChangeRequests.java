@@ -1,8 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
-
 package controller.Service;
 
 import jakarta.servlet.ServletException;
@@ -17,28 +12,72 @@ import model.ChangeRequests;
 import model.Users;
 import service.ApprovalService;
 
+/**
+ * GET  /MyChangeRequests            → Danh sách RFC của IT Support
+ * POST /MyChangeRequests?action=submitDraft&id=X → Submit Draft → Pending Approval
+ */
 @WebServlet("/MyChangeRequests")
 public class MyChangeRequests extends HttpServlet {
-    private ApprovalService service = new ApprovalService();
+
+    private final ApprovalService service = new ApprovalService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         HttpSession session = request.getSession();
         Users user = (Users) session.getAttribute("user");
 
         if (user == null || !"IT Support".equals(user.getRole())) {
-            response.sendRedirect("Login");
+            response.sendRedirect(request.getContextPath() + "/Login");
             return;
+        }
+
+        // Flash message từ redirect
+        String flash = (String) session.getAttribute("flashSuccess");
+        if (flash != null) {
+            request.setAttribute("success", flash);
+            session.removeAttribute("flashSuccess");
         }
 
         String tab = request.getParameter("tab");
         if (tab == null || tab.isEmpty()) tab = "all";
 
-        List<ChangeRequests> requests = service.getMyRequests(user.getId(), tab.equals("all") ? null : tab);
+        String statusFilter = "all".equals(tab) ? null : tab;
+        List<ChangeRequests> requests = service.getMyRequests(user.getId(), statusFilter);
 
         request.setAttribute("requests", requests);
         request.setAttribute("tab", tab);
         request.getRequestDispatcher("/MyChangeRequests.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        HttpSession session = request.getSession();
+        Users user = (Users) session.getAttribute("user");
+
+        if (user == null || !"IT Support".equals(user.getRole())) {
+            response.sendRedirect(request.getContextPath() + "/Login");
+            return;
+        }
+
+        String action = request.getParameter("action");
+        String idStr  = request.getParameter("id");
+
+        if ("submitDraft".equals(action) && idStr != null) {
+            try {
+                int changeId = Integer.parseInt(idStr);
+                boolean ok = service.submitDraft(changeId, user.getId());
+                if (ok) {
+                    session.setAttribute("flashSuccess", "RFC đã được gửi đến Manager để duyệt!");
+                } else {
+                    session.setAttribute("flashError", "Không thể gửi RFC. Chỉ có thể gửi RFC ở trạng thái Draft.");
+                }
+            } catch (NumberFormatException ignored) {}
+        }
+
+        response.sendRedirect(request.getContextPath() + "/MyChangeRequests");
     }
 }
