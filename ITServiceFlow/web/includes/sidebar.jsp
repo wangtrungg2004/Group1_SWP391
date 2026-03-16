@@ -147,7 +147,7 @@
                                 class="pcoded-mtext">Dashboard</span></a>
                     </li>
                     <li class="nav-item">
-                        <a href="Agent/Queues" class="nav-link"><span class="pcoded-micon"><i
+                        <a href="Queues" class="nav-link"><span class="pcoded-micon"><i
                                     class="feather icon-help-circle"></i></span><span class="pcoded-mtext">Ticket Queues</span></a>
                     </li>
 

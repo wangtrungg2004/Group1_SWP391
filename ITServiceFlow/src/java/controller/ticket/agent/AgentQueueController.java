@@ -22,7 +22,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet(name = "AgentQueue", urlPatterns = {"/Agent/Queues"})
+@WebServlet(name = "AgentQueue", urlPatterns = {"/Queues"})
 public class AgentQueueController extends HttpServlet {
 
     // Trong AgentQueueController.java

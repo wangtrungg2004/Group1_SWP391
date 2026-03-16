@@ -37,6 +37,8 @@
     <servlet>
         <servlet-name>AgentQueue</servlet-name>
         <servlet-class>controller.ticket.agent.AgentQueueController</servlet-class>
+    </servlet>
+    <servlet>    
         <servlet-name>CsatSurvey</servlet-name>
         <servlet-class>controller.ticket.user.CsatSurveyController</servlet-class>
     </servlet>
@@ -111,7 +113,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AgentQueue</servlet-name>
-        <url-pattern>/Agent/Queues</url-pattern>
+        <url-pattern>/Queues</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>

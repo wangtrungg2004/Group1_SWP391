@@ -74,7 +74,7 @@
     <a href="?queue=resolved" class="queue-pill ${currentQueue == 'resolved' ? 'active' : ''}"><i class="feather icon-check-circle"></i> Resolved</a>
 </div>
 
-                                    <form action="${pageContext.request.contextPath}/Agent/Queues" method="GET" class="filter-toolbar">
+                                    <form action="${pageContext.request.contextPath}/Queues" method="GET" class="filter-toolbar">
     <input type="hidden" name="queue" value="${currentQueue}">
     
     <div class="input-group" style="max-width: 350px; flex: 1;">
@@ -102,7 +102,7 @@
     </div>
 
     <c:if test="${not empty search or selectedStatus != 'all' or selectedTicketType != 'all'}">
-        <a href="${pageContext.request.contextPath}/Agent/Queues?queue=${currentQueue}" class="btn btn-link text-muted font-weight-bold" style="text-decoration: none;"><i class="feather icon-rotate-ccw mr-1"></i> Reset</a>
+        <a href="${pageContext.request.contextPath}/Queues?queue=${currentQueue}" class="btn btn-link text-muted font-weight-bold" style="text-decoration: none;"><i class="feather icon-rotate-ccw mr-1"></i> Reset</a>
     </c:if>
 </form>
 
