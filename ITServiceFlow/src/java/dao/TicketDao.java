@@ -749,6 +749,8 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         } catch (Exception e) { e.printStackTrace(); }
         return 0;
     }
+    
+    
     public static void main(String[] args) {
 
         TicketDAO dao = new TicketDAO();

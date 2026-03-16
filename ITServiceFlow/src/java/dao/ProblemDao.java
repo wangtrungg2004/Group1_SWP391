@@ -1194,5 +1194,32 @@ public List<TimeLog> getTimeLogsByProblemId(int problemId) {
     }
     return list;
 }
+
+// --- THÊM VÀO PROBLEM DAO ---
+    public Problems getProblemByTicketId(int ticketId) {
+        String sql = "SELECT p.*, u1.FullName AS CreatedByName, u2.FullName AS AssignedToName " +
+                     "FROM [dbo].[Problems] p " +
+                     "JOIN [dbo].[ProblemTickets] pt ON p.Id = pt.ProblemId " +
+                     "LEFT JOIN [dbo].[Users] u1 ON p.CreatedBy = u1.Id " +
+                     "LEFT JOIN [dbo].[Users] u2 ON p.AssignedTo = u2.Id " +
+                     "WHERE pt.TicketId = ?";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, ticketId);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    Problems p = new Problems();
+                    p.setId(rs.getInt("Id"));
+                    p.setTicketNumber(rs.getString("TicketNumber"));
+                    p.setTitle(rs.getString("Title"));
+                    p.setStatus(rs.getString("Status"));
+                    // ... (set các trường khác nếu cần thiết)
+                    return p;
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
     
 }

@@ -126,7 +126,7 @@
                                                     </c:if>
                                                     <c:forEach items="${queueList}" var="ticket">
                                                         <tr>
-                                                            <td><a href="${pageContext.request.contextPath}/Agent/TicketDetail?id=${ticket.id}" class="ticket-key">${ticket.ticketNumber}</a></td>
+                                                            <td><a href="${pageContext.request.contextPath}/TicketAgentDetail?id=${ticket.id}" class="ticket-key">${ticket.ticketNumber}</a></td>
                                                             <td>
                                                                 <div class="font-weight-bold text-dark">${ticket.title}</div>
                                                                 <small class="text-muted"><fmt:formatDate value="${ticket.createdAt}" pattern="dd/MM/yyyy HH:mm"/></small>

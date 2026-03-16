@@ -247,4 +247,26 @@ public class SLATrackingDao extends DbContext {
         }
         return list;
     }
+    
+    // --- THÊM VÀO SLATrackingDao ---
+    public SLATracking getSLATrackingByTicketId(int ticketId) {
+        String sql = "SELECT * FROM [dbo].[SLATracking] WHERE TicketId = ?";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, ticketId);
+            try (java.sql.ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    SLATracking sla = new SLATracking();
+                    sla.setId(rs.getInt("Id"));
+                    sla.setTicketId(rs.getInt("TicketId"));
+                    sla.setResponseDeadline(rs.getTimestamp("ResponseDeadline"));
+                    sla.setResolutionDeadline(rs.getTimestamp("ResolutionDeadline"));
+                    sla.setIsBreached(rs.getBoolean("IsBreached"));
+                    return sla;
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
 }
