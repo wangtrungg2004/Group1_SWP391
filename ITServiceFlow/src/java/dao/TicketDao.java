@@ -750,6 +750,45 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         return 0;
     }
     
+    // =========================================================================
+    // CODE ACTION CHO AGENT 
+    // =========================================================================
+
+    // 9. Phân công vé cho Agent (Assign to me)
+    public boolean assignTicket(int ticketId, int agentId) {
+        String sql = "UPDATE [dbo].[Tickets] SET AssignedTo = ?, UpdatedAt = GETDATE() WHERE Id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, agentId);
+            ps.setInt(2, ticketId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // 10. Cập nhật trạng thái vé (Workflow: In Progress, Resolved, Closed)
+    public boolean updateTicketStatus(int ticketId, String status) {
+        // Cấu trúc SQL động: Tự động chốt thời gian nếu vé hoàn thành
+        String sql = "UPDATE [dbo].[Tickets] SET Status = ?, UpdatedAt = GETDATE() ";
+        
+        if ("Resolved".equals(status)) {
+            sql += ", ResolvedAt = GETDATE() ";
+        } else if ("Closed".equals(status)) {
+            sql += ", ClosedAt = GETDATE() ";
+        }
+        
+        sql += "WHERE Id = ?";
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, ticketId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     
     public static void main(String[] args) {
 

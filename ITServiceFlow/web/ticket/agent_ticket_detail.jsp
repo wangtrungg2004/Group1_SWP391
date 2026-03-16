@@ -166,7 +166,7 @@
                             <div class="row align-items-center">
                                 <div class="col-md-12 d-flex justify-content-between align-items-center">
                                     <ul class="breadcrumb bg-transparent p-0 m-0">
-                                        <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/Agent/Queues" class="text-primary"><i class="feather icon-arrow-left mr-1"></i>Back to Queues</a></li>
+                                        <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/Queues" class="text-primary"><i class="feather icon-arrow-left mr-1"></i>Back to Queues</a></li>
                                         <li class="breadcrumb-item text-muted">${ticket.ticketType}</li>
                                         <li class="breadcrumb-item text-muted">${ticket.ticketNumber}</li>
                                     </ul>
