@@ -102,4 +102,13 @@ public class UserService {
         }
         return dao.markTokenUsed(token);
     }
+    
+    public int getTotalUser()
+    {
+        return dao.getTotalUser();
+    }
+    
+    public List<Users> getTopAgentsThisMonth() {
+        return dao.getTopAgentsThisMonth();
+    }
 }

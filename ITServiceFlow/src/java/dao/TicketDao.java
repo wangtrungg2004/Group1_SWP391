@@ -749,6 +749,34 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         } catch (Exception e) { e.printStackTrace(); }
         return 0;
     }
+    
+    public int getTotalTicketThisMonth()
+    {
+        String sql = "SELECT COUNT(*)"
+                + " FROM [dbo].[Tickets]"
+                + "WHERE YEAR(CreatedAt) = YEAR(GETDATE()) AND MONTH(CreatedAt) = MONTH(GETDATE())";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    public int getTotalTicket()
+    {
+        String sql = "SELECT COUNT(*) "
+                + "FROM [dbo].[Tickets]";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
     public static void main(String[] args) {
 
         TicketDAO dao = new TicketDAO();

@@ -15,11 +15,11 @@
                 <li class="nav-item pcoded-menu-caption">
                     <label>Navigation</label>
                 </li>
-                <li class="nav-item">
+<!--                <li class="nav-item">
                     <a href="AdminDashboard.jsp" class="nav-link"><span class="pcoded-micon"><i
                                 class="feather icon-home"></i></span><span
                             class="pcoded-mtext">Dashboard</span></a>
-                </li>
+                </li>-->
 
                 <!-- USER MENU -->
                 <c:if test="${role == 'User'}">
@@ -63,6 +63,11 @@
                 </c:if>
 
                 <!-- SLA MANAGEMENT (Admin & Manager) -->
+                <li class="nav-item">
+                    <a href="ManagerDashboard" class="nav-link"><span class="pcoded-micon"><i
+                                class="feather icon-home"></i></span><span
+                            class="pcoded-mtext">Dashboard</span></a>
+                </li>
                 <c:if test="${role == 'Admin' || role == 'Manager'}">
                     <li class="nav-item pcoded-menu-caption">
                         <label>SLA Management</label>

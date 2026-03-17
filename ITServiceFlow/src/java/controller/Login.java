@@ -110,7 +110,7 @@ public class Login extends HttpServlet {
                     response.sendRedirect("AdminDashboard.jsp");
                     break;
                 case "Manager":
-                    response.sendRedirect("ManagerDashboard.jsp");
+                    response.sendRedirect("ManagerDashboard");
                     break;
                 case "User":
                     response.sendRedirect("UserDashboard");

@@ -56,4 +56,14 @@ public class TicketService {
     {
         return ticketDao.searchIncidentsNotInProblem(keyword);
     }
+    
+    public int getTotalTicket()
+    {
+        return ticketDao.getTotalTicket();
+    }
+    
+    public int getTotalTicketThisMonth()
+    {
+        return ticketDao.getTotalTicketThisMonth();
+    }
 }
