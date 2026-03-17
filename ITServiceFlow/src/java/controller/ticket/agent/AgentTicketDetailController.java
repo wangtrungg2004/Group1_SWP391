@@ -76,10 +76,22 @@ public class AgentTicketDetailController extends HttpServlet {
         Problems relatedProblem = problemDao.getProblemByTicketId(ticketId);
         request.setAttribute("relatedProblem", relatedProblem);
 
-        // 5. Lấy danh sách THIẾT BỊ LIÊN KẾT (Code của Dev Asset)
-        TicketAssetsDAO assetDao = new TicketAssetsDAO();
-        List<Assets> linkedAssets = assetDao.getLinkedCIsByTicketId(ticketId);
-        request.setAttribute("linkedAssets", linkedAssets);
+        
+        // ==========================================
+        // 8. LẤY DỮ LIỆU CHO US03: PARENT - CHILD
+        // ==========================================
+        // Nếu vé này là vé con (Có ParentId) -> Lấy thông tin vé Cha
+        Integer parentId = ticket.getParentTicketId();
+if (parentId != null && parentId > 0) {
+    Tickets parentTicket = ticketDao.getParentTicket(parentId);
+    request.setAttribute("parentTicket", parentTicket);
+} else {
+    List<Tickets> childTickets = ticketDao.getLinkedChildTickets(ticketId);
+    request.setAttribute("childTickets", childTickets);
+
+    List<Tickets> availableTicketsForLinking = ticketDao.getAvailableTicketsForLinking(ticketId);
+    request.setAttribute("availableTicketsForLinking", availableTicketsForLinking);
+}
         
         // Lấy danh sách Comment
         TicketCommentsDAO commentDao = new TicketCommentsDAO();

@@ -19,121 +19,33 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
 
     <style>
-        /* Typography & Layout Polish (From User View) */
-        body {
-            background-color: #f4f5f7;
-        }
-        .card {
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(9,30,66,0.05);
-            border: 1px solid #dfe1e6;
-        }
+        /* Typography & Layout Polish */
+        body { background-color: #f4f5f7; }
+        .card { border-radius: 8px; box-shadow: 0 1px 3px rgba(9,30,66,0.05); border: 1px solid #dfe1e6; }
 
         /* Header */
-        .ticket-header {
-            border-bottom: 1px solid #dfe1e6;
-            padding-bottom: 20px;
-            margin-bottom: 25px;
-        }
-        .ticket-key {
-            font-size: 0.95rem;
-            color: #5e6c84;
-            font-weight: 500;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-        }
-        .ticket-title {
-            font-size: 1.6rem;
-            color: #172b4d;
-            font-weight: 600;
-            line-height: 1.3;
-            margin: 0;
-        }
+        .ticket-header { border-bottom: 1px solid #dfe1e6; padding-bottom: 20px; margin-bottom: 25px; }
+        .ticket-key { font-size: 0.95rem; color: #5e6c84; font-weight: 500; margin-bottom: 8px; display: flex; align-items: center; }
+        .ticket-title { font-size: 1.6rem; color: #172b4d; font-weight: 600; line-height: 1.3; margin: 0; }
 
         /* Content Sections */
-        .section-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #172b4d;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid #f4f5f7;
-            padding-bottom: 8px;
-        }
-        .section-title i {
-            margin-right: 8px;
-            color: #6b778c;
-            font-size: 1.1rem;
-        }
+        .section-title { font-size: 1rem; font-weight: 600; color: #172b4d; margin-bottom: 15px; display: flex; align-items: center; border-bottom: 1px solid #f4f5f7; padding-bottom: 8px; }
+        .section-title i { margin-right: 8px; color: #6b778c; font-size: 1.1rem; }
 
         /* Description Box */
-        .desc-box {
-            background-color: #fafbfc;
-            padding: 16px 20px;
-            border-radius: 6px;
-            color: #172b4d;
-            white-space: pre-wrap;
-            border: 1px solid #ebecf0;
-            margin-bottom: 35px;
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
+        .desc-box { background-color: #fafbfc; padding: 16px 20px; border-radius: 6px; color: #172b4d; white-space: pre-wrap; border: 1px solid #ebecf0; margin-bottom: 35px; font-size: 0.95rem; line-height: 1.6; }
 
         /* Sidebar Meta Info */
-        .sidebar-section-title {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: #5e6c84;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            border-bottom: 1px solid #dfe1e6;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        .meta-group {
-            margin-bottom: 20px;
-        }
-        .meta-label {
-            color: #6b778c;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-bottom: 6px;
-            display: block;
-            letter-spacing: 0.3px;
-        }
-        .meta-value {
-            color: #172b4d;
-            font-size: 0.9rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-        }
+        .sidebar-section-title { font-size: 0.75rem; font-weight: 700; color: #5e6c84; text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid #dfe1e6; padding-bottom: 10px; margin-bottom: 20px; }
+        .meta-group { margin-bottom: 20px; }
+        .meta-label { color: #6b778c; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; display: block; letter-spacing: 0.3px; }
+        .meta-value { color: #172b4d; font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; }
 
         /* Avatars */
-        .avatar-sm {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background-color: #0052cc;
-            color: white;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: bold;
-            margin-right: 10px;
-            flex-shrink: 0;
-        }
-        .avatar-unassigned {
-            background-color: #fafbfc;
-            color: #7a869a;
-            border: 1px dashed #a5adba;
-        }
+        .avatar-sm { width: 24px; height: 24px; border-radius: 50%; background-color: #0052cc; color: white; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; margin-right: 10px; flex-shrink: 0; }
+        .avatar-unassigned { background-color: #fafbfc; color: #7a869a; border: 1px dashed #a5adba; }
 
-        /* Agent Specific: Comment Area */
+        /* Comment Area */
         .comment-tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid #ebecf0; padding-bottom: 10px;}
         .comment-tab { padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; color: #5e6c84; background: transparent; cursor: pointer; transition: 0.2s;}
         .comment-tab:hover { background: #f4f5f7; }
@@ -219,7 +131,14 @@
                                                             <a class="dropdown-item text-secondary py-2" href="UpdateStatus?id=${ticket.id}&status=Closed"><i class="feather icon-archive mr-2"></i> Close</a>
                                                         </div>
                                                     </div>
-                                                    <a href="${pageContext.request.contextPath}/CreateProblem?sourceTicketId=${ticket.id}" class="btn btn-sm btn-outline-danger bg-white font-weight-bold">
+                                                    
+                                                    <c:if test="${empty ticket.parentTicketId or ticket.parentTicketId == 0}">
+                                                        <button type="button" data-toggle="modal" data-target="#linkChildModal" class="btn btn-sm btn-outline-secondary bg-white font-weight-bold mr-2" title="Gom nhóm các vé con">
+                                                            <i class="feather icon-layers mr-1"></i> Link Incidents
+                                                        </button>
+                                                    </c:if>
+
+                                                    <a href="${pageContext.request.contextPath}/ProblemAdd?sourceTicketId=${ticket.id}" class="btn btn-sm btn-outline-danger bg-white font-weight-bold">
                                                         <i class="feather icon-alert-triangle mr-1"></i> Escalate
                                                     </a>
                                                 </div>
@@ -247,47 +166,47 @@
                                             </div>
 
                                             <div class="card-neat p-4 p-lg-5">
-                                            <div class="section-title mb-4"><i class="feather icon-message-square text-primary mr-3" style="font-size: 1.2rem;"></i> Communication</div>
+                                                <div class="section-title mb-4"><i class="feather icon-message-square text-primary mr-3" style="font-size: 1.2rem;"></i> Communication</div>
                                             
-                                            <div class="comment-tabs">
-                                                <div class="comment-tab active-reply" onclick="toggleComment('reply', this)"><i class="feather icon-corner-up-left mr-2"></i> Reply to User</div>
-                                                <div class="comment-tab" onclick="toggleComment('note', this)"><i class="feather icon-lock mr-2"></i> Internal Note</div>
-                                            </div>
-                                            
-                                            <form action="${pageContext.request.contextPath}/AddAgentComment" method="POST">
-                                                <input type="hidden" name="ticketId" value="${ticket.id}">
-                                                <input type="hidden" name="isInternal" id="isInternalInput" value="false">
-                                                
-                                                <textarea name="content" class="form-control editor-area mb-3 p-3" id="commentArea" rows="5" placeholder="Type your response to the user here..." required></textarea>
-                                                <div class="text-right mt-3">
-                                                    <button type="submit" class="btn btn-primary px-5 py-2 font-weight-bold" id="btnSubmitComment">Save Reply</button>
+                                                <div class="comment-tabs">
+                                                    <div class="comment-tab active-reply" onclick="toggleComment('reply', this)"><i class="feather icon-corner-up-left mr-2"></i> Reply to User</div>
+                                                    <div class="comment-tab" onclick="toggleComment('note', this)"><i class="feather icon-lock mr-2"></i> Internal Note</div>
                                                 </div>
-                                            </form>
-
-                                            <c:if test="${not empty comments}">
-                                                <div class="mt-5 pt-4 border-top">
-                                                    <h6 class="font-weight-bold text-dark mb-4" style="font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px;">Activity Stream</h6>
+                                            
+                                                <form action="${pageContext.request.contextPath}/AddComment" method="POST">
+                                                    <input type="hidden" name="ticketId" value="${ticket.id}">
+                                                    <input type="hidden" name="isInternal" id="isInternalInput" value="false">
                                                     
-                                                    <c:forEach items="${comments}" var="cmt">
-                                                        <div class="p-3 p-md-4 mb-3 border rounded ${cmt.internal ? 'border-warning' : ''}" style="background-color: ${cmt.internal ? '#fffdf5' : '#fafbfc'};">
-                                                            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
-                                                                <span class="font-weight-bold ${cmt.userRole == 'User' ? 'text-primary' : 'text-dark'} d-flex align-items-center">
-                                                                    <div class="avatar-sm d-inline-flex align-items-center justify-content-center text-white rounded-circle mr-2" style="background:${cmt.userRole == 'User' ? '#00875a' : '#0052cc'}; width:28px; height:28px; font-size:11px;">
-                                                                        ${cmt.userFullName.substring(0, 2).toUpperCase()}
-                                                                    </div>
-                                                                    ${cmt.userFullName} <span class="badge badge-light text-muted ml-2 border">${cmt.userRole}</span>
-                                                                </span>
-                                                                <span class="text-muted font-weight-bold" style="font-size: 0.8rem;">
-                                                                    <fmt:formatDate value="${cmt.createdAt}" pattern="dd/MM/yyyy HH:mm" />
-                                                                    <c:if test="${cmt.internal}"><i class="feather icon-lock text-warning ml-2" title="Internal Note" style="font-size: 1rem;"></i></c:if>
-                                                                </span>
+                                                    <textarea name="content" class="form-control editor-area mb-3 p-3" id="commentArea" rows="5" placeholder="Type your response to the user here..." required></textarea>
+                                                    <div class="text-right mt-3">
+                                                        <button type="submit" class="btn btn-primary px-5 py-2 font-weight-bold" id="btnSubmitComment">Save Reply</button>
+                                                    </div>
+                                                </form>
+
+                                                <c:if test="${not empty comments}">
+                                                    <div class="mt-5 pt-4 border-top">
+                                                        <h6 class="font-weight-bold text-dark mb-4" style="font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px;">Activity Stream</h6>
+                                                        
+                                                        <c:forEach items="${comments}" var="cmt">
+                                                            <div class="p-3 p-md-4 mb-3 border rounded ${cmt.internal ? 'border-warning' : ''}" style="background-color: ${cmt.internal ? '#fffdf5' : '#fafbfc'};">
+                                                                <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                                                                    <span class="font-weight-bold ${cmt.userRole == 'User' ? 'text-primary' : 'text-dark'} d-flex align-items-center">
+                                                                        <div class="avatar-sm d-inline-flex align-items-center justify-content-center text-white rounded-circle mr-2" style="background:${cmt.userRole == 'User' ? '#00875a' : '#0052cc'}; width:28px; height:28px; font-size:11px;">
+                                                                            ${cmt.userFullName.substring(0, 2).toUpperCase()}
+                                                                        </div>
+                                                                        ${cmt.userFullName} <span class="badge badge-light text-muted ml-2 border">${cmt.userRole}</span>
+                                                                    </span>
+                                                                    <span class="text-muted font-weight-bold" style="font-size: 0.8rem;">
+                                                                        <fmt:formatDate value="${cmt.createdAt}" pattern="dd/MM/yyyy HH:mm" />
+                                                                        <c:if test="${cmt.internal}"><i class="feather icon-lock text-warning ml-2" title="Internal Note" style="font-size: 1rem;"></i></c:if>
+                                                                    </span>
+                                                                </div>
+                                                                <div style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6; color: #172b4d;">${cmt.content}</div>
                                                             </div>
-                                                            <div style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6; color: #172b4d;">${cmt.content}</div>
-                                                        </div>
-                                                    </c:forEach>
-                                                </div>
-                                            </c:if>
-                                        </div>
+                                                        </c:forEach>
+                                                    </div>
+                                                </c:if>
+                                            </div>
 
                                         </div>
                                     </div>
@@ -347,7 +266,9 @@
 
                                             <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-bottom pb-2 mb-3">
                                                 <h6 class="sidebar-section-title border-0 pb-0 mb-0 m-0">Configuration Items</h6>
-                                                <a href="#!" class="text-primary" title="Link Asset"><i class="feather icon-plus-circle" style="font-size: 1.1rem;"></i></a>
+                                                <a href="${pageContext.request.contextPath}/TicketLinkCIListServlet" class="btn btn-sm btn-light text-primary border" title="Go to Asset Management page">
+                                                    <i class="feather icon-external-link"></i> Manage
+                                                </a>
                                             </div>
                                             
                                             <div class="meta-group mb-0">
@@ -365,6 +286,44 @@
                                                     </c:when>
                                                     <c:otherwise>
                                                         <span class="text-muted font-italic" style="font-size: 0.85rem;">No linked assets</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+
+                                            <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-bottom pb-2 mb-3">
+                                                <h6 class="sidebar-section-title border-0 pb-0 mb-0 m-0">Incident Hierarchy</h6>
+                                            </div>
+                                            
+                                            <div class="meta-group mb-0">
+                                                <c:choose>
+                                                    <c:when test="${not empty parentTicket}">
+                                                        <div class="alert alert-info border-0 p-3" style="background-color: #e9f2ff; border-radius: 6px;">
+                                                            <div class="font-weight-bold text-primary mb-1" style="font-size: 0.85rem;"><i class="feather icon-arrow-up-right mr-1"></i> Part of a Major Incident:</div>
+                                                            <a href="TicketAgentDetail?id=${parentTicket.id}" class="text-dark font-weight-bold text-decoration-none">
+                                                                ${parentTicket.ticketNumber}
+                                                            </a>
+                                                            <div class="text-muted text-truncate mt-1" style="font-size: 0.8rem;">${parentTicket.title}</div>
+                                                            <span class="badge badge-light border mt-2">${parentTicket.status}</span>
+                                                        </div>
+                                                    </c:when>
+                                                    
+                                                    <c:when test="${not empty childTickets}">
+                                                        <div class="text-muted mb-2 font-weight-bold" style="font-size: 0.75rem; text-transform: uppercase;">Child Tickets (${childTickets.size()})</div>
+                                                        <div style="max-height: 250px; overflow-y: auto;">
+                                                            <c:forEach items="${childTickets}" var="child">
+                                                                <div class="p-2 border rounded mb-2 bg-light">
+                                                                    <div class="d-flex justify-content-between align-items-center">
+                                                                        <a href="TicketDetail?id=${child.id}" class="font-weight-bold text-primary" style="font-size: 0.85rem;">${child.ticketNumber}</a>
+                                                                        <span class="badge ${child.status == 'Resolved' ? 'badge-success' : 'badge-secondary'}" style="font-size: 0.7rem;">${child.status}</span>
+                                                                    </div>
+                                                                    <div class="text-dark text-truncate mt-1" style="font-size: 0.8rem;">${child.title}</div>
+                                                                </div>
+                                                            </c:forEach>
+                                                        </div>
+                                                    </c:when>
+                                                    
+                                                    <c:otherwise>
+                                                        <span class="text-muted font-italic" style="font-size: 0.85rem;">No linked incidents</span>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </div>
@@ -392,6 +351,59 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="linkChildModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 8px;">
+                <div class="modal-header bg-light border-bottom-0 p-4">
+                    <h5 class="modal-title font-weight-bold text-dark"><i class="feather icon-layers text-primary mr-2"></i>Link Child Incidents</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <form action="${pageContext.request.contextPath}/LinkChildTicket" method="POST">
+                    <div class="modal-body p-4">
+                        <input type="hidden" name="ticketId" value="${ticket.id}">
+                        <p class="text-muted mb-3">Select the tickets that are caused by this major incident. Resolving this ticket will automatically resolve all linked child tickets.</p>
+                        
+                        <div class="table-responsive" style="max-height: 300px; overflow-y: auto; border: 1px solid #dfe1e6; border-radius: 6px;">
+                            <table class="table table-hover mb-0">
+                                <thead style="background-color: #f4f5f7; position: sticky; top: 0; z-index: 1;">
+                                    <tr>
+                                        <th width="5%" class="text-center">✔</th>
+                                        <th width="20%">Ticket Key</th>
+                                        <th width="55%">Summary</th>
+                                        <th width="20%">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:choose>
+                                        <c:when test="${not empty availableTicketsForLinking}">
+                                            <c:forEach items="${availableTicketsForLinking}" var="avlTicket">
+                                                <tr>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" name="childTicketIds" value="${avlTicket.id}" style="transform: scale(1.2);">
+                                                    </td>
+                                                    <td class="font-weight-bold text-primary">${avlTicket.ticketNumber}</td>
+                                                    <td class="text-dark text-truncate" style="max-width: 250px;">${avlTicket.title}</td>
+                                                    <td><span class="badge badge-light border">${avlTicket.status}</span></td>
+                                                </tr>
+                                            </c:forEach>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <tr><td colspan="4" class="text-center text-muted py-4">No active tickets available for linking.</td></tr>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top-0 p-4 pt-0">
+                        <button type="button" class="btn btn-light font-weight-bold px-4" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary font-weight-bold px-4 shadow-sm">Link Selected Tickets</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

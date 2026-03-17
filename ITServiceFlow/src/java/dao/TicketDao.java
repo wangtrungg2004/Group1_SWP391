@@ -767,9 +767,8 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         }
     }
 
-    // 10. Cập nhật trạng thái vé (Workflow: In Progress, Resolved, Closed)
+    // 10. Cập nhật trạng thái vé (Phiên bản Nâng cấp có Hiệu ứng Domino US03)
     public boolean updateTicketStatus(int ticketId, String status) {
-        // Cấu trúc SQL động: Tự động chốt thời gian nếu vé hoàn thành
         String sql = "UPDATE [dbo].[Tickets] SET Status = ?, UpdatedAt = GETDATE() ";
         
         if ("Resolved".equals(status)) {
@@ -777,13 +776,28 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         } else if ("Closed".equals(status)) {
             sql += ", ClosedAt = GETDATE() ";
         }
-        
         sql += "WHERE Id = ?";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, ticketId);
-            return ps.executeUpdate() > 0;
+            int rows = ps.executeUpdate();
+            
+            // ===== HIỆU ỨNG DOMINO (CASCADE UPDATE) =====
+            // Nếu vé cha được Resolved hoặc Closed, TỰ ĐỘNG cập nhật toàn bộ vé con
+            if (rows > 0 && ("Resolved".equals(status) || "Closed".equals(status))) {
+                String cascadeSql = "UPDATE [dbo].[Tickets] SET Status = ?, UpdatedAt = GETDATE() ";
+                if ("Resolved".equals(status)) cascadeSql += ", ResolvedAt = GETDATE() ";
+                if ("Closed".equals(status)) cascadeSql += ", ClosedAt = GETDATE() ";
+                cascadeSql += "WHERE ParentTicketId = ? AND Status NOT IN ('Resolved', 'Closed')";
+                
+                try (PreparedStatement psCascade = connection.prepareStatement(cascadeSql)) {
+                    psCascade.setString(1, status);
+                    psCascade.setInt(2, ticketId);
+                    psCascade.executeUpdate(); // Chạy lệnh đồng bộ vé con ngầm
+                }
+            }
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -806,5 +820,98 @@ public int getTotalTicketsCount(int userId, String search, String status, String
                             t.getStatus());
         }
 
+    }
+    
+    // =========================================================================
+    // CODE US03: PARENT - CHILD INCIDENTS (GOM NHÓM VÉ)
+    // =========================================================================
+
+    // 1. Lấy danh sách các vé con (Child Tickets) của 1 vé cha
+    public List<Tickets> getLinkedChildTickets(int parentId) {
+        List<Tickets> list = new ArrayList<>();
+        String sql = "SELECT t.*, u.FullName AS AssigneeName " +
+                     "FROM [dbo].[Tickets] t " +
+                     "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id " +
+                     "WHERE t.ParentTicketId = ? ORDER BY t.CreatedAt DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, parentId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Tickets t = new Tickets();
+                t.setId(rs.getInt("Id"));
+                t.setTicketNumber(rs.getString("TicketNumber"));
+                t.setTitle(rs.getString("Title"));
+                t.setStatus(rs.getString("Status"));
+                t.setAssigneeName(rs.getString("AssigneeName"));
+                t.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                list.add(t);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
+    }
+
+    // 2. Lấy thông tin vé cha (Parent Ticket) của 1 vé con
+    public Tickets getParentTicket(int parentTicketId) {
+        if (parentTicketId <= 0) return null;
+        String sql = "SELECT * FROM [dbo].[Tickets] WHERE Id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, parentTicketId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Tickets t = new Tickets();
+                t.setId(rs.getInt("Id"));
+                t.setTicketNumber(rs.getString("TicketNumber"));
+                t.setTitle(rs.getString("Title"));
+                t.setStatus(rs.getString("Status"));
+                return t;
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return null;
+    }
+
+    // 3. Lấy danh sách các vé CÓ THỂ LIÊN KẾT (Để hiển thị trong Modal chọn vé con)
+    // Điều kiện: Không phải là chính nó, chưa bị đóng, và chưa làm con của thằng nào khác
+    public List<Tickets> getAvailableTicketsForLinking(int currentTicketId) {
+        List<Tickets> list = new ArrayList<>();
+        String sql = "SELECT Id, TicketNumber, Title, Status FROM [dbo].[Tickets] " +
+                     "WHERE Id != ? AND Status NOT IN ('Resolved', 'Closed') " +
+                     "AND ParentTicketId IS NULL";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, currentTicketId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Tickets t = new Tickets();
+                t.setId(rs.getInt("Id"));
+                t.setTicketNumber(rs.getString("TicketNumber"));
+                t.setTitle(rs.getString("Title"));
+                t.setStatus(rs.getString("Status"));
+                list.add(t);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
+    }
+
+    // 4. Hàm thực thi việc gán vé con vào vé cha
+    public boolean linkChildTickets(int parentId, String[] childIds) {
+        if (childIds == null || childIds.length == 0) return false;
+        
+        // Tạo chuỗi ?,?,? tương ứng với số lượng vé con được chọn
+        StringBuilder placeholders = new StringBuilder();
+        for (int i = 0; i < childIds.length; i++) {
+            placeholders.append("?");
+            if (i < childIds.length - 1) placeholders.append(",");
+        }
+        
+        String sql = "UPDATE [dbo].[Tickets] SET ParentTicketId = ?, UpdatedAt = GETDATE() WHERE Id IN (" + placeholders.toString() + ")";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, parentId);
+            for (int i = 0; i < childIds.length; i++) {
+                ps.setInt(i + 2, Integer.parseInt(childIds[i]));
+            }
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
