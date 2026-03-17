@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import model.Notifications;
 import model.Problems;
+import service.AuditLogService;
 import service.ProblemService;
 import service.NotificationService;
 /**
@@ -64,6 +65,7 @@ public class ProblemList extends HttpServlet {
     ProblemService problemService = new ProblemService();
     NotificationService notificationService = new NotificationService();
     NotificationDao notificationDao = new NotificationDao();
+    AuditLogService auditLogService = new AuditLogService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -108,7 +110,7 @@ public class ProblemList extends HttpServlet {
             page = 1;
         }
 
-        String status = request.getParameter("status");
+        String status = request.getParameter("filterStatus");
         String fromDate = request.getParameter("fromDate");
         String toDate = request.getParameter("toDate");
         boolean hasStatus = status != null && !status.trim().isEmpty();
@@ -181,7 +183,11 @@ public class ProblemList extends HttpServlet {
         request.setAttribute("totalRecords", totalRecords);
         request.setAttribute("pageSize", pageSize);
         request.setAttribute("filterKeyword", keyword);
-
+        
+        request.setAttribute("filterStatus", status);
+        request.setAttribute("filterFromDate", fromDate);
+        request.setAttribute("filterToDate", toDate);
+        
         request.getRequestDispatcher("ProblemList.jsp").forward(request, response);
     }
 
@@ -198,6 +204,9 @@ public class ProblemList extends HttpServlet {
             throws ServletException, IOException {
        String ProblemId = request.getParameter("Id");
         
+        HttpSession session = request.getSession();
+        String role = (String) session.getAttribute("role");
+        Integer userId = (Integer) session.getAttribute("userId");
         try {
             int id = Integer.parseInt(ProblemId);
             
@@ -242,6 +251,7 @@ public class ProblemList extends HttpServlet {
 //            }
             
             // Redirect về danh sách users sau khi delete thành công
+            auditLogService.createAuditLog(userId, "DELETE", "Problem", id);
             response.sendRedirect("ProblemList");
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ProblemId format");

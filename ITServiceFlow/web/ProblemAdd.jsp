@@ -259,7 +259,7 @@
 	<script src="assets/js/pcoded.min.js"></script>
 <script>
     $('#addProblemForm').submit(function (e) {
-        if (!$('input[name="Title"]').val().trim()) {
+        if (!$('#addProblemForm input[name="Title"]').val().trim()) {
             alert('Title is required');
             e.preventDefault();
         }

@@ -9,7 +9,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import model.KnowErrors;
+import service.AuditLogService;
 import service.KnowErrorService;
 
 @WebServlet(name = "KnowErrorUpdate", urlPatterns = {"/KnowErrorUpdate"})
@@ -41,10 +43,13 @@ public class KnowErrorUpdate extends HttpServlet {
             response.sendRedirect("KnowErrorList?error=invalid_id");
         }
     }
-
+    AuditLogService auditLogService = new AuditLogService();
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("userId");
+        
         request.setCharacterEncoding("UTF-8");
         String idParam = request.getParameter("Id");
         String title = request.getParameter("Title");
@@ -66,6 +71,10 @@ public class KnowErrorUpdate extends HttpServlet {
             }
             boolean success = knowErrorService.updateKnowError(id, title.trim(), workAround.trim());
             if (success) {
+               
+                if (userId != null) {
+                    auditLogService.createAuditLog(userId, "UPDATE", "KnowError", id);
+                }
                 response.sendRedirect("KnowErrorDetail?Id=" + id);
             } else {
                 request.setAttribute("error", "Update failed.");

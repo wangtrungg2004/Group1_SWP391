@@ -17,6 +17,7 @@ import java.util.List;
 import model.Notifications;
 import model.Problems;
 import model.KnowErrors;
+import service.AuditLogService;
 import service.KnowErrorService;
 import service.ProblemService;
 import service.NotificationService;
@@ -64,6 +65,7 @@ public class SubmitApproval extends HttpServlet {
      */
     ProblemService problemService = new ProblemService();
     KnowErrorService knownErrorService = new KnowErrorService();
+    AuditLogService auditLogService = new AuditLogService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -85,51 +87,70 @@ public class SubmitApproval extends HttpServlet {
         HttpSession session = request.getSession();
         String role = (String) session.getAttribute("role");
         Integer userId = (Integer) session.getAttribute("userId");
-        
+
         String problemId = request.getParameter("problemId");
         String status = request.getParameter("status");
-        
-        if(problemId == null)
-        {
+
+        if(problemId == null){
+            response.sendRedirect("ProblemList");
             return;
         }
+
         int id = Integer.parseInt(problemId);
-        if(status.equals("REJECTED"))
-        {
+
+        Problems problem = problemService.getProblemById(id);
+
+        if(problem == null){
+            response.sendRedirect("ProblemList");
+            return;
+        }
+
+        if("PENDING".equals(status)){
+
+            problemService.updateStatusProblem(id, status);
+
+            auditLogService.createAuditLog(userId,"SUBMIT","Problem",id);
+        }
+
+        else if("REJECTED".equals(status)){
+
             String rejectedReason = request.getParameter("rejectedReason");
-            if (rejectedReason != null) {
+
+            if(rejectedReason != null){
                 rejectedReason = rejectedReason.trim();
             }
-            Problems pro = problemService.getProblemById(id);
-            if (pro != null) {
-                pro.setStatus("REJECTED");
-                pro.setRejectedReason(rejectedReason);
-                problemService.updateProblem(pro);
-            }
+
+            problem.setStatus("REJECTED");
+            problem.setRejectedReason(rejectedReason);
+
+            problemService.updateProblem(problem);
+
+            auditLogService.createAuditLog(userId,"REJECTED","Problem",id);
         }
-        if(status.equals("APPROVED"))
-        {
-//            problemService.updateStatusProblem(id, status);
-            
-            Problems pro = problemService.getProblemById(id);
-            
-            if(pro != null)
-            {
-                KnowErrors kn = knownErrorService.findKnowErrorByProblemId(id);
-                if(kn == null)
-                {
-                    knownErrorService.addKnowError(pro.getId(), pro.getTitle(), pro.getWorkaround());
-                }
+
+        else if("APPROVED".equals(status)){
+
+            problemService.updateStatusProblem(id,status);
+
+            KnowErrors kn = knownErrorService.findKnowErrorByProblemId(id);
+
+            if(kn == null){
+                knownErrorService.addKnowError(problem.getId(),
+                                               problem.getTitle(),
+                                               problem.getWorkaround());
             }
+            KnowErrors newKn = knownErrorService.findKnowErrorByProblemId(id);
+            if (newKn != null) {
+                auditLogService.createAuditLog(userId, "CREATE", "KnowError", newKn.getId());
+            }
+
+            auditLogService.createAuditLog(userId,"APPROVED","Problem",id);
         }
-        boolean pro = problemService.updateStatusProblem(id, status);
-        
-        if("IT Support".equals(role))
-        {
+
+        if("IT Support".equals(role)){
             response.sendRedirect("ITProblemListController");
         }
-        else if("Manager".equals(role))
-        {
+        else if("Manager".equals(role)){
             response.sendRedirect("ProblemPendingList");
         }
     }
