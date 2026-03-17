@@ -190,21 +190,20 @@ public class CsatSurveyDAO extends DbContext {
     }
 
     /**
-     * Tỉ lệ phản hồi = số tickets Closed có survey / tổng tickets Closed
-     * Dùng bảng Tickets có sẵn (cột Status, ClosedAt)
+     * Lấy tất cả TicketId mà user đã submit CSAT.
+     * Dùng trong MyTicketsController để biết ticket nào đã được rate
+     * mà chỉ cần 1 query thay vì N query per ticket.
      */
-    public double getResponseRate() {
-        String sql = "SELECT "
-                   + "  CAST(COUNT(cs.Id) AS FLOAT) / NULLIF(COUNT(t.Id), 0) * 100 "
-                   + "FROM Tickets t "
-                   + "LEFT JOIN CsatSurveys cs ON t.Id = cs.TicketId "
-                   + "WHERE t.Status = 'Closed'";
+    public java.util.Set<Integer> getSubmittedTicketIdsByUser(int userId) {
+        java.util.Set<Integer> ids = new java.util.HashSet<>();
+        String sql = "SELECT TicketId FROM CsatSurveys WHERE UserId = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getDouble(1);
+            while (rs.next()) ids.add(rs.getInt("TicketId"));
         } catch (SQLException e) {
-            System.err.println("[CsatSurveyDAO] getResponseRate error: " + e.getMessage());
+            System.err.println("[CsatSurveyDAO] getSubmittedTicketIdsByUser error: " + e.getMessage());
         }
-        return 0.0;
+        return ids;
     }
 }

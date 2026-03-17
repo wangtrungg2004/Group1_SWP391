@@ -384,6 +384,78 @@
                                                 </c:choose>
                                             </div>
 
+                                            <%-- ═══════════════════════════════════════════════
+                                                 TIME TRACKING SECTION
+                                            ═══════════════════════════════════════════════ --%>
+                                            <c:if test="${sessionScope.role eq 'IT Support'}">
+                                            <div class="mt-4 pt-3 border-top">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <h6 class="sidebar-section-title border-0 pb-0 mb-0">
+                                                        <i class="feather icon-clock mr-1 text-primary"></i> Time Tracking
+                                                    </h6>
+                                                    <c:if test="${totalHours > 0}">
+                                                        <span class="badge badge-primary" style="font-size:0.8rem;">
+                                                            <fmt:formatNumber value="${totalHours}" pattern="#.##"/>h total
+                                                        </span>
+                                                    </c:if>
+                                                </div>
+
+                                                <%-- Flash message --%>
+                                                <c:if test="${not empty timeLogFlashMsg}">
+                                                    <div class="alert alert-${timeLogFlashType eq 'success' ? 'success' : 'danger'}
+                                                                alert-dismissible p-2 mb-3" style="font-size:0.82rem;" role="alert">
+                                                        ${timeLogFlashMsg}
+                                                        <button type="button" class="close py-1 px-2" data-dismiss="alert"><span>&times;</span></button>
+                                                    </div>
+                                                </c:if>
+
+                                                <%-- Nút mở popup log time - chỉ hiện khi ticket đã Resolved hoặc Closed --%>
+                                                <c:choose>
+                                                    <c:when test="${ticket.status eq 'Resolved' or ticket.status eq 'Closed'}">
+                                                        <button type="button" class="btn btn-sm btn-outline-primary btn-block mb-3"
+                                                                onclick="openTimeLogModal()">
+                                                            <i class="feather icon-plus mr-1"></i> Log Time
+                                                        </button>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <div class="p-2 mb-3 rounded text-center"
+                                                             style="background:#f4f5f7; border:1px dashed #dfe1e6; font-size:0.78rem; color:#a5adba;">
+                                                            <i class="feather icon-lock mr-1"></i>
+                                                            Available after ticket is resolved
+                                                        </div>
+                                                    </c:otherwise>
+                                                </c:choose>
+
+                                                <%-- LOG HISTORY --%>
+                                                <c:choose>
+                                                    <c:when test="${not empty timeLogs}">
+                                                        <div style="max-height:280px; overflow-y:auto;">
+                                                            <c:forEach var="log" items="${timeLogs}">
+                                                                <div class="p-2 border rounded mb-2 bg-light" style="font-size:0.78rem;">
+                                                                    <div class="d-flex justify-content-between align-items-start">
+                                                                        <span class="font-weight-bold text-dark">${log.fullName}</span>
+                                                                        <span class="text-primary font-weight-bold ml-2" style="white-space:nowrap;">
+                                                                            <fmt:formatNumber value="${log.hours}" pattern="#.##"/>h
+                                                                        </span>
+                                                                    </div>
+                                                                    <c:if test="${not empty log.note}">
+                                                                        <div class="text-dark mt-1">${log.note}</div>
+                                                                    </c:if>
+                                                                    <div class="text-muted mt-1">
+                                                                        <fmt:formatDate value="${log.logDate}" pattern="dd/MM/yyyy"/>
+                                                                    </div>
+                                                                </div>
+                                                            </c:forEach>
+                                                        </div>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <p class="text-muted font-italic" style="font-size:0.82rem;">No time logged yet.</p>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                            </c:if>
+                                            <%-- END TIME TRACKING --%>
+
                                         </div>
                                     </div>
                                 </div>
@@ -396,11 +468,98 @@
         </div>
     </div>
 
+    <%-- ══ Log Time Modal ══════════════════════════════════════════════════════ --%>
+    <div id="timeLogModalBackdrop" onclick="closeTimeLogOnBackdrop(event)"
+         style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1050;
+                align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:12px; width:100%; max-width:440px;
+                    padding:28px 32px; box-shadow:0 8px 40px rgba(0,0,0,0.18); position:relative;"
+             onclick="event.stopPropagation()">
+
+            <%-- Header --%>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 style="margin:0; font-size:1rem; font-weight:700; color:#172b4d;">
+                    <i class="feather icon-clock mr-2" style="color:#0052cc;"></i>Log Time
+                </h5>
+                <button onclick="closeTimeLogModal()"
+                        style="background:none;border:none;cursor:pointer;color:#6b778c;font-size:1.2rem;padding:0;">
+                    <i class="feather icon-x"></i>
+                </button>
+            </div>
+
+            <%-- Tên người thực hiện (readonly - lấy từ session) --%>
+            <div class="form-group mb-3">
+                <label style="font-size:0.75rem;font-weight:600;color:#5e6c84;text-transform:uppercase;letter-spacing:0.4px;">
+                    Performed by
+                </label>
+                <input type="text"
+                       value="${sessionScope.user.fullName}"
+                       class="form-control form-control-sm"
+                       readonly
+                       style="background:#f4f5f7; color:#172b4d; font-weight:600; border:1px solid #dfe1e6;">
+            </div>
+
+            <form action="${pageContext.request.contextPath}/TicketTimeLog" method="post"
+                  id="timeLogForm" onsubmit="return validateTimeLogForm()">
+                <input type="hidden" name="action"   value="logManual">
+                <input type="hidden" name="ticketId" value="${ticket.id}">
+
+                <%-- Số giờ --%>
+                <div class="form-group mb-3">
+                    <label style="font-size:0.75rem;font-weight:600;color:#5e6c84;text-transform:uppercase;letter-spacing:0.4px;">
+                        Time Spent <span class="text-danger">*</span>
+                    </label>
+                    <div class="d-flex align-items-center" style="gap:8px;">
+                        <input type="number" name="hours" id="tlHours"
+                               class="form-control form-control-sm"
+                               min="0" step="1" placeholder="0" style="width:80px; text-align:center;"
+                               oninput="updateTimeDisplay()">
+                        <span style="color:#6b778c; font-size:0.85rem;">h</span>
+                        <input type="number" name="minutes" id="tlMinutes"
+                               class="form-control form-control-sm"
+                               min="0" max="59" step="1" placeholder="0" style="width:80px; text-align:center;"
+                               oninput="updateTimeDisplay()">
+                        <span style="color:#6b778c; font-size:0.85rem;">min</span>
+                    </div>
+                    <div id="tlTimePreview" style="font-size:0.75rem; color:#0052cc; margin-top:5px; font-weight:600;"></div>
+                </div>
+
+                <%-- Mô tả công việc --%>
+                <div class="form-group mb-4">
+                    <label style="font-size:0.75rem;font-weight:600;color:#5e6c84;text-transform:uppercase;letter-spacing:0.4px;">
+                        Work Description <span class="text-danger">*</span>
+                    </label>
+                    <textarea name="note" id="tlNote" rows="3"
+                              class="form-control form-control-sm"
+                              placeholder="Describe what you worked on..."
+                              maxlength="500" required
+                              style="resize:vertical; border:1px solid #dfe1e6; border-radius:6px;
+                                     font-size:0.9rem; padding:8px 12px;"></textarea>
+                    <div style="text-align:right; font-size:0.7rem; color:#a5adba; margin-top:2px;">
+                        <span id="tlNoteCount">0</span>/500
+                    </div>
+                </div>
+
+                <%-- Buttons --%>
+                <div class="d-flex justify-content-end" style="gap:10px;">
+                    <button type="button" onclick="closeTimeLogModal()"
+                            class="btn btn-sm"
+                            style="border:1.5px solid #dfe1e6; color:#6b778c; background:#fff; padding:7px 20px; border-radius:6px; font-weight:600;">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-sm btn-primary"
+                            style="padding:7px 24px; border-radius:6px; font-weight:600;">
+                        <i class="feather icon-check mr-1"></i> Save Log
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="${pageContext.request.contextPath}/assets/plugins/jquery/js/jquery.min.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/vendor-all.min.js"></script>
     <script src="${pageContext.request.contextPath}/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/pcoded.min.js"></script>
-    
     <script>
         function toggleComment(mode, element) {
             $('.comment-tab').removeClass('active-reply active-note');
@@ -419,6 +578,61 @@
                 btn.removeClass('btn-primary').addClass('btn-warning text-dark').text('Save Internal Note');
                 input.val('true');
             }
+        }
+
+        // ── Time Log Modal ───────────────────────────────────────
+        function openTimeLogModal() {
+            var backdrop = document.getElementById('timeLogModalBackdrop');
+            backdrop.style.display = 'flex';
+            document.getElementById('tlHours').focus();
+        }
+        function closeTimeLogModal() {
+            document.getElementById('timeLogModalBackdrop').style.display = 'none';
+            document.getElementById('timeLogForm').reset();
+            document.getElementById('tlTimePreview').textContent = '';
+            document.getElementById('tlNoteCount').textContent = '0';
+        }
+        function closeTimeLogOnBackdrop(e) {
+            if (e.target === document.getElementById('timeLogModalBackdrop')) closeTimeLogModal();
+        }
+
+        // Hiển thị preview thời gian
+        function updateTimeDisplay() {
+            var h = parseInt(document.getElementById('tlHours').value) || 0;
+            var m = parseInt(document.getElementById('tlMinutes').value) || 0;
+            var preview = document.getElementById('tlTimePreview');
+            if (h === 0 && m === 0) { preview.textContent = ''; return; }
+            var parts = [];
+            if (h > 0) parts.push(h + ' hour' + (h > 1 ? 's' : ''));
+            if (m > 0) parts.push(m + ' minute' + (m > 1 ? 's' : ''));
+            preview.textContent = '= ' + parts.join(' ');
+        }
+
+        // Đếm ký tự note
+        document.getElementById('tlNote').addEventListener('input', function() {
+            document.getElementById('tlNoteCount').textContent = this.value.length;
+        });
+
+        // Validate trước khi submit — gộp hours + minutes thành decimal hours
+        function validateTimeLogForm() {
+            var h = parseInt(document.getElementById('tlHours').value) || 0;
+            var m = parseInt(document.getElementById('tlMinutes').value) || 0;
+            var note = document.getElementById('tlNote').value.trim();
+
+            if (h === 0 && m === 0) {
+                alert('Please enter time spent (hours and/or minutes).');
+                return false;
+            }
+            if (note === '') {
+                alert('Please enter a work description.');
+                return false;
+            }
+            // Gộp thành decimal hours và đặt vào hidden field
+            var totalHours = h + (m / 60);
+            document.getElementById('tlHours').value = totalHours.toFixed(4);
+            // Xóa field minutes khỏi submit (server chỉ nhận hours)
+            document.getElementById('tlMinutes').disabled = true;
+            return true;
         }
     </script>
 </body>

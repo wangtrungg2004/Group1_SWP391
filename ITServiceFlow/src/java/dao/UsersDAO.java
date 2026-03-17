@@ -97,10 +97,10 @@ public class UsersDAO extends DbContext {
         }
     }
 
-    // Cập nhật thông tin user
+    // Cập nhật toàn bộ thông tin user (dùng cho Admin)
     public boolean updateUser(Users user) {
-        String sql = "UPDATE Users SET FullName = ?, Role = ?, DepartmentId = ?, LocationId = ?, IsActive = ?, "
-                   + "UpdatedAt = GETDATE() WHERE Id = ?";
+        String sql = "UPDATE Users SET FullName = ?, Role = ?, DepartmentId = ?, LocationId = ?, IsActive = ? "
+                   + "WHERE Id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, user.getFullName());
@@ -113,6 +113,26 @@ public class UsersDAO extends DbContext {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error updating user: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Cập nhật thông tin cá nhân từ trang My Profile.
+     * Chỉ cho phép user tự sửa: FullName, Email, LocationId.
+     * Không động đến Role, IsActive, DepartmentId.
+     */
+    public boolean updateProfile(int userId, String fullName, String email, int locationId) {
+        String sql = "UPDATE Users SET FullName = ?, Email = ?, LocationId = ? WHERE Id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, fullName);
+            ps.setString(2, email);
+            ps.setInt(3, locationId);
+            ps.setInt(4, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error updating profile: " + e.getMessage());
             e.printStackTrace();
             return false;
         }

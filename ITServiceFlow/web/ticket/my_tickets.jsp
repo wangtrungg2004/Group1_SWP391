@@ -450,6 +450,26 @@
                                                                             <a href="${pageContext.request.contextPath}/TicketDetailUser?id=${ticket.id}" class="btn-action" title="View Details">
                                                                                 <i class="feather icon-external-link"></i>
                                                                             </a>
+                                                                            <c:if test="${ticket.status == 'Closed'}">
+                                                                                <c:choose>
+                                                                                    <c:when test="${ratedTicketIds.contains(ticket.id)}">
+                                                                                        <%-- Đã rate: sao vàng đặc, tooltip "Rated" --%>
+                                                                                        <a href="${pageContext.request.contextPath}/CsatSurvey?ticketId=${ticket.id}"
+                                                                                           class="btn-action ml-1" title="You've rated this ticket"
+                                                                                           style="color:#f6c90e; text-shadow: 0 0 6px rgba(246,201,14,0.7);">
+                                                                                            <i class="fas fa-star"></i>
+                                                                                        </a>
+                                                                                    </c:when>
+                                                                                    <c:otherwise>
+                                                                                        <%-- Chưa rate: sao rỗng, mờ --%>
+                                                                                        <a href="${pageContext.request.contextPath}/CsatSurvey?ticketId=${ticket.id}"
+                                                                                           class="btn-action ml-1" title="Rate this ticket"
+                                                                                           style="color:#c0c0c0;">
+                                                                                            <i class="feather icon-star"></i>
+                                                                                        </a>
+                                                                                    </c:otherwise>
+                                                                                </c:choose>
+                                                                            </c:if>
                                                                         </td>
                                                                     </tr>
                                                                 </c:forEach>

@@ -3,12 +3,24 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/dao/TimeLogDAO.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/WEB-INF/web.xml</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/ticket/user/MyTicketsController.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/ticket/agent_ticket_detail.jsp</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/MyProfileController.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/MyProfile.jsp</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/dao/CsatSurveyDAO.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/service/AuditLogService.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/service/TimeLogService.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/ticket/agent/TicketTimeLogController.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/dao/UserDao.java</file>
             <file>file:/E:/Group1_SWP391/ITServiceFlow/web/includes/header.jsp</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/service/TicketService.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/Problems/ProblemUpdate.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/Problems/ProblemAdd.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/model/Tickets.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/dao/TicketDao.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/ticket/user/TicketCreateController.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/dao/AuditLogsDAO.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/ticket/agent/AgentTicketDetailController.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/model/TimeLog.java</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/ticket/my_tickets.jsp</file>
+            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/dao/UsersDAO.java</file>
         </group>
     </open-files>
 </project-private>
