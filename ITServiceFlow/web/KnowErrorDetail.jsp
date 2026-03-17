@@ -155,6 +155,9 @@
                                                     <i class="feather icon-arrow-left"></i> Back to List
                                                 </a>
                                             </div>
+                                            <a href="KnowErrorAuditLogList?Id=${knowError.id}" class="btn btn-sm btn-info">
+                                                <i class="feather icon-clock"></i> View History
+                                            </a>
                                         </div>
                                         <div class="card-body">
                                             <c:if test="${not empty error}">

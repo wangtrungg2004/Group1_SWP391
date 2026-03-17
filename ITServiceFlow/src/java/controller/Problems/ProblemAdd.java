@@ -17,6 +17,7 @@ import java.util.List;
 import service.ProblemService;
 import model.Users;
 import model.Tickets;
+import service.AuditLogService;
 import service.TicketService;
 import service.UserService;
 /**
@@ -64,6 +65,7 @@ public class ProblemAdd extends HttpServlet {
     NotificationDao notificationDao = new NotificationDao();
     TicketService ticketService = new TicketService();
     UserService userService = new UserService();
+    AuditLogService auditLogService = new AuditLogService();
     
     private String trimOrNull(String value) {
         return (value == null || value.trim().isEmpty()) ? null : value.trim();
@@ -111,7 +113,8 @@ public class ProblemAdd extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        
+        
         String Title       = trimOrNull(request.getParameter("Title"));
         String Description = trimOrNull(request.getParameter("Description"));
         String RootCause   = trimOrNull(request.getParameter("RootCause"));
@@ -212,8 +215,7 @@ public class ProblemAdd extends HttpServlet {
                 if (assignedTo > 0) {
                     notificationDao.addNotification(assignedTo, message, null, false, notificationTitle, type);
                 }
-                
-                
+                auditLogService.createAuditLog(createdBy, "CREATE", "Problem", newProblemId);
             }
             response.sendRedirect("ProblemList?success=Problem added successfully!");
         } else {

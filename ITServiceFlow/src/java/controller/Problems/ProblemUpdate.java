@@ -13,10 +13,12 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import model.Problems;
 import model.Tickets;
+import service.AuditLogService;
 import service.ProblemService;
 import service.TicketService;
 import service.UserService;
@@ -68,7 +70,7 @@ public class ProblemUpdate extends HttpServlet {
     UserService userService = new UserService();
     TicketService ticketService = new TicketService();
     NotificationDao notificationDao = new NotificationDao();
-
+    AuditLogService auditLogService = new AuditLogService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -127,7 +129,9 @@ public class ProblemUpdate extends HttpServlet {
         // String status = request.getParameter("Status");
         // String assignedToStr = request.getParameter("AssignedTo");
         //
-
+        HttpSession session = request.getSession();
+//        String role = (String) session.getAttribute("role");
+        Integer userId = (Integer) session.getAttribute("userId");
         try {
             int id = Integer.parseInt(request.getParameter("Id"));
             Problems pro = problemService.getProblemById(id);
@@ -176,6 +180,7 @@ public class ProblemUpdate extends HttpServlet {
 //                        String notifTitle = "Problem updated: " + pro.getTitle();
 //                        notificationDao.addNotification(assignedTo, msg, null, false, notifTitle, "Problem");
 //                    }
+                auditLogService.createAuditLog(userId, "UPDATE", "Problem", id);
                 response.sendRedirect("ProblemDetail?Id=" + id);
             } else {
                 request.setAttribute("error", "Update failed");

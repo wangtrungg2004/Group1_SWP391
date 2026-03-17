@@ -86,7 +86,7 @@ public class KnowErrorDao extends DbContext{
     {
         String sql = "INSERT INTO [dbo].[KnownErrors] "
                 + "([ProblemId], [Title], [Workaround], [Status], [ViewCount])"
-                + " VALUES (?, ?, ?, 'Active', 0)";
+                + " VALUES (?, ?, ?, 'CLOSED', 0)";
         try
         {
             PreparedStatement stm = connection.prepareStatement(sql);

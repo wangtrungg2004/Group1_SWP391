@@ -135,4 +135,61 @@ public class AuditLogsDAO extends DbContext {
             }
         }
     }
+    
+    
+    
+    public List<AuditLog> getActivitiesHistory(String entity, int entityId)
+    {
+        List<AuditLog> list = new ArrayList<>();
+        String sql = "SELECT a.Id, a.UserId, a.Action, a.Entity, a.EntityId, a.CreatedAt, u.FullName AS UserName " +
+                    "FROM AuditLogs a " +
+                    "LEFT JOIN Users u ON a.UserId = u.Id " +
+                    "WHERE a.Entity = ? AND a.EntityId = ? " +
+                    "ORDER BY a.CreatedAt DESC";
+        try
+        {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setString(1, entity);
+            stm.setInt(2, entityId);
+            ResultSet rs = stm.executeQuery();
+            while(rs.next())
+            {
+                AuditLog log = new AuditLog();
+                log.setId(rs.getInt("Id"));
+                log.setUserId(rs.getInt("UserId"));
+                log.setAction(rs.getString("Action"));
+                log.setEntity(rs.getString("Entity"));
+                log.setEntityId(rs.getInt("EntityId"));
+                log.setCreatedAt(rs.getTimestamp("CreatedAt")); 
+                log.setUserName(rs.getString("UserName"));
+                list.add(log);
+            }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+    
+    public boolean createAuditLog(int userId, String action, String entity, int entityId)
+    {
+        String sql = "INSERT INTO AuditLogs (UserId, Action, Entity, EntityId, CreatedAt) " +
+        "VALUES (?, ?, ?, ?, GETDATE())";
+        try
+        {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setInt(1, userId);
+            stm.setString(2, action);
+            stm.setString(3, entity);
+            stm.setInt(4, entityId);
+            stm.executeUpdate();
+            return true;
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            return false;
+        }
+    }
 }

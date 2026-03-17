@@ -9,7 +9,7 @@ public class AuditLog {
     private String entity;
     private int entityId;
     private Timestamp createdAt;
-
+    private String userName;
     // Constructors
     public AuditLog() {}
 
@@ -20,6 +20,25 @@ public class AuditLog {
         this.entityId = entityId;
     }
 
+    public AuditLog(int id, int userId, String action, String entity, int entityId, Timestamp createdAt, String userName) {
+        this.id = id;
+        this.userId = userId;
+        this.action = action;
+        this.entity = entity;
+        this.entityId = entityId;
+        this.createdAt = createdAt;
+        this.userName = userName;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+    
+    
     // Getters & Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }

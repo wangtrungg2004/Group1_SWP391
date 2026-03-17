@@ -16,6 +16,7 @@ import java.util.List;
 import model.Problems;
 import model.Tickets;
 import model.TimeLog;
+import service.AuditLogService;
 import service.ProblemService;
 
 /**
@@ -61,7 +62,7 @@ public class ProblemDetail extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     ProblemService problemService = new ProblemService();
-
+    AuditLogService auditLogService = new AuditLogService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -161,13 +162,15 @@ public class ProblemDetail extends HttpServlet {
         if ("startInvestigation".equals(action)) {
             boolean statusUpdated = problemService.updateAssignStatus(problemId);
             int timeLogId = problemService.startTimer(problemId, userId);
-
-            if (statusUpdated && timeLogId > 0) {
-                session.setAttribute("activeTimeLogId_" + problemId, timeLogId);
-                session.setAttribute("problemDetailFlash", "success:Đã bắt đầu điều tra và timer");
-            } else {
-                session.setAttribute("problemDetailFlash", "error:Lỗi khi bắt đầu điều tra");
-            }
+            auditLogService.createAuditLog(userId, "START_INVESTIGATION", "Problem", problemId);
+//            if (statusUpdated && timeLogId > 0) {
+////                auditLogService.createAuditLog(userId, "START_INVESTIGATION", "Problem", problemId);
+//                
+//                session.setAttribute("activeTimeLogId_" + problemId, timeLogId);
+//                session.setAttribute("problemDetailFlash", "success:Đã bắt đầu điều tra và timer");
+//            } else {
+//                session.setAttribute("problemDetailFlash", "error:Lỗi khi bắt đầu điều tra");
+//            }
         } else if ("stopTimer".equals(action)) {
             String timeLogIdStr = request.getParameter("timeLogId");
             if (timeLogIdStr == null) {

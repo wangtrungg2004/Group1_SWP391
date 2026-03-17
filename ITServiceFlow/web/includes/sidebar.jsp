@@ -1,4 +1,4 @@
-<%-- Left sidebar - phân quy?n theo session attribute "role" --%>
+<%-- Left sidebar - phï¿½n quy?n theo session attribute "role" --%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <!-- [ navigation menu ] start -->
 <nav class="pcoded-navbar menupos-fixed menu-light brand-blue ">
