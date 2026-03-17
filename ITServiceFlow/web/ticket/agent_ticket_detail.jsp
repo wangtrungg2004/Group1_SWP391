@@ -246,24 +246,48 @@
                                                 </c:choose>
                                             </div>
 
-                                            <div class="mt-2">
-                                                <h6 class="section-title"><i class="feather icon-message-square"></i> Communication</h6>
-                                                
-                                                <div class="comment-tabs">
-                                                    <div class="comment-tab active-reply" onclick="toggleComment('reply', this)"><i class="feather icon-corner-up-left mr-1"></i> Reply to User</div>
-                                                    <div class="comment-tab" onclick="toggleComment('note', this)"><i class="feather icon-lock mr-1"></i> Internal Note</div>
-                                                </div>
-                                                
-                                                <form action="AddComment" method="POST">
-                                                    <input type="hidden" name="ticketId" value="${ticket.id}">
-                                                    <input type="hidden" name="isInternal" id="isInternalInput" value="false">
-                                                    
-                                                    <textarea class="form-control editor-area p-3" id="commentArea" rows="4" placeholder="Type your response to the user here..."></textarea>
-                                                    <div class="text-right mt-3">
-                                                        <button type="submit" class="btn btn-primary px-4 py-2 font-weight-bold" id="btnSubmitComment">Save Reply</button>
-                                                    </div>
-                                                </form>
+                                            <div class="card-neat p-4 p-lg-5">
+                                            <div class="section-title mb-4"><i class="feather icon-message-square text-primary mr-3" style="font-size: 1.2rem;"></i> Communication</div>
+                                            
+                                            <div class="comment-tabs">
+                                                <div class="comment-tab active-reply" onclick="toggleComment('reply', this)"><i class="feather icon-corner-up-left mr-2"></i> Reply to User</div>
+                                                <div class="comment-tab" onclick="toggleComment('note', this)"><i class="feather icon-lock mr-2"></i> Internal Note</div>
                                             </div>
+                                            
+                                            <form action="${pageContext.request.contextPath}/AddAgentComment" method="POST">
+                                                <input type="hidden" name="ticketId" value="${ticket.id}">
+                                                <input type="hidden" name="isInternal" id="isInternalInput" value="false">
+                                                
+                                                <textarea name="content" class="form-control editor-area mb-3 p-3" id="commentArea" rows="5" placeholder="Type your response to the user here..." required></textarea>
+                                                <div class="text-right mt-3">
+                                                    <button type="submit" class="btn btn-primary px-5 py-2 font-weight-bold" id="btnSubmitComment">Save Reply</button>
+                                                </div>
+                                            </form>
+
+                                            <c:if test="${not empty comments}">
+                                                <div class="mt-5 pt-4 border-top">
+                                                    <h6 class="font-weight-bold text-dark mb-4" style="font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px;">Activity Stream</h6>
+                                                    
+                                                    <c:forEach items="${comments}" var="cmt">
+                                                        <div class="p-3 p-md-4 mb-3 border rounded ${cmt.internal ? 'border-warning' : ''}" style="background-color: ${cmt.internal ? '#fffdf5' : '#fafbfc'};">
+                                                            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                                                                <span class="font-weight-bold ${cmt.userRole == 'User' ? 'text-primary' : 'text-dark'} d-flex align-items-center">
+                                                                    <div class="avatar-sm d-inline-flex align-items-center justify-content-center text-white rounded-circle mr-2" style="background:${cmt.userRole == 'User' ? '#00875a' : '#0052cc'}; width:28px; height:28px; font-size:11px;">
+                                                                        ${cmt.userFullName.substring(0, 2).toUpperCase()}
+                                                                    </div>
+                                                                    ${cmt.userFullName} <span class="badge badge-light text-muted ml-2 border">${cmt.userRole}</span>
+                                                                </span>
+                                                                <span class="text-muted font-weight-bold" style="font-size: 0.8rem;">
+                                                                    <fmt:formatDate value="${cmt.createdAt}" pattern="dd/MM/yyyy HH:mm" />
+                                                                    <c:if test="${cmt.internal}"><i class="feather icon-lock text-warning ml-2" title="Internal Note" style="font-size: 1rem;"></i></c:if>
+                                                                </span>
+                                                            </div>
+                                                            <div style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6; color: #172b4d;">${cmt.content}</div>
+                                                        </div>
+                                                    </c:forEach>
+                                                </div>
+                                            </c:if>
+                                        </div>
 
                                         </div>
                                     </div>

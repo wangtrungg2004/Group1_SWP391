@@ -3,6 +3,7 @@ package controller.ticket.user;
 import dao.CategoryDao;
 import dao.CsatSurveyDAO;
 import dao.ServiceCatalogDao;
+import dao.TicketCommentsDAO;
 import dao.TicketDAO;
 import model.CsatSurvey;
 import model.Tickets;
@@ -15,6 +16,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
+import model.TicketComments;
 
 /**
  * TicketDetailUserController — CẬP NHẬT cho US20
@@ -56,6 +59,12 @@ public class TicketDetailUserController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/Tickets");
             return;
         }
+        
+        // Lấy danh sách Comment
+        TicketCommentsDAO commentDao = new TicketCommentsDAO();
+        // Truyền 'true' vì Agent có quyền xem Internal Note
+        List<TicketComments> comments = commentDao.getCommentsByTicketId(ticketId, false);
+        request.setAttribute("comments", comments);
 
         request.setAttribute("ticket", ticket);
 

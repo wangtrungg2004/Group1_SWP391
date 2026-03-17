@@ -80,6 +80,12 @@ public class AgentTicketDetailController extends HttpServlet {
         TicketAssetsDAO assetDao = new TicketAssetsDAO();
         List<Assets> linkedAssets = assetDao.getLinkedCIsByTicketId(ticketId);
         request.setAttribute("linkedAssets", linkedAssets);
+        
+        // Lấy danh sách Comment
+        TicketCommentsDAO commentDao = new TicketCommentsDAO();
+        // Truyền 'true' vì Agent có quyền xem Internal Note
+        List<TicketComments> comments = commentDao.getCommentsByTicketId(ticketId, true);
+        request.setAttribute("comments", comments);
 
         // Chuyển toàn bộ dữ liệu ra JSP
         request.setAttribute("ticket", ticket);

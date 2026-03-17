@@ -9,6 +9,9 @@ public class TicketComments {
     private String content;
     private boolean isInternal;
     private Date createdAt;
+     // --- THÊM 2 THUỘC TÍNH NÀY ĐỂ PHỤC VỤ HIỂN THỊ UI ---
+    private String userFullName;
+    private String userRole;
 
     public TicketComments() {
     }
@@ -69,5 +72,23 @@ public class TicketComments {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+    
+   
+
+    public String getUserFullName() {
+        return userFullName;
+    }
+
+    public void setUserFullName(String userFullName) {
+        this.userFullName = userFullName;
+    }
+
+    public String getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(String userRole) {
+        this.userRole = userRole;
     }
 }

@@ -174,14 +174,14 @@
                 color: #00875a;
             }
 
-            /* Activity Log Empty State */
+            /* Activity Log Styling */
             .empty-activity {
                 background: #fafbfc;
                 border: 1px dashed #dfe1e6;
                 border-radius: 6px;
                 padding: 25px;
                 text-align: center;
-                margin-top: 15px;
+                margin-bottom: 20px;
             }
             .empty-activity i {
                 font-size: 2rem;
@@ -194,6 +194,9 @@
                 font-size: 0.9rem;
                 margin: 0;
             }
+            
+            .editor-area { border-radius: 6px; border: 1px solid #dfe1e6; font-size: 0.95rem; background-color: #fafbfc;}
+            .editor-area:focus { background-color: #fff; box-shadow: 0 0 0 2px rgba(0,82,204,0.2); border-color: #0052cc;}
         </style>
     </head>
 
@@ -204,6 +207,7 @@
         <div class="pcoded-main-container">
             <div class="pcoded-wrapper">
                 <div class="pcoded-content">
+                    
                     <div class="pcoded-inner-content">
 
                         <div class="page-header mb-3">
@@ -242,11 +246,24 @@
 
                                                 <h6 class="section-title"><i class="feather icon-paperclip"></i> Attachments</h6>
                                                 <div class="mb-5">
-                                                    <span class="text-muted" style="font-size: 0.85rem; font-style: italic;">No files attached to this request.</span>
+                                                    <c:choose>
+                                                        <c:when test="${not empty attachments}">
+                                                            <div class="d-flex flex-wrap" style="gap: 10px;">
+                                                                <c:forEach items="${attachments}" var="file">
+                                                                    <a href="${pageContext.request.contextPath}/DownloadFile?id=${file.fileId}" target="_blank" class="btn btn-sm btn-light border text-dark font-weight-bold">
+                                                                        <i class="feather icon-file text-primary mr-1"></i> ${file.fileName}
+                                                                    </a>
+                                                                </c:forEach>
+                                                            </div>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-muted" style="font-size: 0.85rem; font-style: italic;">No files attached to this request.</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </div>
 
-                                                <div class="comment-thread mt-2">
-                                                    <h6 class="section-title"><i class="feather icon-message-square"></i> Activity Log</h6>
+                                                <div class="comment-thread mt-2 pt-2 border-top">
+                                                    <h6 class="section-title mt-4"><i class="feather icon-message-square"></i> Activity Log</h6>
 
                                                     <div class="text-center my-4">
                                                         <span class="badge badge-light text-muted border px-3 py-1" style="font-weight: 500;">
@@ -254,82 +271,93 @@
                                                         </span>
                                                     </div>
 
-                                                    <div class="empty-activity">
-                                                        <i class="feather icon-message-circle"></i>
-                                                        <p>No activity or comments yet.</p>
+                                                    <c:choose>
+                                                        <c:when test="${not empty comments}">
+                                                            <c:forEach items="${comments}" var="cmt">
+                                                                <div class="p-3 p-md-4 mb-3 border rounded" style="background-color: #fafbfc;">
+                                                                    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                                                                        <span class="font-weight-bold ${cmt.userRole == 'User' ? 'text-primary' : 'text-dark'} d-flex align-items-center">
+                                                                            <div class="avatar-sm d-inline-flex align-items-center justify-content-center text-white rounded-circle mr-2" style="background:${cmt.userRole == 'User' ? '#00875a' : '#0052cc'}; width:28px; height:28px; font-size:11px;">
+                                                                                ${cmt.userFullName.substring(0, 2).toUpperCase()}
+                                                                            </div>
+                                                                            ${cmt.userFullName} <span class="badge badge-light text-muted ml-2 border">${cmt.userRole}</span>
+                                                                        </span>
+                                                                        <span class="text-muted font-weight-bold" style="font-size: 0.8rem;">
+                                                                            <fmt:formatDate value="${cmt.createdAt}" pattern="dd/MM/yyyy HH:mm" />
+                                                                        </span>
+                                                                    </div>
+                                                                    <div style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6; color: #172b4d;">${cmt.content}</div>
+                                                                </div>
+                                                            </c:forEach>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <div class="empty-activity">
+                                                                <i class="feather icon-message-circle"></i>
+                                                                <p>No activity or comments yet.</p>
+                                                            </div>
+                                                        </c:otherwise>
+                                                    </c:choose>
+
+                                                    <div class="mt-4">
+                                                        <form action="${pageContext.request.contextPath}/AddComment" method="POST">
+                                                            <input type="hidden" name="ticketId" value="${ticket.id}">
+                                                            <input type="hidden" name="isInternal" value="false"> <textarea name="content" class="form-control editor-area p-3" rows="4" placeholder="Add a comment or reply to IT Support..." required></textarea>
+                                                            <div class="text-right mt-3">
+                                                                <button type="submit" class="btn btn-primary px-4 py-2 font-weight-bold">Post Comment</button>
+                                                            </div>
+                                                        </form>
                                                     </div>
                                                 </div>
+                                                
                                                 <%-- ─── US20: CSAT Banner (chỉ hiện khi Tickets.Status = 'Closed') ─────── --%>
                                                 <c:if test="${ticket.status == 'Closed'}">
-                                                    <div class="mt-4" id="csatSection">
+                                                    <div class="mt-5 border-top pt-4" id="csatSection">
                                                         <c:choose>
-
-                                                            <%-- Đã có survey (attribute 'csatSurvey' được set bởi TicketDetailUserController) --%>
+                                                            <%-- Đã có survey --%>
                                                             <c:when test="${not empty csatSurvey}">
                                                                 <div style="background:#f3faf6; border:1px solid #b7e4c7; border-radius:8px; padding:14px 18px;">
                                                                     <div class="d-flex align-items-center">
-                                                                        <div style="width:34px;height:34px;background:#e3fcef;border-radius:50%;
-                                                                             display:flex;align-items:center;justify-content:center;
-                                                                             margin-right:12px;flex-shrink:0;">
+                                                                        <div style="width:34px;height:34px;background:#e3fcef;border-radius:50%; display:flex;align-items:center;justify-content:center; margin-right:12px;flex-shrink:0;">
                                                                             <i class="feather icon-check" style="color:#00875a;font-size:1rem;"></i>
                                                                         </div>
                                                                         <div class="flex-grow-1">
-                                                                            <p class="mb-0 font-weight-bold" style="color:#00875a;font-size:.875rem;">
-                                                                                Feedback Submitted
-                                                                            </p>
+                                                                            <p class="mb-0 font-weight-bold" style="color:#00875a;font-size:.875rem;">Feedback Submitted</p>
                                                                             <p class="mb-0 text-muted" style="font-size:.78rem;">
                                                                                 <fmt:formatDate value="${csatSurvey.submittedAt}" pattern="dd/MM/yyyy HH:mm"/>
                                                                             </p>
                                                                         </div>
-                                                                        <%-- Hiển thị sao đánh giá --%>
                                                                         <div class="ml-2">
                                                                             <c:forEach begin="1" end="5" var="i">
-                                                                                <span style="font-size:1.15rem;
-                                                                                      color:${i <= csatSurvey.rating ? '#f6c90e' : '#dfe1e6'};">
-                                                                                    &#9733;
-                                                                                </span>
+                                                                                <span style="font-size:1.15rem; color:${i <= csatSurvey.rating ? '#f6c90e' : '#dfe1e6'};">&#9733;</span>
                                                                             </c:forEach>
-                                                                            <span class="text-muted ml-1" style="font-size:.8rem;">
-                                                                                (${csatSurvey.rating}/5)
-                                                                            </span>
+                                                                            <span class="text-muted ml-1" style="font-size:.8rem;">(${csatSurvey.rating}/5)</span>
                                                                         </div>
                                                                     </div>
-                                                                    <%-- Comment nếu có --%>
                                                                     <c:if test="${not empty csatSurvey.comment}">
-                                                                        <p class="mb-0 mt-2 text-muted"
-                                                                           style="font-size:.82rem;font-style:italic;padding-left:46px;">
+                                                                        <p class="mb-0 mt-2 text-muted" style="font-size:.82rem;font-style:italic;padding-left:46px;">
                                                                             "<c:out value='${csatSurvey.comment}' />"
                                                                         </p>
                                                                     </c:if>
                                                                 </div>
                                                             </c:when>
 
-                                                            <%-- Chưa có survey → hiện lời mời feedback --%>
+                                                            <%-- Chưa có survey --%>
                                                             <c:otherwise>
                                                                 <div style="background:#e9f2ff; border:1px solid #b3d4ff; border-radius:8px; padding:14px 18px;">
                                                                     <div class="d-flex align-items-center">
-                                                                        <div style="width:36px;height:36px;background:#cce0ff;border-radius:50%;
-                                                                             display:flex;align-items:center;justify-content:center;
-                                                                             margin-right:12px;flex-shrink:0;">
+                                                                        <div style="width:36px;height:36px;background:#cce0ff;border-radius:50%; display:flex;align-items:center;justify-content:center; margin-right:12px;flex-shrink:0;">
                                                                             <i class="feather icon-star" style="color:#0052cc;font-size:1rem;"></i>
                                                                         </div>
                                                                         <div class="flex-grow-1">
-                                                                            <p class="mb-0 font-weight-bold" style="color:#0052cc;font-size:.875rem;">
-                                                                                How was your experience?
-                                                                            </p>
-                                                                            <p class="mb-0 text-muted" style="font-size:.8rem;">
-                                                                                This ticket is closed. Share your feedback to help us improve.
-                                                                            </p>
+                                                                            <p class="mb-0 font-weight-bold" style="color:#0052cc;font-size:.875rem;">How was your experience?</p>
+                                                                            <p class="mb-0 text-muted" style="font-size:.8rem;">This ticket is closed. Share your feedback to help us improve.</p>
                                                                         </div>
-                                                                        <a href="${pageContext.request.contextPath}/CsatSurvey?ticketId=${ticket.id}"
-                                                                           class="btn btn-sm ml-3 font-weight-bold flex-shrink-0"
-                                                                           style="background:#0052cc;color:#fff;border-radius:5px;padding:7px 16px;">
+                                                                        <a href="${pageContext.request.contextPath}/CsatSurvey?ticketId=${ticket.id}" class="btn btn-sm ml-3 font-weight-bold flex-shrink-0" style="background:#0052cc;color:#fff;border-radius:5px;padding:7px 16px;">
                                                                             <i class="feather icon-edit-2 mr-1"></i>Give Feedback
                                                                         </a>
                                                                     </div>
                                                                 </div>
                                                             </c:otherwise>
-
                                                         </c:choose>
                                                     </div>
                                                 </c:if>
