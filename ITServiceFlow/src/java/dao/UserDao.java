@@ -288,7 +288,60 @@ public class UserDao extends DbContext{
         }
         return false;
     }
+    
+    public int getTotalUser()
+    {
+        String sql = "SELECT COUNT(*)"
+                + " FROM [dbo].[Users]"
+                + " WHERE IsActive = 1";
+        try
+        {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            ResultSet rs = stm.executeQuery();
+            if(rs.next())
+            {
+                return rs.getInt(1);
+            }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return 0;
+    }
 
+    public List<Users> getTopAgentsThisMonth() {
+        List<Users> list = new ArrayList<>();
+        String sql = "SELECT TOP 10\n" +
+"                u.Id        AS AgentId,\n" +
+"                u.FullName  AS AgentName,\n" +
+"                COUNT(t.Id) AS TicketCount\n" +
+"            FROM [dbo].[Tickets] t\n" +
+"            INNER JOIN [dbo].[Users] u ON t.AssignedTo = u.Id\n" +
+"            WHERE t.Status IN ('Resolved', 'Approved', 'Closed')\n" +
+//"              AND t.AssignedTo IS NOT NULL\n" +
+//"              AND YEAR(t.UpdatedAt) = YEAR(GETDATE())\n" +
+//"              AND MONTH(t.UpdatedAt) = MONTH(GETDATE())\n" +
+"            GROUP BY u.Id, u.FullName\n" +
+"            ORDER BY COUNT(t.Id) DESC";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Users u = new Users();
+                u.setId(rs.getInt("AgentId"));
+                u.setFullName(rs.getString("AgentName"));
+                u.setTicketCount(rs.getInt("TicketCount"));
+
+                list.add(u);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
     
 //    public static void main(String[] args) {
 //        UserDao dao = new UserDao();

@@ -97,7 +97,10 @@
                                             <h6 class="mb-4">Tickets mới</h6>
                                             <div class="row d-flex align-items-center">
                                                 <div class="col-9">
-                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-file-plus text-c-green f-30 m-r-10"></i>0</h3>
+                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                                        <i class="feather icon-file-plus text-c-green f-30 m-r-10"></i>
+                                                        ${agentKPIs.myNew}
+                                                    </h3>
                                                 </div>
                                             </div>
                                         </div>
@@ -109,7 +112,10 @@
                                             <h6 class="mb-4">Tickets đang xử lý</h6>
                                             <div class="row d-flex align-items-center">
                                                 <div class="col-9">
-                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-clock text-c-yellow f-30 m-r-10"></i>0</h3>
+                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                                        <i class="feather icon-clock text-c-yellow f-30 m-r-10"></i>
+                                                        ${agentKPIs.myInProgress}
+                                                    </h3>
                                                 </div>
                                             </div>
                                         </div>
@@ -118,22 +124,28 @@
                                 <div class="col-md-6 col-xl-3">
                                     <div class="card">
                                         <div class="card-body">
-                                            <h6 class="mb-4">Tickets đã giải quyết</h6>
+                                            <h6 class="mb-4">Đã giải quyết (7 ngày)</h6>
                                             <div class="row d-flex align-items-center">
                                                 <div class="col-9">
-                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-check-circle text-c-blue f-30 m-r-10"></i>0</h3>
+                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                                        <i class="feather icon-check-circle text-c-blue f-30 m-r-10"></i>
+                                                        ${agentKPIs.myResolved}
+                                                    </h3>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-xl-3">
-                                    <div class="card">
+                                    <div class="card ${agentKPIs.slaBreaching > 0 ? 'border-danger' : ''}">
                                         <div class="card-body">
-                                            <h6 class="mb-4">Tổng Tickets</h6>
+                                            <h6 class="mb-4">Sắp breach SLA</h6>
                                             <div class="row d-flex align-items-center">
                                                 <div class="col-9">
-                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="feather icon-list text-c-purple f-30 m-r-10"></i>0</h3>
+                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                                        <i class="feather icon-alert-triangle ${agentKPIs.slaBreaching > 0 ? 'text-danger' : 'text-c-purple'} f-30 m-r-10"></i>
+                                                        <span class="${agentKPIs.slaBreaching > 0 ? 'text-danger' : ''}">${agentKPIs.slaBreaching}</span>
+                                                    </h3>
                                                 </div>
                                             </div>
                                         </div>
@@ -142,20 +154,92 @@
                                 <!-- [ Statistics ] end -->
                             </div>
 
-                            <div class="row">
-                                <div class="col-xl-12">
+                            <div class="row mt-3">
+                                <%-- Tickets gần nhất --%>
+                                <div class="col-xl-8">
+                                    <div class="card">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h5 class="mb-0">Tickets đang xử lý</h5>
+                                            <a href="${pageContext.request.contextPath}/Queues"
+                                               class="btn btn-sm btn-outline-primary">Xem tất cả</a>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <c:choose>
+                                                <c:when test="${not empty recentTickets}">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-sm table-hover mb-0">
+                                                            <thead class="thead-light">
+                                                                <tr>
+                                                                    <th class="pl-3">Ticket</th>
+                                                                    <th>Tiêu đề</th>
+                                                                    <th>Loại</th>
+                                                                    <th>Trạng thái</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <c:forEach var="t" items="${recentTickets}">
+                                                                    <tr>
+                                                                        <td class="pl-3">
+                                                                            <a href="${pageContext.request.contextPath}/TicketAgentDetail?id=${t.id}"
+                                                                               style="font-weight:600; color:#0052cc; font-size:0.83rem;">
+                                                                                ${t.ticketNumber}
+                                                                            </a>
+                                                                        </td>
+                                                                        <td style="font-size:0.85rem; max-width:200px;
+                                                                                   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                                                            ${t.title}
+                                                                        </td>
+                                                                        <td>
+                                                                            <span class="badge ${t.ticketType eq 'Incident' ? 'badge-danger' : 'badge-primary'}"
+                                                                                  style="font-size:0.72rem;">
+                                                                                ${t.ticketType}
+                                                                            </span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span class="badge ${t.status eq 'New' ? 'badge-warning' : 'badge-info'}"
+                                                                                  style="font-size:0.72rem;">
+                                                                                ${t.status}
+                                                                            </span>
+                                                                        </td>
+                                                                    </tr>
+                                                                </c:forEach>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div class="text-center py-4 text-muted">
+                                                        <i class="feather icon-check-circle" style="font-size:2rem; opacity:0.3;"></i>
+                                                        <p class="mt-2 mb-0" style="font-size:0.85rem;">Không có ticket nào đang xử lý</p>
+                                                    </div>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <%-- Quick links --%>
+                                <div class="col-xl-4">
                                     <div class="card">
                                         <div class="card-header">
-                                            <h5>Chào mừng, <%= user != null ? user.getFullName() : "IT Support" %>!</h5>
+                                            <h5 class="mb-0">Chào mừng, <%= user != null ? user.getFullName() : "IT Support" %>!</h5>
                                         </div>
                                         <div class="card-body">
-                                            <p>Đây là trang dashboard dành cho IT Support. Bạn có thể:</p>
-                                            <ul>
-                                                <li>Xem và quản lý tất cả tickets</li>
-                                                <li>Nhận và xử lý tickets được giao</li>
-                                                <li>Cập nhật trạng thái tickets</li>
-                                                <li>Xem tickets đang chờ xử lý</li>
-                                            </ul>
+                                            <a href="${pageContext.request.contextPath}/Queues"
+                                               class="btn btn-primary btn-block mb-2">
+                                                <i class="feather icon-list mr-2"></i>
+                                                Ticket Queue (${agentKPIs.myTotal} đang mở)
+                                            </a>
+                                            <a href="${pageContext.request.contextPath}/ITProblemListController"
+                                               class="btn btn-outline-danger btn-block mb-2">
+                                                <i class="feather icon-alert-circle mr-2"></i>
+                                                My Problems (${myProblems})
+                                            </a>
+                                            <a href="${pageContext.request.contextPath}/SubmitChangeRequest"
+                                               class="btn btn-outline-secondary btn-block">
+                                                <i class="feather icon-edit mr-2"></i>
+                                                Submit Change Request
+                                            </a>
                                         </div>
                                     </div>
                                 </div>

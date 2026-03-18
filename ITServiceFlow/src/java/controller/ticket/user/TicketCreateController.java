@@ -141,7 +141,13 @@ public class TicketCreateController extends HttpServlet {
         String isCreated = dao.createTicket(t);
 
         if ("ok".equals(isCreated)) {
-            response.sendRedirect(request.getContextPath() + "/Tickets");
+            // Redirect đúng trang theo role
+            String role = (String) session.getAttribute("role");
+            if ("IT Support".equals(role) || "Manager".equals(role)) {
+                response.sendRedirect(request.getContextPath() + "/Queues");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/Tickets");
+            }
         } else {
             // Preserve form data
             request.setAttribute("ticketType_val", ticketType);

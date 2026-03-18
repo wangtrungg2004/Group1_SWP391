@@ -1,7 +1,7 @@
 <%-- 
-    Top bar (header) - thanh trên cùng.
-    Sử dụng request attribute "notifications" nếu có (tùy chọn).
-    Tên user có thể lấy từ session "user" (model.Users) hoặc "userName".
+    Top bar (header) - thanh tr�n c�ng.
+    S? d?ng request attribute "notifications" n?u c� (t�y ch?n).
+    T�n user c� th? l?y t? session "user" (model.Users) ho?c "userName".
 --%>
 <%@page import="dao.NotificationDao"%>
 <%@page import="model.Notifications"%>
@@ -65,10 +65,10 @@
                     <div class="dropdown-menu dropdown-menu-right notification">
                         <div class="noti-head">
                             <h6 class="d-inline-block m-b-0">Notifications</h6>
-                            <div class="float-right">
+<!--                            <div class="float-right">
                                 <a href="#!" class="m-r-10">mark as read</a>
                                 <a href="#!">clear all</a>
-                            </div>
+                            </div>-->
                         </div>
                         <ul class="noti-body">
                             <c:choose>
@@ -143,10 +143,8 @@
                             </a>
                         </div>
                         <ul class="pro-body">
-                            <li><a href="#!" class="dropdown-item"><i class="feather icon-settings"></i> Settings</a></li>
-                            <li><a href="#!" class="dropdown-item"><i class="feather icon-user"></i> Profile</a></li>
-                            <li><a href="message.html" class="dropdown-item"><i class="feather icon-mail"></i> My Messages</a></li>
-                            <li><a href="Logout" class="dropdown-item"><i class="feather icon-log-out"></i> Logout</a></li>
+                            <li><a href="${pageContext.request.contextPath}/MyProfile" class="dropdown-item"><i class="feather icon-user"></i> My Profile</a></li>
+                            <li><a href="${pageContext.request.contextPath}/Logout" class="dropdown-item"><i class="feather icon-log-out"></i> Logout</a></li>
                         </ul>
                     </div>
                 </div>

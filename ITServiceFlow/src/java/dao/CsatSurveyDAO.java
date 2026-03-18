@@ -190,8 +190,25 @@ public class CsatSurveyDAO extends DbContext {
     }
 
     /**
+     * Lấy tất cả TicketId mà user đã submit CSAT.
+     * Dùng trong MyTicketsController để biết ticket nào đã được rate
+     * mà chỉ cần 1 query thay vì N query per ticket.
+     */
+    public java.util.Set<Integer> getSubmittedTicketIdsByUser(int userId) {
+        java.util.Set<Integer> ids = new java.util.HashSet<>();
+        String sql = "SELECT TicketId FROM CsatSurveys WHERE UserId = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) ids.add(rs.getInt("TicketId"));
+        } catch (SQLException e) {
+            System.err.println("[CsatSurveyDAO] getSubmittedTicketIdsByUser error: " + e.getMessage());
+        }
+        return ids;
+    }
+
+    /**
      * Tỉ lệ phản hồi = số tickets Closed có survey / tổng tickets Closed
-     * Dùng bảng Tickets có sẵn (cột Status, ClosedAt)
      */
     public double getResponseRate() {
         String sql = "SELECT "
@@ -206,5 +223,35 @@ public class CsatSurveyDAO extends DbContext {
             System.err.println("[CsatSurveyDAO] getResponseRate error: " + e.getMessage());
         }
         return 0.0;
+    }
+
+    /**
+     * Điểm CSAT trung bình theo từng agent.
+     * Trả về List<Object[]>: [agentName, avgRating, totalSurveys]
+     * Dùng cho bảng leaderboard trên CSAT Report Dashboard.
+     */
+    public List<Object[]> getAvgRatingByAgent() {
+        List<Object[]> list = new ArrayList<>();
+        String sql = "SELECT a.FullName AS AgentName, "
+                   + "       AVG(CAST(cs.Rating AS FLOAT)) AS AvgRating, "
+                   + "       COUNT(cs.Id) AS TotalSurveys "
+                   + "FROM CsatSurveys cs "
+                   + "JOIN Tickets t  ON cs.TicketId = t.Id "
+                   + "JOIN Users a    ON t.AssignedTo = a.Id "
+                   + "GROUP BY a.Id, a.FullName "
+                   + "ORDER BY AvgRating DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(new Object[]{
+                    rs.getString("AgentName"),
+                    rs.getDouble("AvgRating"),
+                    rs.getInt("TotalSurveys")
+                });
+            }
+        } catch (SQLException e) {
+            System.err.println("[CsatSurveyDAO] getAvgRatingByAgent error: " + e.getMessage());
+        }
+        return list;
     }
 }

@@ -749,6 +749,20 @@ public class ProblemDao extends DbContext{
         return 0;
     }
 
+    public int getTotalProblemPendingProblem(String excludeStatus) {
+        String sql = "SELECT COUNT(Id) FROM dbo.Problems WHERE Status = ?";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, excludeStatus);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return 0;
+    }
+    
     // Lấy danh sách có phân trang, loại trừ một status
     public List<Problems> getProblemsWithPagesExcludingStatus(int page, int pageSize, String excludeStatus) {
         List<Problems> list = new ArrayList<>();
@@ -789,6 +803,8 @@ public class ProblemDao extends DbContext{
         }
         return list;
     }
+    
+
 //    public static void main(String[] args) {
 //
 //        ProblemDao dao = new ProblemDao(); // constructor đã mở connection

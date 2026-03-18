@@ -9,11 +9,13 @@ package controller.ticket.user;
  * @author Dumb Trung
  */
 
+import dao.CsatSurveyDAO;
 import dao.TicketDAO;
 import model.Tickets;
 import model.Users;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -65,6 +67,11 @@ public class MyTicketsController extends HttpServlet {
     request.setAttribute("myTicketList", myTicketList);
     request.setAttribute("currentPage", page);
     request.setAttribute("totalPages", totalPages);
+
+    // 4. Load set ticketId đã rated — dùng 1 query thay vì N query
+    CsatSurveyDAO csatDao = new CsatSurveyDAO();
+    Set<Integer> ratedTicketIds = csatDao.getSubmittedTicketIdsByUser(currentUser.getId());
+    request.setAttribute("ratedTicketIds", ratedTicketIds);
     
     // Giữ lại trạng thái bộ lọc trên giao diện
     request.setAttribute("search", search); 

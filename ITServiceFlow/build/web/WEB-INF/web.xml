@@ -34,6 +34,34 @@
         <servlet-name>UserDashboard</servlet-name>
         <servlet-class>controller.ticket.user.UserDashboardController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AgentQueue</servlet-name>
+        <servlet-class>controller.ticket.agent.AgentQueueController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AgentTicketDetail</servlet-name>
+        <servlet-class>controller.ticket.agent.AgentTicketDetailController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AssignTicket</servlet-name>
+        <servlet-class>controller.ticket.agent.AssignTicketController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UpdateTicketStatus</servlet-name>
+        <servlet-class>controller.ticket.agent.UpdateStatusController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CsatSurvey</servlet-name>
+        <servlet-class>controller.ticket.user.CsatSurveyController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TicketTimeLog</servlet-name>
+        <servlet-class>controller.ticket.agent.TicketTimeLogController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TicketTimeLog</servlet-name>
+        <url-pattern>/TicketTimeLog</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>Login</servlet-name>
         <url-pattern>/Login</url-pattern>
@@ -103,8 +131,27 @@
         <servlet-name>UserDashboard</servlet-name>
         <url-pattern>/UserDashboard</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AgentQueue</servlet-name>
+        <url-pattern>/Queues</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AgentTicketDetail</servlet-name>
+        <url-pattern>/TicketAgentDetail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AssignTicket</servlet-name>
+        <url-pattern>/AssignTicket</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UpdateTicketStatus</servlet-name>
+        <url-pattern>/UpdateStatus</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
-
+    <servlet-mapping>
+        <servlet-name>CsatSurvey</servlet-name>
+        <url-pattern>/CsatSurvey</url-pattern>
+    </servlet-mapping>
 </web-app>
