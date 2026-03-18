@@ -131,6 +131,10 @@ public class ProblemService {
         return dao.getProblemsWithPagesExcludingStatus(page, pageSize, excludeStatus);
     }
     
+    public int getNumberPendingProblems() {
+        return dao.getTotalProblemPendingProblem("Pending");
+    }
+    
     public boolean logTime(int problemId, int userId, double hours) {
     if (hours <= 0) return false;
     return dao.addTimeLog(problemId, userId, hours);

@@ -3,9 +3,12 @@ package dao;
 import model.Tickets;
 import Utils.DbContext;
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import org.apache.tomcat.dbcp.dbcp2.PoolingConnection;
+import java.util.Map;
 
 public class TicketDAO extends DbContext {
 
@@ -777,21 +780,186 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         return 0;
     }
     
+/**
+ * 6 tháng gần nhất (từ cũ → mới), mỗi tháng: số đã xử lý + số chưa xử lý.
+ */
+    public Map<String, Object> getTicketStatsLast6Months() {
+        List<String> labels = new ArrayList<>();
+        int[] daXuLy = new int[6];
+        int[] chuaXuLy = new int[6];
+
+        // Tháng hiện tại
+        YearMonth thangHienTai = YearMonth.from(LocalDate.now());
+
+        // Duyệt 6 tháng: từ (hiện tại - 5) đến hiện tại
+        for (int i = 0; i < 6; i++) {
+            YearMonth thang = thangHienTai.minusMonths(5 - i); // i=0 → tháng cũ nhất
+
+            labels.add(thang.getMonthValue() + "/" + thang.getYear());
+
+            if (connection == null) {
+                continue;
+            }
+
+            // Ngày đầu tháng và ngày đầu tháng sau (dùng < tháng sau = hết tháng này)
+            Date tuNgay  = Date.valueOf(thang.atDay(1));
+            Date denNgay = Date.valueOf(thang.plusMonths(1).atDay(1));
+
+            daXuLy[i]   = getAllTicketSolvedFromTo(tuNgay, denNgay);
+            chuaXuLy[i] = getAllTicketUnSolvedFromTo(tuNgay, denNgay);
+        }
+
+        Map<String, Object> ketQua = new LinkedHashMap<>();
+        ketQua.put("labels", labels);
+        ketQua.put("daXuLy", daXuLy);
+        ketQua.put("chuaXuLy", chuaXuLy);
+        return ketQua;
+    }
+
+    /** Đã xử lý: đóng/duyệt trong khoảng [tuNgay, denNgay) */
+    private int getAllTicketSolvedFromTo(Date from, Date to) {
+        String sql = "SELECT COUNT(*) FROM Tickets " +
+                "WHERE Status IN ('Resolved','Closed','Approved') " +
+                "AND ResolvedAt >= ? AND ResolvedAt < ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setDate(1, from); // từ ngày
+            ps.setDate(2, to);   // đến ngày
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    /** Chưa xử lý: vẫn mở và được tạo trong khoảng [tuNgay, denNgay) */
+    private int getAllTicketUnSolvedFromTo(Date from, Date to) {
+        String sql = "SELECT COUNT(*) FROM Tickets " +
+                "WHERE Status IN ('New','Open','In Progress') " +
+                "AND CreatedAt >= ? AND CreatedAt < ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setDate(1, from); // từ ngày
+            ps.setDate(2, to);   // đến ngày
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+    
+    public List<Tickets> get10UnassignedTickets() {
+        List<Tickets> list = new ArrayList<>();
+
+        String sql = "SELECT TOP 5 Id, TicketNumber, Title, Status, CreatedAt " +
+                     "FROM [dbo].[Tickets] " +
+                     "WHERE AssignedTo IS NULL " +
+                     "AND Status NOT IN ('Closed','Resolved') " +
+                     "ORDER BY CreatedAt DESC";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Tickets t = new Tickets();
+                t.setId(rs.getInt("Id"));
+                t.setTicketNumber(rs.getString("TicketNumber"));
+                t.setTitle(rs.getString("Title"));
+                t.setStatus(rs.getString("Status"));
+                t.setCreatedAt(rs.getTimestamp("CreatedAt"));
+
+                list.add(t);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+//    private int demMotSo(String sql, Date tu, Date den) {
+//        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+//            ps.setDate(1, tu);
+//            ps.setDate(2, den);
+//            try (ResultSet rs = ps.executeQuery()) {
+//                if (rs.next()) return rs.getInt(1);
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return 0;
+////    }
+//    
+//    public static void main(String[] args) {
+//
+//        TicketDAO dao = new TicketDAO();
+//
+//        List<Tickets> list = dao.getIncidentsNotInProblem();
+//
+//        System.out.println("Danh sach incident chua gan vao problem:");
+//
+//        for (Tickets t : list) {
+//            System.out.println(
+//                    t.getId() + " | " +
+//                            t.getTicketNumber() + " | " +
+//                            t.getTitle() + " | " +
+//                            t.getStatus());
+//        }
+//
+//    }
+//    public static void main(String[] args) {
+//
+//         TicketDAO dao = new TicketDAO(); // đã có connection bên trong
+//
+//    Date from = Date.valueOf(LocalDate.of(2026, 3, 1));
+//    Date to   = Date.valueOf(LocalDate.of(2026, 4, 1));
+//
+//    int result = dao.getAllTicketSolvedFromTo(from, to);
+//
+//    System.out.println("So ticket chua xu ly trong thang: " + result);
+//    }
+    
     public static void main(String[] args) {
 
+        // Tạo DAO (nhớ đảm bảo connection đã connect DB)
         TicketDAO dao = new TicketDAO();
 
-        List<Tickets> list = dao.getIncidentsNotInProblem();
+        // Gọi hàm
+        List<Tickets> list = dao.get10UnassignedTickets();
 
-        System.out.println("Danh sach incident chua gan vao problem:");
+        // In kết quả
+        System.out.println("=== TOP 10 Unassigned Tickets ===");
 
         for (Tickets t : list) {
             System.out.println(
                     t.getId() + " | " +
-                            t.getTicketNumber() + " | " +
-                            t.getTitle() + " | " +
-                            t.getStatus());
+                    t.getTicketNumber() + " | " +
+                    t.getTitle() + " | " +
+                    t.getStatus() + " | " +
+                    t.getCreatedAt()
+            );
         }
 
+        // Nếu không có dữ liệu
+        if (list.isEmpty()) {
+            System.out.println("Khong co ticket nao chua duoc assign.");
+        }
     }
 }

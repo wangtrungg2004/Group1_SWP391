@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Map;
 
 
 import model.Problems;
@@ -88,7 +89,15 @@ public class ManagerDashboard extends HttpServlet {
         int totalTicket = ticketService.getTotalTicket();
         int totalTicketThisMonth = ticketService.getTotalTicketThisMonth();
         List<Users> topAgents = userService.getTopAgentsThisMonth();
+        Map<String, Object> chart = ticketService.getTicketChartLast6Months();
+        int totalPendingProblem = problemService.getNumberPendingProblems();
+        List<Tickets> UnAssignedTicket = ticketService.get10UnAssignedTicket();
         
+        request.setAttribute("UnAssignedTicket", UnAssignedTicket);
+        request.setAttribute("totalPendingProblem", totalPendingProblem);
+        request.setAttribute("chartLabels",   chart.get("labels"));
+        request.setAttribute("chartDaXuLy",   chart.get("daXuLy"));
+        request.setAttribute("chartChuaXuLy", chart.get("chuaXuLy"));
         request.setAttribute("topAgents", topAgents);
         request.setAttribute("totalTicketThisMonth", totalTicketThisMonth);
         request.setAttribute("totalTicket", totalTicket);

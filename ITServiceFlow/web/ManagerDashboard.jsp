@@ -137,9 +137,9 @@
 												<i class="feather icon-activity"></i>
 											</div>
 											<div class="flex-grow-1">
-												<div class="value">94.5%</div>
-												<div class="label">SLA Compliance</div>
-												<div class="trend up"><i class="feather icon-trending-up"></i> 4.07% Tháng trước</div>
+												<div class="value">${totalPendingProblem}</div>
+												<div class="label" style="font-weight: bold;" >Pending Problem</div>
+												<!--<div class="trend up"><i class="feather icon-trending-up"></i> 4.07% Tháng trước</div>-->
 											</div>
 										</div>
 									</div>
@@ -152,8 +152,8 @@
 											</div>
 											<div class="flex-grow-1">
 												<div class="value">${totalTicket}</div>
-												<div class="label">Total Ticket</div>
-												<div class="trend up"><i class="feather icon-trending-up"></i> 0.24% Tháng trước</div>
+                                                                                                <div class="label" style="font-weight: bold;">Total Ticket</div>
+												<!--<div class="trend up"><i class="feather icon-trending-up"></i> 0.24% Tháng trước</div>-->
 											</div>
 										</div>
 									</div>
@@ -166,8 +166,8 @@
 											</div>
 											<div class="flex-grow-1">
 												<div class="value">${totalProblem}</div>
-												<div class="label">Total Problem</div>
-												<div class="trend down"><i class="feather icon-trending-down"></i> 1.64% Tháng trước</div>
+												<div class="label" style="font-weight: bold;">Total Problem</div>
+												<!--<div class="trend down"><i class="feather icon-trending-down"></i> 1.64% Tháng trước</div>-->
 											</div>
 										</div>
 									</div>
@@ -180,8 +180,8 @@
 											</div>
 											<div class="flex-grow-1">
 												<div class="value">${totalUsers}</div>
-												<div class="label">Total User</div>
-												<div class="trend same">0.00% Tháng trước</div>
+												<div class="label" style="font-weight: bold;" >Total User</div>
+												<!--<div class="trend same">0.00% Tháng trước</div>-->
 											</div>
 										</div>
 									</div>
@@ -189,7 +189,7 @@
 								<!-- Chart + Right column -->
 								<div class="col-lg-8 mb-3">
 									<div class="card chart-card">
-										<h6>Thống kê ticket theo tháng</h6>
+										<h6>Ticket statistics by month</h6>
 										<div style="height: 280px;">
 											<canvas id="managerTicketChart"></canvas>
 										</div>
@@ -201,9 +201,9 @@
 											<div>
 												<div class="sub">Total Ticket This month</div>
 												<div class="big-num">${totalTicketThisMonth}</div>
-												<small>Daily Avg.</small>
+												<!--<small>Daily Avg.</small>-->
 											</div>
-											<div class="big-num">+3</div>
+											<!--<div class="big-num">+3</div>-->
 										</div>
 									</div>
 									<div class="card top-list-card">
@@ -221,40 +221,36 @@
 								<!-- Table section start -->
 								<div class="col-12">
 									<div class="card table-card-dash">
-										<div class="card-header">Ticket cần chú ý (SLA sắp trễ / đã trễ)</div>
-										<div class="table-responsive">
-											<table class="table table-hover m-b-0">
-												<thead>
-													<tr>
-														<th>Mã ticket</th>
-														<th>Tiêu đề</th>
-														<th>Agent</th>
-														<th>Trạng thái</th>
-														<th>Ngày tạo</th>
-														<th>Hành động</th>
-													</tr>
-												</thead>
-												<tbody>
-													<tr>
-														<td>#1234</td>
-														<td>Server down - Building A</td>
-														<td>Nguyễn Văn A</td>
-														<td><span class="badge badge-danger">Sắp trễ</span></td>
-														<td>12/03/2026</td>
-														<td><a href="#" class="btn btn-sm btn-outline-primary">Xem</a></td>
-													</tr>
-													<tr>
-														<td>#1240</td>
-														<td>Email không gửi được</td>
-														<td>Trần Thị B</td>
-														<td><span class="badge badge-warning">Đang xử lý</span></td>
-														<td>11/03/2026</td>
-														<td><a href="#" class="btn btn-sm btn-outline-primary">Xem</a></td>
-													</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
+                                                                            <div class="card-header">Unassigned Tickets (Top 10)</div>
+                                                                            <div class="table-responsive">
+                                                                              <table class="table table-hover m-b-0">
+                                                                                <thead>
+                                                                                  <tr>
+                                                                                    <th>Ticket #</th>
+                                                                                    <th>Title</th>
+                                                                                    <th>Status</th>
+                                                                                    <th>CreatedAt</th>
+                                                                                    <th>Action</th>
+                                                                                  </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                  <c:forEach var="t" items="${UnAssignedTicket}">
+                                                                                    <tr>
+                                                                                      <td>${t.ticketNumber}</td>
+                                                                                      <td>${t.title}</td>
+                                                                                      <td><span class="badge badge-light">${t.status}</span></td>
+                                                                                      <td>${t.createdAt}</td>
+                                                                                      <td><a class="btn btn-sm btn-outline-primary" href="TicketDetail?id=${t.id}">View</a></td>
+                                                                                    </tr>
+                                                                                  </c:forEach>
+
+                                                                                  <c:if test="${empty unAssignedTicket}">
+                                                                                    <tr><td colspan="5" class="text-center text-muted">No unassigned tickets</td></tr>
+                                                                                  </c:if>
+                                                                                </tbody>
+                                                                              </table>
+                                                                            </div>
+                                                                          </div>
 				</div>
 			</div>
 
@@ -320,29 +316,58 @@
 	<script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 	<script src="assets/js/pcoded.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-	<script>
-	(function() {
-		var ctx = document.getElementById('managerTicketChart');
-		if (!ctx) return;
-		new Chart(ctx.getContext('2d'), {
-			type: 'line',
-			data: {
-				labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'],
-				datasets: [
-					{ label: 'Đã xử lý', data: [90, 110, 95, 120, 115, 128], borderColor: '#7b1fa2', fill: false, tension: 0.3 },
-					{ label: 'Tháng trước', data: [85, 100, 90, 105, 110, 118], borderColor: '#388e3c', fill: false, tension: 0.3 }
-				]
-			},
-			options: {
-				responsive: true,
-				maintainAspectRatio: false,
-				plugins: { legend: { position: 'top' } },
-				scales: { y: { beginAtZero: true } }
-			}
-		});
-	})();
-	</script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+        <c:set var="lbs" value="${empty chartLabels ? [] : chartLabels}" />
+        <c:set var="done" value="${empty chartDaXuLy ? [] : chartDaXuLy}" />
+        <c:set var="open" value="${empty chartChuaXuLy ? [] : chartChuaXuLy}" />
+
+        <script>
+        var chartLabels = [
+        <c:forEach var="lb" items="${lbs}" varStatus="st">'${lb}'<c:if test="${!st.last}">, </c:if></c:forEach>
+        ];
+
+        var chartDaXuLy = [
+        <c:forEach var="n" items="${done}" varStatus="st">${n}<c:if test="${!st.last}">, </c:if></c:forEach>
+        ];
+
+        var chartChuaXuLy = [
+        <c:forEach var="n" items="${open}" varStatus="st">${n}<c:if test="${!st.last}">, </c:if></c:forEach>
+        ];
+        </script>
+        
+        
+        <script>
+
+            (function() {
+                var ctx = document.getElementById('managerTicketChart');
+                if (!ctx) return;
+
+                // Fallback nếu chưa có dữ liệu (vào thẳng JSP chưa qua servlet)
+                if (typeof chartLabels === 'undefined' || chartLabels.length === 0) {
+                    chartLabels = ['T1','T2','T3','T4','T5','T6'];
+                    chartDaXuLy = [0,0,0,0,0,0];
+                    chartChuaXuLy = [0,0,0,0,0,0];
+                }
+
+                new Chart(ctx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [
+                            { label: 'SOLVED',   data: chartDaXuLy,   borderColor: '#7b1fa2', fill: false, tension: 0.3 },
+                            { label: 'UNSOLVED', data: chartChuaXuLy, borderColor: '#388e3c', fill: false, tension: 0.3 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'top' } },
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            })();
+        </script>
 </body>
 
 </html>

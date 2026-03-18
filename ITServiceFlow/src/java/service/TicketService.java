@@ -4,6 +4,7 @@ import dao.ProblemDao;
 import dao.TicketDAO;
 import java.sql.Date;
 import java.util.List;
+import java.util.Map;
 import model.Problems;
 import model.Tickets;
 
@@ -65,5 +66,14 @@ public class TicketService {
     public int getTotalTicketThisMonth()
     {
         return ticketDao.getTotalTicketThisMonth();
+    }
+    
+    public Map<String, Object> getTicketChartLast6Months() {
+        return ticketDao.getTicketStatsLast6Months();
+    }
+    
+    public List<Tickets> get10UnAssignedTicket()
+    {
+        return ticketDao.get10UnassignedTickets();
     }
 }
