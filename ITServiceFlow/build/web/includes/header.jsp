@@ -65,10 +65,10 @@
                     <div class="dropdown-menu dropdown-menu-right notification">
                         <div class="noti-head">
                             <h6 class="d-inline-block m-b-0">Notifications</h6>
-                            <div class="float-right">
+<!--                            <div class="float-right">
                                 <a href="#!" class="m-r-10">mark as read</a>
                                 <a href="#!">clear all</a>
-                            </div>
+                            </div>-->
                         </div>
                         <ul class="noti-body">
                             <c:choose>

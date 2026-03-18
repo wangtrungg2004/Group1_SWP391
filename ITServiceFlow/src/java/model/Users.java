@@ -21,11 +21,12 @@ public class Users {
     private int locationId;
     private boolean isActive;
     private Date createdAt;
-
+    private int ticketCount;
+    
     public Users() {
     }
 
-    public Users(int id, String username, String email, String passwordHash, String fullName, String role, int departmentId, int locationId, boolean isActive, Date createdAt) {
+    public Users(int id, String username, String email, String passwordHash, String fullName, String role, int departmentId, int locationId, boolean isActive, Date createdAt, int ticketCount) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -36,7 +37,10 @@ public class Users {
         this.locationId = locationId;
         this.isActive = isActive;
         this.createdAt = createdAt;
+        this.ticketCount = ticketCount;
     }
+
+    
 
     
 
@@ -120,5 +124,11 @@ public class Users {
         this.locationId = locationId;
     }
     
+    public int getTicketCount() {
+        return ticketCount;
+    }
+    public void setTicketCount(int ticketCount) {
+        this.ticketCount = ticketCount;
+    }
     
 }

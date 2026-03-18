@@ -1,4 +1,4 @@
-<%-- Left sidebar - phân quy?n theo session attribute "role" --%>
+<%-- Left sidebar - phn quy?n theo session attribute "role" --%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <!-- [ navigation menu ] start -->
 <nav class="pcoded-navbar menupos-fixed menu-light brand-blue ">
@@ -12,6 +12,9 @@
         </div>
         <div class="navbar-content scroll-div">
             <ul class="nav pcoded-inner-navbar">
+                <li class="nav-item pcoded-menu-caption">
+                    <label>Navigation</label>
+                </li>
 
                 <!-- ??? USER MENU ??????????????????????????????????????? -->
                 <c:if test="${role == 'User'}">
@@ -109,12 +112,12 @@
 
                 </c:if>
 
-                <!-- ??? MANAGER MENU ????????????????????????????????????? -->
+                <!-- MANAGER MENU -->
                 <c:if test="${role == 'Manager'}">
 
                     <li class="nav-item pcoded-menu-caption"><label>Overview</label></li>
                     <li class="nav-item">
-                        <a href="ManagerDashboard.jsp" class="nav-link">
+                        <a href="ManagerDashboard" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-home"></i></span>
                             <span class="pcoded-mtext">Dashboard</span>
                         </a>
