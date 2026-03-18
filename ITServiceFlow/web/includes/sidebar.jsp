@@ -1,4 +1,4 @@
-<%-- Left sidebar - ph�n quy?n theo session attribute "role" --%>
+<%-- Left sidebar - ph?n quy?n theo session attribute "role" --%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <!-- [ navigation menu ] start -->
 <nav class="pcoded-navbar menupos-fixed menu-light brand-blue ">
@@ -123,6 +123,10 @@
                         <a href="ManagerChangeApprovals" class="nav-link"><span class="pcoded-micon"><i
                                     class="feather icon-check-square"></i></span><span class="pcoded-mtext">Approve Change Request</span></a>
                     </li>
+                    <li class="nav-item">
+                        <a href="CsatReport" class="nav-link"><span class="pcoded-micon"><i
+                                    class="feather icon-star"></i></span><span class="pcoded-mtext">CSAT Report</span></a>
+                    </li>
                 </c:if>
 
                 <!-- REPORTS (Admin & Manager) -->
@@ -142,7 +146,7 @@
                         <label>Support</label>
                     </li>
                     <li class="nav-item">
-                        <a href="ITDashboard.jsp" class="nav-link"><span class="pcoded-micon"><i
+                        <a href="ITDashboard" class="nav-link"><span class="pcoded-micon"><i
                                     class="feather icon-home"></i></span><span
                                 class="pcoded-mtext">Dashboard</span></a>
                     </li>

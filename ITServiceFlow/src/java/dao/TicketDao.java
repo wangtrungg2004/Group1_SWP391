@@ -790,6 +790,60 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         }
     }
     
+    /**
+     * KPI dashboard cho IT Support agent cụ thể.
+     * Trả về Map với các key:
+     *   - myNew        : ticket mới chưa assign hoặc assign cho agent này
+     *   - myInProgress : ticket đang xử lý (AssignedTo = agentId, Status = In Progress)
+     *   - myResolved   : ticket đã resolved trong 7 ngày gần nhất
+     *   - myTotal      : tổng ticket assign cho agent
+     *   - slaBreaching : ticket sắp breach SLA (ResolutionDeadline trong vòng 2 giờ tới)
+     */
+    public java.util.Map<String, Integer> getAgentKPIs(int agentId) {
+        java.util.Map<String, Integer> kpis = new java.util.HashMap<>();
+        kpis.put("myNew", 0);
+        kpis.put("myInProgress", 0);
+        kpis.put("myResolved", 0);
+        kpis.put("myTotal", 0);
+        kpis.put("slaBreaching", 0);
+
+        String sql = "SELECT "
+                   + "  SUM(CASE WHEN t.Status = 'New' AND (t.AssignedTo = ? OR t.AssignedTo IS NULL) THEN 1 ELSE 0 END) AS MyNew, "
+                   + "  SUM(CASE WHEN t.Status = 'In Progress' AND t.AssignedTo = ? THEN 1 ELSE 0 END) AS MyInProgress, "
+                   + "  SUM(CASE WHEN t.Status = 'Resolved' AND t.AssignedTo = ? "
+                   + "       AND t.ResolvedAt >= DATEADD(day, -7, GETDATE()) THEN 1 ELSE 0 END) AS MyResolved, "
+                   + "  SUM(CASE WHEN t.AssignedTo = ? AND t.Status NOT IN ('Closed','Resolved') THEN 1 ELSE 0 END) AS MyTotal "
+                   + "FROM Tickets t";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, agentId);
+            ps.setInt(2, agentId);
+            ps.setInt(3, agentId);
+            ps.setInt(4, agentId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                kpis.put("myNew",        rs.getInt("MyNew"));
+                kpis.put("myInProgress", rs.getInt("MyInProgress"));
+                kpis.put("myResolved",   rs.getInt("MyResolved"));
+                kpis.put("myTotal",      rs.getInt("MyTotal"));
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+
+        // SLA breaching: ticket của agent này có ResolutionDeadline trong 2 giờ tới
+        String slaSql = "SELECT COUNT(*) FROM SLATracking st "
+                      + "JOIN Tickets t ON st.TicketId = t.Id "
+                      + "WHERE t.AssignedTo = ? "
+                      + "  AND t.Status NOT IN ('Closed','Resolved') "
+                      + "  AND st.IsBreached = 0 "
+                      + "  AND st.ResolutionDeadline <= DATEADD(hour, 2, GETDATE())";
+        try (PreparedStatement ps = connection.prepareStatement(slaSql)) {
+            ps.setInt(1, agentId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) kpis.put("slaBreaching", rs.getInt(1));
+        } catch (Exception e) { e.printStackTrace(); }
+
+        return kpis;
+    }
+
     public static void main(String[] args) {
 
         TicketDAO dao = new TicketDAO();

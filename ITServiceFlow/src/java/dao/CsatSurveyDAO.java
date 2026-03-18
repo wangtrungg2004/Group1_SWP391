@@ -206,4 +206,52 @@ public class CsatSurveyDAO extends DbContext {
         }
         return ids;
     }
+
+    /**
+     * Tỉ lệ phản hồi = số tickets Closed có survey / tổng tickets Closed
+     */
+    public double getResponseRate() {
+        String sql = "SELECT "
+                   + "  CAST(COUNT(cs.Id) AS FLOAT) / NULLIF(COUNT(t.Id), 0) * 100 "
+                   + "FROM Tickets t "
+                   + "LEFT JOIN CsatSurveys cs ON t.Id = cs.TicketId "
+                   + "WHERE t.Status = 'Closed'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getDouble(1);
+        } catch (SQLException e) {
+            System.err.println("[CsatSurveyDAO] getResponseRate error: " + e.getMessage());
+        }
+        return 0.0;
+    }
+
+    /**
+     * Điểm CSAT trung bình theo từng agent.
+     * Trả về List<Object[]>: [agentName, avgRating, totalSurveys]
+     * Dùng cho bảng leaderboard trên CSAT Report Dashboard.
+     */
+    public List<Object[]> getAvgRatingByAgent() {
+        List<Object[]> list = new ArrayList<>();
+        String sql = "SELECT a.FullName AS AgentName, "
+                   + "       AVG(CAST(cs.Rating AS FLOAT)) AS AvgRating, "
+                   + "       COUNT(cs.Id) AS TotalSurveys "
+                   + "FROM CsatSurveys cs "
+                   + "JOIN Tickets t  ON cs.TicketId = t.Id "
+                   + "JOIN Users a    ON t.AssignedTo = a.Id "
+                   + "GROUP BY a.Id, a.FullName "
+                   + "ORDER BY AvgRating DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(new Object[]{
+                    rs.getString("AgentName"),
+                    rs.getDouble("AvgRating"),
+                    rs.getInt("TotalSurveys")
+                });
+            }
+        } catch (SQLException e) {
+            System.err.println("[CsatSurveyDAO] getAvgRatingByAgent error: " + e.getMessage());
+        }
+        return list;
+    }
 }
