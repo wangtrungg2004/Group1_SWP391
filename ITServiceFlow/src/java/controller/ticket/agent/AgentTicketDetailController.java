@@ -92,10 +92,7 @@ if (parentId != null && parentId > 0) {
         TicketAssetsDAO assetDao = new TicketAssetsDAO();
         request.setAttribute("linkedAssets", assetDao.getLinkedCIsByTicketId(ticketId));
 
-        // 6. Comments
-        TicketCommentsDAO commentDao = new TicketCommentsDAO();
-        request.setAttribute("comments", commentDao.getCommentsByTicketId(ticketId, true));
-
+        
         // 7. ── TIME TRACKING ──────────────────────────────────
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId != null) {
