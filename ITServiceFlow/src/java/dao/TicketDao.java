@@ -31,6 +31,7 @@ public class TicketDao extends DbContext {
             stm.setInt(5, ticket.getCategoryId());
             stm.setInt(6, ticket.getLocationId());
 
+<<<<<<< HEAD
             if (ticket.getImpact() != null && ticket.getImpact() > 0)
                 stm.setInt(7, ticket.getImpact());
             else
@@ -44,6 +45,21 @@ public class TicketDao extends DbContext {
             else
                 stm.setNull(9, java.sql.Types.INTEGER);
             if (ticket.getServiceCatalogId() != null && ticket.getServiceCatalogId() > 0)
+=======
+            if (ticket.getImpact() > 0)
+                stm.setInt(7, ticket.getImpact());
+            else
+                stm.setNull(7, java.sql.Types.INTEGER);
+            if (ticket.getUrgency() > 0)
+                stm.setInt(8, ticket.getUrgency());
+            else
+                stm.setNull(8, java.sql.Types.INTEGER);
+            if (ticket.getPriorityId() > 0)
+                stm.setInt(9, ticket.getPriorityId());
+            else
+                stm.setNull(9, java.sql.Types.INTEGER);
+            if (ticket.getServiceCatalogId() > 0)
+>>>>>>> ece779355ca83a81f87be3e036dab2107b9fd596
                 stm.setInt(10, ticket.getServiceCatalogId());
             else
                 stm.setNull(10, java.sql.Types.INTEGER);
@@ -75,6 +91,19 @@ public class TicketDao extends DbContext {
         // Simple logic for demo, better use DB sequence or Max check
         return prefix + System.currentTimeMillis();
     }
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> b5f2af4f1f8516f4efa1cf4f2223e16fbcd340f3
+>>>>>>> 966b29719721540e67a1f1c02a14ac5a25f18dc5
+>>>>>>> d964ee0d9be5877a86f0b424d259db0a76555507
+>>>>>>> ece779355ca83a81f87be3e036dab2107b9fd596
 
     public Tickets getTicketById(int id) {
         String sql = "SELECT * FROM [dbo].[Tickets] WHERE Id = ?";
@@ -109,4 +138,18 @@ public class TicketDao extends DbContext {
         }
         return null;
     }
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> d2154b86978d31b564b8846d8826925bf10e211d
+>>>>>>> b5f2af4f1f8516f4efa1cf4f2223e16fbcd340f3
+>>>>>>> 966b29719721540e67a1f1c02a14ac5a25f18dc5
+>>>>>>> d964ee0d9be5877a86f0b424d259db0a76555507
+>>>>>>> ece779355ca83a81f87be3e036dab2107b9fd596
 }

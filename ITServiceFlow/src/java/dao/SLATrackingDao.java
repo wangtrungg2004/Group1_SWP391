@@ -94,6 +94,19 @@ public class SLATrackingDao extends DbContext {
         }
         return list;
     }
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> b5f2af4f1f8516f4efa1cf4f2223e16fbcd340f3
+>>>>>>> 966b29719721540e67a1f1c02a14ac5a25f18dc5
+>>>>>>> d964ee0d9be5877a86f0b424d259db0a76555507
+>>>>>>> ece779355ca83a81f87be3e036dab2107b9fd596
 
     public java.util.List<java.util.Map<String, Object>> getBreachList(String team, String priority, String agent,
             String status, String sortBy, int offset, int limit) {
@@ -169,6 +182,16 @@ public class SLATrackingDao extends DbContext {
         }
         return list;
     }
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 966b29719721540e67a1f1c02a14ac5a25f18dc5
+>>>>>>> d964ee0d9be5877a86f0b424d259db0a76555507
+>>>>>>> ece779355ca83a81f87be3e036dab2107b9fd596
 
     public java.util.Map<String, Object> getPerformanceStats(java.sql.Date from, java.sql.Date to) {
         java.util.Map<String, Object> stats = new java.util.HashMap<>();
@@ -260,6 +283,13 @@ public class SLATrackingDao extends DbContext {
         }
         return list;
     }
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> d964ee0d9be5877a86f0b424d259db0a76555507
+>>>>>>> ece779355ca83a81f87be3e036dab2107b9fd596
 
     public java.util.List<java.util.Map<String, Object>> getAgentPerformanceStats(java.sql.Date from,
             java.sql.Date to) {
@@ -305,4 +335,16 @@ public class SLATrackingDao extends DbContext {
         }
         return list;
     }
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+=======
+=======
+=======
+>>>>>>> d2154b86978d31b564b8846d8826925bf10e211d
+>>>>>>> b5f2af4f1f8516f4efa1cf4f2223e16fbcd340f3
+>>>>>>> 966b29719721540e67a1f1c02a14ac5a25f18dc5
+>>>>>>> d964ee0d9be5877a86f0b424d259db0a76555507
+>>>>>>> ece779355ca83a81f87be3e036dab2107b9fd596
 }
