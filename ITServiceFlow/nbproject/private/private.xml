@@ -2,8 +2,20 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+<<<<<<< HEAD
         <group>
+<<<<<<< HEAD
             <file>file:/C:/Users/FPTshop/Downloads/System%20Audit%20Logs/System%20Audit%20Logs/Group1_SWP391/ITServiceFlow/src/java/controller/AgentPerformanceReport.java</file>
+=======
+<<<<<<< HEAD
+            <file>file:/E:/CODE/System%20Audit%20Logs%20update/System%20Audit%20Logs/Group1_SWP391/ITServiceFlow/src/java/Utils/DbContext.java</file>
+=======
+            <file>file:/E:/CODE/System%20Audit%20Logs/Group1_SWP391/ITServiceFlow/src/java/Utils/DbContext.java</file>
+>>>>>>> ece779355ca83a81f87be3e036dab2107b9fd596
+>>>>>>> 6aa9f0b6a4ce1233c4a2880f9e492405f7cdac35
         </group>
+=======
+        <group/>
+>>>>>>> d964ee0d9be5877a86f0b424d259db0a76555507
     </open-files>
 </project-private>

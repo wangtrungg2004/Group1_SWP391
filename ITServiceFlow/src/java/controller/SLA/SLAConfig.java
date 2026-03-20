@@ -145,7 +145,31 @@ public class SLAConfig extends HttpServlet {
                     e.printStackTrace();
                 }
             }
+<<<<<<< HEAD
         } else if ("toggleStatus".equals(action)) {
+=======
+<<<<<<< HEAD
+        } else if ("toggleStatus".equals(action)) {
+=======
+<<<<<<< HEAD
+        } else if ("toggleStatus".equals(action)) {
+=======
+<<<<<<< HEAD
+        } else if ("toggleStatus".equals(action)) {
+=======
+<<<<<<< HEAD
+        } else if ("toggleStatus".equals(action)) {
+=======
+<<<<<<< HEAD
+        } else if ("toggleStatus".equals(action)) {
+=======
+        } else if ("togg leStatus".equals(action)) {
+>>>>>>> d2154b86978d31b564b8846d8826925bf10e211d
+>>>>>>> b5f2af4f1f8516f4efa1cf4f2223e16fbcd340f3
+>>>>>>> 966b29719721540e67a1f1c02a14ac5a25f18dc5
+>>>>>>> d964ee0d9be5877a86f0b424d259db0a76555507
+>>>>>>> ece779355ca83a81f87be3e036dab2107b9fd596
+>>>>>>> 6aa9f0b6a4ce1233c4a2880f9e492405f7cdac35
             String idRaw = request.getParameter("id");
             String currentStatus = request.getParameter("currentStatus");
             if (idRaw != null) {
@@ -155,6 +179,22 @@ public class SLAConfig extends HttpServlet {
                     if (rule != null) {
                         String newStatus = "Active".equals(currentStatus) ? "Inactive" : "Active";
                         rule.setStatus(newStatus);
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> b5f2af4f1f8516f4efa1cf4f2223e16fbcd340f3
+>>>>>>> 966b29719721540e67a1f1c02a14ac5a25f18dc5
+>>>>>>> d964ee0d9be5877a86f0b424d259db0a76555507
+>>>>>>> ece779355ca83a81f87be3e036dab2107b9fd596
+>>>>>>> 6aa9f0b6a4ce1233c4a2880f9e492405f7cdac35
                         // If activating, we might want to check for conflicts, but
                         // SLARuleDao.addSLARule handles it.
                         // For updateSLARule, we need to ensure Dao handles deactivation of other rules
@@ -183,6 +223,29 @@ public class SLAConfig extends HttpServlet {
                             // or make updateSLARule handle it.
                             // Given the timeframe, let's trust the manager knows what they are doing OR
                             // we can improve DAO later. For now, basic toggle.
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+=======
+
+                        slaRuleService.updateSLARule(rule);
+
+                       
+                        if ("Active".equals(newStatus)) {
+
+>>>>>>> d2154b86978d31b564b8846d8826925bf10e211d
+>>>>>>> b5f2af4f1f8516f4efa1cf4f2223e16fbcd340f3
+>>>>>>> 966b29719721540e67a1f1c02a14ac5a25f18dc5
+>>>>>>> d964ee0d9be5877a86f0b424d259db0a76555507
+>>>>>>> ece779355ca83a81f87be3e036dab2107b9fd596
+>>>>>>> 6aa9f0b6a4ce1233c4a2880f9e492405f7cdac35
                         }
                         session.setAttribute("successMessage", "SLA Rule status updated.");
                         response.sendRedirect("SLAConfig?action=detail&id=" + id);

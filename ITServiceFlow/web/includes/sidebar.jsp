@@ -60,17 +60,62 @@
                                             class="feather icon-settings"></i></span><span class="pcoded-mtext">SLA
                                         Configuration</span></a>
                             </li>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> b5f2af4f1f8516f4efa1cf4f2223e16fbcd340f3
+>>>>>>> 966b29719721540e67a1f1c02a14ac5a25f18dc5
+>>>>>>> d964ee0d9be5877a86f0b424d259db0a76555507
+>>>>>>> ece779355ca83a81f87be3e036dab2107b9fd596
+>>>>>>> 6aa9f0b6a4ce1233c4a2880f9e492405f7cdac35
                             <li class="nav-item">
                                 <a href="SLABreachList" class="nav-link"><span class="pcoded-micon"><i
                                             class="feather icon-alert-circle"></i></span><span class="pcoded-mtext">SLA
                                         Breach List</span></a>
                             </li>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 966b29719721540e67a1f1c02a14ac5a25f18dc5
+>>>>>>> d964ee0d9be5877a86f0b424d259db0a76555507
+>>>>>>> ece779355ca83a81f87be3e036dab2107b9fd596
+>>>>>>> 6aa9f0b6a4ce1233c4a2880f9e492405f7cdac35
                             <li class="nav-item">
                                 <a href="PerformanceDashboard" class="nav-link"><span class="pcoded-micon"><i
                                             class="feather icon-bar-chart-2"></i></span><span
                                         class="pcoded-mtext">Performance
                                         Dashboard</span></a>
                             </li>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+=======
+=======
+>>>>>>> d2154b86978d31b564b8846d8826925bf10e211d
+>>>>>>> b5f2af4f1f8516f4efa1cf4f2223e16fbcd340f3
+>>>>>>> 966b29719721540e67a1f1c02a14ac5a25f18dc5
+>>>>>>> d964ee0d9be5877a86f0b424d259db0a76555507
+>>>>>>> ece779355ca83a81f87be3e036dab2107b9fd596
+>>>>>>> 6aa9f0b6a4ce1233c4a2880f9e492405f7cdac35
                         </c:if>
 
                         <c:if test="${role == 'Admin' || role == 'Manager'}">
@@ -82,16 +127,43 @@
                                             class="feather icon-file-text"></i></span><span class="pcoded-mtext">Xem báo
                                         cáo</span></a>
                             </li>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> d964ee0d9be5877a86f0b424d259db0a76555507
+>>>>>>> ece779355ca83a81f87be3e036dab2107b9fd596
+>>>>>>> 6aa9f0b6a4ce1233c4a2880f9e492405f7cdac35
                             <li class="nav-item">
                                 <a href="AgentPerformanceReport" class="nav-link"><span class="pcoded-micon"><i
                                             class="feather icon-users"></i></span><span class="pcoded-mtext">Agent
                                         Performance</span></a>
                             </li>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> ece779355ca83a81f87be3e036dab2107b9fd596
+>>>>>>> 6aa9f0b6a4ce1233c4a2880f9e492405f7cdac35
                             <li class="nav-item">
                                 <a href="AuditLogs" class="nav-link"><span class="pcoded-micon"><i
                                             class="feather icon-shield"></i></span><span class="pcoded-mtext">System
                                         Audit Logs</span></a>
                             </li>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+=======
+=======
+>>>>>>> 966b29719721540e67a1f1c02a14ac5a25f18dc5
+>>>>>>> d964ee0d9be5877a86f0b424d259db0a76555507
+>>>>>>> ece779355ca83a81f87be3e036dab2107b9fd596
+>>>>>>> 6aa9f0b6a4ce1233c4a2880f9e492405f7cdac35
                         </c:if>
 
                         <!-- Menu cho IT Support và Admin -->
