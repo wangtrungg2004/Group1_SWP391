@@ -64,6 +64,10 @@ public class UserService {
         return dao.getUserByEmail(email);
     }
 
+    public Users getUserByUsername(String username) {
+        return dao.getUserByUsername(username);
+    }
+
     public Users loginWithGoogleEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
             return null;

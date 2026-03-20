@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package controller;
+package controller.Auth;
 
 import Utils.GoogleAuthUtil;
 import java.io.IOException;
@@ -20,7 +20,7 @@ import service.UserService;
  *
  * @author DELL
  */
-@WebServlet(name = "Login", urlPatterns = {"/Login"})
+@WebServlet(name = "AuthLogin", urlPatterns = {"/auth/Login"})
 public class Login extends HttpServlet {
 
     /**
@@ -80,7 +80,7 @@ public class Login extends HttpServlet {
             String username = request.getParameter("username");
             String password = request.getParameter("password");
             
-            // Trim whitespace từ form input
+            // Trim whitespace tÃ¡Â»Â« form input
             if (username != null) {
                 username = username.trim();
             }
@@ -88,7 +88,6 @@ public class Login extends HttpServlet {
                 password = password.trim();
             }
 
-            // [PASSWORD_HASH] userService.login sẽ hash password rồi so sánh với DB; khi bỏ hash chỉ cần đổi bên UserService/UserDao
             Users existedUser = userService.getUserByUsername(username);
             if (existedUser != null && !existedUser.isActive()) {
                 request.setAttribute("error", "Your account has been deactivated. Please contact administrator.");
@@ -117,25 +116,25 @@ public class Login extends HttpServlet {
                     response.sendRedirect("AdminDashboard.jsp");
                     break;
                 case "Manager":
-                    response.sendRedirect("ManagerDashboard");
+                    response.sendRedirect("ManagerDashboard.jsp");
                     break;
                 case "User":
-                    response.sendRedirect("UserDashboard");
+                    response.sendRedirect("UserDashboard.jsp");
                     break;
                 case "IT Support":
                     response.sendRedirect("ITDashboard.jsp");
                     break;
                 default:
-                    request.setAttribute("error", "Role không hợp lệ. Vui lòng liên hệ quản trị viên.");
+                    request.setAttribute("error", "Role khÃƒÂ´ng hÃ¡Â»Â£p lÃ¡Â»â€¡. Vui lÃƒÂ²ng liÃƒÂªn hÃ¡Â»â€¡ quÃ¡ÂºÂ£n trÃ¡Â»â€¹ viÃƒÂªn.");
                     forwardLogin(request, response);
                     return;
             }
         } else {
-            request.setAttribute("error", "Không thể xác định role. Vui lòng đăng nhập lại.");
+            request.setAttribute("error", "KhÃƒÂ´ng thÃ¡Â»Æ’ xÃƒÂ¡c Ã„â€˜Ã¡Â»â€¹nh role. Vui lÃƒÂ²ng Ã„â€˜Ã„Æ’ng nhÃ¡ÂºÂ­p lÃ¡ÂºÂ¡i.");
             forwardLogin(request, response);
         }
         } catch (Exception e) {
-            // Log lỗi và hiển thị thông báo cho user
+            // Log lÃ¡Â»â€”i vÃƒÂ  hiÃ¡Â»Æ’n thÃ¡Â»â€¹ thÃƒÂ´ng bÃƒÂ¡o cho user
             System.err.println("Login error: " + e.getMessage());
             e.printStackTrace();
             request.setAttribute("error", "Database connection error. Please contact administrator.");
@@ -160,3 +159,5 @@ public class Login extends HttpServlet {
     }// </editor-fold>
 
 }
+
+

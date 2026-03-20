@@ -61,17 +61,13 @@
             <div class="pt-4 pb-2">
                 <p class="px-3 text-xs font-semibold text-text-muted-light uppercase tracking-wider">Administration</p>
             </div>
-            <a class="flex items-center px-3 py-2 text-sm font-medium rounded-md bg-primary bg-opacity-10 text-primary transition" href="UserCreate">
+            <a class="flex items-center px-3 py-2 text-sm font-medium rounded-md bg-primary bg-opacity-10 text-primary transition" href="UserManagement">
                 <span class="material-icons mr-3 text-xl text-primary">people</span>
                 User Management
             </a>
             <a class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-text-muted-light hover:bg-background-light hover:text-primary transition group" href="#!">
                 <span class="material-icons mr-3 text-xl text-gray-400 group-hover:text-primary">settings</span>
                 Settings
-            </a>
-            <a class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-text-muted-light hover:bg-background-light hover:text-primary transition group" href="#!">
-                <span class="material-icons mr-3 text-xl text-gray-400 group-hover:text-primary">security</span>
-                Roles &amp; Permissions
             </a>
         </nav>
         <div class="border-t border-border-light p-4 relative">

@@ -1,4 +1,4 @@
-package controller;
+package controller.Home;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  * @author admin
  */
-@WebServlet(urlPatterns = {"/HomeController"})
+@WebServlet(name = "HomeModuleHomeController", urlPatterns = {"/HomeController"})
 public class HomeController extends HttpServlet {
 
     /**
@@ -86,3 +86,4 @@ public class HomeController extends HttpServlet {
     }// </editor-fold>
 
 }
+
