@@ -43,12 +43,6 @@
                                 <span class="pcoded-mtext">Dashboard</span>
                             </a>
                         </li>
-                        <li class="nav-item"> 
-                            <a href="TicketLinkCIListServlet" class="nav-link"> 
-                                <span class="pcoded-micon"><i class="feather icon-link"></i></span> 
-                                <span class="pcoded-mtext">Ticket - CI Links</span> 
-                            </a> 
-                        </li> 
                         <li class="nav-item">
                             <a href="Long_TicketListServlet" class="nav-link">
                                 <span class="pcoded-micon"><i class="feather icon-file-text"></i></span>
@@ -79,8 +73,7 @@
                                         <div class="col-lg-12">
                                             <div class="page-header-title">
                                                 <div class="d-inline">
-                                                    <h4>Configuration Items (CMDB)</h4>
-                                                    <span>Manage all IT assets in the system.</span>
+                                                    <h4>Configuration Items</h4>
                                                 </div>
                                             </div>
                                         </div>
@@ -133,7 +126,7 @@
 
                                                         <div class="row">
                                                             <%-- Keyword --%>
-                                                            <div class="col-md-8">
+                                                            <div class="col-md-6">
                                                                 <label class="col-form-label">
                                                                     <i class="feather icon-search mr-1"></i>Search CI
                                                                 </label>
@@ -141,13 +134,13 @@
                                                                     <input type="text"
                                                                            name="keyword"
                                                                            class="form-control"
-                                                                           placeholder="Search by name, type, location, owner, date (dd/MM/yyyy)..."
+                                                                           placeholder="Search by name, owner, date (dd/MM/yyyy)..."
                                                                            value="${keyword}">
                                                                     <div class="input-group-append">
                                                                         <button type="submit" class="btn btn-primary">
                                                                             <i class="feather icon-search"></i> Search
                                                                         </button>
-                                                                        <c:if test="${not empty keyword or (status ne 'all')}">
+                                                                        <c:if test="${not empty keyword or (status ne 'all') or (assetType ne 'all' and not empty assetType) or (location ne 'all' and not empty location)}">
                                                                             <a href="CIListServlet"
                                                                                class="btn btn-outline-secondary" title="Clear filters">
                                                                                 <i class="feather icon-x"></i>
@@ -157,7 +150,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="col-md-4">
+                                                            <div class="col-md-2">
                                                                 <label class="col-form-label">
                                                                     <i class="feather icon-filter mr-1"></i>Filter by Status
                                                                 </label>
@@ -170,9 +163,45 @@
                                                                     <option value="Maintenance" ${status eq 'Maintenance' ? 'selected' : ''}>Maintenance</option>
                                                                 </select>
                                                             </div>
+
+                                                            <div class="col-md-2">
+                                                                <label class="col-form-label">
+                                                                    <i class="feather icon-filter mr-1"></i>Filter by Type
+                                                                </label>
+                                                                <select name="assetType"
+                                                                        class="form-control"
+                                                                        onchange="document.getElementById('searchForm').submit()">
+                                                                    <option value="all"     ${assetType eq 'all' ? 'selected' : ''}>All</option>
+                                                                    <option value="Laptop"  ${assetType eq 'Laptop' ? 'selected' : ''}>Laptop</option>
+                                                                    <option value="Server"  ${assetType eq 'Server' ? 'selected' : ''}>Server</option>
+                                                                    <option value="Network" ${assetType eq 'Network' ? 'selected' : ''}>Network</option>
+                                                                    <option value="Printer" ${assetType eq 'Printer' ? 'selected' : ''}>Printer</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="col-md-2">
+                                                                <label class="col-form-label">
+                                                                    <i class="feather icon-filter mr-1"></i>Filter by Location
+                                                                </label>
+                                                                <select name="location"
+                                                                        class="form-control"
+                                                                        onchange="document.getElementById('searchForm').submit()">
+                                                                    <option value="all" ${location eq 'all' ? 'selected' : ''}>All</option>
+                                                                    <option value="Tầng 1 - Hà Nội" ${location eq 'Tầng 1 - Hà Nội' ? 'selected' : ''}>Tầng 1 - Hà Nội</option>
+                                                                    <option value="Tầng 2 - Hà Nội" ${location eq 'Tầng 2 - Hà Nội' ? 'selected' : ''}>Tầng 2 - Hà Nội</option>
+                                                                    <option value="Tầng 3 - Hà Nội" ${location eq 'Tầng 3 - Hà Nội' ? 'selected' : ''}>Tầng 3 - Hà Nội</option>
+                                                                    <option value="Tầng 4 - Hà Nội" ${location eq 'Tầng 4 - Hà Nội' ? 'selected' : ''}>Tầng 4 - Hà Nội</option>
+                                                                    <option value="Tầng 1 - HCM" ${location eq 'Tầng 1 - HCM' ? 'selected' : ''}>Tầng 1 - HCM</option>
+                                                                    <option value="Tầng 2 - HCM" ${location eq 'Tầng 2 - HCM' ? 'selected' : ''}>Tầng 2 - HCM</option>
+                                                                    <option value="Tầng 1 - Đà Nẵng" ${location eq 'Tầng 1 - Đà Nẵng' ? 'selected' : ''}>Tầng 1 - Đà Nẵng</option>
+                                                                    <option value="Tầng 2 - Đà Nẵng" ${location eq 'Tầng 2 - Đà Nẵng' ? 'selected' : ''}>Tầng 2 - Đà Nẵng</option>
+                                                                    <option value="Tầng 1 - Cần Thơ" ${location eq 'Tầng 1 - Cần Thơ' ? 'selected' : ''}>Tầng 1 - Cần Thơ</option>
+                                                                    <option value="Tầng 2 - Cần Thơ" ${location eq 'Tầng 2 - Cần Thơ' ? 'selected' : ''}>Tầng 2 - Cần Thơ</option>
+                                                                </select>
+                                                            </div>
                                                         </div>
                                                         <small class="text-muted mt-1 d-block">
-                                                            Searches across: Name, Type, Location, Owner, Created Date (dd/MM/yyyy)
+                                                            Searches across: Name, Owner, Created Date (dd/MM/yyyy)
                                                         </small>
                                                     </form>
 
@@ -184,18 +213,15 @@
                                                 <div class="card-header d-flex justify-content-between align-items-center">
                                                     <h5 class="mb-0">
                                                         Configuration Items List
-                                                        <span class="badge badge-primary ml-2">${totalItems}</span>
                                                     </h5>
-                                                    <small class="text-muted">
-                                                        Page ${currentPage} of ${totalPages}
-                                                    </small>
+                                                    
                                                 </div>
                                                 <div class="card-block table-border-style">
                                                     <div class="table-responsive">
                                                         <table class="table table-hover table-bordered">
                                                             <thead class="thead-light">
                                                                 <tr>
-                                                                    <th style="width:50px">#</th>
+                                                                    <th style="width:50px">No</th>
                                                                     <th>Asset Tag</th>
                                                                     <th>Name</th>
                                                                     <th>Type</th>
@@ -278,34 +304,14 @@
                                                                                        title="View CI details">
                                                                                         <i class="feather icon-eye"></i> View
                                                                                     </a>
-                                                                                    <%-- View Relationship Map --%>
-                                                                                    <a href="CIRelationshipMapServlet?id=${ci.id}"
-                                                                                       class="btn btn-sm btn-warning mb-1"
-                                                                                       title="View Relationship Map">
-                                                                                        <i class="feather icon-share-2"></i> Map
-                                                                                    </a>
-                                                                                    <%-- Link to Ticket --%>
-                                                                                    <button type="button"
-                                                                                            class="btn btn-sm btn-primary mb-1"
-                                                                                            data-toggle="collapse"
-                                                                                            data-target="#linkTicketForm${ci.id}"
-                                                                                            aria-expanded="false"
-                                                                                            aria-controls="linkTicketForm${ci.id}">
-                                                                                        <i class="feather icon-link"></i> Link to Ticket
-                                                                                    </button>
-                                                                                    <div class="collapse mt-2" id="linkTicketForm${ci.id}">
-                                                                                        <form action="CILinkTicketServlet" method="POST" class="form-inline">
-                                                                                            <input type="hidden" name="assetId" value="${ci.id}">
-                                                                                            <input type="text"
-                                                                                                   name="ticketNumber"
-                                                                                                   class="form-control form-control-sm mr-1"
-                                                                                                   placeholder="Enter Ticket Number"
-                                                                                                   required>
-                                                                                            <button type="submit" class="btn btn-sm btn-success">
-                                                                                                <i class="feather icon-check"></i> Link
-                                                                                            </button>
-                                                                                        </form>
-                                                                                    </div>
+                                                                                    <%-- Delete Asset --%>
+                                                                                    <form action="CIDeleteServlet" method="POST" style="display:inline;"
+                                                                                          onsubmit="return confirm('Are you sure you want to delete this asset?');">
+                                                                                        <input type="hidden" name="id" value="${ci.id}" />
+                                                                                        <button type="submit" class="btn btn-sm btn-danger mb-1" title="Delete Asset">
+                                                                                            <i class="feather icon-trash-2"></i> Delete
+                                                                                        </button>
+                                                                                    </form>
                                                                                 </td>
 
                                                                             </tr>
@@ -333,43 +339,44 @@
                                                 </div>
                                                 <%-- TABLE END --%>
 
-                                                <%-- PAGINATION --%>
-                                                <c:if test="${totalPages > 1}">
-                                                    <div class="text-center mt-3 mb-3">
-                                                        <nav aria-label="Pagination">
-                                                            <ul class="pagination justify-content-center">
-
-                                                                <li class="page-item ${currentPage le 1 ? 'disabled' : ''}">
-                                                                    <a class="page-link"
-                                                                       href="CIListServlet?page=${currentPage - 1}&keyword=${keyword}&status=${status}${not empty ticketId ? '&ticketId='.concat(ticketId) : ''}">
-                                                                        <i class="feather icon-chevron-left"></i>
-                                                                    </a>
-                                                                </li>
-
-                                                                <c:forEach begin="1" end="${totalPages}" var="i">
-                                                                    <li class="page-item ${currentPage eq i ? 'active' : ''}">
-                                                                        <a class="page-link"
-                                                                           href="CIListServlet?page=${i}&keyword=${keyword}&status=${status}${not empty ticketId ? '&ticketId='.concat(ticketId) : ''}">
-                                                                            ${i}
-                                                                        </a>
-                                                                    </li>
-                                                                </c:forEach>
-
-                                                                <li class="page-item ${currentPage ge totalPages ? 'disabled' : ''}">
-                                                                    <a class="page-link"
-                                                                       href="CIListServlet?page=${currentPage + 1}&keyword=${keyword}&status=${status}${not empty ticketId ? '&ticketId='.concat(ticketId) : ''}">
-                                                                        <i class="feather icon-chevron-right"></i>
-                                                                    </a>
-                                                                </li>
-
-                                                            </ul>
-                                                        </nav>
-                                                    </div>
-                                                </c:if>
-                                                <%-- PAGINATION END --%>
-
                                             </div>
                                             <%-- CI LIST CARD END --%>
+
+                                            <%-- PAGINATION --%>
+                                            <c:if test="${totalPages ge 1}">
+                                                <div class="text-center mt-3 mb-3">
+                                                    <nav aria-label="Pagination">
+                                                        <ul class="pagination pagination-sm justify-content-center mb-0">
+
+                                                            <li class="page-item ${currentPage le 1 ? 'disabled' : ''}">
+                                                                <a class="page-link"
+                                                                   href="CIListServlet?page=${currentPage - 1}&keyword=${keyword}&status=${status}&assetType=${assetType}&location=${location}${not empty ticketId ? '&ticketId='.concat(ticketId) : ''}">
+                                                                    Prev
+                                                                </a>
+                                                            </li>
+
+                                                            <c:forEach begin="1" end="${totalPages}" var="i">
+                                                                <li class="page-item ${currentPage eq i ? 'active' : ''}">
+                                                                    <a class="page-link"
+                                                                       href="CIListServlet?page=${i}&keyword=${keyword}&status=${status}&assetType=${assetType}&location=${location}${not empty ticketId ? '&ticketId='.concat(ticketId) : ''}"
+                                                                       style="${(currentPage eq i and i eq 1) ? 'background-color:#ffc107 !important; border-color:#ffc107 !important; color:#212529 !important; font-weight:600;' : ''}">
+                                                                        ${i}
+                                                                    </a>
+                                                                </li>
+                                                            </c:forEach>
+
+                                                            <li class="page-item ${currentPage ge totalPages ? 'disabled' : ''}">
+                                                                <a class="page-link"
+                                                                   href="CIListServlet?page=${currentPage + 1}&keyword=${keyword}&status=${status}&assetType=${assetType}&location=${location}${not empty ticketId ? '&ticketId='.concat(ticketId) : ''}">
+                                                                    Next
+                                                                </a>
+                                                            </li>
+
+                                                        </ul>
+                                                    </nav>
+                                                </div>
+                                            </c:if>
+                                            <%-- PAGINATION END --%>
 
                                         </div>
                                     </div>

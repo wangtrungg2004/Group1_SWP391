@@ -23,12 +23,12 @@ public class AssetsDAO extends DbContext {
             + "LEFT JOIN Users u ON a.OwnerId = u.Id ";
 
     public List<Assets> searchAssets(String keyword, String filterType, String status) {
-        return searchAssets(keyword, filterType, status, null, null, null, null, null);
+        return searchAssets(keyword, filterType, status, null, null, null, null, null, null);
     }
 
     public List<Assets> searchAssets(String keyword, String filterType, String status,
             String assetTypeFilter, Integer locationIdFilter, Integer ownerIdFilter,
-            java.sql.Date createdFrom, java.sql.Date createdTo) {
+            java.sql.Date createdFrom, java.sql.Date createdTo, String locationNameFilter) {
 
         List<Assets> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(BASE_SELECT).append(" WHERE 1=1");
@@ -96,6 +96,9 @@ public class AssetsDAO extends DbContext {
         if (locationIdFilter != null) {
             sql.append(" AND a.LocationId = ?");
         }
+        if (locationNameFilter != null && !locationNameFilter.trim().isEmpty()) {
+            sql.append(" AND l.Name = ?");
+        }
         if (ownerIdFilter != null) {
             sql.append(" AND a.OwnerId = ?");
         }
@@ -148,6 +151,9 @@ public class AssetsDAO extends DbContext {
             if (locationIdFilter != null) {
                 ps.setInt(idx++, locationIdFilter);
             }
+            if (locationNameFilter != null && !locationNameFilter.trim().isEmpty()) {
+                ps.setString(idx++, locationNameFilter.trim());
+            }
             if (ownerIdFilter != null) {
                 ps.setInt(idx++, ownerIdFilter);
             }
@@ -179,6 +185,53 @@ public class AssetsDAO extends DbContext {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return list;
+    }
+
+    // Dùng cho popup "Link to Asset" trong Ticket List:
+    // - chỉ lấy asset theo LocationId của người tạo ticket
+    // - tìm theo Name asset hoặc OwnerName
+    // - filter theo AssetType (Laptop/Server/Network/Printer hoặc all)
+    public List<Assets> searchAssetsForTicketLink(int locationId, String keyword, String assetType) {
+        List<Assets> list = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder(BASE_SELECT)
+                .append(" WHERE a.LocationId = ? ");
+
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        if (hasKeyword) {
+            sql.append(" AND (a.Name LIKE ? OR u.FullName LIKE ?) ");
+        }
+
+        if (assetType != null && !assetType.trim().isEmpty() && !"all".equalsIgnoreCase(assetType.trim())) {
+            sql.append(" AND a.AssetType = ? ");
+        }
+
+        sql.append(" ORDER BY a.AssetTag ASC");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int idx = 1;
+            ps.setInt(idx++, locationId);
+
+            if (hasKeyword) {
+                String term = "%" + keyword.trim() + "%";
+                ps.setString(idx++, term);
+                ps.setString(idx++, term);
+            }
+
+            if (assetType != null && !assetType.trim().isEmpty() && !"all".equalsIgnoreCase(assetType.trim())) {
+                ps.setString(idx++, assetType.trim());
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapResultSetToAsset(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         return list;
     }
 

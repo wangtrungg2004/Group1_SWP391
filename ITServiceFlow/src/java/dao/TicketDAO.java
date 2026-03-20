@@ -176,6 +176,102 @@ public class TicketDAO extends DbContext {
         return list;
     }
 
+    // Lookup Category.Id theo Category.Name (case-insensitive)
+    public Integer getCategoryIdByName(String categoryName) {
+        if (categoryName == null || categoryName.trim().isEmpty()) {
+            return null;
+        }
+        String sql = "SELECT TOP 1 Id FROM [dbo].[Categories] WHERE LOWER(Name) = LOWER(?) AND IsActive = 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, categoryName.trim());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("Id");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Lookup Priorities.Id theo Priorities.Level (case-insensitive)
+    public Integer getPriorityIdByLevel(String level) {
+        if (level == null || level.trim().isEmpty()) {
+            return null;
+        }
+        String sql = "SELECT TOP 1 Id FROM [dbo].[Priorities] WHERE LOWER([Level]) = LOWER(?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, level.trim());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("Id");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Update nhanh các field cơ bản cho Ticket Detail
+    public boolean updateTicketBasicFields(int ticketId, String ticketType, Integer categoryId, Integer priorityId, String status) {
+        // Nếu categoryId hoặc priorityId null -> giữ nguyên giá trị cũ trong DB
+        Integer effectiveCategoryId = categoryId;
+        Integer effectivePriorityId = priorityId;
+
+        String selectSql = "SELECT CategoryId, PriorityId FROM [dbo].[Tickets] WHERE Id = ?";
+        try (PreparedStatement sel = connection.prepareStatement(selectSql)) {
+            sel.setInt(1, ticketId);
+            try (ResultSet rs = sel.executeQuery()) {
+                if (rs.next()) {
+                    if (effectiveCategoryId == null) {
+                        Object catObj = rs.getObject("CategoryId");
+                        if (catObj != null) {
+                            effectiveCategoryId = (Integer) catObj;
+                        }
+                    }
+                    if (effectivePriorityId == null) {
+                        Object priObj = rs.getObject("PriorityId");
+                        if (priObj != null) {
+                            effectivePriorityId = (Integer) priObj;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String sql = "UPDATE [dbo].[Tickets] "
+                + "SET TicketType = ?, CategoryId = ?, PriorityId = ?, Status = ?, UpdatedAt = GETDATE() "
+                + "WHERE Id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, ticketType);
+
+            if (effectiveCategoryId != null) {
+                ps.setInt(2, effectiveCategoryId);
+            } else {
+                ps.setNull(2, Types.INTEGER);
+            }
+
+            if (effectivePriorityId != null) {
+                ps.setInt(3, effectivePriorityId);
+            } else {
+                ps.setNull(3, Types.INTEGER);
+            }
+
+            ps.setString(4, status);
+            ps.setInt(5, ticketId);
+
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     // public static void main(String[] args) {
     //
     // TicketDao dao = new TicketDao();

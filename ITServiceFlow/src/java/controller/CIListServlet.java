@@ -33,6 +33,8 @@ public class CIListServlet extends HttpServlet {
         
         String keywordParam  = request.getParameter("keyword");
         String statusParam   = request.getParameter("status");
+        String assetTypeParam = request.getParameter("assetType");
+        String locationParam = request.getParameter("location");
         String pageStr       = request.getParameter("page");
 
         String keyword = (keywordParam == null) ? "" : keywordParam.trim();
@@ -44,6 +46,20 @@ public class CIListServlet extends HttpServlet {
                 : statusParam.trim();
 
         String statusForJSP = (statusForDAO == null) ? "all" : statusForDAO;
+
+        String assetTypeForDAO = (assetTypeParam == null
+                || assetTypeParam.trim().isEmpty()
+                || "all".equalsIgnoreCase(assetTypeParam.trim()))
+                ? null
+                : assetTypeParam.trim();
+        String assetTypeForJSP = (assetTypeForDAO == null) ? "all" : assetTypeForDAO;
+
+        String locationForDAO = (locationParam == null
+                || locationParam.trim().isEmpty()
+                || "all".equalsIgnoreCase(locationParam.trim()))
+                ? null
+                : locationParam.trim();
+        String locationForJSP = (locationForDAO == null) ? "all" : locationForDAO;
 
 
         // Page number
@@ -59,13 +75,26 @@ public class CIListServlet extends HttpServlet {
 
         List<Assets> fullList;
         try {
-            boolean hasKeyword     = !keyword.isBlank();
-            boolean hasStatusFilter = (statusForDAO != null);
+            boolean hasKeyword       = !keyword.isBlank();
+            boolean hasStatusFilter  = (statusForDAO != null);
+            boolean hasTypeFilter    = (assetTypeForDAO != null);
+            boolean hasLocationFilter = (locationForDAO != null);
 
-            if (!hasKeyword && !hasStatusFilter) {
+            if (!hasKeyword && !hasStatusFilter && !hasTypeFilter && !hasLocationFilter) {
                 fullList = assetsDAO.getAllAssets();
             } else {
-                fullList = assetsDAO.searchAssets(keyword, "all", statusForDAO);
+                // Sử dụng searchAssets với assetTypeFilter (lọc type) và locationFilter
+                fullList = assetsDAO.searchAssets(
+                        keyword,
+                        "all",
+                        statusForDAO,
+                        assetTypeForDAO,   // assetTypeFilter
+                        null,              // locationIdFilter
+                        null,              // ownerIdFilter
+                        null,
+                        null,
+                        locationForDAO
+                );
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -88,6 +117,8 @@ public class CIListServlet extends HttpServlet {
         request.setAttribute("ciList",      pageList);
         request.setAttribute("keyword",     keyword);
         request.setAttribute("status",      statusForJSP);
+        request.setAttribute("assetType",   assetTypeForJSP);
+        request.setAttribute("location",    locationForJSP);
         request.setAttribute("totalItems",  totalItems);
         request.setAttribute("currentPage", currentPage);
         request.setAttribute("totalPages",  totalPages);
