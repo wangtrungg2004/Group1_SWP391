@@ -13,9 +13,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import model.Users;
+import service.TemporaryRoleAccessService;
 
 @WebFilter(filterName = "AuthorizationFilter", urlPatterns = {"/AdminDashboard.jsp", "/UserDashboard.jsp", "/ITDashboard.jsp", "/ManagerDashboard", "/ManagerDashboard.jsp", "/admin/*", "/user/*", "/it/*"})
 public class AuthorizationFilter implements Filter {
+
+    private final TemporaryRoleAccessService temporaryRoleAccessService = new TemporaryRoleAccessService();
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -62,7 +65,7 @@ public class AuthorizationFilter implements Filter {
             }
         }
 
-        String role = (String) session.getAttribute("role");
+        String role = temporaryRoleAccessService.synchronizeSessionRole(session);
         if (role == null) {
             session.invalidate();
             httpResponse.sendRedirect(contextPath + "/Login.jsp");

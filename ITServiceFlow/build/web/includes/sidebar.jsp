@@ -49,6 +49,12 @@
                             <span class="pcoded-mtext">Known Errors</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="TemporaryAccessRequest" class="nav-link">
+                            <span class="pcoded-micon"><i class="feather icon-unlock"></i></span>
+                            <span class="pcoded-mtext">Temporary Access</span>
+                        </a>
+                    </li>
                 </c:if>
 
                 <!-- ??? IT SUPPORT MENU ?????????????????????????????????? -->
@@ -107,6 +113,12 @@
                         <a href="MyChangeRequests" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-file-text"></i></span>
                             <span class="pcoded-mtext">My Change Requests</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="TemporaryAccessRequest" class="nav-link">
+                            <span class="pcoded-micon"><i class="feather icon-unlock"></i></span>
+                            <span class="pcoded-mtext">Temporary Access</span>
                         </a>
                     </li>
 
@@ -172,6 +184,12 @@
                             <span class="pcoded-mtext">Approve RFC</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="TemporaryAccessApproval" class="nav-link">
+                            <span class="pcoded-micon"><i class="feather icon-shield"></i></span>
+                            <span class="pcoded-mtext">Approve Temp Access</span>
+                        </a>
+                    </li>
 
                     <li class="nav-item pcoded-menu-caption"><label>Reports</label></li>
                     <li class="nav-item">
@@ -202,6 +220,12 @@
                         <a href="CIListServlet" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-server"></i></span>
                             <span class="pcoded-mtext">Configuration Items</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="TemporaryAccessApproval" class="nav-link">
+                            <span class="pcoded-micon"><i class="feather icon-shield"></i></span>
+                            <span class="pcoded-mtext">Temp Access Approval</span>
                         </a>
                     </li>
                 </c:if>

@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Users;
+import service.TemporaryRoleAccessService;
 import service.UserService;
 
 /**
@@ -59,6 +60,8 @@ public class Login extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     UserService userService = new UserService();
+    TemporaryRoleAccessService temporaryRoleAccessService = new TemporaryRoleAccessService();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -79,8 +82,7 @@ public class Login extends HttpServlet {
         try {
             String username = request.getParameter("username");
             String password = request.getParameter("password");
-            
-            // Trim whitespace tÃ¡Â»Â« form input
+
             if (username != null) {
                 username = username.trim();
             }
@@ -103,38 +105,40 @@ public class Login extends HttpServlet {
                 return;
             }
 
-        HttpSession session = request.getSession();
-        session.setAttribute("user", user);
-        session.setAttribute("role", user.getRole());
-        session.setAttribute("userId", user.getId());
-        
-        // Redirect theo role
-        String role = user.getRole();
-        if (role != null) {
-            switch (role) {
-                case "Admin":
-                    response.sendRedirect("AdminDashboard.jsp");
-                    break;
-                case "Manager":
-                    response.sendRedirect("ManagerDashboard.jsp");
-                    break;
-                case "User":
-                    response.sendRedirect("UserDashboard.jsp");
-                    break;
-                case "IT Support":
-                    response.sendRedirect("ITDashboard.jsp");
-                    break;
-                default:
-                    request.setAttribute("error", "Role khÃƒÂ´ng hÃ¡Â»Â£p lÃ¡Â»â€¡. Vui lÃƒÂ²ng liÃƒÂªn hÃ¡Â»â€¡ quÃ¡ÂºÂ£n trÃ¡Â»â€¹ viÃƒÂªn.");
-                    forwardLogin(request, response);
-                    return;
+            HttpSession session = request.getSession();
+            session.setAttribute("user", user);
+            session.setAttribute("baseRole", user.getRole());
+            session.setAttribute("effectiveRole", user.getRole());
+            session.setAttribute("role", user.getRole());
+            session.setAttribute("userId", user.getId());
+            session.setAttribute(TemporaryRoleAccessService.SESSION_TEMP_ROLE_ACTIVATED, false);
+            temporaryRoleAccessService.synchronizeSessionRole(session);
+
+            String role = user.getRole();
+            if (role != null) {
+                switch (role) {
+                    case "Admin":
+                        response.sendRedirect("AdminDashboard.jsp");
+                        break;
+                    case "Manager":
+                        response.sendRedirect("ManagerDashboard.jsp");
+                        break;
+                    case "User":
+                        response.sendRedirect("UserDashboard.jsp");
+                        break;
+                    case "IT Support":
+                        response.sendRedirect("ITDashboard.jsp");
+                        break;
+                    default:
+                        request.setAttribute("error", "Invalid role. Please contact administrator.");
+                        forwardLogin(request, response);
+                        return;
+                }
+            } else {
+                request.setAttribute("error", "Cannot determine role. Please login again.");
+                forwardLogin(request, response);
             }
-        } else {
-            request.setAttribute("error", "KhÃƒÂ´ng thÃ¡Â»Æ’ xÃƒÂ¡c Ã„â€˜Ã¡Â»â€¹nh role. Vui lÃƒÂ²ng Ã„â€˜Ã„Æ’ng nhÃ¡ÂºÂ­p lÃ¡ÂºÂ¡i.");
-            forwardLogin(request, response);
-        }
         } catch (Exception e) {
-            // Log lÃ¡Â»â€”i vÃƒÂ  hiÃ¡Â»Æ’n thÃ¡Â»â€¹ thÃƒÂ´ng bÃƒÂ¡o cho user
             System.err.println("Login error: " + e.getMessage());
             e.printStackTrace();
             request.setAttribute("error", "Database connection error. Please contact administrator.");
@@ -159,5 +163,3 @@ public class Login extends HttpServlet {
     }// </editor-fold>
 
 }
-
-
