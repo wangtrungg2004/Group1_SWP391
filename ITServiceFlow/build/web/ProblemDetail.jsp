@@ -10,6 +10,7 @@
 <%@ page import="java.util.List" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
+<%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
 <%
     List<Notifications> notifications = new java.util.ArrayList<>();
     Integer userId = (Integer) session.getAttribute("userId");
@@ -430,13 +431,22 @@
                                                                                                                     ${ticket.status}
                                                                                                                 </span>
                                                                                                             </td>
-
                                                                                                             <td class="text-center">
-                                                                                                                <a href="TicketDetail?Id=${ticket.id}"
-                                                                                                                   class="btn btn-sm btn-primary">
-                                                                                                                    <i class="feather icon-eye"></i>
-                                                                                                                </a>
+                                                                                                                        <a href="${pageContext.request.contextPath}/TicketAgentDetail?id=${ticket.id}"
+                                                                                                                           class="btn btn-sm btn-primary">
+                                                                                                                            <i class="feather icon-eye"></i>
+                                                                                                                        </a>
                                                                                                             </td>
+<!--                                                                                                            <td class="text-center">
+                                                                                                                <button type="button" class="btn btn-sm btn-primary"
+                                                                                                                        data-toggle="modal" data-target="#modalTicketView"
+                                                                                                                        data-ticket-number="${ticket.ticketNumber}"
+                                                                                                                        data-ticket-title="${fn:escapeXml(ticket.title)}"
+                                                                                                                        data-ticket-status="${ticket.status}"
+                                                                                                                        data-ticket-type="${ticket.ticketType}">
+                                                                                                                    <i class="feather icon-eye"></i>
+                                                                                                                </button>
+                                                                                                             </td>-->
                                                                                                         </tr>
                                                                                                     </c:forEach>
                                                                                                 </tbody>
@@ -576,6 +586,32 @@
             <script src="assets/js/pcoded.min.js"></script>
     </body>
 
+    <div class="modal fade" id="modalTicketView" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ticket preview</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <p><strong>Ticket number:</strong> <span id="tvTicketNumber"></span></p>
+                <p><strong>Type:</strong> <span id="tvTicketType"></span></p>
+                <p><strong>Status:</strong> <span id="tvTicketStatus"></span></p>
+
+                <label><strong>Title</strong></label>
+                <div class="p-3 bg-light rounded" id="tvTicketTitle"></div>
+
+                
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+    
 </html>
 
 <script>
@@ -612,4 +648,14 @@
             setInterval(updateTimer, 1000);
         }
     });
+</script>
+
+<script>
+$('#modalTicketView').on('show.bs.modal', function (event) {
+    var btn = $(event.relatedTarget);
+    $('#tvTicketNumber').text(btn.data('ticket-number') || '');
+    $('#tvTicketType').text(btn.data('ticket-type') || '');
+    $('#tvTicketStatus').text(btn.data('ticket-status') || '');
+    $('#tvTicketTitle').text(btn.data('ticket-title') || '');
+});
 </script>
