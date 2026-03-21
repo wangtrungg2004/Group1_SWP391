@@ -20,12 +20,12 @@ import java.util.List;
 import model.TicketComments;
 
 /**
- * TicketDetailUserController — CẬP NHẬT cho US20
+ * TicketDetailUserController  CP NHT cho US20
  *
- * Thêm: Nếu Tickets.Status = 'Closed', load CsatSurvey (nếu có)
- * để ticket_detail.jsp hiển thị banner CSAT phù hợp.
+ * Thm: Nu Tickets.Status = 'Closed', load CsatSurvey (nu c)
+ *  ticket_detail.jsp hin th banner CSAT ph hp.
  *
- * Không thay đổi logic cũ, chỉ thêm ~7 dòng sau khi set attribute "ticket".
+ * Khng thay i logic c, ch thm ~7 dng sau khi set attribute "ticket".
  */
 @WebServlet(name = "TicketDetailUser", urlPatterns = {"/TicketDetailUser"})
 public class TicketDetailUserController extends HttpServlet {
@@ -48,37 +48,53 @@ public class TicketDetailUserController extends HttpServlet {
             return;
         }
 
-        int ticketId = Integer.parseInt(idParam);
+        int ticketId;
+        try {
+            ticketId = Integer.parseInt(idParam);
+        } catch (NumberFormatException ex) {
+            response.sendRedirect(request.getContextPath() + "/Tickets");
+            return;
+        }
+
         TicketDAO ticketDao = new TicketDAO();
 
-        // Lấy ticket từ bảng Tickets (dùng method có sẵn)
+        // Ly ticket t bng Tickets (dng method c sn)
         Tickets ticket = ticketDao.getTicketById(ticketId);
 
-        // Kiểm tra: ticket tồn tại và Tickets.CreatedBy = Users.Id hiện tại
+        // Kim tra: ticket tn ti v Tickets.CreatedBy = Users.Id hin ti
         if (ticket == null || ticket.getCreatedBy() != currentUser.getId()) {
             response.sendRedirect(request.getContextPath() + "/Tickets");
             return;
         }
         
-        // Lấy danh sách Comment
+        // Ly danh sch Comment
         TicketCommentsDAO commentDao = new TicketCommentsDAO();
-        // Truyền 'true' vì Agent có quyền xem Internal Note
+        // Truyn 'true' v Agent c quyn xem Internal Note
         List<TicketComments> comments = commentDao.getCommentsByTicketId(ticketId, false);
         request.setAttribute("comments", comments);
 
         request.setAttribute("ticket", ticket);
 
-        // ── US20: Load CSAT survey nếu Tickets.Status = 'Closed' ──────────────
+        String flashType = (String) session.getAttribute("ticketDetailFlashType");
+        String flashMessage = (String) session.getAttribute("ticketDetailFlashMessage");
+        if (flashMessage != null && !flashMessage.isEmpty()) {
+            request.setAttribute("ticketDetailFlashType", flashType);
+            request.setAttribute("ticketDetailFlashMessage", flashMessage);
+            session.removeAttribute("ticketDetailFlashType");
+            session.removeAttribute("ticketDetailFlashMessage");
+        }
+
+        //  US20: Load CSAT survey nu Tickets.Status = 'Closed' 
         if ("Closed".equalsIgnoreCase(ticket.getStatus())) {
             CsatSurveyDAO csatDao = new CsatSurveyDAO();
             CsatSurvey survey = csatDao.getSurveyByTicket(ticketId);
             if (survey != null) {
-                // Đã có survey → forward vào JSP để hiển thị kết quả
+                //  c survey  forward vo JSP  hin th kt qu
                 request.setAttribute("csatSurvey", survey);
             }
-            // Nếu null → JSP sẽ hiển thị nút "Give Feedback"
+            // Nu null  JSP s hin th nt "Give Feedback"
         }
-        // ──────────────────────────────────────────────────────────────────────
+        // 
 
         CategoryDao catDao = new CategoryDao();
         ServiceCatalogDao svcDao = new ServiceCatalogDao();
@@ -88,3 +104,4 @@ public class TicketDetailUserController extends HttpServlet {
         request.getRequestDispatcher("/ticket/ticket_detail.jsp").forward(request, response);
     }
 }
+

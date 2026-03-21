@@ -163,6 +163,10 @@
                 background-color: #dfe1e6;
                 color: #42526e;
             }
+            .badge-reopened {
+                background-color: #fff4e5;
+                color: #b26b00;
+            }
 
             .prio-high {
                 color: #ff5630;
@@ -223,6 +227,15 @@
                             </div>
                         </div>
 
+                        <c:if test="${not empty ticketDetailFlashMessage}">
+                            <div class="alert alert-${ticketDetailFlashType == 'success' ? 'success' : 'danger'} alert-dismissible fade show" role="alert">
+                                ${ticketDetailFlashMessage}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </c:if>
+
                         <div class="main-body">
                             <div class="page-wrapper p-0">
                                 <div class="row">
@@ -230,15 +243,22 @@
                                         <div class="card border-0">
                                             <div class="card-body p-4 p-md-5">
 
-                                                <div class="ticket-header">
-                                                    <span class="ticket-key">
-                                                        <c:choose>
-                                                            <c:when test="${ticket.ticketType == 'Incident'}"><i class="feather icon-alert-octagon text-danger mr-2"></i> IT Incident</c:when>
-                                                            <c:otherwise><i class="feather icon-monitor text-primary mr-2"></i> Service Request</c:otherwise>
-                                                        </c:choose>
-                                                        <span class="mx-2 text-muted">|</span> ${ticket.ticketNumber}
-                                                    </span>
-                                                    <h1 class="ticket-title">${ticket.title}</h1>
+                                                <div class="ticket-header d-flex justify-content-between align-items-start flex-wrap">
+                                                    <div>
+                                                        <span class="ticket-key">
+                                                            <c:choose>
+                                                                <c:when test="${ticket.ticketType == 'Incident'}"><i class="feather icon-alert-octagon text-danger mr-2"></i> IT Incident</c:when>
+                                                                <c:otherwise><i class="feather icon-monitor text-primary mr-2"></i> Service Request</c:otherwise>
+                                                            </c:choose>
+                                                            <span class="mx-2 text-muted">|</span> ${ticket.ticketNumber}
+                                                        </span>
+                                                        <h1 class="ticket-title">${ticket.title}</h1>
+                                                    </div>
+                                                    <c:if test="${ticket.status == 'Resolved' || ticket.status == 'Closed'}">
+                                                        <button type="button" class="btn btn-warning shadow-sm font-weight-bold mt-2 mt-md-0" data-toggle="modal" data-target="#reopenModal">
+                                                            <i class="feather icon-rotate-ccw mr-1"></i> Reopen Ticket
+                                                        </button>
+                                                    </c:if>
                                                 </div>
 
                                                 <h6 class="section-title"><i class="feather icon-align-left"></i> Description</h6>
@@ -309,11 +329,11 @@
                                                     </div>
                                                 </div>
                                                 
-                                                <%-- ─── US20: CSAT Banner (chỉ hiện khi Tickets.Status = 'Closed') ─────── --%>
+                                                <%-- CSAT Banner (only shown when ticket status is Closed) --%>
                                                 <c:if test="${ticket.status == 'Closed'}">
                                                     <div class="mt-5 border-top pt-4" id="csatSection">
                                                         <c:choose>
-                                                            <%-- Đã có survey --%>
+                                                            <%-- Survey exists --%>
                                                             <c:when test="${not empty csatSurvey}">
                                                                 <div style="background:#f3faf6; border:1px solid #b7e4c7; border-radius:8px; padding:14px 18px;">
                                                                     <div class="d-flex align-items-center">
@@ -341,7 +361,7 @@
                                                                 </div>
                                                             </c:when>
 
-                                                            <%-- Chưa có survey --%>
+                                                            <%-- Survey not submitted yet --%>
                                                             <c:otherwise>
                                                                 <div style="background:#e9f2ff; border:1px solid #b3d4ff; border-radius:8px; padding:14px 18px;">
                                                                     <div class="d-flex align-items-center">
@@ -359,6 +379,33 @@
                                                                 </div>
                                                             </c:otherwise>
                                                         </c:choose>
+                                                    </div>
+                                                </c:if>
+
+                                                <c:if test="${ticket.status == 'Resolved' || ticket.status == 'Closed'}">
+                                                    <div class="modal fade" id="reopenModal" tabindex="-1" role="dialog" aria-labelledby="reopenModalLabel" aria-hidden="true">
+                                                        <div class="modal-dialog" role="document">
+                                                            <div class="modal-content">
+                                                                <form action="${pageContext.request.contextPath}/TicketReopen" method="POST">
+                                                                    <input type="hidden" name="ticketId" value="${ticket.id}">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="reopenModalLabel">Reopen Ticket ${ticket.ticketNumber}</h5>
+                                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                            <span aria-hidden="true">&times;</span>
+                                                                        </button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <label class="font-weight-bold">Reason for reopen <span class="text-danger">*</span></label>
+                                                                        <textarea class="form-control" name="reopenReason" rows="4" maxlength="500" required placeholder="Describe what issue is still not resolved..."></textarea>
+                                                                        <small class="text-muted d-block mt-2">The ticket will move to <strong>Reopened</strong> and notify the assigned queue/agent.</small>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-light border" data-dismiss="modal">Cancel</button>
+                                                                        <button type="submit" class="btn btn-warning font-weight-bold">Submit Reopen Request</button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </c:if>
 
@@ -383,6 +430,7 @@
                                                         <c:choose>
                                                             <c:when test="${ticket.status == 'New'}"><span class="jira-badge badge-new">Pending</span></c:when>
                                                             <c:when test="${ticket.status == 'In Progress'}"><span class="jira-badge badge-progress">In Progress</span></c:when>
+                                                            <c:when test="${ticket.status == 'Reopened'}"><span class="jira-badge badge-reopened">Reopened</span></c:when>
                                                             <c:when test="${ticket.status == 'Resolved'}"><span class="jira-badge badge-resolved">Resolved</span></c:when>
                                                             <c:when test="${ticket.status == 'Closed'}"><span class="jira-badge badge-closed">Closed</span></c:when>
                                                             <c:otherwise><span class="jira-badge badge-closed">${ticket.status}</span></c:otherwise>
@@ -397,7 +445,7 @@
                                                             <c:when test="${ticket.priorityLevel == 'Critical' || ticket.priorityLevel == 'High'}"><i class="feather icon-arrow-up prio-high"></i> ${ticket.priorityLevel}</c:when>
                                                             <c:when test="${ticket.priorityLevel == 'Low'}"><i class="feather icon-arrow-down prio-low"></i> ${ticket.priorityLevel}</c:when>
                                                             <c:when test="${ticket.priorityLevel == 'Medium'}"><i class="feather icon-minus prio-medium"></i> ${ticket.priorityLevel}</c:when>
-                                                            <c:otherwise><span class="text-muted">Chưa phân loại</span></c:otherwise>
+                                                            <c:otherwise><span class="text-muted">Unclassified</span></c:otherwise>
                                                         </c:choose>
                                                     </div>
                                                 </div>
@@ -487,3 +535,4 @@
         <script src="${pageContext.request.contextPath}/assets/js/pcoded.min.js"></script>
     </body>
 </html>
+
