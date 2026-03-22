@@ -102,22 +102,33 @@ public class CIRelationshipMapServlet extends HttpServlet {
         }
 
         if (depth > 0) {
-            // Get relationships where this CI is the source (dependencies)
+            // Lấy tất cả quan hệ có liên quan tới CI này (source hoặc target)
             List<CIRelationships> relationships = ciRelationshipsDAO.getRelationshipsByCIId(ciId);
 
             for (CIRelationships rel : relationships) {
                 int targetId = rel.getTargetCIId();
                 int sourceId = rel.getSourceCIId();
 
-                // Add target node if not exists
-                Assets targetAsset = assetsDAO.getAssetById(targetId);
-                if (targetAsset != null && !processedNodes.contains(targetId)) {
-                    json.append(",");
-                    addNode(json, targetAsset);
-                    processedNodes.add(targetId);
+                // Đảm bảo cả 2 node (source/target) đều tồn tại trước khi add edge
+                if (!processedNodes.contains(sourceId)) {
+                    Assets sourceAsset = assetsDAO.getAssetById(sourceId);
+                    if (sourceAsset != null) {
+                        json.append(",");
+                        addNode(json, sourceAsset);
+                        processedNodes.add(sourceId);
+                    }
                 }
 
-                // Add edge
+                if (!processedNodes.contains(targetId)) {
+                    Assets targetAsset = assetsDAO.getAssetById(targetId);
+                    if (targetAsset != null) {
+                        json.append(",");
+                        addNode(json, targetAsset);
+                        processedNodes.add(targetId);
+                    }
+                }
+
+                // Add edge (chỉ khi chưa add)
                 String edgeId = "e" + sourceId + "-" + targetId;
                 if (!processedEdges.contains(edgeId)) {
                     json.append(",");
@@ -125,9 +136,10 @@ public class CIRelationshipMapServlet extends HttpServlet {
                     processedEdges.add(edgeId);
                 }
 
-                // Recursively build for target
-                if (targetId != ciId) {
-                    buildDependencyGraph(targetId, json, processedNodes, processedEdges, depth - 1, false);
+                // Recursively build graph theo node còn lại (mở rộng 2 phía)
+                int nextId = (sourceId == ciId) ? targetId : sourceId;
+                if (nextId != ciId) {
+                    buildDependencyGraph(nextId, json, processedNodes, processedEdges, depth - 1, false);
                 }
             }
         }

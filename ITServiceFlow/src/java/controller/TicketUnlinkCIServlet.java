@@ -1,6 +1,5 @@
 package controller;
 
-import dao.AssetsDAO;
 import dao.TicketAssetsDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -8,19 +7,16 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import model.Assets;
 
-@WebServlet(name = "TicketLinkCIServlet", urlPatterns = {"/TicketLinkCIServlet"})
-public class TicketLinkCIServlet extends HttpServlet {
+@WebServlet(name = "TicketUnlinkCIServlet", urlPatterns = {"/TicketUnlinkCIServlet"})
+public class TicketUnlinkCIServlet extends HttpServlet {
 
     private TicketAssetsDAO ticketAssetsDAO;
-    private AssetsDAO assetsDAO;
 
     @Override
     public void init() throws ServletException {
         super.init();
         ticketAssetsDAO = new TicketAssetsDAO();
-        assetsDAO = new AssetsDAO();
     }
 
     @Override
@@ -31,32 +27,24 @@ public class TicketLinkCIServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
 
         String ticketIdStr = request.getParameter("ticketId");
-        String assetTag = request.getParameter("assetTag");
+        String assetIdStr = request.getParameter("assetId");
 
-        int ticketId;
+        int ticketId = 0;
+        int assetId = 0;
         try {
             ticketId = Integer.parseInt(ticketIdStr);
-        } catch (Exception e) {
-            response.sendRedirect("Long_TicketListServlet?errorMessage=Invalid+ticketId");
+            assetId = Integer.parseInt(assetIdStr);
+        } catch (NumberFormatException e) {
+            response.sendRedirect("Long_TicketListServlet?errorMessage=Invalid+ticketId+or+assetId");
             return;
         }
 
-        if (assetTag == null || assetTag.trim().isEmpty()) {
-            response.sendRedirect("Long_TicketListServlet?errorMessage=AssetTag+is+required");
-            return;
-        }
+        boolean success = ticketAssetsDAO.removeLink(ticketId, assetId);
 
-        Assets asset = assetsDAO.getAssetByTag(assetTag.trim());
-        if (asset == null) {
-            response.sendRedirect("Long_TicketListServlet?errorMessage=Asset+not+found");
-            return;
-        }
-
-        boolean success = ticketAssetsDAO.addLink(ticketId, asset.getId());
         if (success) {
-            response.sendRedirect("Long_TicketListServlet?successMessage=Linked+asset+successfully");
+            response.sendRedirect("Long_TicketListServlet?successMessage=Unlinked+asset+from+ticket+successfully");
         } else {
-            response.sendRedirect("Long_TicketListServlet?errorMessage=Asset+already+linked+or+failed");
+            response.sendRedirect("Long_TicketListServlet?errorMessage=Failed+to+unlink+asset+from+ticket");
         }
     }
 

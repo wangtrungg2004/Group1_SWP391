@@ -14,6 +14,7 @@ public class CIRelationships {
 private String targetName;
 private String targetAssetTag;
 private String sourceName;
+private String sourceAssetTag;
 
 // Getters & Setters
 public String getTargetName() { return targetName; }
@@ -24,6 +25,9 @@ public void setTargetAssetTag(String targetAssetTag) { this.targetAssetTag = tar
 
 public String getSourceName() { return sourceName; }
 public void setSourceName(String sourceName) { this.sourceName = sourceName; }
+
+public String getSourceAssetTag() { return sourceAssetTag; }
+public void setSourceAssetTag(String sourceAssetTag) { this.sourceAssetTag = sourceAssetTag; }
 
     public CIRelationships() {
     }
