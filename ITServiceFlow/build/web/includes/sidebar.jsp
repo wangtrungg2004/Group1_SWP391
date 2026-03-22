@@ -108,9 +108,6 @@
                         <a href="<c:url value='/KnowledgeArticleManage'/>" target="_self" class="nav-link"><span class="pcoded-micon"><i class="feather icon-book"></i></span><span class="pcoded-mtext">Knowledge Article Management</span></a>
                     </li>
                     <li class="nav-item">
-                        <a href="<c:url value='/KnowledgeSearch'/>" class="nav-link"><span class="pcoded-micon"><i class="feather icon-book-open"></i></span><span class="pcoded-mtext">Knowledge Search</span></a>
-                    </li>
-                    <li class="nav-item">
                         <a href="<c:url value='/TicketResolutionReview'/>" class="nav-link"><span class="pcoded-micon"><i class="feather icon-check-square"></i></span><span class="pcoded-mtext">Ticket Resolution Review</span></a>
                     </li>
 
