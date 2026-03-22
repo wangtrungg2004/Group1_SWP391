@@ -488,18 +488,35 @@ public class TicketDAO extends DbContext {
         return null;
     }
 
-    // 5. Lấy danh sách ticket đã Resolved (có thể lọc theo keyword TicketNumber)
-    public List<Tickets> getResolvedTickets(String keyword) {
+    // 5. Lấy danh sách ticket đã Resolved (với bộ lọc từ khóa và loại ticket)
+    public List<Tickets> getResolvedTickets(String keyword, String type) {
         List<Tickets> list = new ArrayList<>();
-        String baseSql = "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.ResolvedAt "
-                + "FROM [dbo].[Tickets] t WHERE t.Status = 'Resolved'";
-        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
-        String sql = hasKeyword ? baseSql + " AND t.TicketNumber LIKE ?" : baseSql;
-        sql += " ORDER BY t.ResolvedAt DESC";
+        StringBuilder sql = new StringBuilder(
+                "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.ResolvedAt, c.Name as CategoryName "
+                        + "FROM [dbo].[Tickets] t "
+                        + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
+                        + "WHERE t.Status = 'Resolved' ");
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        boolean hasType = type != null && !type.trim().isEmpty() && !type.equalsIgnoreCase("All");
+
+        if (hasKeyword) {
+            sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
+        }
+        if (hasType) {
+            sql.append("AND t.TicketType = ? ");
+        }
+        sql.append("ORDER BY t.ResolvedAt DESC");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int paramIdx = 1;
             if (hasKeyword) {
-                ps.setString(1, "%" + keyword.trim() + "%");
+                String pattern = "%" + keyword.trim() + "%";
+                ps.setString(paramIdx++, pattern);
+                ps.setString(paramIdx++, pattern);
+            }
+            if (hasType) {
+                ps.setString(paramIdx++, type);
             }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -510,6 +527,7 @@ public class TicketDAO extends DbContext {
                 t.setTitle(rs.getString("Title"));
                 t.setStatus(rs.getString("Status"));
                 t.setResolvedAt(rs.getTimestamp("ResolvedAt"));
+                t.setCategoryName(rs.getString("CategoryName"));
                 list.add(t);
             }
         } catch (Exception ex) {
