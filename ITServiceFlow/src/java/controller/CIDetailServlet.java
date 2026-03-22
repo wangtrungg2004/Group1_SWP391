@@ -4,6 +4,7 @@ import dao.AssetsDAO;
 import dao.CIRelationshipsDAO;
 import dao.TicketAssetsDAO;
 import dao.TicketDAO;
+import dao.UsersDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import model.Assets;
 import model.CIRelationships;
 import model.Tickets;
+import model.Users;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,6 +25,7 @@ public class CIDetailServlet extends HttpServlet {
     private CIRelationshipsDAO ciRelationshipsDAO;
     private TicketAssetsDAO ticketAssetsDAO;
     private TicketDAO ticketDAO;
+    private UsersDAO usersDAO;
 
     @Override
     public void init() throws ServletException {
@@ -31,6 +34,7 @@ public class CIDetailServlet extends HttpServlet {
         ciRelationshipsDAO = new CIRelationshipsDAO();
         ticketAssetsDAO = new TicketAssetsDAO();
         ticketDAO = new TicketDAO();
+        usersDAO = new UsersDAO();
     }
 
     @Override
@@ -76,14 +80,33 @@ public class CIDetailServlet extends HttpServlet {
             return;
         }
 
+        // For "Add Relationship" modal: only show Active CIs in same Location (exclude current CI)
+        List<Assets> targetCIs = assetsDAO.searchAssets(
+                null,
+                "all",
+                "Active",
+                null,
+                ci.getLocationId(),
+                null,
+                null,
+                null,
+                null
+        );
+        if (targetCIs != null && !targetCIs.isEmpty()) {
+            targetCIs.removeIf(a -> a != null && a.getId() == ciId);
+        }
+
         List<CIRelationships> relationships = ciRelationshipsDAO.getRelationshipsByCIId(ciId);
         enrichRelationships(relationships);
 
         int relatedTicketCount = ticketAssetsDAO.getTicketIdsByAssetId(ciId).size();
+        List<Users> users = usersDAO.getAllUsers();
 
         request.setAttribute("ci", ci);
+        request.setAttribute("targetCIs", targetCIs);
         request.setAttribute("relationships", relationships);
         request.setAttribute("relatedTicketCount", relatedTicketCount);
+        request.setAttribute("users", users);
         if (ticketId != null) {
             request.setAttribute("ticketId", ticketId);
             request.setAttribute("ticket", ticket);
@@ -111,6 +134,7 @@ public class CIDetailServlet extends HttpServlet {
             Assets sourceCI = assetsDAO.getAssetById(rel.getSourceCIId());
             if (sourceCI != null) {
                 rel.setSourceName(sourceCI.getName());
+                rel.setSourceAssetTag(sourceCI.getAssetTag());
             }
         }
     }

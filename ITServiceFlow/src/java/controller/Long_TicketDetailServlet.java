@@ -58,6 +58,37 @@ public class Long_TicketDetailServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response);
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html;charset=UTF-8");
+
+        String action = request.getParameter("action");
+        if (action == null || !"update".equalsIgnoreCase(action.trim())) {
+            doGet(request, response);
+            return;
+        }
+
+        String idRaw = request.getParameter("id");
+        String ticketType = request.getParameter("ticketType");
+        String categoryName = request.getParameter("categoryName");
+        String priorityLevel = request.getParameter("priorityLevel");
+        String status = request.getParameter("status");
+
+        int ticketId;
+        try {
+            ticketId = Integer.parseInt(idRaw.trim());
+        } catch (Exception e) {
+            response.sendRedirect("Long_TicketDetailServlet?id=" + idRaw + "&errorMessage=Invalid+ticket+id");
+            return;
+        }
+
+        Integer categoryId = ticketDAO.getCategoryIdByName(categoryName);
+        Integer priorityId = ticketDAO.getPriorityIdByLevel(priorityLevel);
+
+        boolean ok = ticketDAO.updateTicketBasicFields(ticketId, ticketType, categoryId, priorityId, status);
+        if (ok) {
+            response.sendRedirect("Long_TicketDetailServlet?id=" + ticketId + "&successMessage=Updated+successfully");
+        } else {
+            response.sendRedirect("Long_TicketDetailServlet?id=" + ticketId + "&errorMessage=Update+failed");
+        }
     }
 }
