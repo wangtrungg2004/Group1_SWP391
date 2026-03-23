@@ -1,6 +1,7 @@
 package controller;
 
 import dao.TicketDAO;
+import dao.TicketAssetsDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import model.Tickets;
+import model.Assets;
 
 @WebServlet(name = "Long_TicketListServlet", urlPatterns = {"/Long_TicketListServlet", "/TicketList"})
 public class Long_TicketListServlet extends HttpServlet {
@@ -33,9 +35,13 @@ public class Long_TicketListServlet extends HttpServlet {
 
         String keywordParam = request.getParameter("keyword");
         String typeParam = request.getParameter("type");
+        String statusParam = request.getParameter("status");
+        String priorityParam = request.getParameter("priority");
 
         String keyword = (keywordParam == null) ? "" : keywordParam.trim();
         String type = (typeParam == null || typeParam.trim().isEmpty()) ? "all" : typeParam.trim();
+        String status = (statusParam == null || statusParam.trim().isEmpty()) ? "all" : statusParam.trim();
+        String priority = (priorityParam == null || priorityParam.trim().isEmpty()) ? "all" : priorityParam.trim();
 
         List<Tickets> allTickets;
         try {
@@ -46,15 +52,24 @@ public class Long_TicketListServlet extends HttpServlet {
             request.setAttribute("errorMessage", "Cannot load ticket list: " + e.getMessage());
         }
 
-        List<Tickets> ticketList = applySearchAndTypeFilter(allTickets, keyword, type);
+        List<Tickets> ticketList = applyFilters(allTickets, keyword, type, status, priority);
+
+        // Gắn thông tin Asset (nếu có) cho từng ticket để JSP hiển thị
+        TicketAssetsDAO ticketAssetsDAO = new TicketAssetsDAO();
+        for (Tickets t : ticketList) {
+            List<Assets> linkedAssets = ticketAssetsDAO.getLinkedCIsByTicketId(t.getId());
+            t.setLinkedAssets(linkedAssets);
+        }
 
         request.setAttribute("ticketList", ticketList);
         request.setAttribute("keyword", keyword);
         request.setAttribute("type", type);
+        request.setAttribute("status", status);
+        request.setAttribute("priority", priority);
         request.getRequestDispatcher("/Long_TicketList.jsp").forward(request, response);
     }
 
-    private List<Tickets> applySearchAndTypeFilter(List<Tickets> source, String keyword, String type) {
+    private List<Tickets> applyFilters(List<Tickets> source, String keyword, String type, String status, String priority) {
         if (source == null || source.isEmpty()) {
             return Collections.emptyList();
         }
@@ -62,9 +77,13 @@ public class Long_TicketListServlet extends HttpServlet {
         final String loweredKeyword = (keyword == null) ? "" : keyword.trim().toLowerCase(Locale.ROOT);
         final boolean hasKeyword = !loweredKeyword.isEmpty();
         final boolean filterAllTypes = (type == null || type.trim().isEmpty() || "all".equalsIgnoreCase(type.trim()));
+        final boolean filterAllStatus = (status == null || status.trim().isEmpty() || "all".equalsIgnoreCase(status.trim()));
+        final boolean filterAllPriority = (priority == null || priority.trim().isEmpty() || "all".equalsIgnoreCase(priority.trim()));
 
         return source.stream()
                 .filter(t -> filterAllTypes || equalsIgnoreCaseSafe(t.getTicketType(), type))
+                .filter(t -> filterAllStatus || equalsIgnoreCaseSafe(t.getStatus(), status))
+                .filter(t -> filterAllPriority || equalsIgnoreCaseSafe(t.getPriorityLevel(), priority))
                 .filter(t -> !hasKeyword || matchesKeyword(t, loweredKeyword))
                 .collect(Collectors.toList());
     }

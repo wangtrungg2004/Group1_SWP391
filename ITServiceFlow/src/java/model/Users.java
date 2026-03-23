@@ -19,6 +19,8 @@ public class Users {
     private String role;
     private int departmentId;
     private int locationId;
+    private String departmentName;
+    private String locationName;
     private boolean isActive;
     private Date createdAt;
     private int ticketCount;
@@ -122,6 +124,22 @@ public class Users {
 
     public void setLocationId(int locationId) {
         this.locationId = locationId;
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
     }
     
     public int getTicketCount() {

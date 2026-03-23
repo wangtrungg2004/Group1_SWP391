@@ -1,8 +1,10 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@ taglib uri="jakarta.tags.core" prefix="c" %>
-        <% if (session.getAttribute("user")==null) { response.sendRedirect("Login.jsp"); return; } String role=(String)
-            session.getAttribute("role"); if (role==null || !role.equals("User")) { response.sendRedirect("Login.jsp");
-            return; } model.Users currentUser=(model.Users) session.getAttribute("user"); %>
+        <% if (session.getAttribute("user")==null) { response.sendRedirect("Login.jsp"); return; } 
+           String role=(String) session.getAttribute("role"); 
+           // Allow all roles to search the knowledge base
+           if (role==null) { response.sendRedirect("Login.jsp"); return; } 
+           model.Users currentUser=(model.Users) session.getAttribute("user"); %>
             <!DOCTYPE html>
             <html lang="vi">
 

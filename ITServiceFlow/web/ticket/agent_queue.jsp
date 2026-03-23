@@ -25,7 +25,7 @@
         .queue-pill.active { background: #0052cc; color: white; box-shadow: 0 4px 8px rgba(0,82,204,0.2);}
         .queue-pill i { margin-right: 6px; }
 
-        /* Filter Toolbar (Tái sử dụng style tốt từ user ticket list) */
+        /* Filter toolbar styles */
         .filter-toolbar { background: #f4f5f7; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; border: 1px solid #dfe1e6; }
         .filter-toolbar .form-control { border: 1px solid #c1c7d0; height: 38px; }
 
@@ -90,6 +90,7 @@
             <option value="all" ${selectedStatus == 'all' ? 'selected' : ''}>All Statuses</option>
             <option value="New" ${selectedStatus == 'New' ? 'selected' : ''}>Pending / New</option>
             <option value="In Progress" ${selectedStatus == 'In Progress' ? 'selected' : ''}>In Progress</option>
+            <option value="Reopened" ${selectedStatus == 'Reopened' ? 'selected' : ''}>Reopened</option>
         </select>
 
         <select name="ticketType" class="form-control" style="width: 160px;">

@@ -198,6 +198,10 @@
                 background-color: #dfe1e6;
                 color: #42526e;
             }
+            .badge-reopened {
+                background-color: #fff4e5;
+                color: #b26b00;
+            }
 
             .btn-action {
                 width: 32px;
@@ -218,7 +222,7 @@
                 border-color: #dfe1e6;
             }
 
-            /* Styling cho phân trang */
+            /* Pagination styling */
             .pagination {
                 display: flex;
                 justify-content: flex-end;
@@ -276,6 +280,12 @@
 
                         <div class="main-body">
                             <div class="page-wrapper">
+
+                                <c:if test="${param.created == '1'}">
+                                    <div id="ticketCreatedToast" class="alert alert-success fade show shadow-sm mb-3" role="alert" style="border-radius: 8px;">
+                                        <i class="feather icon-check-circle mr-2"></i>Ticket created successfully.
+                                    </div>
+                                </c:if>
 
                                 <div class="row mb-2">
                                     <div class="col-md-3 col-sm-6">
@@ -347,6 +357,7 @@
                                                                 <option value="all" ${selectedStatus == 'all' ? 'selected' : ''}>All Statuses</option>
                                                                 <option value="New" ${selectedStatus == 'New' ? 'selected' : ''}>Pending / New</option>
                                                                 <option value="In Progress" ${selectedStatus == 'In Progress' ? 'selected' : ''}>In Progress</option>
+                                                                <option value="Reopened" ${selectedStatus == 'Reopened' ? 'selected' : ''}>Reopened</option>
                                                                 <option value="Resolved" ${selectedStatus == 'Resolved' ? 'selected' : ''}>Resolved</option>
                                                                 <option value="Closed" ${selectedStatus == 'Closed' ? 'selected' : ''}>Closed</option>
                                                             </select>
@@ -438,6 +449,7 @@
                                                                             <c:choose>
                                                                                 <c:when test="${ticket.status == 'New'}"><span class="jira-badge badge-new">Pending</span></c:when>
                                                                                 <c:when test="${ticket.status == 'In Progress'}"><span class="jira-badge badge-progress">In Progress</span></c:when>
+                                                                                <c:when test="${ticket.status == 'Reopened'}"><span class="jira-badge badge-reopened">Reopened</span></c:when>
                                                                                 <c:when test="${ticket.status == 'Resolved'}"><span class="jira-badge badge-resolved">Resolved</span></c:when>
                                                                                 <c:when test="${ticket.status == 'Closed'}"><span class="jira-badge badge-closed">Closed</span></c:when>
                                                                                 <c:otherwise><span class="jira-badge badge-closed">${ticket.status}</span></c:otherwise>
@@ -453,7 +465,7 @@
                                                                             <c:if test="${ticket.status == 'Closed'}">
                                                                                 <c:choose>
                                                                                     <c:when test="${ratedTicketIds.contains(ticket.id)}">
-                                                                                        <%-- Đã rate: sao vàng đặc, tooltip "Rated" --%>
+                                                                                        <%-- Ã„ÂÃƒÂ£ rate: sao vÃƒÂ ng Ã„â€˜Ã¡ÂºÂ·c, tooltip "Rated" --%>
                                                                                         <a href="${pageContext.request.contextPath}/CsatSurvey?ticketId=${ticket.id}"
                                                                                            class="btn-action ml-1" title="You've rated this ticket"
                                                                                            style="color:#f6c90e; text-shadow: 0 0 6px rgba(246,201,14,0.7);">
@@ -461,7 +473,7 @@
                                                                                         </a>
                                                                                     </c:when>
                                                                                     <c:otherwise>
-                                                                                        <%-- Chưa rate: sao rỗng, mờ --%>
+                                                                                        <%-- ChÃ†Â°a rate: sao rÃ¡Â»â€”ng, mÃ¡Â»Â --%>
                                                                                         <a href="${pageContext.request.contextPath}/CsatSurvey?ticketId=${ticket.id}"
                                                                                            class="btn-action ml-1" title="Rate this ticket"
                                                                                            style="color:#c0c0c0;">
@@ -509,7 +521,27 @@
             <script src="${pageContext.request.contextPath}/assets/js/vendor-all.min.js"></script>
             <script src="${pageContext.request.contextPath}/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
             <script src="${pageContext.request.contextPath}/assets/js/pcoded.min.js"></script>
-
+            <c:if test="${param.created == '1'}">
+            <script>
+                (function () {
+                    var el = document.getElementById('ticketCreatedToast');
+                    if (!el) return;
+                    setTimeout(function () {
+                        el.classList.remove('show');
+                        el.classList.add('fade');
+                        el.style.opacity = '0';
+                        el.style.transition = 'opacity 0.3s ease';
+                        setTimeout(function () { el.remove(); }, 350);
+                    }, 2000);
+                    if (window.history && window.history.replaceState) {
+                        var u = new URL(window.location.href);
+                        u.searchParams.delete('created');
+                        var q = u.searchParams.toString();
+                        window.history.replaceState({}, '', u.pathname + (q ? '?' + q : '') + u.hash);
+                    }
+                })();
+            </script>
+            </c:if>
 
     </body>
 </html>
