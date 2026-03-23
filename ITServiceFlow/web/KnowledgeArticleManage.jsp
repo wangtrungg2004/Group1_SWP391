@@ -13,11 +13,6 @@
 </head>
 
 <body>
-    <div class="loader-bg">
-        <div class="loader-track">
-            <div class="loader-fill"></div>
-        </div>
-    </div>
     <jsp:include page="/includes/sidebar.jsp" />
     <jsp:include page="/includes/header.jsp" />
 
@@ -31,7 +26,7 @@
                                 <h5 class="m-b-10">Knowledge Article Management</h5>
                             </div>
                             <ul class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/ITDashboard"><i
+                                <li class="breadcrumb-item"><a href="ITDashboard.jsp"><i
                                             class="feather icon-home"></i></a></li>
                                 <li class="breadcrumb-item active">Article Management</li>
                             </ul>
@@ -47,25 +42,22 @@
                             <div class="col-sm-12">
                                 <div class="card">
                                     <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h5 class="mb-0"><i class="feather icon-book mr-1"></i> Danh sách bài viết tri thức</h5>
-                                        <a href="<c:url value='/KnowledgeArticleCreate'/>" class="btn btn-primary btn-sm">
-                                            <i class="feather icon-plus mr-1"></i> Tạo bài viết mới
-                                        </a>
+                                        <h5 class="mb-0"><i class="feather icon-book mr-1"></i> List of knowledge articles</h5>
                                     </div>
                                     <div class="card-body">
                                         <form action="KnowledgeArticleManage" method="GET" class="mb-4">
                                             <div class="row align-items-end">
                                                 <div class="col-md-5">
                                                     <div class="form-group mb-0">
-                                                        <label class="floating-label">Tìm kiếm</label>
-                                                        <input type="text" class="form-control" name="keyword" value="${keyword}" placeholder="Tiêu đề, nội dung hoặc mã bài viết...">
+                                                        <label class="floating-label">Search</label>
+                                                        <input type="text" class="form-control" name="keyword" value="${keyword}" placeholder="Article title, content, or code...">
                                                     </div>
                                                 </div>
                                                 <div class="col-md-3">
                                                     <div class="form-group mb-0">
-                                                        <label class="floating-label">Trạng thái</label>
+                                                        <label class="floating-label">Status</label>
                                                         <select class="form-control" name="status">
-                                                            <option value="All" ${status == 'All' || empty status ? 'selected' : ''}>Tất cả trạng thái</option>
+                                                            <option value="All" ${status == 'All' || empty status ? 'selected' : ''}>All</option>
                                                             <option value="Draft" ${status == 'Draft' ? 'selected' : ''}>Draft</option>
                                                             <option value="Published" ${status == 'Published' ? 'selected' : ''}>Published</option>
                                                             <option value="Archived" ${status == 'Archived' ? 'selected' : ''}>Archived</option>
@@ -74,7 +66,7 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <button type="submit" class="btn btn-primary">
-                                                        <i class="feather icon-search mr-1"></i> Lọc
+                                                        <i class="feather icon-search mr-1"></i> Filter
                                                     </button>
                                                     <a href="KnowledgeArticleManage" class="btn btn-outline-secondary">
                                                         <i class="feather icon-refresh-cw mr-1"></i> Reset
@@ -88,10 +80,10 @@
                                                 <thead class="thead-light">
                                                     <tr>
                                                         <th>ID</th>
-                                                        <th>Tiêu đề</th>
-                                                        <th>Ngày tạo</th>
-                                                        <th>Đính kèm</th>
-                                                        <th class="text-center">Thao tác</th>
+                                                        <th>Title</th>
+                                                        <th>Date created</th>
+                                                        <th>Attached</th>
+                                                        <th class="text-center">Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -108,14 +100,14 @@
                                                                 </c:forEach>
                                                             </td>
                                                             <td class="text-center">
-                                                                <a href="<c:url value='/KnowledgeArticleView?id=${article.id}'/>" class="btn btn-sm btn-info" title="Xem">
-                                                                    <i class="feather icon-eye"></i>
+                                                                <a href="<c:url value='/KnowledgeArticleView?id=${article.id}'/>" class="btn btn-sm btn-info" title="View">
+                                                                    <i class="feather icon-eye"></i>View
                                                                 </a>
-                                                                <a href="<c:url value='/KnowledgeArticleEdit?id=${article.id}'/>" class="btn btn-sm btn-warning" title="Chỉnh sửa">
-                                                                    <i class="feather icon-edit"></i>
+                                                                <a href="<c:url value='/KnowledgeArticleEdit?id=${article.id}'/>" class="btn btn-sm btn-warning" title="Edit">
+                                                                    <i class="feather icon-edit"></i>Edit
                                                                 </a>
-                                                                <a href="<c:url value='/FileUpload.jsp?kbId=${article.id}'/>" class="btn btn-sm btn-success" title="Đính kèm file">
-                                                                    <i class="feather icon-paperclip"></i>
+                                                                <a href="<c:url value='/FileUpload.jsp?kbId=${article.id}'/>" class="btn btn-sm btn-success" title="Attached file">
+                                                                    <i class="feather icon-paperclip"></i>Attached file
                                                                 </a>
                                                             </td>
                                                         </tr>
@@ -126,7 +118,7 @@
                                         <c:if test="${empty articles}">
                                             <div class="text-center py-4 text-muted">
                                                 <i class="feather icon-inbox" style="font-size:3rem;display:block;"></i>
-                                                <p class="mt-2">Chưa có bài viết nào.</p>
+                                                <p class="mt-2">No articles have been published yet.</p>
                                             </div>
                                         </c:if>
                                     </div>
