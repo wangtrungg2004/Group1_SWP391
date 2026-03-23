@@ -6,6 +6,7 @@ package dao;
 
 import Utils.DbContext;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import model.SLATracking;
 
 /**
@@ -160,6 +161,146 @@ public class SLATrackingDao extends DbContext {
             ex.printStackTrace();
         }
         return list;
+    }
+
+    public boolean isEscalationHistoryEnabled() {
+        String sql = "SELECT OBJECT_ID('dbo.SLAEscalationHistory', 'U') AS TableId";
+        try (PreparedStatement stm = connection.prepareStatement(sql);
+             java.sql.ResultSet rs = stm.executeQuery()) {
+            if (rs.next()) {
+                return rs.getObject("TableId") != null;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public int markBreachedTickets() {
+        String sql = "UPDATE st " +
+                "SET st.IsBreached = 1 " +
+                "FROM [dbo].[SLATracking] st " +
+                "INNER JOIN [dbo].[Tickets] t ON t.Id = st.TicketId " +
+                "WHERE t.Status NOT IN ('Resolved', 'Closed', 'Cancelled') " +
+                "  AND st.ResolutionDeadline < GETDATE() " +
+                "  AND ISNULL(st.IsBreached, 0) = 0";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            return stm.executeUpdate();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return 0;
+    }
+
+    public java.util.List<java.util.Map<String, Object>> getEscalationCandidates() {
+        java.util.List<java.util.Map<String, Object>> list = new java.util.ArrayList<>();
+        String sql = "SELECT st.TicketId, t.TicketNumber, t.Title, t.AssignedTo, st.ResolutionDeadline, " +
+                "DATEDIFF(MINUTE, GETDATE(), st.ResolutionDeadline) AS RemainingMinutes " +
+                "FROM [dbo].[SLATracking] st " +
+                "INNER JOIN [dbo].[Tickets] t ON t.Id = st.TicketId " +
+                "WHERE t.Status NOT IN ('Resolved', 'Closed', 'Cancelled') " +
+                "  AND st.ResolutionDeadline <= DATEADD(HOUR, 2, GETDATE()) " +
+                "ORDER BY st.ResolutionDeadline ASC";
+        try (PreparedStatement stm = connection.prepareStatement(sql);
+             java.sql.ResultSet rs = stm.executeQuery()) {
+            while (rs.next()) {
+                java.util.Map<String, Object> map = new java.util.HashMap<>();
+                map.put("TicketId", rs.getInt("TicketId"));
+                map.put("TicketNumber", rs.getString("TicketNumber"));
+                map.put("Title", rs.getString("Title"));
+                Object assignedObj = rs.getObject("AssignedTo");
+                map.put("AssignedTo", assignedObj == null ? null : ((Number) assignedObj).intValue());
+                map.put("ResolutionDeadline", rs.getTimestamp("ResolutionDeadline"));
+                map.put("RemainingMinutes", rs.getInt("RemainingMinutes"));
+                list.add(map);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+
+    public boolean hasEscalationHistory(int ticketId, String stageCode, java.util.Date resolutionDeadline) {
+        if (resolutionDeadline == null || stageCode == null || stageCode.trim().isEmpty()) {
+            return false;
+        }
+        String sql = "SELECT TOP 1 1 " +
+                "FROM [dbo].[SLAEscalationHistory] " +
+                "WHERE TicketId = ? AND StageCode = ? AND ResolutionDeadline = ?";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, ticketId);
+            stm.setString(2, stageCode);
+            stm.setTimestamp(3, new java.sql.Timestamp(resolutionDeadline.getTime()));
+            try (java.sql.ResultSet rs = stm.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean addEscalationHistory(int ticketId,
+                                        String stageCode,
+                                        String stageLabel,
+                                        java.util.Date resolutionDeadline,
+                                        Integer remainingMinutes,
+                                        String notificationTargetType,
+                                        Integer notificationTargetId,
+                                        String notificationTitle,
+                                        String notificationMessage,
+                                        String autoAction,
+                                        String escalatedToRole,
+                                        Integer escalatedToUserId) {
+        String sql = "INSERT INTO [dbo].[SLAEscalationHistory] " +
+                "(TicketId, StageCode, StageLabel, ResolutionDeadline, RemainingMinutes, " +
+                "NotificationTargetType, NotificationTargetId, NotificationTitle, NotificationMessage, " +
+                "AutoAction, EscalatedToRole, EscalatedToUserId, TriggeredAt) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE())";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, ticketId);
+            stm.setString(2, stageCode);
+            stm.setString(3, stageLabel);
+            stm.setTimestamp(4, new java.sql.Timestamp(resolutionDeadline.getTime()));
+            if (remainingMinutes == null) {
+                stm.setNull(5, java.sql.Types.INTEGER);
+            } else {
+                stm.setInt(5, remainingMinutes);
+            }
+            stm.setString(6, notificationTargetType == null ? "BROADCAST" : notificationTargetType);
+            if (notificationTargetId == null) {
+                stm.setNull(7, java.sql.Types.INTEGER);
+            } else {
+                stm.setInt(7, notificationTargetId);
+            }
+            stm.setString(8, notificationTitle);
+            stm.setString(9, notificationMessage);
+            if (autoAction == null || autoAction.trim().isEmpty()) {
+                stm.setNull(10, java.sql.Types.NVARCHAR);
+            } else {
+                stm.setString(10, autoAction);
+            }
+            if (escalatedToRole == null || escalatedToRole.trim().isEmpty()) {
+                stm.setNull(11, java.sql.Types.NVARCHAR);
+            } else {
+                stm.setString(11, escalatedToRole);
+            }
+            if (escalatedToUserId == null) {
+                stm.setNull(12, java.sql.Types.INTEGER);
+            } else {
+                stm.setInt(12, escalatedToUserId);
+            }
+            return stm.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            // Ignore duplicate key when the same stage was already recorded.
+            if (ex.getErrorCode() == 2601 || ex.getErrorCode() == 2627) {
+                return false;
+            }
+            ex.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
     }
 
     public java.util.Map<String, Object> getPerformanceStats(java.sql.Date from, java.sql.Date to) {
