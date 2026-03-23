@@ -62,4 +62,12 @@ public class NotificationService {
     public boolean addBroadcastNotification(String message, Integer relatedTicketId, String title, String type) {
         return dao.addBroadcastNotification(message, relatedTicketId, title, type);
     }
+    
+        /** Giong ProblemService.searchProblem: null/blank -> full list trong pham vi user + broadcast. */
+    public List<Notifications> searchNotificationsForUser(int userId, String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return dao.getNotificationsByUserId(userId);
+        }
+        return dao.searchNotificationsForUser(userId, keyword.trim());
+    }
 }

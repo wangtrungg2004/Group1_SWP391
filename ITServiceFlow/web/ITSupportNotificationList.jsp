@@ -128,10 +128,10 @@
                                              Notification list is empty
                                             </div>
                                         </c:if>
-                                            <form action="ITProblemListController" method="get" class="mb-3">
+                                            <form action="ITSupportNotificationList" method="get" class="mb-3">
                                                 <div class="input-group">
-                                                    <input type="text" name="keyword" class="form-control" placeholder="Search by Title or Ticket Number..."
-                                                           value="${keyword != null ? keyword : ''}">
+                                                    <input type="search" name="keyword" class="form-control" placeholder="Search title, message, type..."
+                                                           value="${searchKeyword}">
                                                     <div class="input-group-append">
                                                         <button type="submit" class="btn btn-primary">Search</button>
                                                     </div>

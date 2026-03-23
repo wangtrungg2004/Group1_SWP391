@@ -39,7 +39,7 @@
                     </li>
                     <li class="nav-item">
                         <a href="KnowledgeSearch" class="nav-link">
-                            <span class="pcoded-micon"><i class="feather icon-book-open"></i></span>
+                            <span class="pcoded-micon"><i class="feather icon-inbox"></i></span>
                             <span class="pcoded-mtext">Knowledge Base</span>
                         </a>
                     </li>
@@ -76,6 +76,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="Long_TicketListServlet" class="nav-link">
+                            <span class="pcoded-micon"><i class="feather icon-inbox"></i></span>
+                            <span class="pcoded-mtext">Ticket - Assets</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="CreateTicket" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-plus-circle"></i></span>
                             <span class="pcoded-mtext">Create Ticket</span>
@@ -97,7 +103,7 @@
                     </li>
                     <li class="nav-item">
                         <a href="KnowledgeSearch" class="nav-link">
-                            <span class="pcoded-micon"><i class="feather icon-book-open"></i></span>
+                            <span class="pcoded-micon"><i class="feather icon-inbox"></i></span>
                             <span class="pcoded-mtext">Knowledge Base</span>
                         </a>
                     </li>
@@ -176,6 +182,16 @@
                             </li>
                         </ul>
                     </li>
+                    
+                    
+                    <li class="nav-item pcoded-menu-caption"><label>Configuration Items Management</label></li>
+                    <li class="nav-item">
+                        <a href="CIListServlet" class="nav-link">
+                            <span class="pcoded-micon"><i class="feather icon-box"></i></span>
+                            <span class="pcoded-mtext">Configuration Items</span>
+                        </a>
+                    </li>
+                    
 
                     <li class="nav-item pcoded-menu-caption"><label>Change Management</label></li>
                     <li class="nav-item">

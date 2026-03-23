@@ -18,20 +18,20 @@ public class NotificationDao extends DbContext{
      * Map 1 dong ResultSet thanh object Notifications.
      * UserId co the null (broadcast), co them cot IsBroadcast.
      */
-    private Notifications mapRow(ResultSet rs) throws SQLException {
-        Notifications not = new Notifications();
-        not.setId(rs.getInt("Id"));
-        Object userIdObj = rs.getObject("UserId");
-        not.setUserId(userIdObj == null ? null : ((Number) userIdObj).intValue());
-        not.setMessage(rs.getString("Message"));
-        not.setRelatedTicketId(rs.getInt("RelatedTicketId"));
-        not.setIsRead(rs.getBoolean("IsRead"));
-        not.setCreatedAt(rs.getTimestamp("CreatedAt"));
-        not.setTitle(rs.getString("Title"));
-        not.setType(rs.getString("Type"));
-        not.setIsBroadcast(rs.getBoolean("IsBroadcast"));
-        return not;
-    }
+//    private Notifications mapRow(ResultSet rs) throws SQLException {
+//        Notifications not = new Notifications();
+//        not.setId(rs.getInt("Id"));
+//        Object userIdObj = rs.getObject("UserId");
+//        not.setUserId(userIdObj == null ? null : ((Number) userIdObj).intValue());
+//        not.setMessage(rs.getString("Message"));
+//        not.setRelatedTicketId(rs.getInt("RelatedTicketId"));
+//        not.setIsRead(rs.getBoolean("IsRead"));
+//        not.setCreatedAt(rs.getTimestamp("CreatedAt"));
+//        not.setTitle(rs.getString("Title"));
+//        not.setType(rs.getString("Type"));
+//        not.setIsBroadcast(rs.getBoolean("IsBroadcast"));
+//        return not;
+//    }
 
     public List<Notifications> getAllNotifications() {
         List<Notifications> list = new ArrayList<>();
@@ -202,6 +202,42 @@ public class NotificationDao extends DbContext{
         return list;
     }
     
+                    
+        /** Giong ProblemDao.searchProblem — tim trong Title / Message / Type. */
+    public List<Notifications> searchNotificationsForUser(int userId, String keyword) {
+        List<Notifications> list = new ArrayList<>();
+        try {
+            String sql = "SELECT [Id], [UserId], [Message], [RelatedTicketId], [IsRead], [CreatedAt], [Title], [Type], [IsBroadcast] "
+                    + "FROM [dbo].[Notifications] "
+                    + "WHERE ([UserId] = ? OR [IsBroadcast] = 1) "
+                    + "AND ([Title] LIKE ? OR [Message] LIKE ? OR [Type] LIKE ?) "
+                    + "ORDER BY [CreatedAt] DESC";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            String searchValue = "%" + keyword + "%";
+            stm.setInt(1, userId);
+            stm.setString(2, searchValue);
+            stm.setString(3, searchValue);
+            stm.setString(4, searchValue);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Notifications not = new Notifications();
+                not.setId(rs.getInt("Id"));
+                Object userIdObj = rs.getObject("UserId");
+                not.setUserId(userIdObj == null ? null : ((Number) userIdObj).intValue());
+                not.setMessage(rs.getString("Message"));
+                not.setRelatedTicketId(rs.getInt("RelatedTicketId"));
+                not.setIsRead(rs.getBoolean("IsRead"));
+                not.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                not.setTitle(rs.getString("Title"));
+                not.setType(rs.getString("Type"));
+                not.setIsBroadcast(rs.getBoolean("IsBroadcast"));
+                list.add(not);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return list;
+    }
 //    public static void main(String[] args) {
 //        NotificationDao dao = new NotificationDao(); // nhớ init connection trong constructor
 //
