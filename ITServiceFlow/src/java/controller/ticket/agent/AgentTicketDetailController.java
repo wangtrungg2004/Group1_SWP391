@@ -124,6 +124,12 @@ if (parentId != null && parentId > 0) {
             }
             session.removeAttribute("timeLogFlash");
         }
+        
+        // Nếu là Manager, lấy danh sách IT Support để phục vụ Modal "Assign To..."
+        // Sửa trong cả 2 file Controller (AgentTicketDetail và AgentQueue)
+        if ("Manager".equals(session.getAttribute("role")) || "Admin".equals(session.getAttribute("role"))) {
+            request.setAttribute("itSupportList", ticketDao.getActiveAgents());
+        }
 
         // [CÁC ĐOẠN CODE LẤY DỮ LIỆU TICKET, COMMENT, ASSET... GIỮ NGUYÊN BÊN TRÊN]
 

@@ -296,9 +296,11 @@
                                                             </button>
                                                         </c:if>
 
-                                                        <a href="${pageContext.request.contextPath}/ProblemAdd?sourceTicketId=${ticket.id}" class="btn btn-sm btn-outline-danger bg-white font-weight-bold">
-                                                            <i class="feather icon-alert-triangle mr-1"></i> Escalate
-                                                        </a>
+                                                        <c:if test="${sessionScope.role == 'IT Support'}">
+    <a href="${pageContext.request.contextPath}/ProblemAdd?sourceTicketId=${ticket.id}" class="btn btn-sm btn-outline-danger bg-white font-weight-bold">
+        <i class="feather icon-alert-triangle mr-1"></i> Escalate
+    </a>
+</c:if>
                                                     </div>
                                                 </div>
 
@@ -421,10 +423,25 @@
                                                                 ${ticket.assigneeName}
                                                             </c:when>
                                                             <c:otherwise>
-                                                                <div class="avatar-sm avatar-unassigned"><i class="feather icon-user-x"></i></div> 
-                                                                <span class="text-muted mr-2">Unassigned</span>
-                                                                <a href="AssignTicket?id=${ticket.id}" class="text-primary font-weight-bold" style="font-size: 0.8rem;">(Assign to me)</a>
-                                                            </c:otherwise>
+                                                            <div class="avatar-sm avatar-unassigned"><i class="feather icon-user-x"></i></div> 
+                                                            <span class="text-muted mr-2">Unassigned</span>
+                                                            
+                                                            <c:if test="${ticket.status != 'Awaiting Approval'}">
+                                                                <c:choose>
+                                                                    <%-- Nếu là Manager/Admin: Hiện cả 2 nút --%>
+                                                                    <c:when test="${sessionScope.role == 'Manager' || sessionScope.role == 'Admin'}">
+                                                                        <div class="d-inline-block mt-1">
+                                                                            <a href="AssignTicket?id=${ticket.id}" class="text-primary font-weight-bold mr-2" style="font-size: 0.8rem;" title="Nhận xử lý vé này">(Assign to me)</a>
+                                                                           
+                                                                        </div>
+                                                                    </c:when>
+                                                                    <%-- Nếu là IT Support: Chỉ hiện Assign to me --%>
+                                                                    <c:otherwise>
+                                                                        <a href="AssignTicket?id=${ticket.id}" class="text-primary font-weight-bold" style="font-size: 0.8rem;">(Assign to me)</a>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </c:if>
+                                                        </c:otherwise>
                                                         </c:choose>
                                                     </div>
                                                 </div>
@@ -440,7 +457,7 @@
                                                 <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-bottom pb-2 mb-3">
                                                     <h6 class="sidebar-section-title border-0 pb-0 mb-0 m-0">Configuration Items</h6>
                                                     <a href="${pageContext.request.contextPath}/TicketLinkCIListServlet" class="btn btn-sm btn-light text-primary border" title="Go to Asset Management page">
-                                                        <i class="feather icon-external-link"></i> Manage
+                                                        
                                                     </a>
                                                 </div>
 
@@ -650,6 +667,7 @@
                         </div>
                     </form>
                 </div>
+                            
                 <%-- ══ Log Time Modal ══════════════════════════════════════════════════════ --%>
                 <div id="timeLogModalBackdrop" onclick="closeTimeLogOnBackdrop(event)"
                      style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1050;
@@ -737,6 +755,8 @@
                         </form>
                     </div>
                 </div>
+                            
+                            
 
                 <script src="${pageContext.request.contextPath}/assets/plugins/jquery/js/jquery.min.js"></script>
                 <script src="${pageContext.request.contextPath}/assets/js/vendor-all.min.js"></script>

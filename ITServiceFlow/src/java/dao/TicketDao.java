@@ -157,6 +157,28 @@ public class TicketDAO extends DbContext {
         }
         return list;
     }
+    
+    // Lấy danh sách TOÀN BỘ nhân sự IT (Support, Manager, Admin) để gán vé
+    public List<model.Users> getActiveAgents() {
+        List<model.Users> list = new ArrayList<>();
+        // Lấy tất cả trừ End User, sắp xếp theo Role để dễ nhìn
+        String sql = "SELECT Id, FullName, Role FROM [dbo].[Users] "
+                   + "WHERE Role IN ('IT Support', 'Manager', 'Admin') AND IsActive = 1 "
+                   + "ORDER BY Role, FullName";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                model.Users u = new model.Users();
+                u.setId(rs.getInt("Id"));
+                // Format tên hiển thị: Nguyễn Văn A (IT Support)
+                u.setFullName(rs.getString("FullName") + " (" + rs.getString("Role") + ")");
+                list.add(u);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 
     // public static void main(String[] args) {
     //

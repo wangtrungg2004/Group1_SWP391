@@ -69,7 +69,12 @@ public class AgentQueueController extends HttpServlet {
         int totalTickets = ticketDao.getTotalAgentQueuesCount(currentUser.getId(), currentLevel, queueType, search, status, ticketType);
         int totalPages = (int) Math.ceil((double) totalTickets / pageSize);
         List<Tickets> queueList = ticketDao.getAgentQueues(currentUser.getId(), currentLevel, queueType, offset, pageSize, search, status, ticketType);
-        // 4. Đẩy ra View
+// Nếu là Manager, lấy danh sách IT Support để phục vụ Modal gán vé trên Queue
+        // Sửa trong cả 2 file Controller (AgentTicketDetail và AgentQueue)
+        if ("Manager".equals(session.getAttribute("role")) || "Admin".equals(session.getAttribute("role"))) {
+            request.setAttribute("itSupportList", ticketDao.getActiveAgents());
+        }       
+// 4. Đẩy ra View
         request.setAttribute("queueList", queueList);
         request.setAttribute("currentQueue", queueType); // Tab đang mở
         request.setAttribute("currentPage", page);
