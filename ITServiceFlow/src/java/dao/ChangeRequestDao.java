@@ -16,6 +16,7 @@ import model.Tickets;
 public class ChangeRequestDao extends DbContext {
 
     private volatile Boolean linkedTicketColumnAvailable;
+    private volatile String requestNumberColumn;
 
     private boolean isLinkedTicketIdAvailable() {
         Boolean cached = linkedTicketColumnAvailable;
@@ -27,6 +28,16 @@ public class ChangeRequestDao extends DbContext {
         return available;
     }
 
+    private String getRequestNumberColumn() {
+        String cached = requestNumberColumn;
+        if (cached != null) {
+            return cached;
+        }
+        String resolved = hasColumn("ChangeRequests", "RFCNumber") ? "RFCNumber" : "TicketNumber";
+        requestNumberColumn = resolved;
+        return resolved;
+    }
+
     private String getNextRFCNumber() {
         int year = Year.now().getValue();
         String prefix = "CHG-" + year + "-";
@@ -34,7 +45,8 @@ public class ChangeRequestDao extends DbContext {
             return prefix + "001";
         }
 
-        String sql = "SELECT MAX(RFCNumber) FROM ChangeRequests WHERE RFCNumber LIKE ?";
+        String numberColumn = getRequestNumberColumn();
+        String sql = "SELECT MAX(" + numberColumn + ") FROM ChangeRequests WHERE " + numberColumn + " LIKE ?";
         int next = 1;
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, prefix + "%");
@@ -69,15 +81,16 @@ public class ChangeRequestDao extends DbContext {
         }
 
         String status = savedAsDraft ? "Draft" : "Pending Approval";
+        String numberColumn = getRequestNumberColumn();
         String sql;
         if (isLinkedTicketIdAvailable()) {
             sql = "INSERT INTO ChangeRequests "
-                    + "(RFCNumber, Title, Description, ChangeType, RiskLevel, RollbackPlan, "
+                    + "(" + numberColumn + ", Title, Description, ChangeType, RiskLevel, RollbackPlan, "
                     + " PlannedStart, PlannedEnd, Status, CreatedBy, LinkedTicketId, CreatedAt) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE())";
         } else {
             sql = "INSERT INTO ChangeRequests "
-                    + "(RFCNumber, Title, Description, ChangeType, RiskLevel, RollbackPlan, "
+                    + "(" + numberColumn + ", Title, Description, ChangeType, RiskLevel, RollbackPlan, "
                     + " PlannedStart, PlannedEnd, Status, CreatedBy, CreatedAt) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE())";
         }
@@ -132,9 +145,10 @@ public class ChangeRequestDao extends DbContext {
             return null;
         }
 
+        String numberColumn = getRequestNumberColumn();
         String sql;
         if (isLinkedTicketIdAvailable()) {
-            sql = "SELECT cr.*, u.FullName AS CreatedByName, "
+            sql = "SELECT cr." + numberColumn + " AS RFCNumber, cr.*, u.FullName AS CreatedByName, "
                     + " t.TicketNumber AS LinkedTicketNumber, t.Title AS LinkedTicketTitle, "
                     + " (SELECT TOP 1 ca.Comment FROM ChangeApprovals ca "
                     + "  WHERE ca.ChangeId = cr.Id ORDER BY ca.DecidedAt DESC) AS ApproverComment, "
@@ -145,7 +159,7 @@ public class ChangeRequestDao extends DbContext {
                     + "LEFT JOIN Tickets t ON cr.LinkedTicketId = t.Id "
                     + "WHERE cr.Id = ?";
         } else {
-            sql = "SELECT cr.*, u.FullName AS CreatedByName, "
+            sql = "SELECT cr." + numberColumn + " AS RFCNumber, cr.*, u.FullName AS CreatedByName, "
                     + " NULL AS LinkedTicketNumber, NULL AS LinkedTicketTitle, "
                     + " (SELECT TOP 1 ca.Comment FROM ChangeApprovals ca "
                     + "  WHERE ca.ChangeId = cr.Id ORDER BY ca.DecidedAt DESC) AS ApproverComment, "
@@ -178,9 +192,10 @@ public class ChangeRequestDao extends DbContext {
             return list;
         }
 
+        String numberColumn = getRequestNumberColumn();
         String sql;
         if (isLinkedTicketIdAvailable()) {
-            sql = "SELECT cr.*, u.FullName AS CreatedByName, "
+            sql = "SELECT cr." + numberColumn + " AS RFCNumber, cr.*, u.FullName AS CreatedByName, "
                     + " t.TicketNumber AS LinkedTicketNumber, t.Title AS LinkedTicketTitle, "
                     + " (SELECT TOP 1 ca.Comment FROM ChangeApprovals ca WHERE ca.ChangeId = cr.Id ORDER BY ca.DecidedAt DESC) AS ApproverComment, "
                     + " (SELECT TOP 1 ca.DecidedAt FROM ChangeApprovals ca WHERE ca.ChangeId = cr.Id ORDER BY ca.DecidedAt DESC) AS ApprovedAt "
@@ -189,7 +204,7 @@ public class ChangeRequestDao extends DbContext {
                     + "LEFT JOIN Tickets t ON cr.LinkedTicketId = t.Id "
                     + "ORDER BY cr.CreatedAt DESC";
         } else {
-            sql = "SELECT cr.*, u.FullName AS CreatedByName, "
+            sql = "SELECT cr." + numberColumn + " AS RFCNumber, cr.*, u.FullName AS CreatedByName, "
                     + " NULL AS LinkedTicketNumber, NULL AS LinkedTicketTitle, "
                     + " (SELECT TOP 1 ca.Comment FROM ChangeApprovals ca WHERE ca.ChangeId = cr.Id ORDER BY ca.DecidedAt DESC) AS ApproverComment, "
                     + " (SELECT TOP 1 ca.DecidedAt FROM ChangeApprovals ca WHERE ca.ChangeId = cr.Id ORDER BY ca.DecidedAt DESC) AS ApprovedAt "
@@ -215,16 +230,17 @@ public class ChangeRequestDao extends DbContext {
             return list;
         }
 
+        String numberColumn = getRequestNumberColumn();
         String sql;
         if (isLinkedTicketIdAvailable()) {
-            sql = "SELECT cr.*, u.FullName AS CreatedByName, "
+            sql = "SELECT cr." + numberColumn + " AS RFCNumber, cr.*, u.FullName AS CreatedByName, "
                     + " t.TicketNumber AS LinkedTicketNumber, t.Title AS LinkedTicketTitle "
                     + "FROM ChangeRequests cr "
                     + "LEFT JOIN Users u ON cr.CreatedBy = u.Id "
                     + "LEFT JOIN Tickets t ON cr.LinkedTicketId = t.Id "
                     + "WHERE cr.Status = ? ORDER BY cr.CreatedAt DESC";
         } else {
-            sql = "SELECT cr.*, u.FullName AS CreatedByName, "
+            sql = "SELECT cr." + numberColumn + " AS RFCNumber, cr.*, u.FullName AS CreatedByName, "
                     + " NULL AS LinkedTicketNumber, NULL AS LinkedTicketTitle "
                     + "FROM ChangeRequests cr "
                     + "LEFT JOIN Users u ON cr.CreatedBy = u.Id "
@@ -249,16 +265,17 @@ public class ChangeRequestDao extends DbContext {
             return list;
         }
 
+        String numberColumn = getRequestNumberColumn();
         StringBuilder sql = new StringBuilder();
         if (isLinkedTicketIdAvailable()) {
-            sql.append("SELECT cr.*, u.FullName AS CreatedByName, ")
+            sql.append("SELECT cr.").append(numberColumn).append(" AS RFCNumber, cr.*, u.FullName AS CreatedByName, ")
                     .append(" t.TicketNumber AS LinkedTicketNumber, t.Title AS LinkedTicketTitle ")
                     .append("FROM ChangeRequests cr ")
                     .append("LEFT JOIN Users u ON cr.CreatedBy = u.Id ")
                     .append("LEFT JOIN Tickets t ON cr.LinkedTicketId = t.Id ")
                     .append("WHERE cr.CreatedBy = ? ");
         } else {
-            sql.append("SELECT cr.*, u.FullName AS CreatedByName, ")
+            sql.append("SELECT cr.").append(numberColumn).append(" AS RFCNumber, cr.*, u.FullName AS CreatedByName, ")
                     .append(" NULL AS LinkedTicketNumber, NULL AS LinkedTicketTitle ")
                     .append("FROM ChangeRequests cr ")
                     .append("LEFT JOIN Users u ON cr.CreatedBy = u.Id ")
@@ -402,14 +419,18 @@ public class ChangeRequestDao extends DbContext {
         ChangeRequests request = new ChangeRequests();
         request.setId(rs.getInt("Id"));
 
+        String number = null;
         try {
-            request.setRfcNumber(rs.getString("RFCNumber"));
-        } catch (Exception ex) {
+            number = rs.getString("RFCNumber");
+        } catch (Exception ignored) {
+        }
+        if (number == null) {
             try {
-                request.setTicketNumber(rs.getString("RFCNumber"));
+                number = rs.getString("TicketNumber");
             } catch (Exception ignored) {
             }
         }
+        request.setRfcNumber(number);
 
         request.setTitle(rs.getString("Title"));
         request.setDescription(rs.getString("Description"));

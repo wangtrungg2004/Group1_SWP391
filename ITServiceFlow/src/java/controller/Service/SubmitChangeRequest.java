@@ -83,6 +83,7 @@ public class SubmitChangeRequest extends HttpServlet {
 
         // Parse ngày
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        sdf.setLenient(false);
         java.util.Date plannedStart = null, plannedEnd = null;
         try {
             if (plannedStartStr != null && !plannedStartStr.isEmpty())
@@ -90,7 +91,7 @@ public class SubmitChangeRequest extends HttpServlet {
             if (plannedEndStr != null && !plannedEndStr.isEmpty())
                 plannedEnd = sdf.parse(plannedEndStr);
         } catch (ParseException e) {
-            request.setAttribute("error", "Định dạng ngày không hợp lệ (dd/MM/yyyy).");
+            request.setAttribute("error", "Định dạng ngày không hợp lệ (yyyy-MM-dd).");
             doGet(request, response);
             return;
         }
