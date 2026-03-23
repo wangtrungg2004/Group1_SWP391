@@ -6,12 +6,7 @@ package dao;
 
 import Utils.DbContext;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.SQLException;
 import model.SLATracking;
 
 /**
@@ -168,6 +163,146 @@ public class SLATrackingDao extends DbContext {
         return list;
     }
 
+    public boolean isEscalationHistoryEnabled() {
+        String sql = "SELECT OBJECT_ID('dbo.SLAEscalationHistory', 'U') AS TableId";
+        try (PreparedStatement stm = connection.prepareStatement(sql);
+             java.sql.ResultSet rs = stm.executeQuery()) {
+            if (rs.next()) {
+                return rs.getObject("TableId") != null;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public int markBreachedTickets() {
+        String sql = "UPDATE st " +
+                "SET st.IsBreached = 1 " +
+                "FROM [dbo].[SLATracking] st " +
+                "INNER JOIN [dbo].[Tickets] t ON t.Id = st.TicketId " +
+                "WHERE t.Status NOT IN ('Resolved', 'Closed', 'Cancelled') " +
+                "  AND st.ResolutionDeadline < GETDATE() " +
+                "  AND ISNULL(st.IsBreached, 0) = 0";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            return stm.executeUpdate();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return 0;
+    }
+
+    public java.util.List<java.util.Map<String, Object>> getEscalationCandidates() {
+        java.util.List<java.util.Map<String, Object>> list = new java.util.ArrayList<>();
+        String sql = "SELECT st.TicketId, t.TicketNumber, t.Title, t.AssignedTo, st.ResolutionDeadline, " +
+                "DATEDIFF(MINUTE, GETDATE(), st.ResolutionDeadline) AS RemainingMinutes " +
+                "FROM [dbo].[SLATracking] st " +
+                "INNER JOIN [dbo].[Tickets] t ON t.Id = st.TicketId " +
+                "WHERE t.Status NOT IN ('Resolved', 'Closed', 'Cancelled') " +
+                "  AND st.ResolutionDeadline <= DATEADD(HOUR, 2, GETDATE()) " +
+                "ORDER BY st.ResolutionDeadline ASC";
+        try (PreparedStatement stm = connection.prepareStatement(sql);
+             java.sql.ResultSet rs = stm.executeQuery()) {
+            while (rs.next()) {
+                java.util.Map<String, Object> map = new java.util.HashMap<>();
+                map.put("TicketId", rs.getInt("TicketId"));
+                map.put("TicketNumber", rs.getString("TicketNumber"));
+                map.put("Title", rs.getString("Title"));
+                Object assignedObj = rs.getObject("AssignedTo");
+                map.put("AssignedTo", assignedObj == null ? null : ((Number) assignedObj).intValue());
+                map.put("ResolutionDeadline", rs.getTimestamp("ResolutionDeadline"));
+                map.put("RemainingMinutes", rs.getInt("RemainingMinutes"));
+                list.add(map);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+
+    public boolean hasEscalationHistory(int ticketId, String stageCode, java.util.Date resolutionDeadline) {
+        if (resolutionDeadline == null || stageCode == null || stageCode.trim().isEmpty()) {
+            return false;
+        }
+        String sql = "SELECT TOP 1 1 " +
+                "FROM [dbo].[SLAEscalationHistory] " +
+                "WHERE TicketId = ? AND StageCode = ? AND ResolutionDeadline = ?";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, ticketId);
+            stm.setString(2, stageCode);
+            stm.setTimestamp(3, new java.sql.Timestamp(resolutionDeadline.getTime()));
+            try (java.sql.ResultSet rs = stm.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean addEscalationHistory(int ticketId,
+                                        String stageCode,
+                                        String stageLabel,
+                                        java.util.Date resolutionDeadline,
+                                        Integer remainingMinutes,
+                                        String notificationTargetType,
+                                        Integer notificationTargetId,
+                                        String notificationTitle,
+                                        String notificationMessage,
+                                        String autoAction,
+                                        String escalatedToRole,
+                                        Integer escalatedToUserId) {
+        String sql = "INSERT INTO [dbo].[SLAEscalationHistory] " +
+                "(TicketId, StageCode, StageLabel, ResolutionDeadline, RemainingMinutes, " +
+                "NotificationTargetType, NotificationTargetId, NotificationTitle, NotificationMessage, " +
+                "AutoAction, EscalatedToRole, EscalatedToUserId, TriggeredAt) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE())";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, ticketId);
+            stm.setString(2, stageCode);
+            stm.setString(3, stageLabel);
+            stm.setTimestamp(4, new java.sql.Timestamp(resolutionDeadline.getTime()));
+            if (remainingMinutes == null) {
+                stm.setNull(5, java.sql.Types.INTEGER);
+            } else {
+                stm.setInt(5, remainingMinutes);
+            }
+            stm.setString(6, notificationTargetType == null ? "BROADCAST" : notificationTargetType);
+            if (notificationTargetId == null) {
+                stm.setNull(7, java.sql.Types.INTEGER);
+            } else {
+                stm.setInt(7, notificationTargetId);
+            }
+            stm.setString(8, notificationTitle);
+            stm.setString(9, notificationMessage);
+            if (autoAction == null || autoAction.trim().isEmpty()) {
+                stm.setNull(10, java.sql.Types.NVARCHAR);
+            } else {
+                stm.setString(10, autoAction);
+            }
+            if (escalatedToRole == null || escalatedToRole.trim().isEmpty()) {
+                stm.setNull(11, java.sql.Types.NVARCHAR);
+            } else {
+                stm.setString(11, escalatedToRole);
+            }
+            if (escalatedToUserId == null) {
+                stm.setNull(12, java.sql.Types.INTEGER);
+            } else {
+                stm.setInt(12, escalatedToUserId);
+            }
+            return stm.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            // Ignore duplicate key when the same stage was already recorded.
+            if (ex.getErrorCode() == 2601 || ex.getErrorCode() == 2627) {
+                return false;
+            }
+            ex.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
     public java.util.Map<String, Object> getPerformanceStats(java.sql.Date from, java.sql.Date to) {
         java.util.Map<String, Object> stats = new java.util.HashMap<>();
         String sql = "SELECT " +
@@ -274,232 +409,5 @@ public class SLATrackingDao extends DbContext {
             ex.printStackTrace();
         }
         return null;
-    }
-
-    public boolean isEscalationHistoryReady() {
-        if (connection == null) {
-            return false;
-        }
-        String sql = "SELECT OBJECT_ID('dbo.SLAEscalationHistory', 'U')";
-        try (PreparedStatement stm = connection.prepareStatement(sql);
-                ResultSet rs = stm.executeQuery()) {
-            if (rs.next()) {
-                return rs.getObject(1) != null;
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
-
-    public List<Map<String, Object>> getEscalationCandidates() {
-        List<Map<String, Object>> list = new ArrayList<>();
-        if (connection == null) {
-            return list;
-        }
-
-        String sql = "SELECT "
-                + "    t.Id AS TicketId, "
-                + "    t.TicketNumber, "
-                + "    t.Title, "
-                + "    t.Status, "
-                + "    t.AssignedTo, "
-                + "    t.CreatedBy, "
-                + "    st.ResolutionDeadline, "
-                + "    DATEDIFF(MINUTE, GETDATE(), st.ResolutionDeadline) AS RemainingMinutes "
-                + "FROM [dbo].[SLATracking] st "
-                + "JOIN [dbo].[Tickets] t ON st.TicketId = t.Id "
-                + "WHERE st.ResolutionDeadline IS NOT NULL "
-                + "  AND t.Status NOT IN ('Resolved', 'Closed', 'Cancelled') "
-                + "ORDER BY st.ResolutionDeadline ASC";
-        try (PreparedStatement stm = connection.prepareStatement(sql);
-                ResultSet rs = stm.executeQuery()) {
-            while (rs.next()) {
-                Map<String, Object> item = new HashMap<>();
-                item.put("TicketId", rs.getInt("TicketId"));
-                item.put("TicketNumber", rs.getString("TicketNumber"));
-                item.put("Title", rs.getString("Title"));
-                item.put("Status", rs.getString("Status"));
-                item.put("AssignedTo", rs.getObject("AssignedTo"));
-                item.put("CreatedBy", rs.getObject("CreatedBy"));
-                item.put("ResolutionDeadline", rs.getTimestamp("ResolutionDeadline"));
-                item.put("RemainingMinutes", rs.getInt("RemainingMinutes"));
-                list.add(item);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return list;
-    }
-
-    public boolean hasEscalationEvent(int ticketId, String stageCode, java.util.Date resolutionDeadline) {
-        if (connection == null || ticketId <= 0 || stageCode == null || stageCode.trim().isEmpty() || resolutionDeadline == null) {
-            return false;
-        }
-        String sql = "SELECT COUNT(1) "
-                + "FROM [dbo].[SLAEscalationHistory] "
-                + "WHERE TicketId = ? "
-                + "  AND StageCode = ? "
-                + "  AND ResolutionDeadline = ?";
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, ticketId);
-            stm.setString(2, stageCode.trim());
-            stm.setTimestamp(3, new Timestamp(resolutionDeadline.getTime()));
-            try (ResultSet rs = stm.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
-
-    public boolean createEscalationEvent(
-            int ticketId,
-            String stageCode,
-            String stageLabel,
-            java.util.Date resolutionDeadline,
-            Integer remainingMinutes,
-            String notificationTargetType,
-            Integer notificationTargetId,
-            String notificationTitle,
-            String notificationMessage,
-            String autoAction,
-            String escalatedToRole,
-            Integer escalatedToUserId) {
-
-        if (connection == null || ticketId <= 0 || stageCode == null || stageCode.trim().isEmpty()
-                || stageLabel == null || stageLabel.trim().isEmpty() || resolutionDeadline == null
-                || notificationTargetType == null || notificationTargetType.trim().isEmpty()
-                || notificationTitle == null || notificationTitle.trim().isEmpty()
-                || notificationMessage == null || notificationMessage.trim().isEmpty()) {
-            return false;
-        }
-
-        String sql = "INSERT INTO [dbo].[SLAEscalationHistory] "
-                + "(TicketId, StageCode, StageLabel, ResolutionDeadline, RemainingMinutes, "
-                + " NotificationTargetType, NotificationTargetId, NotificationTitle, NotificationMessage, "
-                + " AutoAction, EscalatedToRole, EscalatedToUserId, TriggeredAt) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE())";
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, ticketId);
-            stm.setString(2, stageCode.trim());
-            stm.setString(3, stageLabel.trim());
-            stm.setTimestamp(4, new Timestamp(resolutionDeadline.getTime()));
-            if (remainingMinutes == null) {
-                stm.setNull(5, java.sql.Types.INTEGER);
-            } else {
-                stm.setInt(5, remainingMinutes);
-            }
-            stm.setString(6, notificationTargetType.trim());
-            if (notificationTargetId == null) {
-                stm.setNull(7, java.sql.Types.INTEGER);
-            } else {
-                stm.setInt(7, notificationTargetId);
-            }
-            stm.setString(8, notificationTitle.trim());
-            stm.setString(9, notificationMessage.trim());
-            if (autoAction == null || autoAction.trim().isEmpty()) {
-                stm.setNull(10, java.sql.Types.NVARCHAR);
-            } else {
-                stm.setString(10, autoAction.trim());
-            }
-            if (escalatedToRole == null || escalatedToRole.trim().isEmpty()) {
-                stm.setNull(11, java.sql.Types.NVARCHAR);
-            } else {
-                stm.setString(11, escalatedToRole.trim());
-            }
-            if (escalatedToUserId == null) {
-                stm.setNull(12, java.sql.Types.INTEGER);
-            } else {
-                stm.setInt(12, escalatedToUserId);
-            }
-            return stm.executeUpdate() > 0;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
-
-    public boolean markBreachedTicket(int ticketId) {
-        if (connection == null || ticketId <= 0) {
-            return false;
-        }
-        String sql = "UPDATE [dbo].[SLATracking] SET IsBreached = 1 "
-                + "WHERE TicketId = ? AND ISNULL(IsBreached, 0) = 0";
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, ticketId);
-            return stm.executeUpdate() > 0;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
-
-    public List<Integer> getActiveUserIdsByRole(String role) {
-        List<Integer> list = new ArrayList<>();
-        if (connection == null || role == null || role.trim().isEmpty()) {
-            return list;
-        }
-
-        String sql = "SELECT Id FROM [dbo].[Users] WHERE IsActive = 1 AND Role = ?";
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setString(1, role.trim());
-            try (ResultSet rs = stm.executeQuery()) {
-                while (rs.next()) {
-                    list.add(rs.getInt("Id"));
-                }
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Map<String, Object>> getRecentEscalationEvents(int limit) {
-        List<Map<String, Object>> list = new ArrayList<>();
-        if (connection == null || limit <= 0) {
-            return list;
-        }
-        if (!isEscalationHistoryReady()) {
-            return list;
-        }
-
-        String sql = "SELECT TOP (?) "
-                + "    h.Id, h.TicketId, h.StageCode, h.StageLabel, h.ResolutionDeadline, h.RemainingMinutes, "
-                + "    h.NotificationTargetType, h.AutoAction, h.EscalatedToRole, h.EscalatedToUserId, h.TriggeredAt, "
-                + "    t.TicketNumber, t.Title, u.FullName AS EscalatedToUserName "
-                + "FROM [dbo].[SLAEscalationHistory] h "
-                + "LEFT JOIN [dbo].[Tickets] t ON t.Id = h.TicketId "
-                + "LEFT JOIN [dbo].[Users] u ON u.Id = h.EscalatedToUserId "
-                + "ORDER BY h.TriggeredAt DESC, h.Id DESC";
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, limit);
-            try (ResultSet rs = stm.executeQuery()) {
-                while (rs.next()) {
-                    Map<String, Object> item = new HashMap<>();
-                    item.put("Id", rs.getInt("Id"));
-                    item.put("TicketId", rs.getInt("TicketId"));
-                    item.put("TicketNumber", rs.getString("TicketNumber"));
-                    item.put("Title", rs.getString("Title"));
-                    item.put("StageCode", rs.getString("StageCode"));
-                    item.put("StageLabel", rs.getString("StageLabel"));
-                    item.put("ResolutionDeadline", rs.getTimestamp("ResolutionDeadline"));
-                    item.put("RemainingMinutes", rs.getObject("RemainingMinutes"));
-                    item.put("NotificationTargetType", rs.getString("NotificationTargetType"));
-                    item.put("AutoAction", rs.getString("AutoAction"));
-                    item.put("EscalatedToRole", rs.getString("EscalatedToRole"));
-                    item.put("EscalatedToUserId", rs.getObject("EscalatedToUserId"));
-                    item.put("EscalatedToUserName", rs.getString("EscalatedToUserName"));
-                    item.put("TriggeredAt", rs.getTimestamp("TriggeredAt"));
-                    list.add(item);
-                }
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return list;
     }
 }
