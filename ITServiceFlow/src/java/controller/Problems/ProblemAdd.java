@@ -1,0 +1,238 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+ */
+package controller.Problems;
+
+import dao.NotificationDao;
+import java.io.IOException;
+import java.io.PrintWriter;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
+import service.ProblemService;
+import model.Users;
+import model.Tickets;
+import service.AuditLogService;
+import service.TicketService;
+import service.UserService;
+/**
+ *
+ * @author DELL
+ */
+public class ProblemAdd extends HttpServlet {
+
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        try (PrintWriter out = response.getWriter()) {
+            /* TODO output your page here. You may use following sample code. */
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Servlet ProblemAdd</title>");
+            out.println("</head>");
+            out.println("<body>");
+            out.println("<h1>Servlet ProblemAdd at " + request.getContextPath() + "</h1>");
+            out.println("</body>");
+            out.println("</html>");
+        }
+    }
+
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    /**
+     * Handles the HTTP <code>GET</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    ProblemService problemService = new ProblemService();
+    NotificationDao notificationDao = new NotificationDao();
+    TicketService ticketService = new TicketService();
+    UserService userService = new UserService();
+    AuditLogService auditLogService = new AuditLogService();
+    
+    private String trimOrNull(String value) {
+        return (value == null || value.trim().isEmpty()) ? null : value.trim();
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        List<Users> assignees = userService.getAllUser();
+        
+        String ticketKeyword = request.getParameter("ticketKeyword");
+        
+        if (ticketKeyword != null) ticketKeyword = ticketKeyword.trim();
+        List<Tickets> Ticket = (ticketKeyword != null && !ticketKeyword.isEmpty())
+                ? ticketService.searchIncidentsNotProblem(ticketKeyword)
+                : ticketService.getIncidentsNotInProblem();
+        
+        request.setAttribute("Ticket", Ticket);
+        request.setAttribute("assignees", assignees);
+        request.setAttribute("savedTitle", request.getParameter("Title"));
+        request.setAttribute("savedDescription", request.getParameter("Description"));
+        request.setAttribute("savedAssignedTo", request.getParameter("AssignedTo"));
+        
+        String[] ticketIds = request.getParameterValues("ticketIds");
+        List<Integer> savedTicketIds = new ArrayList<>();
+        if (ticketIds != null) {
+            for (String id : ticketIds) {
+                if (id != null && !id.trim().isEmpty()) {
+                    try { savedTicketIds.add(Integer.parseInt(id.trim())); } catch (NumberFormatException ignored) { }
+                }
+            }
+        }
+        request.setAttribute("savedTicketIds", savedTicketIds);
+        request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
+    }
+
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        
+        String Title       = trimOrNull(request.getParameter("Title"));
+        String Description = trimOrNull(request.getParameter("Description"));
+        String RootCause   = trimOrNull(request.getParameter("RootCause"));
+        String Workaround  = trimOrNull(request.getParameter("Workaround"));
+//        String Status      = trimOrNull(request.getParameter("Status"));
+        String assignedToStr = request.getParameter("AssignedTo");
+
+        final String defaultStatus = "NEW";
+        
+        int assignedTo = 0;
+        if (assignedToStr != null && !assignedToStr.trim().isEmpty()) {
+            try {
+                assignedTo = Integer.parseInt(assignedToStr.trim());
+            } catch (NumberFormatException e) {
+                request.setAttribute("error", "Invalid Assigned To ID.");
+                request.setAttribute("assignees", userService.getAllUser());
+                request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
+                return;
+            }
+        }
+
+        if (Title == null) {
+            request.setAttribute("error", "Title is required.");
+            request.setAttribute("assignees", userService.getAllUser());
+            request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
+            return;
+        }
+        
+                // Thu thập ticket đã chọn từ form
+        List<Integer> relatedTickets = new ArrayList<>();
+        String[] ticketArray = request.getParameterValues("ticketIds");
+        if (ticketArray != null) {
+            for (String RLTicket : ticketArray) {
+                if (RLTicket != null && !RLTicket.trim().isEmpty()) {
+                    try {
+                        relatedTickets.add(Integer.parseInt(RLTicket.trim()));
+                    } catch (NumberFormatException ex) { }
+                }
+            }
+        }
+        // Bắt buộc chọn ít nhất 1 ticket
+        if (relatedTickets.isEmpty()) {
+            request.setAttribute("error", "Please select at least one related ticket.");
+            request.setAttribute("assignees", userService.getAllUser());
+            request.setAttribute("Ticket", ticketService.getIncidentsNotInProblem());
+            request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
+            return;
+        }
+        
+        HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("userId");
+        int createdBy = (userId != null) ? userId : 1;
+
+        java.sql.Date createdAt = new java.sql.Date(System.currentTimeMillis());
+
+        boolean success = problemService.insertProblem(
+            null,
+            Title,
+            Description,
+            RootCause,
+            Workaround,
+            defaultStatus,
+            createdBy,
+            assignedTo,
+            createdAt
+        );
+
+        if (success) {
+//            
+//            List<Integer> relatedTickets = new ArrayList<>();
+//            String[] ticketArray = request.getParameterValues("ticketIds");
+//            if(ticketArray != null)
+//            {
+//                for (String RLTicket : ticketArray) {
+//                    if(RLTicket != null && !RLTicket.trim().isEmpty())
+//                    {
+//                        try{
+//                            relatedTickets.add(Integer.parseInt(RLTicket.trim()));
+//                        }
+//                        catch(NumberFormatException ex)
+//                        {
+//                        }
+//                    }
+//                }
+//            }
+            
+            int newProblemId = problemService.getLatestProblemId();
+            if (newProblemId > 0) {
+                    // Link ticket đã chọn vào problem
+                if (!relatedTickets.isEmpty()) {
+                    problemService.linkProblemTicket(newProblemId, relatedTickets);
+                    // hoặc: problemService.addProblemTickets(newProblemId, relatedTickets);
+                }
+                String message = "New problem: " + Title + " (Status: " + defaultStatus + ")";
+                String notificationTitle = "New problem: " + Title;
+                String type = "Problem";
+                // Gửi notification cho người được assign (nếu có)
+                if (assignedTo > 0) {
+                    notificationDao.addNotification(assignedTo, message, null, false, notificationTitle, type);
+                }
+                auditLogService.createAuditLog(createdBy, "CREATE", "Problem", newProblemId);
+            }
+            response.sendRedirect("ProblemList?success=Problem added successfully!");
+        } else {
+            request.setAttribute("error", "Failed to add problem. Please try again.");
+            request.setAttribute("assignees", userService.getAllUser());
+            request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
+        }
+    }
+
+    /**
+     * Returns a short description of the servlet.
+     *
+     * @return a String containing servlet description
+     */
+    @Override
+    public String getServletInfo() {
+        return "Short description";
+    }// </editor-fold>
+
+}

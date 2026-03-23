@@ -1,3 +1,11 @@
 /Group1_SWP/nbproject/private/
 /Group1_SWP/build/
 /Group1_SWP/dist/
+/ITServiceFlow/build/
+/ITServiceFlow/dist/
+ITServiceFlow/nbproject/private/private.xml
+# Chặn các file thực thi đã biên dịch
+*.class
+
+# Chặn các file cấu hình cá nhân của NetBeans
+ITServiceFlow/nbproject/private/
