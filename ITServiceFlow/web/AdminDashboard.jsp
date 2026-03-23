@@ -352,7 +352,7 @@
 	<nav class="pcoded-navbar menupos-fixed menu-light brand-blue ">
 		<div class="navbar-wrapper ">
 			<div class="navbar-brand header-logo">
-				<a href="AdminDashboard.jsp" class="b-brand">
+				<a href="${pageContext.request.contextPath}/AdminDashboard" class="b-brand">
 <!--					<img src="assets/images/logo.svg" alt="" class="logo images">
 					<img src="assets/images/logo-icon.svg" alt="" class="logo-thumb images">-->
 				</a>
@@ -364,7 +364,7 @@
 						<label>Navigation</label>
 					</li>
 					<li class="nav-item">
-						<a href="AdminDashboard.jsp" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
+						<a href="${pageContext.request.contextPath}/AdminDashboard" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
 					</li>
 					<li class="nav-item pcoded-menu-caption">
 						<label>UI Element</label>
@@ -451,7 +451,7 @@
         <nav class="pcoded-navbar menupos-fixed menu-light brand-blue ">
             <div class="navbar-wrapper ">
                 <div class="navbar-brand header-logo">
-                    <a href="AdminDashboard.jsp" class="b-brand">
+                    <a href="${pageContext.request.contextPath}/AdminDashboard" class="b-brand">
                         <!--					<img src="assets/images/logo.svg" alt="" class="logo images">
                                                                 <img src="assets/images/logo-icon.svg" alt="" class="logo-thumb images">-->
                     </a>
@@ -463,7 +463,7 @@
                             <label>Navigation</label>
                         </li>
                         <li class="nav-item">
-                            <a href="AdminDashboard.jsp" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
+                            <a href="${pageContext.request.contextPath}/AdminDashboard" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
                         </li>
                         <li class="nav-item pcoded-menu-caption">
                             <label>UI Element</label>

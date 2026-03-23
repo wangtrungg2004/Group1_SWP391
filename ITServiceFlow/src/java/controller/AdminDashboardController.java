@@ -47,15 +47,6 @@ import java.util.Map;
 @WebServlet(name = "AdminDashboardController", urlPatterns = {"/AdminDashboard"})
 public class AdminDashboardController extends HttpServlet {
 
-    // ── DAO instances ────────────────────────────────────────────────────────
-    private final TicketDAO       ticketDAO       = new TicketDAO();
-    private final UserDao         userDao         = new UserDao();
-    private final ProblemDao      problemDao      = new ProblemDao();
-    private final ChangeRequestDao changeDao      = new ChangeRequestDao();
-    private final SLATrackingDao  slaDao          = new SLATrackingDao();
-    private final CsatSurveyDAO   csatDAO         = new CsatSurveyDAO();
-    private final AuditLogsDAO    auditDAO        = new AuditLogsDAO();
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -72,6 +63,15 @@ public class AdminDashboardController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
         }
+
+        // ── Tạo DAO mới mỗi request — tránh stale connection ───────────────
+        TicketDAO       ticketDAO = new TicketDAO();
+        UserDao         userDao   = new UserDao();
+        ProblemDao      problemDao= new ProblemDao();
+        ChangeRequestDao changeDao= new ChangeRequestDao();
+        SLATrackingDao  slaDao    = new SLATrackingDao();
+        CsatSurveyDAO   csatDAO   = new CsatSurveyDAO();
+        AuditLogsDAO    auditDAO  = new AuditLogsDAO();
 
         // ════════════════════════════════════════════════════════════════════
         // ZONE 1 — System Health KPIs
@@ -202,25 +202,24 @@ public class AdminDashboardController extends HttpServlet {
 
     // ════════════════════════════════════════════════════════════════════════
     // INLINE QUERY HELPERS
-    // (small SELECT ... GROUP BY queries that don't exist yet in DAOs)
+    // Dùng AdminDbHelper để tạo connection fresh mỗi lần gọi
     // ════════════════════════════════════════════════════════════════════════
 
-    /**
-     * Returns ticket count grouped by Status.
-     * Key order: New, Open, Pending, In Progress, Resolved, Closed
-     */
+    /** Helper: tạo connection mới mỗi lần — tránh stale connection */
+    private static class AdminDbHelper extends DbContext {
+        public Connection getConn() { return connection; }
+    }
+
+    /** Ticket count grouped by Status */
     private Map<String, Integer> getTicketCountByStatus() {
         Map<String, Integer> result = new LinkedHashMap<>();
-        // Pre-fill with 0 so JSP always has all keys
         for (String s : new String[]{"New","Open","Pending","In Progress","Resolved","Closed"}) {
             result.put(s, 0);
         }
+        AdminDbHelper db = new AdminDbHelper();
+        if (!db.isConnected()) return result;
         String sql = "SELECT Status, COUNT(*) AS cnt FROM [dbo].[Tickets] GROUP BY Status";
-        try (Connection conn = new DbContext() {
-                { /* expose connection */ }
-                public Connection get() { return connection; }
-             }.get();
-             PreparedStatement ps = conn.prepareStatement(sql);
+        try (PreparedStatement ps = db.getConn().prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 String status = rs.getString("Status");
@@ -229,20 +228,19 @@ public class AdminDashboardController extends HttpServlet {
             }
         } catch (SQLException e) {
             System.err.println("[AdminDashboard] getTicketCountByStatus: " + e.getMessage());
+        } finally {
+            try { db.getConn().close(); } catch (Exception ignored) {}
         }
         return result;
     }
 
-    /**
-     * Returns ticket count grouped by TicketType.
-     */
+    /** Ticket count grouped by TicketType */
     private Map<String, Integer> getTicketCountByType() {
         Map<String, Integer> result = new LinkedHashMap<>();
+        AdminDbHelper db = new AdminDbHelper();
+        if (!db.isConnected()) return result;
         String sql = "SELECT TicketType, COUNT(*) AS cnt FROM [dbo].[Tickets] GROUP BY TicketType ORDER BY cnt DESC";
-        try (Connection conn = new DbContext() {
-                public Connection get() { return connection; }
-             }.get();
-             PreparedStatement ps = conn.prepareStatement(sql);
+        try (PreparedStatement ps = db.getConn().prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 String type = rs.getString("TicketType");
@@ -251,23 +249,22 @@ public class AdminDashboardController extends HttpServlet {
             }
         } catch (SQLException e) {
             System.err.println("[AdminDashboard] getTicketCountByType: " + e.getMessage());
+        } finally {
+            try { db.getConn().close(); } catch (Exception ignored) {}
         }
         return result;
     }
 
-    /**
-     * Returns problem count grouped by Status.
-     */
+    /** Problem count grouped by Status */
     private Map<String, Integer> getProblemCountByStatus() {
         Map<String, Integer> result = new LinkedHashMap<>();
         for (String s : new String[]{"New","Under Investigation","Pending","Approved","Resolved","Rejected","Closed"}) {
             result.put(s, 0);
         }
+        AdminDbHelper db = new AdminDbHelper();
+        if (!db.isConnected()) return result;
         String sql = "SELECT Status, COUNT(*) AS cnt FROM [dbo].[Problems] GROUP BY Status";
-        try (Connection conn = new DbContext() {
-                public Connection get() { return connection; }
-             }.get();
-             PreparedStatement ps = conn.prepareStatement(sql);
+        try (PreparedStatement ps = db.getConn().prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 String status = rs.getString("Status");
@@ -276,23 +273,22 @@ public class AdminDashboardController extends HttpServlet {
             }
         } catch (SQLException e) {
             System.err.println("[AdminDashboard] getProblemCountByStatus: " + e.getMessage());
+        } finally {
+            try { db.getConn().close(); } catch (Exception ignored) {}
         }
         return result;
     }
 
-    /**
-     * Returns RFC count grouped by Status.
-     */
+    /** RFC (ChangeRequests) count grouped by Status */
     private Map<String, Integer> getRFCCountByStatus() {
         Map<String, Integer> result = new LinkedHashMap<>();
         for (String s : new String[]{"Draft","Pending Approval","Approved","In Progress","Completed","Rejected","RolledBack"}) {
             result.put(s, 0);
         }
+        AdminDbHelper db = new AdminDbHelper();
+        if (!db.isConnected()) return result;
         String sql = "SELECT Status, COUNT(*) AS cnt FROM [dbo].[ChangeRequests] GROUP BY Status";
-        try (Connection conn = new DbContext() {
-                public Connection get() { return connection; }
-             }.get();
-             PreparedStatement ps = conn.prepareStatement(sql);
+        try (PreparedStatement ps = db.getConn().prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 String status = rs.getString("Status");
@@ -301,16 +297,17 @@ public class AdminDashboardController extends HttpServlet {
             }
         } catch (SQLException e) {
             System.err.println("[AdminDashboard] getRFCCountByStatus: " + e.getMessage());
+        } finally {
+            try { db.getConn().close(); } catch (Exception ignored) {}
         }
         return result;
     }
 
-    /**
-     * Returns SLA compliance % grouped by Priority level (P1–P4).
-     * Returns Map with keys: P1_total, P1_breached, P1_pct, P2_...  etc.
-     */
+    /** SLA compliance % grouped by Priority level (P1–P4) */
     private Map<String, Object> getSLAComplianceByPriority() {
         Map<String, Object> result = new HashMap<>();
+        AdminDbHelper db = new AdminDbHelper();
+        if (!db.isConnected()) return result;
         String sql =
             "SELECT p.Level AS PriorityLevel, " +
             "  COUNT(st.Id) AS Total, " +
@@ -318,15 +315,11 @@ public class AdminDashboardController extends HttpServlet {
             "FROM [dbo].[SLATracking] st " +
             "JOIN [dbo].[Tickets] t ON st.TicketId = t.Id " +
             "JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id " +
-            "GROUP BY p.Level " +
-            "ORDER BY p.Level";
-        try (Connection conn = new DbContext() {
-                public Connection get() { return connection; }
-             }.get();
-             PreparedStatement ps = conn.prepareStatement(sql);
+            "GROUP BY p.Level ORDER BY p.Level";
+        try (PreparedStatement ps = db.getConn().prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                String lvl = rs.getString("PriorityLevel");  // P1, P2, P3, P4
+                String lvl   = rs.getString("PriorityLevel");
                 int total    = rs.getInt("Total");
                 int breached = rs.getInt("Breached");
                 int pct = total > 0 ? (int) Math.round((total - breached) * 100.0 / total) : 0;
@@ -336,23 +329,22 @@ public class AdminDashboardController extends HttpServlet {
             }
         } catch (SQLException e) {
             System.err.println("[AdminDashboard] getSLAComplianceByPriority: " + e.getMessage());
+        } finally {
+            try { db.getConn().close(); } catch (Exception ignored) {}
         }
         return result;
     }
 
-    /**
-     * Returns active user count grouped by Role.
-     */
+    /** Active user count grouped by Role */
     private Map<String, Integer> getUserCountByRole() {
         Map<String, Integer> result = new LinkedHashMap<>();
         for (String r : new String[]{"IT Support","Manager","EndUser","Admin"}) {
             result.put(r, 0);
         }
+        AdminDbHelper db = new AdminDbHelper();
+        if (!db.isConnected()) return result;
         String sql = "SELECT Role, COUNT(*) AS cnt FROM [dbo].[Users] WHERE IsActive = 1 GROUP BY Role ORDER BY cnt DESC";
-        try (Connection conn = new DbContext() {
-                public Connection get() { return connection; }
-             }.get();
-             PreparedStatement ps = conn.prepareStatement(sql);
+        try (PreparedStatement ps = db.getConn().prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 String r = rs.getString("Role");
@@ -361,6 +353,8 @@ public class AdminDashboardController extends HttpServlet {
             }
         } catch (SQLException e) {
             System.err.println("[AdminDashboard] getUserCountByRole: " + e.getMessage());
+        } finally {
+            try { db.getConn().close(); } catch (Exception ignored) {}
         }
         return result;
     }

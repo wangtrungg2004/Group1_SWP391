@@ -77,16 +77,16 @@ public class GoogleLogin extends HttpServlet {
 
         switch (role) {
             case "Admin":
-                response.sendRedirect("AdminDashboard.jsp");
+                response.sendRedirect(request.getContextPath() + "/AdminDashboard");
                 break;
             case "Manager":
-                response.sendRedirect("ManagerDashboard.jsp");
+                response.sendRedirect(request.getContextPath() + "/ManagerDashboard");
                 break;
             case "User":
-                response.sendRedirect("UserDashboard.jsp");
+                response.sendRedirect(request.getContextPath() + "/UserDashboard");
                 break;
             case "IT Support":
-                response.sendRedirect("ITDashboard.jsp");
+                response.sendRedirect(request.getContextPath() + "/ITDashboard");
                 break;
             default:
                 request.setAttribute("error", "Invalid role. Please contact administrator.");

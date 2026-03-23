@@ -77,7 +77,7 @@
                                         <h5 class="m-b-10">IT Support Dashboard</h5>
                                     </div>
                                     <ul class="breadcrumb">
-                                        <li class="breadcrumb-item"><a href="ITDashboard.jsp"><i class="feather icon-home"></i></a></li>
+                                        <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/ITDashboard"><i class="feather icon-home"></i></a></li>
                                         <li class="breadcrumb-item"><a href="#!">Dashboard</a></li>
                                     </ul>
                                 </div>

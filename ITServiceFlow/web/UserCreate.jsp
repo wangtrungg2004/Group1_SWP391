@@ -54,7 +54,7 @@
             <span class="font-bold text-xl tracking-tight">IT ServiceFlow</span>
         </div>
         <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1">
-            <a class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-text-muted-light hover:bg-background-light hover:text-primary transition group" href="AdminDashboard.jsp">
+            <a class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-text-muted-light hover:bg-background-light hover:text-primary transition group" href="${pageContext.request.contextPath}/AdminDashboard">
                 <span class="material-icons mr-3 text-xl text-gray-400 group-hover:text-primary">dashboard</span>
                 Dashboard
             </a>
@@ -108,7 +108,7 @@
         <nav aria-label="Breadcrumb" class="flex mb-6">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a class="inline-flex items-center text-sm font-medium text-text-muted-light hover:text-primary" href="AdminDashboard.jsp">
+                    <a class="inline-flex items-center text-sm font-medium text-text-muted-light hover:text-primary" href="${pageContext.request.contextPath}/AdminDashboard">
                         <span class="material-icons text-base mr-1">home</span>
                         Home
                     </a>
@@ -183,7 +183,7 @@
                     </div>
                 </div>
                 <div class="pt-6 flex items-center justify-end space-x-3 border-t border-border-light mt-6">
-                    <a class="bg-white py-2 px-4 border border-border-light rounded-md shadow-sm text-sm font-medium hover:bg-gray-50" href="AdminDashboard.jsp">Cancel</a>
+                    <a class="bg-white py-2 px-4 border border-border-light rounded-md shadow-sm text-sm font-medium hover:bg-gray-50" href="${pageContext.request.contextPath}/AdminDashboard">Cancel</a>
                     <button class="bg-primary border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-blue-700" type="submit">
                         <span class="material-icons text-sm mr-2">save</span>
                         Save User

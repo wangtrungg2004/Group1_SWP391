@@ -31,7 +31,7 @@
                                 <h5 class="m-b-10">Chỉnh sửa bài viết tri thức</h5>
                             </div>
                             <ul class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="ITDashboard.jsp"><i
+                                <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/ITDashboard"><i
                                             class="feather icon-home"></i></a></li>
                                 <li class="breadcrumb-item"><a href="KnowledgeArticleManage">Quản lý bài viết</a></li>
                                 <li class="breadcrumb-item active">Chỉnh sửa</li>

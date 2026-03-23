@@ -216,7 +216,7 @@
                                                 <h5 class="m-b-10">System Administration</h5>
                                             </div>
                                             <ul class="breadcrumb">
-                                                <li class="breadcrumb-item"><a href="AdminDashboard.jsp"><i class="feather icon-home"></i></a></li>
+                                                <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/AdminDashboard"><i class="feather icon-home"></i></a></li>
                                                 <li class="breadcrumb-item"><a href="#!">Administration</a></li>
                                                 <li class="breadcrumb-item"><a href="UserManagement">User Management</a></li>
                                             </ul>

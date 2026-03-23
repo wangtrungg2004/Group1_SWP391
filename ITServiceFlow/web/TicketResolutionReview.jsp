@@ -57,7 +57,7 @@
                                         <h5 class="m-b-10">Ticket Resolution Review</h5>
                                     </div>
                                     <ul class="breadcrumb">
-                                        <li class="breadcrumb-item"><a href="ITDashboard.jsp"><i
+                                        <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/ITDashboard"><i
                                                     class="feather icon-home"></i></a></li>
                                         <li class="breadcrumb-item active">Resolution Review</li>
                                     </ul>

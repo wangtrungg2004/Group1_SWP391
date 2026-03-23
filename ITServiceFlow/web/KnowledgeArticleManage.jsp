@@ -31,7 +31,7 @@
                                 <h5 class="m-b-10">Knowledge Article Management</h5>
                             </div>
                             <ul class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="ITDashboard.jsp"><i
+                                <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/ITDashboard"><i
                                             class="feather icon-home"></i></a></li>
                                 <li class="breadcrumb-item active">Article Management</li>
                             </ul>
