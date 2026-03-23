@@ -5,7 +5,6 @@
 package controller.SLA;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -37,6 +36,8 @@ public class SLADashboard extends HttpServlet {
             return;
         }
 
+        SLATrackingService.EscalationRunResult escalationResult = slaTrackingService.runEscalationSweep();
+
         // Get Statistics
         Map<String, Integer> stats = slaTrackingService.getSLAStatistics();
         request.setAttribute("stats", stats);
@@ -50,9 +51,12 @@ public class SLADashboard extends HttpServlet {
         // Get Ticket Lists
         List<Map<String, Object>> nearBreachTickets = slaTrackingService.getNearBreachTickets(10);
         List<Map<String, Object>> breachedTickets = slaTrackingService.getBreachedTickets(10);
+        List<Map<String, Object>> recentEscalations = slaTrackingService.getRecentEscalationEvents(20);
 
+        request.setAttribute("escalationResult", escalationResult);
         request.setAttribute("nearBreachTickets", nearBreachTickets);
         request.setAttribute("breachedTickets", breachedTickets);
+        request.setAttribute("recentEscalations", recentEscalations);
 
         request.getRequestDispatcher("sla-dashboard.jsp").forward(request, response);
     }

@@ -2,7 +2,6 @@ package controller.ticket.user;
 
 import dao.CategoryDao;
 import dao.ServiceCatalogDao;
-import dao.TicketDAO;
 import model.ServiceCatalog;
 import model.Tickets;
 import model.Users;
@@ -14,6 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import service.TicketService;
 
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024 * 2, // 2MB
@@ -137,10 +137,10 @@ public class TicketCreateController extends HttpServlet {
             }
         }
 
-        TicketDAO dao = new TicketDAO();
-        String isCreated = dao.createTicket(t);
+        TicketService ticketService = new TicketService();
+        boolean isCreated = ticketService.createTicket(t);
 
-        if ("ok".equals(isCreated)) {
+        if (isCreated) {
             // Redirect đúng trang theo role
             String role = (String) session.getAttribute("role");
             if ("IT Support".equals(role) || "Manager".equals(role)) {

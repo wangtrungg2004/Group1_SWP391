@@ -108,6 +108,15 @@
                                                 </div>
                                             </div>
 
+                                            <c:if test="${not empty escalationResult}">
+                                                <div class="alert alert-info">
+                                                    Escalation engine checked
+                                                    <strong>${escalationResult.checkedCount}</strong> tickets,
+                                                    triggered <strong>${escalationResult.triggeredCount}</strong> events,
+                                                    skipped <strong>${escalationResult.skippedCount}</strong>.
+                                                </div>
+                                            </c:if>
+
                                             <!-- Alert Tables -->
                                             <div class="row">
                                                 <!-- Near Breach Tickets -->
@@ -186,6 +195,58 @@
                                                                                     <fmt:formatDate
                                                                                         value="${t['ResolutionDeadline']}"
                                                                                         pattern="MM-dd HH:mm" />
+                                                                                </td>
+                                                                            </tr>
+                                                                        </c:forEach>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-xl-12">
+                                                    <div class="card">
+                                                        <div class="card-header">
+                                                            <h5>Recent Escalation Events</h5>
+                                                        </div>
+                                                        <div class="card-body table-border-style">
+                                                            <div class="table-responsive">
+                                                                <table class="table table-hover">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Ticket #</th>
+                                                                            <th>Stage</th>
+                                                                            <th>Remaining (min)</th>
+                                                                            <th>Target</th>
+                                                                            <th>Triggered At</th>
+                                                                            <th>Deadline</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <c:if test="${empty recentEscalations}">
+                                                                            <tr>
+                                                                                <td colspan="6" class="text-center">No escalation events yet.</td>
+                                                                            </tr>
+                                                                        </c:if>
+                                                                        <c:forEach items="${recentEscalations}" var="e">
+                                                                            <tr>
+                                                                                <td>${e['TicketNumber']}</td>
+                                                                                <td>${e['StageLabel']}</td>
+                                                                                <td>
+                                                                                    <c:choose>
+                                                                                        <c:when test="${e['RemainingMinutes'] != null}">${e['RemainingMinutes']}</c:when>
+                                                                                        <c:otherwise>-</c:otherwise>
+                                                                                    </c:choose>
+                                                                                </td>
+                                                                                <td>${e['NotificationTargetType']}</td>
+                                                                                <td>
+                                                                                    <fmt:formatDate value="${e['TriggeredAt']}" pattern="MM-dd HH:mm" />
+                                                                                </td>
+                                                                                <td>
+                                                                                    <fmt:formatDate value="${e['ResolutionDeadline']}" pattern="MM-dd HH:mm" />
                                                                                 </td>
                                                                             </tr>
                                                                         </c:forEach>

@@ -5,7 +5,10 @@
 package Utils;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *
@@ -14,6 +17,7 @@ import java.sql.DriverManager;
 public class DbContext {
     
     protected Connection connection;
+
     public DbContext() {
         try {
             // Load SQL Server JDBC Driver
@@ -24,10 +28,10 @@ public class DbContext {
             String url = "jdbc:sqlserver://localhost:1433;"
            + "databaseName=ITServiceFlow;"
            + "encrypt=true;"
-           + "trustServerCertificate=true";
+           + "trustServerCertificate=true;"
+           + "loginTimeout=5;";
 
             connection = DriverManager.getConnection(url, user, pass);
-            System.out.println("Database connection established successfully.");
         } catch (ClassNotFoundException ex) {
             System.err.println("SQL Server JDBC Driver not found. Please add mssql-jdbc.jar to your classpath.");
             ex.printStackTrace();
@@ -46,6 +50,56 @@ public class DbContext {
 
     public boolean isConnected() {
         return connection != null;
+    }
+
+    protected boolean hasConnection() {
+        return connection != null;
+    }
+
+    protected boolean hasTable(String tableName) {
+        if (!hasConnection() || tableName == null || tableName.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            DatabaseMetaData metaData = connection.getMetaData();
+            String catalog = connection.getCatalog();
+            if (tableExists(metaData, catalog, "dbo", tableName)) {
+                return true;
+            }
+            return tableExists(metaData, catalog, null, tableName);
+        } catch (SQLException ex) {
+            return false;
+        }
+    }
+
+    protected boolean hasColumn(String tableName, String columnName) {
+        if (!hasConnection()
+                || tableName == null || tableName.trim().isEmpty()
+                || columnName == null || columnName.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            DatabaseMetaData metaData = connection.getMetaData();
+            String catalog = connection.getCatalog();
+            if (columnExists(metaData, catalog, "dbo", tableName, columnName)) {
+                return true;
+            }
+            return columnExists(metaData, catalog, null, tableName, columnName);
+        } catch (SQLException ex) {
+            return false;
+        }
+    }
+
+    private boolean tableExists(DatabaseMetaData metaData, String catalog, String schema, String tableName) throws SQLException {
+        try (ResultSet rs = metaData.getTables(catalog, schema, tableName, new String[]{"TABLE"})) {
+            return rs.next();
+        }
+    }
+
+    private boolean columnExists(DatabaseMetaData metaData, String catalog, String schema, String tableName, String columnName) throws SQLException {
+        try (ResultSet rs = metaData.getColumns(catalog, schema, tableName, columnName)) {
+            return rs.next();
+        }
     }
     
     public static void main(String[] args) {

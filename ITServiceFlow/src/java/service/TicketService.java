@@ -31,11 +31,16 @@ public class TicketService {
             ticket.setTicketNumber(ticketDao.getNextTicketNumber(ticket.getTicketType()));
         }
 
-        // 2. Create Ticket
+        // 2. Ensure default status for insert paths using createTicket2()
+        if (ticket.getStatus() == null || ticket.getStatus().trim().isEmpty()) {
+            ticket.setStatus("New");
+        }
+
+        // 3. Create Ticket
         int ticketId = ticketDao.createTicket2(ticket);
 
         if (ticketId > 0) {
-            // 3. Apply SLA
+            // 4. Apply SLA
             if (ticket.getPriorityId() != null && ticket.getPriorityId() > 0) {
                 slaTrackingService.applySLARuleToTicket(ticketId, ticket.getTicketType(), ticket.getPriorityId());
             }
