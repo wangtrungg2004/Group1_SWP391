@@ -125,7 +125,17 @@ if (parentId != null && parentId > 0) {
             session.removeAttribute("timeLogFlash");
         }
 
+        // [CÁC ĐOẠN CODE LẤY DỮ LIỆU TICKET, COMMENT, ASSET... GIỮ NGUYÊN BÊN TRÊN]
+
         request.setAttribute("ticket", ticket);
-        request.getRequestDispatcher("/ticket/agent_ticket_detail.jsp").forward(request, response);
+        
+        // 🚀 BỘ ĐỊNH TUYẾN GIAO DIỆN (Y-FORK ROUTING)
+        if ("ServiceRequest".equals(ticket.getTicketType())) {
+            // Nếu là Yêu cầu dịch vụ -> Trả về giao diện chuyên biệt cho Request
+            request.getRequestDispatcher("/ticket/service_request_detail.jsp").forward(request, response);
+        } else {
+            // Mặc định là Incident -> Trả về giao diện Xử lý sự cố (bản đã làm)
+            request.getRequestDispatcher("/ticket/agent_ticket_detail.jsp").forward(request, response);
+        }
     }
 }

@@ -13,15 +13,14 @@ import java.util.Map;
 public class TicketDAO extends DbContext {
 
     // 1. Unified Create Ticket (Cho cả Incident và Service Request)
+    // 1. Unified Create Ticket (Đã fix lỗi Hardcode Status và Unreachable code)
     public String createTicket(Tickets t) {
-        // Lưu ý: Các trường ngày tháng như CreatedAt, UpdatedAt sẽ để SQL tự sinh bằng
-        // GETDATE()
-        // Status mặc định là 'New', CurrentLevel mặc định là 1
+        // Đổi cứng 'New' thành dấu ? để nhận trạng thái động từ hàm Routing
         String sql = "INSERT INTO Tickets ("
                 + "TicketNumber, TicketType, Title, Description, CategoryId, LocationId, "
                 + "Impact, Urgency, PriorityId, ServiceCatalogId, RequiresApproval, "
-                + "Status, CreatedBy, CurrentLevel, CreatedAt, UpdatedAt"
-                + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'New', ?, 1, GETDATE(), GETDATE())";
+                + "AssignedTo, Status, CreatedBy, CurrentLevel, CreatedAt, UpdatedAt"
+                + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, t.getTicketNumber());
@@ -31,34 +30,18 @@ public class TicketDAO extends DbContext {
             ps.setInt(5, t.getCategoryId());
             ps.setInt(6, t.getLocationId());
 
-            // Xử lý cẩn thận các trường Integer có thể NULL
-            if (t.getImpact() != null)
-                ps.setInt(7, t.getImpact());
-            else
-                ps.setNull(7, Types.INTEGER);
+            if (t.getImpact() != null) ps.setInt(7, t.getImpact()); else ps.setNull(7, Types.INTEGER);
+            if (t.getUrgency() != null) ps.setInt(8, t.getUrgency()); else ps.setNull(8, Types.INTEGER);
+            if (t.getPriorityId() != null) ps.setInt(9, t.getPriorityId()); else ps.setNull(9, Types.INTEGER);
+            if (t.getServiceCatalogId() != null) ps.setInt(10, t.getServiceCatalogId()); else ps.setNull(10, Types.INTEGER);
+            if (t.getRequiresApproval() != null) ps.setBoolean(11, t.getRequiresApproval()); else ps.setBoolean(11, false);
 
-            if (t.getUrgency() != null)
-                ps.setInt(8, t.getUrgency());
-            else
-                ps.setNull(8, Types.INTEGER);
+            if (t.getAssignedTo() != null && t.getAssignedTo() > 0) ps.setInt(12, t.getAssignedTo()); else ps.setNull(12, Types.INTEGER);
 
-            if (t.getPriorityId() != null)
-                ps.setInt(9, t.getPriorityId());
-            else
-                ps.setNull(9, Types.INTEGER);
-
-            if (t.getServiceCatalogId() != null)
-                ps.setInt(10, t.getServiceCatalogId());
-            else
-                ps.setNull(10, Types.INTEGER);
-
-            // Xử lý Boolean
-            if (t.getRequiresApproval() != null)
-                ps.setBoolean(11, t.getRequiresApproval());
-            else
-                ps.setBoolean(11, false); // Mặc định không cần duyệt
-
-            ps.setInt(12, t.getCreatedBy());
+            // 🚀 ĐÃ FIX: Lấy Status từ Object (do Routing quyết định) thay vì ghim chữ 'New'
+            ps.setString(13, t.getStatus() != null ? t.getStatus() : "New");
+            ps.setInt(14, t.getCreatedBy());
+            ps.setInt(15, t.getCurrentLevel());
 
             int rowsAffected = ps.executeUpdate();
             return rowsAffected > 0 ? "ok" : "Lỗi: Không có dòng nào được tạo.";
@@ -656,7 +639,8 @@ public int getTotalTicketsCount(int userId, String search, String status, String
     // =========================================================================
 
     // 7. Lấy danh sách Hàng đợi (Queue) cho Agent có Filter
-    public List<Tickets> getAgentQueues(int agentId, String queueType, int offset, int limit, String search, String status, String type) {
+    // 7. Lấy danh sách Hàng đợi (Queue) cho Agent có Filter (ĐÃ FIX LỖI ITIL)
+    public List<Tickets> getAgentQueues(int agentId, int currentLevel, String queueType, int offset, int limit, String search, String status, String type) {
         List<Tickets> list = new ArrayList<>();
         
         StringBuilder sql = new StringBuilder(
@@ -667,18 +651,24 @@ public int getTotalTicketsCount(int userId, String search, String status, String
             "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id WHERE 1=1 "
         );
 
-        // Lọc theo Queue Type
+        // Lọc theo Queue Type VÀ LEVEL (ITIL Standard)
         if ("unassigned".equals(queueType)) {
-            sql.append("AND t.AssignedTo IS NULL AND t.Status != 'Closed' AND t.Status != 'Resolved' ");
+            sql.append("AND t.AssignedTo IS NULL AND t.Status NOT IN ('Closed', 'Resolved') ");
+            // IT Support (L1) chỉ thấy vé L1. Manager (L2) thấy cả L1 và L2.
+            if (currentLevel == 1) {
+                sql.append("AND t.CurrentLevel = 1 ");
+            } else {
+                sql.append("AND t.CurrentLevel <= 2 "); 
+            }
         } else if ("mine".equals(queueType)) {
-            sql.append("AND t.AssignedTo = ? AND t.Status != 'Closed' AND t.Status != 'Resolved' ");
+            sql.append("AND t.AssignedTo = ? AND t.Status NOT IN ('Closed', 'Resolved') ");
         } else if ("resolved".equals(queueType)) {
             sql.append("AND t.Status = 'Resolved' ");
         } else { // all_active
-            sql.append("AND t.Status != 'Closed' AND t.Status != 'Resolved' ");
+            sql.append("AND t.Status NOT IN ('Closed', 'Resolved') ");
         }
 
-        // Lọc theo thanh Search & Filter
+        // ... (Giữ nguyên các đoạn code append Filter Search/Status/Type và Offset/Fetch cũ của bạn) ...
         if (search != null && !search.trim().isEmpty()) {
             sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
         }
@@ -704,7 +694,6 @@ public int getTotalTicketsCount(int userId, String search, String status, String
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Tickets t = new Tickets();
-                // Map dữ liệu
                 t.setId(rs.getInt("Id"));
                 t.setTicketNumber(rs.getString("TicketNumber"));
                 t.setTicketType(rs.getString("TicketType"));
@@ -719,20 +708,23 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         return list;
     }
 
-    // 8. Đếm tổng số vé của Queue (Phục vụ phân trang)
-    public int getTotalAgentQueuesCount(int agentId, String queueType, String search, String status, String type) {
+    // 8. Đếm tổng số vé của Queue (ĐÃ FIX LỖI ITIL)
+    public int getTotalAgentQueuesCount(int agentId, int currentLevel, String queueType, String search, String status, String type) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM [dbo].[Tickets] t WHERE 1=1 ");
 
         if ("unassigned".equals(queueType)) {
-            sql.append("AND t.AssignedTo IS NULL AND t.Status != 'Closed' AND t.Status != 'Resolved' ");
+            sql.append("AND t.AssignedTo IS NULL AND t.Status NOT IN ('Closed', 'Resolved') ");
+            if (currentLevel == 1) sql.append("AND t.CurrentLevel = 1 ");
+            else sql.append("AND t.CurrentLevel <= 2 ");
         } else if ("mine".equals(queueType)) {
-            sql.append("AND t.AssignedTo = ? AND t.Status != 'Closed' AND t.Status != 'Resolved' ");
+            sql.append("AND t.AssignedTo = ? AND t.Status NOT IN ('Closed', 'Resolved') ");
         } else if ("resolved".equals(queueType)) {
             sql.append("AND t.Status = 'Resolved' ");
         } else {
-            sql.append("AND t.Status != 'Closed' AND t.Status != 'Resolved' ");
+            sql.append("AND t.Status NOT IN ('Closed', 'Resolved') ");
         }
 
+        // ... (Giữ nguyên đoạn append và setParam cũ của bạn) ...
         if (search != null && !search.trim().isEmpty()) sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
         if (status != null && !status.equals("all")) sql.append("AND t.Status = ? ");
         if (type != null && !type.equals("all")) sql.append("AND t.TicketType = ? ");
@@ -752,6 +744,8 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         } catch (Exception e) { e.printStackTrace(); }
         return 0;
     }
+
+    
     
     // =========================================================================
     // CODE ACTION CHO AGENT 
@@ -1098,6 +1092,59 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         }
 
         return list;
+    }
+    
+    // =========================================================================
+    // CODE US02: TICKET ROUTING THEO CHUẨN ITIL (QUEUE-BASED)
+    // =========================================================================
+    public void applyITILRouting(Tickets t) {
+        // Mặc định vé sinh ra không thuộc về cá nhân nào
+        t.setAssignedTo(null); 
+        
+        // Mặc định vé rớt vào hàng đợi Level 1 (IT Support)
+        t.setCurrentLevel(1); 
+
+        // Rule 1: Vé Service Request yêu cầu phê duyệt -> Ném lên L2 (Manager Queue)
+                // Nâng cấp Rule 1 trong Auto-Routing
+    if (t.getRequiresApproval() != null && t.getRequiresApproval()) {
+        t.setCurrentLevel(2); // Đẩy lên Manager
+        t.setStatus("Awaiting Approval"); // Đóng băng trạng thái
+        t.setAssignedTo(null);
+        return;
+    }
+
+        // Rule 2: Sự cố nghiêm trọng (Major Incident - Priority 1) -> Ném lên L2 để giám sát khẩn
+        if ("Incident".equals(t.getTicketType()) && t.getPriorityId() != null && t.getPriorityId() == 1) {
+            t.setCurrentLevel(2);
+            return;
+        }
+    }
+    
+    // Hàm thực thi luồng Duyệt / Từ chối (Chuẩn ITIL Fulfillment)
+    public boolean processApproval(int ticketId, int managerId, boolean isApproved) {
+        String sql;
+        if (isApproved) {
+            // DUYỆT: Lưu người duyệt, đổi trạng thái thành New, trả về Level 1 cho IT Support xử lý
+            sql = "UPDATE [dbo].[Tickets] SET "
+                + "ApprovedBy = ?, ApprovedAt = GETDATE(), "
+                + "Status = 'New', CurrentLevel = 1, UpdatedAt = GETDATE() "
+                + "WHERE Id = ?";
+        } else {
+            // TỪ CHỐI: Đóng vé luôn, giữ nguyên Level
+            sql = "UPDATE [dbo].[Tickets] SET "
+                + "ApprovedBy = ?, ApprovedAt = GETDATE(), "
+                + "Status = 'Closed', UpdatedAt = GETDATE() "
+                + "WHERE Id = ?";
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, managerId);
+            ps.setInt(2, ticketId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 //    private int demMotSo(String sql, Date tu, Date den) {

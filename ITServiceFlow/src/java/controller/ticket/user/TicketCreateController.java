@@ -138,6 +138,8 @@ public class TicketCreateController extends HttpServlet {
         }
 
         TicketDAO dao = new TicketDAO();
+        //GỌI BỘ ĐIỀU PHỐI ITIL ĐỂ XẾP HÀNG ĐỢI
+        dao.applyITILRouting(t);
         String isCreated = dao.createTicket(t);
 
         if ("ok".equals(isCreated)) {
