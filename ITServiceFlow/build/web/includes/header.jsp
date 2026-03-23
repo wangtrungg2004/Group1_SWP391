@@ -1,7 +1,7 @@
 <%-- 
-    Top bar (header) - thanh trên cùng.
-    S? d?ng request attribute "notifications" n?u có (tùy ch?n).
-    Tên user có th? l?y t? session "user" (model.Users) ho?c "userName".
+    Top bar (header) - thanh trï¿½n cï¿½ng.
+    S? d?ng request attribute "notifications" n?u cï¿½ (tï¿½y ch?n).
+    Tï¿½n user cï¿½ th? l?y t? session "user" (model.Users) ho?c "userName".
 --%>
 <%@page import="dao.NotificationDao"%>
 <%@page import="model.Notifications"%>

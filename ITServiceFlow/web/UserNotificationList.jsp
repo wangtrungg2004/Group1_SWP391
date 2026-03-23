@@ -80,7 +80,7 @@
                                                             <th>Send to</th>
                                                             <th>Message</th>
                                                             <th>Created At</th>
-                                                            <th>Status</th>
+                                                            <!--<th>Status</th>-->
                                                             <th>Action</th>
                                                         </tr>
                                                     </thead>
@@ -109,7 +109,7 @@
                                                                         </td>
                                                                         <td>${n.message}</td>
                                                                         <td><fmt:formatDate value="${n.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
-                                                                        <td>${n.isRead ? 'Read' : 'Unread'}</td>
+                                                                        <!--<td>${n.isRead ? 'Read' : 'Unread'}</td>-->
                                                                         <td>
                                                                             <a class="btn btn-sm btn-primary" href="NotificationDetail?Id=${n.id}">Detail</a>
                                                                         </td>

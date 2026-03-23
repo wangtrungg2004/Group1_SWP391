@@ -147,7 +147,7 @@
                                                         <th>Send to</th>
                                                         <th>Message</th>
                                                         <th>Created At</th>
-                                                        <th>Is Read</th>
+                                                        <!--<th>Is Read</th>-->
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -178,7 +178,7 @@
                                                                     </td>
                                                                     <td>${n.message}</td>
                                                                     <td>${n.createdAt}</td>
-                                                                    <td>${n.isRead  ? 'Read' : 'UnRead'}</td>
+                                                                    <!--<td>${n.isRead  ? 'Read' : 'UnRead'}</td>-->
                                                                     <td class="d-flex gap-1">
                                                                         <a class="btn btn-sm btn-primary"
                                                                            href="NotificationDetail?Id=${n.id}">
