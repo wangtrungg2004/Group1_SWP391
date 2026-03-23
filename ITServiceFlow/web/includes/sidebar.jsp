@@ -90,22 +90,25 @@
 
                     <li class="nav-item pcoded-menu-caption"><label>Problem & Knowledge</label></li>
                     <li class="nav-item">
-                        <a href="ITProblemListController" class="nav-link">
+                        <a href="<c:url value='/ITProblemListController'/>" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-alert-circle"></i></span>
                             <span class="pcoded-mtext">Problem List</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="KnowErrorList" class="nav-link">
+                        <a href="<c:url value='/KnowErrorList'/>" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-alert-triangle"></i></span>
                             <span class="pcoded-mtext">Known Errors</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="KnowledgeSearch" class="nav-link">
-                            <span class="pcoded-micon"><i class="feather icon-inbox"></i></span>
-                            <span class="pcoded-mtext">Knowledge Base</span>
-                        </a>
+                        <a href="<c:url value='/files/upload'/>" target="_self" class="nav-link"><span class="pcoded-micon"><i class="feather icon-upload"></i></span><span class="pcoded-mtext">Shared Upload</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<c:url value='/KnowledgeArticleManage'/>" target="_self" class="nav-link"><span class="pcoded-micon"><i class="feather icon-book"></i></span><span class="pcoded-mtext">Knowledge Article Management</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<c:url value='/TicketResolutionReview'/>" class="nav-link"><span class="pcoded-micon"><i class="feather icon-check-square"></i></span><span class="pcoded-mtext">Ticket Resolution Review</span></a>
                     </li>
 
                     <li class="nav-item pcoded-menu-caption"><label>Change Management</label></li>

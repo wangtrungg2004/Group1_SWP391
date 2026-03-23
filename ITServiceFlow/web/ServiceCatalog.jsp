@@ -63,7 +63,7 @@
     <nav class="pcoded-navbar menupos-fixed menu-light brand-blue">
         <div class="navbar-wrapper">
             <div class="navbar-brand header-logo">
-                <a href="AdminDashboard.jsp" class="b-brand">
+                <a href="${pageContext.request.contextPath}/AdminDashboard" class="b-brand">
                     <!-- Logo here if needed -->
                 </a>
                 <a class="mobile-menu" id="mobile-collapse" href="#!"><span></span></a>
@@ -74,7 +74,7 @@
                         <label>Navigation</label>
                     </li>
                     <li class="nav-item">
-                        <a href="AdminDashboard.jsp" class="nav-link">
+                        <a href="${pageContext.request.contextPath}/AdminDashboard" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-home"></i></span>
                             <span class="pcoded-mtext">Dashboard</span>
                         </a>
@@ -128,7 +128,7 @@
     <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed">
         <div class="m-header">
             <a class="mobile-menu" id="mobile-collapse1" href="#!"><span></span></a>
-            <a href="AdminDashboard.jsp" class="b-brand">
+            <a href="${pageContext.request.contextPath}/AdminDashboard" class="b-brand">
                 <!-- Logo -->
             </a>
         </div>
@@ -242,7 +242,7 @@
                                                 <h5>Service Catalog</h5>
                                             </div>
                                             <ul class="breadcrumb">
-                                                <li class="breadcrumb-item"><a href="AdminDashboard.jsp"><i class="feather icon-home"></i></a></li>
+                                                <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/AdminDashboard"><i class="feather icon-home"></i></a></li>
                                                 <li class="breadcrumb-item"><a href="#!">Management</a></li>
                                                 <li class="breadcrumb-item"><a href="ServiceCatalog?action=list">Service Catalog</a></li>
                                             </ul>

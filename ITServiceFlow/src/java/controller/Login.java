@@ -120,16 +120,16 @@ public class Login extends HttpServlet {
         if (role != null) {
             switch (role) {
                 case "Admin":
-                    response.sendRedirect("AdminDashboard.jsp");
+                    response.sendRedirect(request.getContextPath() + "/AdminDashboard");
                     break;
                 case "Manager":
-                    response.sendRedirect("ManagerDashboard");
+                    response.sendRedirect(request.getContextPath() + "/ManagerDashboard");
                     break;
                 case "User":
-                    response.sendRedirect("UserDashboard");
+                    response.sendRedirect(request.getContextPath() + "/UserDashboard");
                     break;
                 case "IT Support":
-                    response.sendRedirect("ITDashboard.jsp");
+                    response.sendRedirect(request.getContextPath() + "/ITDashboard");
                     break;
                 default:
                     request.setAttribute("error", "Role không hợp lệ. Vui lòng liên hệ quản trị viên.");

@@ -281,6 +281,12 @@
                         <div class="main-body">
                             <div class="page-wrapper">
 
+                                <c:if test="${param.created == '1'}">
+                                    <div id="ticketCreatedToast" class="alert alert-success fade show shadow-sm mb-3" role="alert" style="border-radius: 8px;">
+                                        <i class="feather icon-check-circle mr-2"></i>Ticket created successfully.
+                                    </div>
+                                </c:if>
+
                                 <div class="row mb-2">
                                     <div class="col-md-3 col-sm-6">
                                         <div class="kpi-card">
@@ -515,7 +521,27 @@
             <script src="${pageContext.request.contextPath}/assets/js/vendor-all.min.js"></script>
             <script src="${pageContext.request.contextPath}/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
             <script src="${pageContext.request.contextPath}/assets/js/pcoded.min.js"></script>
-
+            <c:if test="${param.created == '1'}">
+            <script>
+                (function () {
+                    var el = document.getElementById('ticketCreatedToast');
+                    if (!el) return;
+                    setTimeout(function () {
+                        el.classList.remove('show');
+                        el.classList.add('fade');
+                        el.style.opacity = '0';
+                        el.style.transition = 'opacity 0.3s ease';
+                        setTimeout(function () { el.remove(); }, 350);
+                    }, 2000);
+                    if (window.history && window.history.replaceState) {
+                        var u = new URL(window.location.href);
+                        u.searchParams.delete('created');
+                        var q = u.searchParams.toString();
+                        window.history.replaceState({}, '', u.pathname + (q ? '?' + q : '') + u.hash);
+                    }
+                })();
+            </script>
+            </c:if>
 
     </body>
 </html>

@@ -57,7 +57,7 @@
                                         <h5 class="m-b-10">Ticket Resolution Review</h5>
                                     </div>
                                     <ul class="breadcrumb">
-                                        <li class="breadcrumb-item"><a href="ITDashboard.jsp"><i
+                                        <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/ITDashboard"><i
                                                     class="feather icon-home"></i></a></li>
                                         <li class="breadcrumb-item active">Resolution Review</li>
                                     </ul>
@@ -255,23 +255,31 @@
                                                                     Danh sách Resolved Tickets</h6>
                                                             </div>
                                                             <div class="card-body">
-                                                                <form action="TicketResolutionReview" method="GET"
-                                                                    class="mb-3">
-                                                                    <div class="input-group" style="max-width:420px;">
-                                                                        <input type="text" class="form-control"
-                                                                            name="keyword" value="${keyword}"
-                                                                            placeholder="Tìm theo TicketNumber (VD: INC-...)">
-                                                                        <div class="input-group-append">
-                                                                            <button class="btn btn-primary"
-                                                                                type="submit">
-                                                                                <i class="feather icon-search"></i> Tìm
+                                                                 <form action="TicketResolutionReview" method="GET" class="mb-4">
+                                                                    <div class="row align-items-end">
+                                                                        <div class="col-md-5">
+                                                                            <div class="form-group mb-0">
+                                                                                <label class="floating-label">Tìm kiếm</label>
+                                                                                <input type="text" class="form-control" name="keyword" value="${keyword}" placeholder="TicketNumber hoặc Tiêu đề...">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-3">
+                                                                            <div class="form-group mb-0">
+                                                                                <label class="floating-label">Loại ticket</label>
+                                                                                <select class="form-control" name="type">
+                                                                                    <option value="All" ${type == 'All' || empty type ? 'selected' : ''}>Tất cả loại</option>
+                                                                                    <option value="Incident" ${type == 'Incident' ? 'selected' : ''}>Incident</option>
+                                                                                    <option value="Service Request" ${type == 'Service Request' ? 'selected' : ''}>Service Request</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-4">
+                                                                            <button type="submit" class="btn btn-primary">
+                                                                                <i class="feather icon-search mr-1"></i> Lọc
                                                                             </button>
-                                                                            <c:if test="${not empty keyword}">
-                                                                                <a href="TicketResolutionReview"
-                                                                                    class="btn btn-outline-secondary">
-                                                                                    <i class="feather icon-x"></i>
-                                                                                </a>
-                                                                            </c:if>
+                                                                            <a href="TicketResolutionReview" class="btn btn-outline-secondary">
+                                                                                <i class="feather icon-refresh-cw mr-1"></i> Reset
+                                                                            </a>
                                                                         </div>
                                                                     </div>
                                                                 </form>
@@ -302,57 +310,34 @@
                                                                                     <tr>
                                                                                         <th>Ticket #</th>
                                                                                         <th>Loại</th>
+                                                                                        <th>Category</th>
                                                                                         <th>Tiêu đề</th>
                                                                                         <th>Impact</th>
                                                                                         <th>Resolved At</th>
-                                                                                        <th class="text-center">Thao tác
-                                                                                        </th>
+                                                                                        <th class="text-center">Thao tác</th>
                                                                                     </tr>
                                                                                 </thead>
                                                                                 <tbody>
-                                                                                    <c:forEach var="t"
-                                                                                        items="${resolvedTickets}">
-                                                                                        <tr class="ticket-card"
-                                                                                            onclick="location.href='TicketResolutionReview?ticketNumber=<c:out value="
-                                                                                            ${t.ticketNumber}" />'">
-                                                                                        <td><strong>${t.ticketNumber}</strong>
-                                                                                        </td>
-                                                                                        <td>${t.ticketType}</td>
-                                                                                        <td>${t.title}</td>
-                                                                                        <td>
-                                                                                            <c:choose>
-                                                                                                <c:when
-                                                                                                    test="${t.impact == 1}">
-                                                                                                    <span
-                                                                                                        class="badge badge-success">Low</span>
-                                                                                                </c:when>
-                                                                                                <c:when
-                                                                                                    test="${t.impact == 2}">
-                                                                                                    <span
-                                                                                                        class="badge badge-warning">Medium</span>
-                                                                                                </c:when>
-                                                                                                <c:when
-                                                                                                    test="${t.impact == 3}">
-                                                                                                    <span
-                                                                                                        class="badge badge-danger">High</span>
-                                                                                                </c:when>
-                                                                                                <c:otherwise><span
-                                                                                                        class="badge badge-secondary">N/A</span>
-                                                                                                </c:otherwise>
-                                                                                            </c:choose>
-                                                                                        </td>
-                                                                                        <td>${t.resolvedAt}</td>
-                                                                                        <td class="text-center">
-                                                                                            <a href="TicketResolutionReview?ticketNumber=<c:out value="
-                                                                                                ${t.ticketNumber}" />"
-                                                                                            class="btn btn-sm
-                                                                                            btn-primary"
-                                                                                            onclick="event.stopPropagation()">
-                                                                                            <i
-                                                                                                class="feather icon-edit-2"></i>
-                                                                                            Review
-                                                                                            </a>
-                                                                                        </td>
+                                                                                    <c:forEach var="t" items="${resolvedTickets}">
+                                                                                        <tr class="ticket-card" onclick="window.location.href='TicketResolutionReview?ticketNumber=${t.ticketNumber}'">
+                                                                                            <td><strong>${t.ticketNumber}</strong></td>
+                                                                                            <td>${t.ticketType}</td>
+                                                                                            <td>${t.categoryName}</td>
+                                                                                            <td>${t.title}</td>
+                                                                                            <td>
+                                                                                                <c:choose>
+                                                                                                    <c:when test="${t.impact == 1}"><span class="badge badge-success">Low</span></c:when>
+                                                                                                    <c:when test="${t.impact == 2}"><span class="badge badge-warning">Medium</span></c:when>
+                                                                                                    <c:when test="${t.impact == 3}"><span class="badge badge-danger">High</span></c:when>
+                                                                                                    <c:otherwise><span class="badge badge-secondary">N/A</span></c:otherwise>
+                                                                                                </c:choose>
+                                                                                            </td>
+                                                                                            <td>${t.resolvedAt}</td>
+                                                                                            <td class="text-center">
+                                                                                                <a href="TicketResolutionReview?ticketNumber=${t.ticketNumber}" class="btn btn-sm btn-primary" onclick="event.stopPropagation()">
+                                                                                                    <i class="feather icon-edit-2"></i> Review
+                                                                                                </a>
+                                                                                            </td>
                                                                                         </tr>
                                                                                     </c:forEach>
                                                                                 </tbody>
