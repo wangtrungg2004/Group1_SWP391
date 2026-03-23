@@ -31,6 +31,9 @@ public class Tickets {
     private String priorityLevel;
     private String assigneeName;
     private String serviceName;
+    
+    // Thêm thuộc tính này vào model
+    private java.util.Date resolutionDeadline;
 
     public Tickets() {
     }
@@ -292,6 +295,17 @@ public class Tickets {
 
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
+    }
+    
+    
+
+    // Thêm Getter / Setter
+    public java.util.Date getResolutionDeadline() {
+        return resolutionDeadline;
+    }
+
+    public void setResolutionDeadline(java.util.Date resolutionDeadline) {
+        this.resolutionDeadline = resolutionDeadline;
     }
 
 }

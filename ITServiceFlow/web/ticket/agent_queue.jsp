@@ -135,7 +135,28 @@
                                                                 <span class="badge ${ticket.priorityLevel == 'High' ? 'badge-danger' : 'badge-warning'}">${ticket.priorityLevel}</span>
                                                             </td>
                                                             
-                                                            <td><div class="sla-badge-placeholder"><i class="feather icon-clock"></i> SLA Module</div></td>
+                                                            <%-- Khai báo biến thời gian hiện tại --%>
+                                                    <jsp:useBean id="now" class="java.util.Date" />
+                                                            <td>
+                                                                <c:choose>
+                                                                    <c:when test="${not empty ticket.resolutionDeadline}">
+                                                                        <c:choose>
+                                                                            <c:when test="${ticket.resolutionDeadline.time < now.time}">
+                                                                                <span class="badge badge-danger p-2" title="SLA Breached!"><i class="feather icon-alert-octagon mr-1"></i> <fmt:formatDate value="${ticket.resolutionDeadline}" pattern="dd/MM HH:mm"/></span>
+                                                                            </c:when>
+                                                                            <c:when test="${(ticket.resolutionDeadline.time - now.time) < 7200000}">
+                                                                                <span class="badge badge-warning text-dark p-2" title="Due Soon!"><i class="feather icon-alert-triangle mr-1"></i> <fmt:formatDate value="${ticket.resolutionDeadline}" pattern="dd/MM HH:mm"/></span>
+                                                                            </c:when>
+                                                                            <c:otherwise>
+                                                                                <span class="badge badge-success p-2"><i class="feather icon-clock mr-1"></i> <fmt:formatDate value="${ticket.resolutionDeadline}" pattern="dd/MM HH:mm"/></span>
+                                                                            </c:otherwise>
+                                                                        </c:choose>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <span class="text-muted font-italic" style="font-size: 0.8rem;"><i class="feather icon-minus"></i> No SLA</span>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </td>
 
                                                             <td>
                                                                 <c:choose>

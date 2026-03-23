@@ -140,18 +140,27 @@ public class TicketCreateController extends HttpServlet {
         TicketDAO dao = new TicketDAO();
         //GỌI BỘ ĐIỀU PHỐI ITIL ĐỂ XẾP HÀNG ĐỢI
         dao.applyITILRouting(t);
-        String isCreated = dao.createTicket(t);
+        // 2. Lưu Database lấy ID
+        int newTicketId = dao.createTicket(t);
 
-        if ("ok".equals(isCreated)) {
-            // Redirect đúng trang theo role
-            String role = (String) session.getAttribute("role");
-            if ("IT Support".equals(role) || "Manager".equals(role)) {
-                response.sendRedirect(request.getContextPath() + "/Queues");
-            } else {
-                response.sendRedirect(request.getContextPath() + "/Tickets");
+        if (newTicketId > 0) {
+            // 3. 🚀 TÍCH HỢP SLA MODULE TỰ ĐỘNG (CÓ ĐIỀU KIỆN ITIL)
+            if (t.getPriorityId() != null && t.getPriorityId() > 0) {
+                
+                // Kiểm tra xem vé này có phải là Service Request đang bị khóa chờ duyệt không?
+                boolean isPendingApproval = "ServiceRequest".equals(t.getTicketType()) 
+                                            && t.getRequiresApproval() != null 
+                                            && t.getRequiresApproval();
+                
+                // Nếu KHÔNG PHẢI vé chờ duyệt -> Khởi động đồng hồ SLA ngay lập tức!
+                if (!isPendingApproval) {
+                    dao.SLATrackingDao slaDao = new dao.SLATrackingDao();
+                    slaDao.applySLAForTicket(newTicketId, t.getTicketType(), t.getPriorityId());
+                }
             }
+            response.sendRedirect(request.getContextPath() + "/Tickets");
         } else {
-            // Preserve form data
+            // Preserve form data khi có lỗi
             request.setAttribute("ticketType_val", ticketType);
             request.setAttribute("title_val", request.getParameter("title"));
             request.setAttribute("description_val", request.getParameter("description"));
@@ -160,7 +169,7 @@ public class TicketCreateController extends HttpServlet {
             request.setAttribute("urgency_val", request.getParameter("urgency"));
             request.setAttribute("serviceCatalogId_val", request.getParameter("serviceCatalogId"));
             
-            request.setAttribute("errorMessage", "Lỗi hệ thống: " + isCreated);
+            request.setAttribute("errorMessage", "Lỗi hệ thống: Không thể tạo Ticket.");
             doGet(request, response);
         }
 
