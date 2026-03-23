@@ -30,21 +30,27 @@ public class LinkChildTicketController extends HttpServlet {
         Users currentUser = (Users) session.getAttribute("user");
         String role = (String) session.getAttribute("role");
 
-        if (currentUser == null || (!"Manager".equals(role) && !"IT Support".equals(role))) {
+        if (currentUser == null || (!"IT Support".equals(role) && !"Manager".equals(role) && !"Admin".equals(role))) {
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
         }
 
-        int parentId = Integer.parseInt(request.getParameter("ticketId"));
-        // Lấy danh sách các Checkbox được tick từ Modal
-        String[] childIds = request.getParameterValues("childTicketIds"); 
+        try {
+            int parentTicketId = Integer.parseInt(request.getParameter("ticketId"));
+            String[] childTicketIds = request.getParameterValues("childTicketIds");
 
-        if (childIds != null && childIds.length > 0) {
-            TicketDAO ticketDao = new TicketDAO();
-            ticketDao.linkChildTickets(parentId, childIds);
+            if (childTicketIds != null && childTicketIds.length > 0) {
+                TicketDAO dao = new TicketDAO();
+                // Thực thi link vào DB
+                dao.linkChildTickets(parentTicketId, childTicketIds);
+            }
+            
+            // Link xong tải lại trang chi tiết vé Cha
+            response.sendRedirect(request.getContextPath() + "/TicketAgentDetail?id=" + parentTicketId);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/Queues");
         }
-
-        // F5 lại trang Detail
-        response.sendRedirect(request.getContextPath() + "/TicketAgentDetail?id=" + parentId);
     }
 }

@@ -337,6 +337,7 @@ public class TicketDAO extends DbContext {
     }
 
     // 4. Lấy chi tiết 1 Ticket theo ID - ĐÃ NÂNG CẤP JOIN
+   // 4. Lấy chi tiết 1 Ticket theo ID - ĐÃ NÂNG CẤP JOIN VÀ FIX LỖI OBJECT
     public Tickets getTicketById(int id) {
         String sql = "SELECT t.*, "
                 + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, "
@@ -368,6 +369,13 @@ public class TicketDAO extends DbContext {
                 t.setCreatedBy(rs.getInt("CreatedBy"));
                 t.setCreatedAt(rs.getTimestamp("CreatedAt"));
                 t.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
+                
+                // 🚀 ĐÃ FIX: Bổ sung các trường bị thiếu để Controller và JSP nhận diện quyền
+                t.setAssignedTo((Integer) rs.getObject("AssignedTo"));
+                t.setCurrentLevel((Integer) rs.getObject("CurrentLevel"));
+                t.setRequiresApproval((Boolean) rs.getObject("RequiresApproval"));
+                t.setApprovedBy((Integer) rs.getObject("ApprovedBy"));
+                t.setParentTicketId((Integer) rs.getObject("ParentTicketId"));
 
                 // Set các trường hiển thị
                 t.setPriorityLevel(rs.getString("PriorityLevel"));
@@ -789,14 +797,11 @@ public int getTotalTicketsCount(int userId, String search, String status, String
     }
 
     // 10. Cập nhật trạng thái vé (Phiên bản Nâng cấp có Hiệu ứng Domino US03)
+  // 10. Cập nhật trạng thái vé (Hiệu ứng Domino & Dừng đồng hồ SLA)
     public boolean updateTicketStatus(int ticketId, String status) {
         String sql = "UPDATE [dbo].[Tickets] SET Status = ?, UpdatedAt = GETDATE() ";
-        
-        if ("Resolved".equals(status)) {
-            sql += ", ResolvedAt = GETDATE() ";
-        } else if ("Closed".equals(status)) {
-            sql += ", ClosedAt = GETDATE() ";
-        }
+        if ("Resolved".equals(status)) sql += ", ResolvedAt = GETDATE() ";
+        else if ("Closed".equals(status)) sql += ", ClosedAt = GETDATE() ";
         sql += "WHERE Id = ?";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -804,9 +809,10 @@ public int getTotalTicketsCount(int userId, String search, String status, String
             ps.setInt(2, ticketId);
             int rows = ps.executeUpdate();
             
-            // ===== HIỆU ỨNG DOMINO (CASCADE UPDATE) =====
-            // Nếu vé cha được Resolved hoặc Closed, TỰ ĐỘNG cập nhật toàn bộ vé con
+            // ===== HIỆU ỨNG DOMINO ĐỐI VỚI VÉ CON =====
             if (rows > 0 && ("Resolved".equals(status) || "Closed".equals(status))) {
+                // Update trạng thái và thời gian ResolvedAt cho vé con. 
+                // Cột ResolvedAt này sẽ tự động làm "điểm chốt" để báo cáo SLA biết là vé con đã hoàn thành, không bị Breach nữa!
                 String cascadeSql = "UPDATE [dbo].[Tickets] SET Status = ?, UpdatedAt = GETDATE() ";
                 if ("Resolved".equals(status)) cascadeSql += ", ResolvedAt = GETDATE() ";
                 if ("Closed".equals(status)) cascadeSql += ", ClosedAt = GETDATE() ";
@@ -815,7 +821,7 @@ public int getTotalTicketsCount(int userId, String search, String status, String
                 try (PreparedStatement psCascade = connection.prepareStatement(cascadeSql)) {
                     psCascade.setString(1, status);
                     psCascade.setInt(2, ticketId);
-                    psCascade.executeUpdate(); // Chạy lệnh đồng bộ vé con ngầm
+                    psCascade.executeUpdate(); 
                 }
             }
             return true;
@@ -994,12 +1000,14 @@ public int getTotalTicketsCount(int userId, String search, String status, String
     }
 
     // 3. Lấy danh sách các vé CÓ THỂ LIÊN KẾT (Để hiển thị trong Modal chọn vé con)
-    // Điều kiện: Không phải là chính nó, chưa bị đóng, và chưa làm con của thằng nào khác
+    // 3. Lấy danh sách các vé CÓ THỂ LIÊN KẾT (Để hiển thị trong Modal chọn vé con)
+    // 3. Lấy danh sách các vé CÓ THỂ LIÊN KẾT (Chỉ lấy Incident, bỏ qua Service Request)
     public List<Tickets> getAvailableTicketsForLinking(int currentTicketId) {
         List<Tickets> list = new ArrayList<>();
+        // 🚀 ĐÃ BỔ SUNG: AND TicketType = 'Incident'
         String sql = "SELECT Id, TicketNumber, Title, Status FROM [dbo].[Tickets] " +
                      "WHERE Id != ? AND Status NOT IN ('Resolved', 'Closed') " +
-                     "AND ParentTicketId IS NULL";
+                     "AND ParentTicketId IS NULL AND TicketType = 'Incident'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, currentTicketId);
             ResultSet rs = ps.executeQuery();
@@ -1015,23 +1023,51 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         return list;
     }
 
-    // 4. Hàm thực thi việc gán vé con vào vé cha
+   
+   // 4. Hàm thực thi việc gán vé con vào vé cha (ĐÃ NÂNG CẤP KẾ THỪA ASSIGNEE)
     public boolean linkChildTickets(int parentId, String[] childIds) {
         if (childIds == null || childIds.length == 0) return false;
         
-        // Tạo chuỗi ?,?,? tương ứng với số lượng vé con được chọn
+        // 1. Lấy thông tin vé cha để biết IT Support nào đang xử lý
+        Tickets parent = getTicketById(parentId);
+        Integer parentAssigneeId = null;
+        if (parent != null && parent.getAssignedTo() != null && parent.getAssignedTo() > 0) {
+            parentAssigneeId = parent.getAssignedTo();
+        }
+        
+        // 2. Chuẩn bị tham số cho mệnh đề IN (...)
         StringBuilder placeholders = new StringBuilder();
         for (int i = 0; i < childIds.length; i++) {
             placeholders.append("?");
             if (i < childIds.length - 1) placeholders.append(",");
         }
         
-        String sql = "UPDATE [dbo].[Tickets] SET ParentTicketId = ?, UpdatedAt = GETDATE() WHERE Id IN (" + placeholders.toString() + ")";
+        // 3. Xây dựng câu lệnh SQL thông minh
+        String sql = "UPDATE [dbo].[Tickets] SET ParentTicketId = ?, UpdatedAt = GETDATE() ";
+        
+        // Nếu vé cha ĐÃ CÓ người xử lý -> Mang người đó đi gán cho vé con
+        if (parentAssigneeId != null) {
+            // Dùng COALESCE: Nếu vé con IS NULL (chưa ai nhận) -> Gán cho Parent Assignee.
+            // Nếu vé con ĐÃ CÓ người nhận -> Giữ nguyên người cũ.
+            sql += ", AssignedTo = COALESCE(AssignedTo, ?) ";
+        }
+        
+        sql += "WHERE Id IN (" + placeholders.toString() + ")";
+        
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, parentId);
-            for (int i = 0; i < childIds.length; i++) {
-                ps.setInt(i + 2, Integer.parseInt(childIds[i]));
+            int paramIndex = 1;
+            ps.setInt(paramIndex++, parentId); // Set ParentId
+            
+            // Set ID người xử lý (nếu có)
+            if (parentAssigneeId != null) {
+                ps.setInt(paramIndex++, parentAssigneeId);
             }
+            
+            // Set danh sách ID vé con
+            for (int i = 0; i < childIds.length; i++) {
+                ps.setInt(paramIndex++, Integer.parseInt(childIds[i]));
+            }
+            
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -1179,6 +1215,27 @@ public int getTotalTicketsCount(int userId, String search, String status, String
             }
             
             return rows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    // =========================================================================
+    // CODE US05: TICKET TRIAGE (LV1 EDIT TICKET)
+    // =========================================================================
+    public boolean updateTicketTriage(int ticketId, int categoryId, Integer impact, Integer urgency, Integer priorityId) {
+        String sql = "UPDATE [dbo].[Tickets] SET CategoryId = ?, Impact = ?, Urgency = ?, PriorityId = ?, UpdatedAt = GETDATE() WHERE Id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, categoryId);
+            
+            // Xử lý an toàn cho Integer có thể Null (trường hợp Service Request)
+            if (impact != null) ps.setInt(2, impact); else ps.setNull(2, Types.INTEGER);
+            if (urgency != null) ps.setInt(3, urgency); else ps.setNull(3, Types.INTEGER);
+            if (priorityId != null) ps.setInt(4, priorityId); else ps.setNull(4, Types.INTEGER);
+            
+            ps.setInt(5, ticketId);
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
