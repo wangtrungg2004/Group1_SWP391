@@ -5,6 +5,7 @@ import dao.CategoryDao;
 import dao.ServiceCatalogDao;
 import dao.TicketAssetsDAO;
 import dao.TicketDAO;
+import dao.SLATrackingDao;
 import model.Assets;
 import model.ServiceCatalog;
 import model.Tickets;
@@ -86,6 +87,7 @@ public class TicketCreateController extends HttpServlet {
 
             if (catStr == null || catStr.isEmpty() || "null".equals(catStr)) {
                 request.setAttribute("errorMessage", "Vui lòng chọn đầy đủ đến mục 'Lỗi chi tiết'.");
+                preserveFormForError(request, ticketType);
                 doGet(request, response);
                 return;
             }
@@ -101,6 +103,7 @@ public class TicketCreateController extends HttpServlet {
 
             } catch (NumberFormatException e) {
                 request.setAttribute("errorMessage", "Dữ liệu độ khẩn cấp/ảnh hưởng không hợp lệ.");
+                preserveFormForError(request, ticketType);
                 doGet(request, response);
                 return;
             }
@@ -111,6 +114,7 @@ public class TicketCreateController extends HttpServlet {
 
             if (serviceStr == null || serviceStr.isEmpty()) {
                 request.setAttribute("errorMessage", "Vui lòng chọn dịch vụ cụ thể.");
+                preserveFormForError(request, ticketType);
                 doGet(request, response);
                 return;
             }
@@ -130,11 +134,13 @@ public class TicketCreateController extends HttpServlet {
                     t.setPriorityId(null);
                 } else {
                     request.setAttribute("errorMessage", "Dịch vụ không tồn tại trong hệ thống.");
+                    preserveFormForError(request, ticketType);
                     doGet(request, response);
                     return;
                 }
             } catch (Exception e) {
                 request.setAttribute("errorMessage", "Lỗi dữ liệu dịch vụ.");
+                preserveFormForError(request, ticketType);
                 doGet(request, response);
                 return;
             }
@@ -143,6 +149,7 @@ public class TicketCreateController extends HttpServlet {
         String assetTag = request.getParameter("assetTag");
         if (assetTag == null || assetTag.trim().isEmpty()) {
             request.setAttribute("errorMessage", "Vui lòng nhập Asset tag.");
+            preserveFormForError(request, ticketType);
             doGet(request, response);
             return;
         }
@@ -157,58 +164,44 @@ public class TicketCreateController extends HttpServlet {
         }
 
         TicketDAO dao = new TicketDAO();
-        //GỌI BỘ ĐIỀU PHỐI ITIL ĐỂ XẾP HÀNG ĐỢI
+        // GỌI BỘ ĐIỀU PHỐI ITIL ĐỂ XẾP HÀNG ĐỢI
         dao.applyITILRouting(t);
-        // 2. Lưu Database lấy ID
+        // Lưu Database lấy ID
         int newTicketId = dao.createTicket(t);
 
-        if ("ok".equals(isCreated)) {
-            Tickets created = dao.getTicketByNumber(t.getTicketNumber());
-            if (created != null) {
-                TicketAssetsDAO ticketAssetsDAO = new TicketAssetsDAO();
-                boolean linked = ticketAssetsDAO.addLink(created.getId(), asset.getId());
-                if (!linked) {
-                    request.setAttribute("errorMessage", "Could not link asset to ticket. Please try again from ticket detail.");
-                    preserveFormForError(request, ticketType);
-                    doGet(request, response);
-                    return;
-                }
-                response.sendRedirect(request.getContextPath() + "/Tickets?created=1");
+        // KIỂM TRA LƯU THÀNH CÔNG BẰNG newTicketId
+        if (newTicketId > 0) {
+            // 1. Map Asset vào Ticket
+            TicketAssetsDAO ticketAssetsDAO = new TicketAssetsDAO();
+            boolean linked = ticketAssetsDAO.addLink(newTicketId, asset.getId());
+            if (!linked) {
+                request.setAttribute("errorMessage", "Could not link asset to ticket. Please try again from ticket detail.");
+                preserveFormForError(request, ticketType);
+                doGet(request, response);
                 return;
             }
-            request.setAttribute("errorMessage", "Could not load the new ticket after creation.");
-            preserveFormForError(request, ticketType);
-            doGet(request, response);
-            return;
-        } else {
-            preserveFormForError(request, ticketType);
-            request.setAttribute("errorMessage", "Lỗi hệ thống: " + isCreated);
-        if (newTicketId > 0) {
-            // 3. 🚀 TÍCH HỢP SLA MODULE TỰ ĐỘNG (CÓ ĐIỀU KIỆN ITIL)
+
+            // 2. TÍCH HỢP SLA MODULE TỰ ĐỘNG (CÓ ĐIỀU KIỆN ITIL)
             if (t.getPriorityId() != null && t.getPriorityId() > 0) {
-                
-                // Kiểm tra xem vé này có phải là Service Request đang bị khóa chờ duyệt không?
+                // Kiểm tra xem vé này có phải là Service Request đang bị khóa chờ duyệt không
                 boolean isPendingApproval = "ServiceRequest".equals(t.getTicketType()) 
                                             && t.getRequiresApproval() != null 
                                             && t.getRequiresApproval();
                 
-                // Nếu KHÔNG PHẢI vé chờ duyệt -> Khởi động đồng hồ SLA ngay lập tức!
+                // Nếu KHÔNG PHẢI vé chờ duyệt -> Khởi động đồng hồ SLA ngay lập tức
                 if (!isPendingApproval) {
-                    dao.SLATrackingDao slaDao = new dao.SLATrackingDao();
+                    SLATrackingDao slaDao = new SLATrackingDao();
                     slaDao.applySLAForTicket(newTicketId, t.getTicketType(), t.getPriorityId());
                 }
             }
-            response.sendRedirect(request.getContextPath() + "/Tickets");
-        } else {
-            // Preserve form data khi có lỗi
-            request.setAttribute("ticketType_val", ticketType);
-            request.setAttribute("title_val", request.getParameter("title"));
-            request.setAttribute("description_val", request.getParameter("description"));
-            request.setAttribute("categoryId_val", request.getParameter("categoryId"));
-            request.setAttribute("impact_val", request.getParameter("impact"));
-            request.setAttribute("urgency_val", request.getParameter("urgency"));
-            request.setAttribute("serviceCatalogId_val", request.getParameter("serviceCatalogId"));
             
+            // 3. Chuyển hướng thành công
+            response.sendRedirect(request.getContextPath() + "/Tickets?created=1");
+            return;
+
+        } else {
+            // Xử lý khi Insert thất bại (newTicketId <= 0)
+            preserveFormForError(request, ticketType);
             request.setAttribute("errorMessage", "Lỗi hệ thống: Không thể tạo Ticket.");
             doGet(request, response);
         }
