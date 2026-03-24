@@ -19,35 +19,38 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet(name = "LinkChildTicket", urlPatterns = {"/LinkChildTicket"})
-public class LinkChildTicketController extends HttpServlet {
+@WebServlet(name = "ProcessApproval", urlPatterns = {"/ProcessApproval"})
+public class ProcessApprovalController extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
         HttpSession session = request.getSession();
         Users currentUser = (Users) session.getAttribute("user");
         String role = (String) session.getAttribute("role");
 
-        if (currentUser == null || (!"IT Support".equals(role) && !"Manager".equals(role) && !"Admin".equals(role))) {
+        // Bảo mật cấp cao: Chỉ Manager (hoặc Admin) mới có quyền gọi API duyệt vé
+        if (currentUser == null || (!"Manager".equals(role) && !"Admin".equals(role))) {
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
         }
 
         try {
-            int parentTicketId = Integer.parseInt(request.getParameter("ticketId"));
-            String[] childTicketIds = request.getParameterValues("childTicketIds");
-
-            if (childTicketIds != null && childTicketIds.length > 0) {
-                TicketDAO dao = new TicketDAO();
-                // Thực thi link vào DB
-                dao.linkChildTickets(parentTicketId, childTicketIds);
+            int ticketId = Integer.parseInt(request.getParameter("id"));
+            String action = request.getParameter("action"); // Nhận giá trị 'approve' hoặc 'reject'
+            
+            TicketDAO dao = new TicketDAO();
+            
+            if ("approve".equals(action)) {
+                dao.processApproval(ticketId, currentUser.getId(), true);
+            } else if ("reject".equals(action)) {
+                dao.processApproval(ticketId, currentUser.getId(), false);
             }
             
-            // Link xong tải lại trang chi tiết vé Cha
-            response.sendRedirect(request.getContextPath() + "/TicketAgentDetail?id=" + parentTicketId);
-
+            // Duyệt xong tải lại trang chi tiết đó
+            response.sendRedirect(request.getContextPath() + "/TicketAgentDetail?id=" + ticketId);
+            
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect(request.getContextPath() + "/Queues");

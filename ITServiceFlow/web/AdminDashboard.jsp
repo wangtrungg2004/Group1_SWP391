@@ -341,12 +341,7 @@
     </head>
 
     <body class="">
-        <!-- [ Pre-loader ] start -->
-        <div class="loader-bg">
-            <div class="loader-track">
-                <div class="loader-fill"></div>
-            </div>
-        </div>
+        
         <!-- [ Pre-loader ] End -->
 	<!-- [ navigation menu ] start -->
 	<nav class="pcoded-navbar menupos-fixed menu-light brand-blue ">

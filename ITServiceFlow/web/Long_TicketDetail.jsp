@@ -94,10 +94,17 @@
                             </a>
                         </div>
 
-                        <c:if test="${not empty errorMessage}">
+                        <c:if test="${not empty errorMessage or not empty param.errorMessage}">
                             <div class="alert alert-danger" role="alert">
                                 <i class="feather icon-alert-circle"></i>
-                                ${errorMessage}
+                                <c:out value="${not empty errorMessage ? errorMessage : param.errorMessage}"/>
+                            </div>
+                        </c:if>
+
+                        <c:if test="${not empty param.successMessage}">
+                            <div class="alert alert-success" role="alert">
+                                <i class="feather icon-check-circle"></i>
+                                ${param.successMessage}
                             </div>
                         </c:if>
 
@@ -105,8 +112,14 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="card">
-                                        <div class="card-header">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
                                             <h5 class="mb-0">${ticket.ticketNumber} - ${ticket.title}</h5>
+                                            <button type="button"
+                                                    class="btn btn-sm btn-primary"
+                                                    data-toggle="modal"
+                                                    data-target="#editTicketModal">
+                                                <i class="feather icon-edit"></i> Edit
+                                            </button>
                                         </div>
                                         <div class="card-body">
                                             <div class="row">
@@ -134,8 +147,11 @@
                                                                     <c:when test="${ticket.status eq 'Resolved'}">
                                                                         <span class="badge badge-success">Resolved</span>
                                                                     </c:when>
-                                                                    <c:when test="${ticket.status eq 'Closed'}">
-                                                                        <span class="badge badge-secondary">Closed</span>
+                                                                    <c:when test="${ticket.status eq 'InProgress'}">
+                                                                        <span class="badge badge-warning">InProgress</span>
+                                                                    </c:when>
+                                                                    <c:when test="${ticket.status eq 'Completed'}">
+                                                                        <span class="badge badge-secondary">Completed</span>
                                                                     </c:when>
                                                                     <c:otherwise>
                                                                         <span class="badge badge-light">${ticket.status}</span>
@@ -256,6 +272,70 @@
                                             </div>
 
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <%-- Edit Ticket Modal --%>
+                            <div class="modal fade" id="editTicketModal" tabindex="-1" role="dialog" aria-labelledby="editTicketModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <form action="Long_TicketDetailServlet" method="POST">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="editTicketModalLabel">Chỉnh sửa Ticket</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <input type="hidden" name="action" value="update" />
+                                                <input type="hidden" name="id" value="${ticket.id}" />
+
+                                                <div class="form-group">
+                                                    <label>Type</label>
+                                                    <select name="ticketType" class="form-control">
+                                                        <option value="Incident" ${ticket.ticketType eq 'Incident' ? 'selected' : ''}>Incident</option>
+                                                        <option value="ServiceRequest" ${ticket.ticketType eq 'ServiceRequest' ? 'selected' : ''}>Service Request</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label>Category</label>
+                                                    <select name="categoryName" class="form-control">
+                                                        <option value="Hardware" ${ticket.categoryName eq 'Hardware' ? 'selected' : ''}>Hardware</option>
+                                                        <option value="Software" ${ticket.categoryName eq 'Software' ? 'selected' : ''}>Software</option>
+                                                        <option value="Network" ${ticket.categoryName eq 'Network' ? 'selected' : ''}>Network</option>
+                                                        <option value="Security" ${ticket.categoryName eq 'Security' ? 'selected' : ''}>Security</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label>Priority Level</label>
+                                                    <select name="priorityLevel" class="form-control">
+                                                        <option value="Critical" ${ticket.priorityLevel eq 'Critical' ? 'selected' : ''}>Critical</option>
+                                                        <option value="High" ${ticket.priorityLevel eq 'High' ? 'selected' : ''}>High</option>
+                                                        <option value="Medium" ${ticket.priorityLevel eq 'Medium' ? 'selected' : ''}>Medium</option>
+                                                        <option value="Low" ${ticket.priorityLevel eq 'Low' ? 'selected' : ''}>Low</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="form-group mb-0">
+                                                    <label>Status</label>
+                                                    <select name="status" class="form-control">
+                                                        <option value="New" ${ticket.status eq 'New' ? 'selected' : ''}>New</option>
+                                                        <option value="InProgress" ${ticket.status eq 'InProgress' ? 'selected' : ''}>InProgress</option>
+                                                        <option value="Resolved" ${ticket.status eq 'Resolved' ? 'selected' : ''}>Resolved</option>
+                                                        <option value="Completed" ${ticket.status eq 'Completed' ? 'selected' : ''}>Completed</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="feather icon-save"></i> Save
+                                                </button>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>

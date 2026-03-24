@@ -136,7 +136,28 @@
                                                                 <span class="badge ${ticket.priorityLevel == 'High' ? 'badge-danger' : 'badge-warning'}">${ticket.priorityLevel}</span>
                                                             </td>
                                                             
-                                                            <td><div class="sla-badge-placeholder"><i class="feather icon-clock"></i> SLA Module</div></td>
+                                                            <%-- Khai báo biến thời gian hiện tại --%>
+                                                    <jsp:useBean id="now" class="java.util.Date" />
+                                                            <td>
+                                                                <c:choose>
+                                                                    <c:when test="${not empty ticket.resolutionDeadline}">
+                                                                        <c:choose>
+                                                                            <c:when test="${ticket.resolutionDeadline.time < now.time}">
+                                                                                <span class="badge badge-danger p-2" title="SLA Breached!"><i class="feather icon-alert-octagon mr-1"></i> <fmt:formatDate value="${ticket.resolutionDeadline}" pattern="dd/MM HH:mm"/></span>
+                                                                            </c:when>
+                                                                            <c:when test="${(ticket.resolutionDeadline.time - now.time) < 7200000}">
+                                                                                <span class="badge badge-warning text-dark p-2" title="Due Soon!"><i class="feather icon-alert-triangle mr-1"></i> <fmt:formatDate value="${ticket.resolutionDeadline}" pattern="dd/MM HH:mm"/></span>
+                                                                            </c:when>
+                                                                            <c:otherwise>
+                                                                                <span class="badge badge-success p-2"><i class="feather icon-clock mr-1"></i> <fmt:formatDate value="${ticket.resolutionDeadline}" pattern="dd/MM HH:mm"/></span>
+                                                                            </c:otherwise>
+                                                                        </c:choose>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <span class="text-muted font-italic" style="font-size: 0.8rem;"><i class="feather icon-minus"></i> No SLA</span>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </td>
 
                                                             <td>
                                                                 <c:choose>
@@ -146,8 +167,15 @@
                                                             </td>
                                                             <td><span class="badge badge-light border">${ticket.status}</span></td>
                                                             <td>
-                                                                <c:if test="${empty ticket.assigneeName}">
-                                                                    <button class="btn btn-sm btn-outline-primary font-weight-bold px-3">Assign</button>
+                                                                <c:if test="${empty ticket.assigneeName && ticket.status != 'Awaiting Approval'}">
+                                                                    <c:choose>
+                                                                        <c:when test="${sessionScope.role == 'Manager' || sessionScope.role == 'Admin'}">
+                                                                            <button type="button" class="btn btn-sm btn-outline-primary font-weight-bold px-3" data-toggle="modal" data-target="#assignModal" onclick="document.getElementById('assignModalTicketId').value = '${ticket.id}'">Assign</button>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <a href="${pageContext.request.contextPath}/AssignTicket?id=${ticket.id}" class="btn btn-sm btn-outline-primary font-weight-bold px-3">Assign to me</a>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
                                                                 </c:if>
                                                             </td>
                                                         </tr>
@@ -181,6 +209,36 @@
             </div>
         </div>
     </div>
+        <c:if test="${sessionScope.role == 'Manager' || sessionScope.role == 'Admin'}">
+        <div class="modal fade" id="assignModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 8px;">
+                    <div class="modal-header bg-light border-bottom-0 p-4">
+                        <h5 class="modal-title font-weight-bold text-dark"><i class="feather icon-user-check text-primary mr-2"></i>Assign Ticket</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <form action="${pageContext.request.contextPath}/AssignTicket" method="POST">
+                        <div class="modal-body p-4">
+                            <input type="hidden" name="ticketId" id="assignModalTicketId" value="${not empty ticket ? ticket.id : ''}">
+                            <div class="form-group">
+                                <label class="font-weight-bold text-dark mb-2">Select IT Support Agent</label>
+                                <select name="agentId" class="form-control" required style="border: 1px solid #dfe1e6; border-radius: 6px; height: 42px;">
+                                    <option value="" disabled selected>-- Choose an agent --</option>
+                                    <c:forEach items="${itSupportList}" var="agent">
+                                        <option value="${agent.id}">${agent.fullName}</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-top-0 p-4 pt-0">
+                            <button type="button" class="btn btn-light font-weight-bold px-4" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary font-weight-bold px-4 shadow-sm">Assign Ticket</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </c:if>
     
     <script src="${pageContext.request.contextPath}/assets/plugins/jquery/js/jquery.min.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/vendor-all.min.js"></script>
