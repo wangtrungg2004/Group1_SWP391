@@ -495,8 +495,8 @@
 </div>
 
 <script src="${pageContext.request.contextPath}/assets/plugins/jquery/js/jquery.min.js"></script>
-<script src="${pageContext.request.contextPath}/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/assets/js/vendor-all.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/assets/js/pcoded.min.js"></script>
 <script>
 function doApprove() {

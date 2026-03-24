@@ -173,6 +173,22 @@
                         </div>
                     </div>
 
+                    <!-- Search bar -->
+                    <form method="GET" action="${pageContext.request.contextPath}/MyChangeRequests" class="search-bar mb-3">
+                        <input type="hidden" name="tab" value="${tab}"/>
+                        <input type="text" name="keyword" value="${keyword}"
+                               placeholder="Tìm theo tiêu đề, số RFC…"/>
+                        <button type="submit" class="btn-search">
+                            <i class="feather icon-search"></i> Tìm
+                        </button>
+                        <c:if test="${not empty keyword}">
+                            <a href="${pageContext.request.contextPath}/MyChangeRequests?tab=${tab}" class="btn-reset">
+                                <i class="feather icon-x"></i> Xóa
+                            </a>
+                            <span class="search-result-info">${requests.size()} kết quả cho "<strong>${keyword}</strong>"</span>
+                        </c:if>
+                    </form>
+
                     <!-- Tabs -->
                     <div class="rfc-tabs">
                         <a href="${pageContext.request.contextPath}/MyChangeRequests?tab=all&keyword=${keyword}"              class="rfc-tab ${tab=='all'              ? 'active':''}">Tất cả</a>
@@ -219,7 +235,7 @@
                                                             <a href="#" class="rfc-num"
                                                                data-toggle="modal"
                                                                data-target="#modal${req.id}">
-                                                                ${req.ticketNumber}
+                                                                ${req.rfcNumber}
                                                             </a>
                                                         </td>
                                                         <td style="max-width:240px;">
@@ -301,7 +317,7 @@
                                     <div class="modal-header" style="background:#f4f5f7;border-bottom:1px solid #dfe1e6;">
                                         <div>
                                             <h5 class="modal-title mb-0" style="color:#172b4d;font-weight:700;">
-                                                ${req.ticketNumber}
+                                                ${req.rfcNumber}
                                             </h5>
                                             <small class="text-muted"><c:out value="${req.title}"/></small>
                                         </div>
@@ -391,8 +407,8 @@
     </div>
 
     <script src="${pageContext.request.contextPath}/assets/plugins/jquery/js/jquery.min.js"></script>
-    <script src="${pageContext.request.contextPath}/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/vendor-all.min.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/pcoded.min.js"></script>
 </body>
 </html>
