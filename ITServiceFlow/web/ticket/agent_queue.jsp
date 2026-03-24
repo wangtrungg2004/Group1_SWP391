@@ -13,6 +13,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
     <title>Agent Workspace - ITServiceFlow</title>
+    <meta name="ctx" content="${pageContext.request.contextPath}">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/fonts/fontawesome/css/fontawesome-all.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/plugins/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
@@ -38,6 +39,63 @@
         .ticket-key { font-weight: 600; color: #0052cc; font-size: 0.95rem;}
         
         .sla-badge-placeholder { border: 1px dashed #ff8b00; color: #ff8b00; font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; font-weight: bold; display: inline-block;}
+
+        /* ── Quick Action Panel ── */
+        .tr-wrap { position: relative; }
+        .quick-actions {
+            display: none;
+            position: absolute;
+            right: 12px;
+            top: 50%; transform: translateY(-50%);
+            background: #fff;
+            border: 1px solid #dfe1e6;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            padding: 6px 8px;
+            gap: 4px;
+            align-items: center;
+            z-index: 10;
+            white-space: nowrap;
+        }
+        .jira-table tbody tr:hover .quick-actions { display: flex; }
+        .btn-qa {
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .15s;
+            display: inline-flex; align-items: center; gap: 4px;
+        }
+        .btn-qa-view   { background: #deebff; color: #0052cc; }
+        .btn-qa-assign { background: #e3fcef; color: #006644; }
+        .btn-qa-status { background: #fff0b3; color: #974f0c; }
+        .btn-qa-view:hover   { background: #b3d4ff; }
+        .btn-qa-assign:hover { background: #abf5d1; }
+        .btn-qa-status:hover { background: #ffe380; }
+        .qa-divider { width: 1px; height: 20px; background: #dfe1e6; margin: 0 2px; }
+
+        /* status quick-change dropdown */
+        .status-dropdown {
+            position: absolute;
+            right: 0; top: calc(100% + 4px);
+            background: #fff;
+            border: 1px solid #dfe1e6;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            min-width: 160px;
+            z-index: 100;
+            display: none;
+        }
+        .status-dropdown.show { display: block; }
+        .status-opt {
+            padding: 8px 14px;
+            font-size: 0.83rem;
+            cursor: pointer;
+            color: #172b4d;
+        }
+        .status-opt:hover { background: #f4f5f7; }
     </style>
 </head>
 <body class="">
@@ -126,7 +184,7 @@
                                                         <tr><td colspan="7" class="text-center py-5 text-muted"><i class="feather icon-check-circle d-block mb-2" style="font-size: 2rem;"></i> Queue is empty. Great job!</td></tr>
                                                     </c:if>
                                                     <c:forEach items="${queueList}" var="ticket">
-                                                        <tr>
+                                                        <tr class="tr-wrap" style="position:relative;">
                                                             <td><a href="${pageContext.request.contextPath}/TicketAgentDetail?id=${ticket.id}" class="ticket-key">${ticket.ticketNumber}</a></td>
                                                             <td>
                                                                 <div class="font-weight-bold text-dark">${ticket.title}</div>
@@ -166,17 +224,55 @@
                                                                 </c:choose>
                                                             </td>
                                                             <td><span class="badge badge-light border">${ticket.status}</span></td>
-                                                            <td>
-                                                                <c:if test="${empty ticket.assigneeName && ticket.status != 'Awaiting Approval'}">
-                                                                    <c:choose>
-                                                                        <c:when test="${sessionScope.role == 'Manager' || sessionScope.role == 'Admin'}">
-                                                                            <button type="button" class="btn btn-sm btn-outline-primary font-weight-bold px-3" data-toggle="modal" data-target="#assignModal" onclick="document.getElementById('assignModalTicketId').value = '${ticket.id}'">Assign</button>
-                                                                        </c:when>
-                                                                        <c:otherwise>
-                                                                            <a href="${pageContext.request.contextPath}/AssignTicket?id=${ticket.id}" class="btn btn-sm btn-outline-primary font-weight-bold px-3">Assign to me</a>
-                                                                        </c:otherwise>
-                                                                    </c:choose>
-                                                                </c:if>
+                                                            <td style="overflow:visible; position:relative; min-width:80px;">
+                                                                <%-- Quick Action Panel (hiện khi hover row) --%>
+                                                                <div class="quick-actions" id="qa-${ticket.id}">
+                                                                    <a href="${pageContext.request.contextPath}/TicketAgentDetail?id=${ticket.id}"
+                                                                       class="btn-qa btn-qa-view" title="View Details">
+                                                                        <i class="feather icon-eye"></i> View
+                                                                    </a>
+                                                                    <c:if test="${empty ticket.assigneeName && ticket.status != 'Awaiting Approval'}">
+                                                                        <div class="qa-divider"></div>
+                                                                        <c:choose>
+                                                                            <c:when test="${sessionScope.role == 'Manager' || sessionScope.role == 'Admin'}">
+                                                                                <button type="button"
+                                                                                        class="btn-qa btn-qa-assign"
+                                                                                        data-toggle="modal" data-target="#assignModal"
+                                                                                        onclick="document.getElementById('assignModalTicketId').value='${ticket.id}'"
+                                                                                        title="Assign to agent">
+                                                                                    <i class="feather icon-user-check"></i> Assign
+                                                                                </button>
+                                                                            </c:when>
+                                                                            <c:otherwise>
+                                                                                <a href="${pageContext.request.contextPath}/AssignTicket?id=${ticket.id}"
+                                                                                   class="btn-qa btn-qa-assign" title="Take this ticket">
+                                                                                    <i class="feather icon-user-plus"></i> Take
+                                                                                </a>
+                                                                            </c:otherwise>
+                                                                        </c:choose>
+                                                                    </c:if>
+                                                                    <c:if test="${not empty ticket.assigneeName}">
+                                                                        <div class="qa-divider"></div>
+                                                                        <div style="position:relative;">
+                                                                            <button class="btn-qa btn-qa-status"
+                                                                                    onclick="toggleStatusDrop('sd-${ticket.id}', event)"
+                                                                                    title="Change Status">
+                                                                                <i class="feather icon-refresh-cw"></i> Status
+                                                                            </button>
+                                                                            <div class="status-dropdown" id="sd-${ticket.id}">
+                                                                                <div class="status-opt" onclick="quickStatus(${ticket.id}, 'In Progress')">
+                                                                                    <i class="feather icon-play mr-1" style="color:#0052cc"></i> In Progress
+                                                                                </div>
+                                                                                <div class="status-opt" onclick="quickStatus(${ticket.id}, 'Pending')">
+                                                                                    <i class="feather icon-pause mr-1" style="color:#ff8b00"></i> Pending
+                                                                                </div>
+                                                                                <div class="status-opt" onclick="quickStatus(${ticket.id}, 'Resolved')">
+                                                                                    <i class="feather icon-check-circle mr-1" style="color:#00875a"></i> Resolved
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </c:if>
+                                                                </div>
                                                             </td>
                                                         </tr>
                                                     </c:forEach>
@@ -244,5 +340,34 @@
     <script src="${pageContext.request.contextPath}/assets/js/vendor-all.min.js"></script>
     <script src="${pageContext.request.contextPath}/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/pcoded.min.js"></script>
+
+    <script>
+    // ── Quick Status Change ────────────────────────────────────────────────
+    function toggleStatusDrop(id, event) {
+        event.stopPropagation();
+        document.querySelectorAll('.status-dropdown').forEach(d => {
+            if (d.id !== id) d.classList.remove('show');
+        });
+        document.getElementById(id).classList.toggle('show');
+    }
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.status-dropdown').forEach(d => d.classList.remove('show'));
+    });
+
+    function quickStatus(ticketId, newStatus) {
+        if (!confirm('Change status to "' + newStatus + '"?')) return;
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = document.querySelector('meta[name="ctx"]').content + '/UpdateStatus';
+        const fields = { ticketId: ticketId, newStatus: newStatus, redirectUrl: window.location.href };
+        Object.entries(fields).forEach(([k, v]) => {
+            const i = document.createElement('input');
+            i.type = 'hidden'; i.name = k; i.value = v;
+            form.appendChild(i);
+        });
+        document.body.appendChild(form);
+        form.submit();
+    }
+    </script>
 </body>
 </html>

@@ -30,6 +30,27 @@
 		.agent-avatar { width:34px; height:34px; border-radius:50%; background:#4099ff; color:#fff;
 		                display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; flex-shrink:0; }
 		.agent-name   { flex:1; font-size:0.88rem; font-weight:600; color:#172b4d; margin-left:10px; }
+		
+		/* ── Filter bar ── */
+		.filter-bar { display:flex; gap:10px; align-items:center; padding:12px 16px;
+		              background:#f8f9fa; border-bottom:1px solid #e9ecef; flex-wrap:wrap; }
+		.filter-bar select, .filter-bar input {
+		    height:34px; border:1px solid #dfe1e6; border-radius:5px;
+		    padding:0 10px; font-size:.82rem; color:#172b4d; background:#fff; outline:none;
+		}
+		.filter-bar select:focus, .filter-bar input:focus { border-color:#4c9aff; }
+		.btn-filter {
+		    height:34px; padding:0 14px; border:none; border-radius:5px;
+		    background:#0052cc; color:#fff; font-size:.82rem; font-weight:600;
+		    cursor:pointer; display:inline-flex; align-items:center; gap:5px;
+		}
+		.btn-filter:hover { background:#003d99; }
+		.btn-reset-f {
+		    height:34px; padding:0 12px; border:1px solid #dfe1e6; border-radius:5px;
+		    background:#fff; color:#42526e; font-size:.82rem; font-weight:600;
+		    cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:5px;
+		}
+		.btn-reset-f:hover { background:#f4f5f7; text-decoration:none; }
 		.survey-table th { font-size:0.75rem; text-transform:uppercase; letter-spacing:0.4px; color:#6b778c; font-weight:600; }
 		.survey-table td { font-size:0.85rem; vertical-align:middle; }
 		.comment-cell { max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#5e6c84; font-style:italic; }
@@ -214,7 +235,24 @@
 										<div class="card-body p-0">
 											<c:choose>
 												<c:when test="${not empty surveys}">
-													<div style="max-height:560px; overflow-y:auto;">
+
+										<div class="filter-bar">
+										    <input type="text" id="surveySearch" placeholder="Tìm theo tên user, agent, ticket…"
+										           oninput="filterSurveys()" style="min-width:200px;"/>
+										    <select id="ratingFilter" onchange="filterSurveys()">
+										        <option value="">Tất cả rating</option>
+										        <option value="5">★★★★★ (5)</option>
+										        <option value="4">★★★★ (4)</option>
+										        <option value="3">★★★ (3)</option>
+										        <option value="2">★★ (2)</option>
+										        <option value="1">★ (1)</option>
+										    </select>
+										    <span id="filterCount" style="font-size:.78rem; color:#6b778c; align-self:center;"></span>
+										    <a href="#" class="btn-reset-f" onclick="resetFilter(); return false;">
+										        <i class="feather icon-rotate-ccw"></i> Reset
+										    </a>
+										</div>
+													<div style="max-height:520px; overflow-y:auto;">
 														<table class="table table-hover survey-table mb-0">
 															<thead class="thead-light" style="position:sticky;top:0;z-index:1;">
 																<tr>
@@ -228,7 +266,7 @@
 															</thead>
 															<tbody>
 																<c:forEach var="s" items="${surveys}">
-																	<tr>
+																	<tr class="survey-row" data-rating="${s.rating}" data-text="${s.userFullName} ${s.assigneeName} ${s.ticketNumber}">
 																		<td class="pl-3">
 																			<a href="${pageContext.request.contextPath}/TicketDetailUser?id=${s.ticketId}"
 																			   style="font-size:0.8rem; font-weight:600; color:#4099ff;">
@@ -298,5 +336,29 @@
 			$('.fixed-button').remove();
 		});
 	</script>
+
+    <script>
+    function filterSurveys() {
+        const kw     = document.getElementById('surveySearch').value.toLowerCase();
+        const rating = document.getElementById('ratingFilter').value;
+        const rows   = document.querySelectorAll('tr.survey-row');
+        let visible  = 0;
+        rows.forEach(r => {
+            const text    = (r.dataset.text || '').toLowerCase();
+            const rowRate = r.dataset.rating;
+            const matchKw = !kw     || text.includes(kw);
+            const matchRt = !rating || rowRate === rating;
+            r.style.display = (matchKw && matchRt) ? '' : 'none';
+            if (matchKw && matchRt) visible++;
+        });
+        const el = document.getElementById('filterCount');
+        if (el) el.textContent = (kw || rating) ? visible + ' kết quả' : '';
+    }
+    function resetFilter() {
+        document.getElementById('surveySearch').value = '';
+        document.getElementById('ratingFilter').value = '';
+        filterSurveys();
+    }
+    </script>
 </body>
 </html>

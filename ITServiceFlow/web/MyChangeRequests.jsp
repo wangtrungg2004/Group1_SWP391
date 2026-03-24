@@ -75,6 +75,27 @@
         /* Empty state */
         .empty-state { text-align: center; padding: 50px 20px; color: #6b778c; }
         .empty-state i { font-size: 3rem; color: #b3bac5; display: block; margin-bottom: 12px; }
+
+        /* ── Search bar ── */
+        .search-bar { display:flex; gap:10px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
+        .search-bar input[type=text] {
+            flex:1; min-width:200px; height:36px; border:1px solid #dfe1e6;
+            border-radius:5px; padding:0 12px; font-size:.875rem; color:#172b4d; outline:none;
+        }
+        .search-bar input[type=text]:focus { border-color:#4c9aff; box-shadow:0 0 0 2px rgba(76,154,255,.2); }
+        .btn-search {
+            height:36px; padding:0 16px; border:none; border-radius:5px;
+            background:#0052cc; color:#fff; font-size:.875rem; font-weight:600;
+            cursor:pointer; display:inline-flex; align-items:center; gap:5px;
+        }
+        .btn-search:hover { background:#003d99; }
+        .btn-reset {
+            height:36px; padding:0 12px; border:1px solid #dfe1e6; border-radius:5px;
+            background:#fff; color:#42526e; font-size:.875rem; font-weight:600;
+            cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:5px;
+        }
+        .btn-reset:hover { background:#f4f5f7; text-decoration:none; }
+        .search-result-info { font-size:.78rem; color:#6b778c; align-self:center; }
     </style>
 </head>
 <body>
@@ -154,12 +175,12 @@
 
                     <!-- Tabs -->
                     <div class="rfc-tabs">
-                        <a href="?tab=all"              class="rfc-tab ${tab=='all'              ? 'active':''}">Tất cả</a>
-                        <a href="?tab=Draft"            class="rfc-tab ${tab=='Draft'            ? 'active':''}">Nháp</a>
-                        <a href="?tab=Pending Approval" class="rfc-tab ${tab=='Pending Approval' ? 'active':''}">Chờ duyệt</a>
-                        <a href="?tab=Approved"         class="rfc-tab ${tab=='Approved'         ? 'active':''}">Đã duyệt</a>
-                        <a href="?tab=Rejected"         class="rfc-tab ${tab=='Rejected'         ? 'active':''}">Từ chối</a>
-                        <a href="?tab=In Progress"      class="rfc-tab ${tab=='In Progress'      ? 'active':''}">Đang thực hiện</a>
+                        <a href="${pageContext.request.contextPath}/MyChangeRequests?tab=all&keyword=${keyword}"              class="rfc-tab ${tab=='all'              ? 'active':''}">Tất cả</a>
+                        <a href="${pageContext.request.contextPath}/MyChangeRequests?tab=Draft&keyword=${keyword}"            class="rfc-tab ${tab=='Draft'            ? 'active':''}">Nháp</a>
+                        <a href="${pageContext.request.contextPath}/MyChangeRequests?tab=Pending Approval&keyword=${keyword}" class="rfc-tab ${tab=='Pending Approval' ? 'active':''}">Chờ duyệt</a>
+                        <a href="${pageContext.request.contextPath}/MyChangeRequests?tab=Approved&keyword=${keyword}"         class="rfc-tab ${tab=='Approved'         ? 'active':''}">Đã duyệt</a>
+                        <a href="${pageContext.request.contextPath}/MyChangeRequests?tab=Rejected&keyword=${keyword}"         class="rfc-tab ${tab=='Rejected'         ? 'active':''}">Từ chối</a>
+                        <a href="${pageContext.request.contextPath}/MyChangeRequests?tab=In Progress&keyword=${keyword}"      class="rfc-tab ${tab=='In Progress'      ? 'active':''}">Đang thực hiện</a>
                     </div>
 
                     <!-- Table card -->

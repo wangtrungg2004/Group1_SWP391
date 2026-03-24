@@ -72,6 +72,28 @@
                       cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:5px; }
         .btn-review:hover { background:#003d99; color:#fff; text-decoration:none; }
 
+
+        /* ── Search bar ── */
+        .search-bar { display:flex; gap:10px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
+        .search-bar input[type=text] {
+            flex:1; min-width:200px; height:38px; border:1px solid #dfe1e6;
+            border-radius:5px; padding:0 12px; font-size:.875rem; color:#172b4d;
+            background:#fff; outline:none; transition:border-color .15s;
+        }
+        .search-bar input[type=text]:focus { border-color:#4c9aff; box-shadow:0 0 0 2px rgba(76,154,255,.2); }
+        .btn-search {
+            height:38px; padding:0 18px; border:none; border-radius:5px;
+            background:#0052cc; color:#fff; font-size:.875rem; font-weight:600;
+            cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:background .15s;
+        }
+        .btn-search:hover { background:#003d99; }
+        .btn-reset {
+            height:38px; padding:0 14px; border:1px solid #dfe1e6; border-radius:5px;
+            background:#fff; color:#42526e; font-size:.875rem; font-weight:600;
+            cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:6px;
+        }
+        .btn-reset:hover { background:#f4f5f7; text-decoration:none; color:#172b4d; }
+        .search-result-info { font-size:.8rem; color:#6b778c; align-self:center; }
         /* ── Empty ── */
         .empty { text-align:center; padding:60px 20px; color:#6b778c; }
         .empty-icon { font-size:3rem; color:#dfe1e6; display:block; margin-bottom:14px; }
@@ -96,7 +118,7 @@
       <div class="page-block">
         <ul class="breadcrumb bg-transparent p-0 m-0">
           <li class="breadcrumb-item">
-            <a href="${pageContext.request.contextPath}/ManagerDashboard.jsp" class="text-primary">
+            <a href="${pageContext.request.contextPath}/ManagerDashboard" class="text-primary">
               <i class="feather icon-home"></i>
             </a>
           </li>
@@ -119,15 +141,34 @@
       </div>
     </c:if>
 
+
+    <!-- Search -->
+    <form method="GET" action="${pageContext.request.contextPath}/ManagerChangeApprovals" class="search-bar">
+        <input type="hidden" name="tab" value="${tab}"/>
+        <input type="text" name="keyword" value="${keyword}"
+               placeholder="Tìm theo tiêu đề, tên người đề xuất, số RFC…"/>
+        <button type="submit" class="btn-search">
+            <i class="feather icon-search"></i> Tìm kiếm
+        </button>
+        <c:if test="${not empty keyword}">
+            <a href="${pageContext.request.contextPath}/ManagerChangeApprovals?tab=${tab}" class="btn-reset">
+                <i class="feather icon-x"></i> Xóa
+            </a>
+            <span class="search-result-info">
+                ${requests.size()} kết quả cho "<strong>${keyword}</strong>"
+            </span>
+        </c:if>
+    </form>
+
     <!-- Tabs -->
     <div class="pg-tabs">
-      <a href="?tab=pending" class="pg-tab ${tab=='pending' || empty tab ? 'active':''}">
+      <a href="${pageContext.request.contextPath}/ManagerChangeApprovals?tab=pending&keyword=${keyword}" class="pg-tab ${tab=='pending' || empty tab ? 'active':''}">
         Chờ phê duyệt
         <c:if test="${tab=='pending' && not empty requests}">
           <span class="cnt-badge">${requests.size()}</span>
         </c:if>
       </a>
-      <a href="?tab=all" class="pg-tab ${tab=='all' ? 'active':''}">Tất cả RFC</a>
+      <a href="${pageContext.request.contextPath}/ManagerChangeApprovals?tab=all&keyword=${keyword}" class="pg-tab ${tab=='all' ? 'active':''}">Tất cả RFC</a>
     </div>
 
     <!-- Card -->

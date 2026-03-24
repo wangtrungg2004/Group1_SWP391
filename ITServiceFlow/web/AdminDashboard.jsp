@@ -6,12 +6,12 @@
 <%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
 <%
     if (session.getAttribute("user") == null) {
-        response.sendRedirect("Login.jsp");
+        response.sendRedirect(request.getContextPath() + "/Login.jsp");
         return;
     }
     String role = (String) session.getAttribute("role");
     if (!"Admin".equals(role)) {
-        response.sendRedirect("Login.jsp");
+        response.sendRedirect(request.getContextPath() + "/Login.jsp");
         return;
     }
     model.Users currentUser = (model.Users) session.getAttribute("user");
@@ -24,10 +24,10 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <title>Admin Dashboard — IT ServiceFlow</title>
 
-        <link rel="stylesheet" href="assets/fonts/fontawesome/css/fontawesome-all.min.css">
-        <link rel="stylesheet" href="assets/plugins/animation/css/animate.min.css">
-        <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
-        <link rel="stylesheet" href="assets/css/style.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/fonts/fontawesome/css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/plugins/animation/css/animate.min.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/plugins/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
 
         <style>
             /* ── Page background ───────────────────────────────────────── */
@@ -562,7 +562,7 @@
                                                     <h5 class="m-b-10">Admin Dashboard</h5>
                                                 </div>
                                                 <ul class="breadcrumb">
-                                                    <li class="breadcrumb-item"><a href="AdminDashboard"><i class="feather icon-home"></i></a></li>
+                                                    <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/AdminDashboard"><i class="feather icon-home"></i></a></li>
                                                     <li class="breadcrumb-item">System Overview</li>
                                                 </ul>
                                             </div>
@@ -1157,10 +1157,10 @@
         <!-- ════════════════════════════════════════════════════════════════════
              SCRIPTS
         ════════════════════════════════════════════════════════════════════ -->
-        <script src="assets/plugins/jquery/js/jquery.min.js"></script>
-        <script src="assets/js/vendor-all.min.js"></script>
-        <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-        <script src="assets/js/pcoded.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/plugins/jquery/js/jquery.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/vendor-all.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/pcoded.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
         <%-- Pass server-side data into JS --%>
