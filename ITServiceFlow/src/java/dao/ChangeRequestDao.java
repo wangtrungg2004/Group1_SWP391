@@ -245,6 +245,91 @@ public class ChangeRequestDao extends DbContext {
         return list;
     }
 
+
+    // ── Tìm kiếm RFC cho Manager (keyword + status tab) ──────────────────────
+    public List<ChangeRequests> searchRequests(String keyword, String tab) {
+        List<ChangeRequests> list = new ArrayList<>();
+        boolean hasLinked = hasLinkedTicketIdColumn();
+        String numberColumn = getRequestNumberColumn();
+        String linkedSelect = hasLinked
+                ? " t.TicketNumber AS LinkedTicketNumber, t.Title AS LinkedTicketTitle, "
+                : " NULL AS LinkedTicketNumber, NULL AS LinkedTicketTitle, ";
+        String linkedJoin = hasLinked ? "LEFT JOIN Tickets t ON cr.LinkedTicketId = t.Id " : "";
+
+        StringBuilder sql = new StringBuilder(
+            "SELECT cr." + numberColumn + " AS RFCNumber, cr.*, u.FullName AS CreatedByName, "
+            + linkedSelect
+            + " (SELECT TOP 1 ca.Comment   FROM ChangeApprovals ca WHERE ca.ChangeId = cr.Id ORDER BY ca.DecidedAt DESC) AS ApproverComment, "
+            + " (SELECT TOP 1 ca.DecidedAt FROM ChangeApprovals ca WHERE ca.ChangeId = cr.Id ORDER BY ca.DecidedAt DESC) AS ApprovedAt "
+            + "FROM ChangeRequests cr "
+            + "LEFT JOIN Users u ON cr.CreatedBy = u.Id "
+            + linkedJoin
+            + "WHERE 1=1 "
+        );
+
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        boolean hasStatus  = tab != null && !tab.isEmpty() && !"all".equals(tab);
+
+        if (hasKeyword) sql.append("AND (cr.Title LIKE ? OR u.FullName LIKE ? OR cr." + numberColumn + " LIKE ?) ");
+        if (hasStatus)  sql.append("AND cr.Status = ? ");
+        sql.append("ORDER BY cr.CreatedAt DESC");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int idx = 1;
+            if (hasKeyword) {
+                String like = "%" + keyword.trim() + "%";
+                ps.setString(idx++, like);
+                ps.setString(idx++, like);
+                ps.setString(idx++, like);
+            }
+            if (hasStatus) ps.setString(idx, "Pending Approval".equals(tab) ? "Pending Approval" : tab);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) list.add(mapCR(rs));
+        } catch (Exception ex) { ex.printStackTrace(); }
+        return list;
+    }
+
+    // ── Tìm kiếm RFC của IT Support (keyword + status) ───────────────────────
+    public List<ChangeRequests> searchMyRequests(int createdBy, String keyword, String status) {
+        List<ChangeRequests> list = new ArrayList<>();
+        boolean hasLinked = hasLinkedTicketIdColumn();
+        String numberColumn = getRequestNumberColumn();
+        String linkedSelect = hasLinked
+                ? " t.TicketNumber AS LinkedTicketNumber, t.Title AS LinkedTicketTitle "
+                : " NULL AS LinkedTicketNumber, NULL AS LinkedTicketTitle ";
+        String linkedJoin = hasLinked ? "LEFT JOIN Tickets t ON cr.LinkedTicketId = t.Id " : "";
+
+        StringBuilder sql = new StringBuilder(
+            "SELECT cr." + numberColumn + " AS RFCNumber, cr.*, u.FullName AS CreatedByName, "
+            + linkedSelect
+            + "FROM ChangeRequests cr "
+            + "LEFT JOIN Users u ON cr.CreatedBy = u.Id "
+            + linkedJoin
+            + "WHERE cr.CreatedBy = ? "
+        );
+
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        boolean hasStatus  = status != null && !status.isEmpty() && !"all".equals(status);
+
+        if (hasKeyword) sql.append("AND (cr.Title LIKE ? OR cr." + numberColumn + " LIKE ?) ");
+        if (hasStatus)  sql.append("AND cr.Status = ? ");
+        sql.append("ORDER BY cr.CreatedAt DESC");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int idx = 1;
+            ps.setInt(idx++, createdBy);
+            if (hasKeyword) {
+                String like = "%" + keyword.trim() + "%";
+                ps.setString(idx++, like);
+                ps.setString(idx++, like);
+            }
+            if (hasStatus) ps.setString(idx, status);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) list.add(mapCR(rs));
+        } catch (Exception ex) { ex.printStackTrace(); }
+        return list;
+    }
+
     // ── Update status ─────────────────────────────────────────────────────────
     public boolean updateStatus(int changeId, String newStatus) {
         String sql = "UPDATE ChangeRequests SET Status = ? WHERE Id = ?";

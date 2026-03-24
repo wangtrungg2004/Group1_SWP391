@@ -87,6 +87,13 @@ public class ApprovalService {
     public List<ChangeRequests> getMyRequests(int userId, String status) {
         return dao.getMyChangeRequests(userId, status);
     }
+
+    public List<ChangeRequests> searchRequests(String keyword, String tab) {
+        return dao.searchRequests(keyword, tab);
+    }
+    public List<ChangeRequests> searchMyRequests(int userId, String keyword, String status) {
+        return dao.searchMyRequests(userId, keyword, status);
+    }
     public List<Tickets> getAssignedTicketsForRFC(int itSupportId) {
         return dao.getAssignedTicketsForRFC(itSupportId);
     }
