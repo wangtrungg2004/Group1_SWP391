@@ -3,6 +3,7 @@ package controller.ticket.user;
 import dao.AssetsDAO;
 import dao.CategoryDao;
 import dao.ServiceCatalogDao;
+import dao.SLATrackingDao;
 import dao.TicketAssetsDAO;
 import dao.TicketDAO;
 import dao.SLATrackingDao;
@@ -20,11 +21,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 @MultipartConfig(
-        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
-        maxFileSize = 1024 * 1024 * 15,      // 15MB
-        maxRequestSize = 1024 * 1024 * 50    // 50MB
+        fileSizeThreshold = 1024 * 1024 * 2,
+        maxFileSize       = 1024 * 1024 * 15,
+        maxRequestSize    = 1024 * 1024 * 50
 )
-@WebServlet(name = "CreateTicket", urlPatterns = { "/CreateTicket" })
+@WebServlet(name = "CreateTicket", urlPatterns = {"/CreateTicket"})
 public class TicketCreateController extends HttpServlet {
 
     @Override
@@ -33,25 +34,17 @@ public class TicketCreateController extends HttpServlet {
 
         CategoryDao catDao = new CategoryDao();
         ServiceCatalogDao svcDao = new ServiceCatalogDao();
-
         request.setAttribute("categoryList", catDao.getAllCategories());
         request.setAttribute("serviceList", svcDao.getAllServices());
-
         request.getRequestDispatcher("/ticket/create.jsp").forward(request, response);
     }
 
     private int calculatePriority(int impact, int urgency) {
         int score = impact + urgency;
-        if (score <= 2) {
-            return 1; 
-        }
-        if (score <= 4) {
-            return 2; 
-        }
-        if (score <= 5) {
-            return 3; 
-        }
-        return 4; 
+        if (score <= 2) return 1;
+        if (score <= 4) return 2;
+        if (score <= 5) return 3;
+        return 4;
     }
 
     @Override
@@ -76,31 +69,24 @@ public class TicketCreateController extends HttpServlet {
         t.setCreatedBy(currentUser.getId());
         t.setLocationId(currentUser.getLocationId() > 0 ? currentUser.getLocationId() : 1);
 
+        // ── Incident ────────────────────────────────────────────────────────
         if ("Incident".equals(ticketType)) {
-
             String catStr = request.getParameter("categoryId");
-
-            int impact = Integer.parseInt(request.getParameter("impact"));
-            int urgency = Integer.parseInt(request.getParameter("urgency"));
-
-            int calculatedPriority = calculatePriority(impact, urgency);
-
             if (catStr == null || catStr.isEmpty() || "null".equals(catStr)) {
                 request.setAttribute("errorMessage", "Vui lòng chọn đầy đủ đến mục 'Lỗi chi tiết'.");
                 preserveFormForError(request, ticketType);
                 doGet(request, response);
                 return;
             }
-
             try {
+                int impact = Integer.parseInt(request.getParameter("impact"));
+                int urgency = Integer.parseInt(request.getParameter("urgency"));
                 t.setCategoryId(Integer.parseInt(catStr));
                 t.setImpact(impact);
                 t.setUrgency(urgency);
-                t.setPriorityId(calculatedPriority);
-
+                t.setPriorityId(calculatePriority(impact, urgency));
                 t.setServiceCatalogId(null);
                 t.setRequiresApproval(false);
-
             } catch (NumberFormatException e) {
                 request.setAttribute("errorMessage", "Dữ liệu độ khẩn cấp/ảnh hưởng không hợp lệ.");
                 preserveFormForError(request, ticketType);
@@ -108,27 +94,23 @@ public class TicketCreateController extends HttpServlet {
                 return;
             }
 
+        // ── ServiceRequest ──────────────────────────────────────────────────
         } else if ("ServiceRequest".equals(ticketType)) {
-
             String serviceStr = request.getParameter("serviceCatalogId");
-
             if (serviceStr == null || serviceStr.isEmpty()) {
                 request.setAttribute("errorMessage", "Vui lòng chọn dịch vụ cụ thể.");
                 preserveFormForError(request, ticketType);
                 doGet(request, response);
                 return;
             }
-
             try {
                 int serviceId = Integer.parseInt(serviceStr);
                 ServiceCatalogDao svcDao = new ServiceCatalogDao();
                 ServiceCatalog svc = svcDao.getServiceById(serviceId);
-
                 if (svc != null) {
                     t.setServiceCatalogId(serviceId);
                     t.setCategoryId(svc.getCategoryId());
                     t.setRequiresApproval(svc.isRequiresApproval());
-
                     t.setImpact(null);
                     t.setUrgency(null);
                     t.setPriorityId(null);
@@ -146,6 +128,7 @@ public class TicketCreateController extends HttpServlet {
             }
         }
 
+        // ── Kiểm tra Asset tag ──────────────────────────────────────────────
         String assetTag = request.getParameter("assetTag");
         if (assetTag == null || assetTag.trim().isEmpty()) {
             request.setAttribute("errorMessage", "Vui lòng nhập Asset tag.");
@@ -153,16 +136,16 @@ public class TicketCreateController extends HttpServlet {
             doGet(request, response);
             return;
         }
-
         AssetsDAO assetsDAO = new AssetsDAO();
         Assets asset = assetsDAO.getAssetByTag(assetTag.trim());
         if (asset == null) {
-            request.setAttribute("errorMessage", "Asset tag is wrong.");
+            request.setAttribute("errorMessage", "Asset tag không tồn tại trong hệ thống.");
             preserveFormForError(request, ticketType);
             doGet(request, response);
             return;
         }
 
+        // ── Tạo Ticket ──────────────────────────────────────────────────────
         TicketDAO dao = new TicketDAO();
         // GỌI BỘ ĐIỀU PHỐI ITIL ĐỂ XẾP HÀNG ĐỢI
         dao.applyITILRouting(t);
@@ -205,6 +188,33 @@ public class TicketCreateController extends HttpServlet {
             request.setAttribute("errorMessage", "Lỗi hệ thống: Không thể tạo Ticket.");
             doGet(request, response);
         }
+
+        // ── Liên kết Asset ──────────────────────────────────────────────────
+        Tickets created = dao.getTicketByNumber(t.getTicketNumber());
+        if (created != null) {
+            TicketAssetsDAO ticketAssetsDAO = new TicketAssetsDAO();
+            boolean linked = ticketAssetsDAO.addLink(created.getId(), asset.getId());
+            if (!linked) {
+                request.setAttribute("errorMessage",
+                        "Ticket đã tạo nhưng không thể liên kết asset. Vui lòng thử lại từ trang chi tiết ticket.");
+                preserveFormForError(request, ticketType);
+                doGet(request, response);
+                return;
+            }
+        }
+
+        // ── Khởi động SLA ───────────────────────────────────────────────────
+        if (t.getPriorityId() != null && t.getPriorityId() > 0) {
+            boolean isPendingApproval = "ServiceRequest".equals(t.getTicketType())
+                    && t.getRequiresApproval() != null
+                    && t.getRequiresApproval();
+            if (!isPendingApproval) {
+                SLATrackingDao slaDao = new SLATrackingDao();
+                slaDao.applySLAForTicket(newTicketId, t.getTicketType(), t.getPriorityId());
+            }
+        }
+
+        response.sendRedirect(request.getContextPath() + "/Tickets?created=1");
     }
 
     private void preserveFormForError(HttpServletRequest request, String ticketType) {

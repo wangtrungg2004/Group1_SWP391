@@ -81,12 +81,8 @@
                             <span class="pcoded-mtext">Ticket - Assets</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="CreateTicket" class="nav-link">
-                            <span class="pcoded-micon"><i class="feather icon-plus-circle"></i></span>
-                            <span class="pcoded-mtext">Create Ticket</span>
-                        </a>
-                    </li>
+                    
+                    
 
                     <li class="nav-item pcoded-menu-caption"><label>Problem & Knowledge</label></li>
                     <li class="nav-item">
@@ -141,6 +137,12 @@
                         <a href="ManagerDashboard" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-home"></i></span>
                             <span class="pcoded-mtext">Dashboard</span>
+                        </a>
+                    </li>
+                     <li class="nav-item">
+                        <a href="Queues" class="nav-link">
+                            <span class="pcoded-micon"><i class="feather icon-inbox"></i></span>
+                            <span class="pcoded-mtext">Ticket Queues</span>
                         </a>
                     </li>
 
