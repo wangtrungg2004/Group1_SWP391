@@ -1242,45 +1242,70 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         }
     }
 
-//    private int demMotSo(String sql, Date tu, Date den) {
-//        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-//            ps.setDate(1, tu);
-//            ps.setDate(2, den);
-//            try (ResultSet rs = ps.executeQuery()) {
-//                if (rs.next()) return rs.getInt(1);
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        return 0;
-////    }
-//    
-//    public static void main(String[] args) {
-//
-//        TicketDAO dao = new TicketDAO();
-//
-//        List<Tickets> list = dao.getIncidentsNotInProblem();
-//
-//        System.out.println("Danh sach incident chua gan vao problem:");
-//
-//        for (Tickets t : list) {
-//            System.out.println(
-//                    t.getId() + " | " +
-//                            t.getTicketNumber() + " | " +
-//                            t.getTitle() + " | " +
-//                            t.getStatus());
-//        }
-//
-//    }
-//    public static void main(String[] args) {
-//
-//         TicketDAO dao = new TicketDAO(); // đã có connection bên trong
-//
-//    Date from = Date.valueOf(LocalDate.of(2026, 3, 1));
-//    Date to   = Date.valueOf(LocalDate.of(2026, 4, 1));
-//
-//    int result = dao.getAllTicketSolvedFromTo(from, to);
-//
-//    System.out.println("So ticket chua xu ly trong thang: " + result);
-//    }
+public List<Tickets> getResolvedTickets(String keyword, String type) {
+        List<Tickets> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.ResolvedAt, c.Name as CategoryName "
+                        + "FROM [dbo].[Tickets] t "
+                        + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
+                        + "WHERE t.Status = 'Resolved' ");
+
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        boolean hasType = type != null && !type.trim().isEmpty() && !type.equalsIgnoreCase("All");
+
+        if (hasKeyword) {
+            sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
+        }
+        if (hasType) {
+            sql.append("AND t.TicketType = ? ");
+        }
+        sql.append("ORDER BY t.ResolvedAt DESC");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int paramIdx = 1;
+            if (hasKeyword) {
+                String pattern = "%" + keyword.trim() + "%";
+                ps.setString(paramIdx++, pattern);
+                ps.setString(paramIdx++, pattern);
+            }
+            if (hasType) {
+                ps.setString(paramIdx++, type);
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Tickets t = new Tickets();
+                t.setId(rs.getInt("Id"));
+                t.setTicketNumber(rs.getString("TicketNumber"));
+                t.setTicketType(rs.getString("TicketType"));
+                t.setTitle(rs.getString("Title"));
+                t.setStatus(rs.getString("Status"));
+                t.setResolvedAt(rs.getTimestamp("ResolvedAt"));
+                t.setCategoryName(rs.getString("CategoryName"));
+                list.add(t);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+
+public boolean reopenTicketForUser(int ticketId, int userId) {
+        String sql = "UPDATE [dbo].[Tickets] "
+                + "SET Status = 'Reopened', "
+                + "    UpdatedAt = GETDATE(), "
+                + "    ResolvedAt = NULL, "
+                + "    ClosedAt = NULL "
+                + "WHERE Id = ? "
+                + "  AND CreatedBy = ? "
+                + "  AND Status IN ('Resolved', 'Closed')";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, ticketId);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }
