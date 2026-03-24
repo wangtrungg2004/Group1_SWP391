@@ -596,7 +596,7 @@
                                             <div>
                                                 <div class="kpi-lbl">Active Users</div>
                                                 <div class="kpi-val">${totalActiveUsers}</div>
-                                                <div class="kpi-sub">IsActive = true</div>
+<!--                                                <div class="kpi-sub">IsActive = true</div>-->
                                             </div>
                                         </div>
                                     </div>
