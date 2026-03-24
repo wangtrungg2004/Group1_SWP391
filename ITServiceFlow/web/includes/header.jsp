@@ -8,6 +8,7 @@
 <%@page import="java.util.List"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
+<%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
 <%
     if (session != null && session.getAttribute("userId") != null 
         && request.getAttribute("headerNotifications") == null) 
@@ -29,6 +30,15 @@
     <style>
         .noti-body {
             overflow-y: auto;
+        }
+        .noti-text-ellipsis {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+            word-break: break-word;
         }
     </style>
     <div class="m-header">
@@ -88,7 +98,16 @@
                                                                 <fmt:formatDate value="${notification.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
                                                             </span>
                                                         </p>
-                                                        <p><c:out value="${notification.message}"/></p>
+                                                        <p class="noti-text-ellipsis" title="${notification.message}">
+                                                            <c:choose>
+                                                                <c:when test="${fn:length(notification.message) > 120}">
+                                                                    <c:out value="${fn:substring(notification.message, 0, 120)}"/>...
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <c:out value="${notification.message}"/>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </a>

@@ -103,11 +103,19 @@ public class CreateNotification extends HttpServlet {
         String target = request.getParameter("target"); // "one" hoặc "all"
         String userIdParam = request.getParameter("userId"); // khi target = one
 
-        if (title == null || title.trim().isEmpty() || message == null || message.trim().isEmpty()) {
+        title = (title == null) ? "" : title.trim();
+        message = (message == null) ? "" : message.trim();
+        if (title.isEmpty() || message.isEmpty()) {
             request.setAttribute("error", "Title and Message are required.");
             request.getRequestDispatcher("CreateNotification.jsp").forward(request, response);
             return;
         }
+        if (message.length() > 500) {
+            request.setAttribute("error", "Message cannot exceed 500 characters.");
+            request.getRequestDispatcher("CreateNotification.jsp").forward(request, response);
+            return;
+        }
+
         if (type == null || type.trim().isEmpty()) type = "General";
         Integer relatedTicketId = null;
 

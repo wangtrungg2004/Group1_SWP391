@@ -3,7 +3,7 @@
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 <%@ page import="java.util.List" %>
 <%@ page import="model.Notifications" %>
-
+<%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,6 +23,12 @@
         .pcoded-navbar.navbar-collapsed ~ .pcoded-main-container { margin-left: 80px !important; }
         .pcoded-content, .pcoded-inner-content, .main-body, .page-wrapper { max-width: 100% !important; width: 100% !important; }
         body { overflow-x: hidden; }
+        .msg-cell {
+            max-width: 320px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     </style>
 </head>
 <body class="">
@@ -107,7 +113,16 @@
                                                                                 </c:otherwise>
                                                                             </c:choose>
                                                                         </td>
-                                                                        <td>${n.message}</td>
+                                                                        <td class="msg-cell" title="${n.message}">
+                                                                            <c:choose>
+                                                                                <c:when test="${fn:length(n.message) > 80}">
+                                                                                    <c:out value="${fn:substring(n.message, 0, 80)}"/>...
+                                                                                </c:when>
+                                                                                <c:otherwise>
+                                                                                    <c:out value="${n.message}"/>
+                                                                                </c:otherwise>
+                                                                            </c:choose>
+                                                                        </td>
                                                                         <td><fmt:formatDate value="${n.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
                                                                         <!--<td>${n.isRead ? 'Read' : 'Unread'}</td>-->
                                                                         <td>

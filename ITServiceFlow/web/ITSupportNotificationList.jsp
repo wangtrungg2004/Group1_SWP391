@@ -9,6 +9,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="model.Notifications" %>
 <%@ page import="dao.NotificationDao" %>
+<%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
 <%
         if (session != null && session.getAttribute("userId") != null 
                 && request.getAttribute("headerNotifications") == null) 
@@ -74,6 +75,12 @@
     /* tránh scroll ngang ảo */
     body {
         overflow-x: hidden;
+    }
+    .msg-cell {
+        max-width: 320px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     </style>
 </head>
@@ -176,7 +183,16 @@
                                                                             </c:otherwise>
                                                                         </c:choose>
                                                                     </td>
-                                                                    <td>${n.message}</td>
+                                                                    <td class="msg-cell" title="${n.message}">
+                                                                        <c:choose>
+                                                                            <c:when test="${fn:length(n.message) > 80}">
+                                                                                <c:out value="${fn:substring(n.message, 0, 80)}"/>...
+                                                                            </c:when>
+                                                                            <c:otherwise>
+                                                                                <c:out value="${n.message}"/>
+                                                                            </c:otherwise>
+                                                                        </c:choose>
+                                                                    </td>
                                                                     <td>${n.createdAt}</td>
                                                                     <!--<td>${n.isRead  ? 'Read' : 'UnRead'}</td>-->
                                                                     <td class="d-flex gap-1">
