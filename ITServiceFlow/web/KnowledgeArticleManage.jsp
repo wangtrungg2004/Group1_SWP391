@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -13,8 +14,8 @@
 </head>
 
 <body>
-    <jsp:include page="/includes/sidebar.jsp" />
-    <jsp:include page="/includes/header.jsp" />
+    <jsp:include page="includes/sidebar.jsp" />
+    <jsp:include page="includes/header.jsp" />
 
     <div class="pcoded-main-container">
         <div class="pcoded-content">
@@ -45,32 +46,50 @@
                                         <h5 class="mb-0"><i class="feather icon-book mr-1"></i> List of knowledge articles</h5>
                                     </div>
                                     <div class="card-body">
-                                        <form action="KnowledgeArticleManage" method="GET" class="mb-4">
+                                        <form id="searchForm" action="KnowledgeArticleManage" method="GET" class="mb-4">
                                             <div class="row align-items-end">
-                                                <div class="col-md-5">
+                                                <div class="col-md-7">
                                                     <div class="form-group mb-0">
                                                         <label class="floating-label">Search</label>
-                                                        <input type="text" class="form-control" name="keyword" value="${keyword}" placeholder="Article title, content, or code...">
+                                                        <div class="input-group">
+                                                            <input type="text" class="form-control" name="keyword" value="${keyword}" placeholder="Article title, content, or code...">
+                                                            <div class="input-group-append">
+                                                                <button type="submit" class="btn btn-primary">
+                                                                    <i class="feather icon-search mr-1"></i> Search
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <div class="form-group mb-0">
                                                         <label class="floating-label">Status</label>
-                                                        <select class="form-control" name="status">
-                                                            <option value="All" ${status == 'All' || empty status ? 'selected' : ''}>All</option>
-                                                            <option value="Draft" ${status == 'Draft' ? 'selected' : ''}>Draft</option>
-                                                            <option value="Published" ${status == 'Published' ? 'selected' : ''}>Published</option>
-                                                            <option value="Archived" ${status == 'Archived' ? 'selected' : ''}>Archived</option>
+                                                        <select class="form-control" name="status" onchange="document.getElementById('searchForm').submit()">
+                                                            <option value="All" ${status eq 'All' or empty status ? 'selected' : ''}>All</option>
+                                                            <option value="Draft" ${status eq 'Draft' ? 'selected' : ''}>Draft</option>
+                                                            <option value="Published" ${status eq 'Published' ? 'selected' : ''}>Published</option>
+                                                            <option value="Archived" ${status eq 'Archived' ? 'selected' : ''}>Archived</option>
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-4">
-                                                    <button type="submit" class="btn btn-primary">
-                                                        <i class="feather icon-search mr-1"></i> Filter
-                                                    </button>
-                                                    <a href="KnowledgeArticleManage" class="btn btn-outline-secondary">
-                                                        <i class="feather icon-refresh-cw mr-1"></i> Reset
-                                                    </a>
+                                                <div class="col-md-2">
+                                                    <div class="form-group mb-0">
+                                                        <label class="floating-label">Category</label>
+                                                        <select class="form-control" name="category" onchange="document.getElementById('searchForm').submit()">
+                                                            <option value="All" ${category eq 'All' or empty category ? 'selected' : ''}>All</option>
+                                                            <option value="Phần mềm" ${category eq 'Phần mềm' ? 'selected' : ''}>Phần mềm</option>
+                                                            <option value="Mạng & Kết nối" ${category eq 'Mạng & Kết nối' ? 'selected' : ''}>Mạng & Kết nối</option>
+                                                            <option value="Phần cứng" ${category eq 'Phần cứng' ? 'selected' : ''}>Phần cứng</option>
+                                                            <option value="Bảo mật" ${category eq 'Bảo mật' ? 'selected' : ''}>Bảo mật</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-1">
+                                                    <c:if test="${not empty keyword or (not empty status and status ne 'All') or (not empty category and category ne 'All')}">
+                                                        <a href="KnowledgeArticleManage" class="btn btn-outline-secondary">
+                                                            <i class="feather icon-refresh-cw mr-1"></i>
+                                                        </a>
+                                                    </c:if>
                                                 </div>
                                             </div>
                                         </form>
@@ -81,6 +100,8 @@
                                                     <tr>
                                                         <th>ID</th>
                                                         <th>Title</th>
+                                                        <th>Status</th>
+                                                        <th>Category</th>
                                                         <th>Date created</th>
                                                         <th>Attached</th>
                                                         <th class="text-center">Action</th>
@@ -91,7 +112,23 @@
                                                         <tr>
                                                             <td>${article.id}</td>
                                                             <td><strong>${article.title}</strong></td>
-                                                            <td>${article.createdAt}</td>
+                                                            <td>${article.status}</td>
+                                                            <td>
+                                                                <c:choose>
+                                                                    <c:when test="${not empty article.categoryId}">
+                                                                        ${categoryMap[article.categoryId]}
+                                                                    </c:when>
+                                                                    <c:otherwise>—</c:otherwise>
+                                                                </c:choose>
+                                                            </td>
+                                                            <td>
+                                                                <c:choose>
+                                                                    <c:when test="${not empty article.createdAt}">
+                                                                        <fmt:formatDate value="${article.createdAt}" pattern="dd/MM/yyyy" />
+                                                                    </c:when>
+                                                                    <c:otherwise>—</c:otherwise>
+                                                                </c:choose>
+                                                            </td>
                                                             <td>
                                                                 <c:forEach var="file" items="${article.attachments}">
                                                                     <a href="<c:url value='/files/download?id=${file.id}'/>" target="_blank" class="badge badge-info mb-1">

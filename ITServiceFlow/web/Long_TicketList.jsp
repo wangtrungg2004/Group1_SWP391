@@ -232,6 +232,9 @@
                                                                                     </c:choose>
                                                                                 </td>
                                                                                 <td>
+                                                                                    <a href="TicketDetailServlet?id=${t.id}" class="btn btn-sm btn-info mb-1" title="View Ticket Detail">
+                                                                                        <i class="feather icon-eye"></i> View
+                                                                                    </a>
                                                                                     <button type="button"
                                                                                             class="btn btn-sm btn-warning mb-1"
                                                                                             data-toggle="modal"
