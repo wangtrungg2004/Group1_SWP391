@@ -194,7 +194,7 @@ public class SLATrackingDao extends DbContext {
 
     public java.util.List<java.util.Map<String, Object>> getEscalationCandidates() {
         java.util.List<java.util.Map<String, Object>> list = new java.util.ArrayList<>();
-        String sql = "SELECT st.TicketId, t.TicketNumber, t.Title, t.AssignedTo, st.ResolutionDeadline, " +
+        String sql = "SELECT st.TicketId, t.TicketNumber, t.Title, t.CreatedBy, t.AssignedTo, st.ResolutionDeadline, " +
                 "DATEDIFF(MINUTE, GETDATE(), st.ResolutionDeadline) AS RemainingMinutes " +
                 "FROM [dbo].[SLATracking] st " +
                 "INNER JOIN [dbo].[Tickets] t ON t.Id = st.TicketId " +
@@ -208,6 +208,7 @@ public class SLATrackingDao extends DbContext {
                 map.put("TicketId", rs.getInt("TicketId"));
                 map.put("TicketNumber", rs.getString("TicketNumber"));
                 map.put("Title", rs.getString("Title"));
+                map.put("CreatedBy", rs.getInt("CreatedBy"));
                 Object assignedObj = rs.getObject("AssignedTo");
                 map.put("AssignedTo", assignedObj == null ? null : ((Number) assignedObj).intValue());
                 map.put("ResolutionDeadline", rs.getTimestamp("ResolutionDeadline"));

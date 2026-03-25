@@ -7,12 +7,17 @@ package service;
 import dao.NotificationDao;
 import dao.SLARuleDao;
 import dao.SLATrackingDao;
+import dao.UserDao;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import model.SLARule;
 import model.SLATracking;
 
@@ -24,11 +29,13 @@ public class SLATrackingService {
     private SLATrackingDao slaTrackingDao;
     private SLARuleDao slaRuleDao;
     private NotificationDao notificationDao;
+    private UserDao userDao;
 
     public SLATrackingService() {
         this.slaTrackingDao = new SLATrackingDao();
         this.slaRuleDao = new SLARuleDao();
         this.notificationDao = new NotificationDao();
+        this.userDao = new UserDao();
     }
 
     public void applySLARuleToTicket(int ticketId, String ticketType, int priorityId) {
@@ -85,13 +92,14 @@ public class SLATrackingService {
             return;
         }
 
+        List<Integer> managerIds = userDao.getActiveUserIdsByRoles(Arrays.asList("Manager"));
         List<Map<String, Object>> candidates = slaTrackingDao.getEscalationCandidates();
         for (Map<String, Object> item : candidates) {
-            processEscalationCandidate(item);
+            processEscalationCandidate(item, managerIds);
         }
     }
 
-    private void processEscalationCandidate(Map<String, Object> item) {
+    private void processEscalationCandidate(Map<String, Object> item, List<Integer> managerIds) {
         Integer ticketId = toInteger(item.get("TicketId"));
         Date deadline = toDate(item.get("ResolutionDeadline"));
         Integer remainingMinutes = toInteger(item.get("RemainingMinutes"));
@@ -99,19 +107,19 @@ public class SLATrackingService {
             return;
         }
 
+        Integer assignedTo = toInteger(item.get("AssignedTo"));
+        Integer createdBy = toInteger(item.get("CreatedBy"));
+        List<Integer> recipients = collectRecipientUserIds(createdBy, assignedTo, managerIds);
+
         if (remainingMinutes < 0) {
             String title = "SLA Breached: " + getTicketDisplay(item, ticketId);
             String message = "Ticket " + getTicketDisplay(item, ticketId)
                     + " da breach SLA (deadline: " + formatDateTime(deadline) + ")."
                     + " Vui long uu tien xu ly ngay.";
             triggerEscalation(item, "BREACHED", "SLA breached", deadline, remainingMinutes,
-                    "BROADCAST", null, title, message, "ESCALATE_TO_MANAGER", "Manager", null);
+                    recipients, title, message, "ESCALATE_TO_MANAGER", "Manager", null);
             return;
         }
-
-        Integer assignedTo = toInteger(item.get("AssignedTo"));
-        String targetType = assignedTo == null ? "BROADCAST" : "USER";
-        Integer targetUserId = assignedTo;
 
         if (remainingMinutes <= 30) {
             String title = "SLA Warning (30m): " + getTicketDisplay(item, ticketId);
@@ -119,7 +127,7 @@ public class SLATrackingService {
                     + " con " + Math.max(0, remainingMinutes)
                     + " phut truoc han SLA. Can hoan tat gap.";
             triggerEscalation(item, "NEAR_BREACH_30M", "Near breach 30m", deadline, remainingMinutes,
-                    targetType, targetUserId, title, message, null, null, null);
+                    recipients, title, message, null, "Manager", null);
             return;
         }
 
@@ -128,7 +136,7 @@ public class SLATrackingService {
             String message = "Ticket " + getTicketDisplay(item, ticketId)
                     + " dang sap breach SLA. Con " + remainingMinutes + " phut.";
             triggerEscalation(item, "NEAR_BREACH_2H", "Near breach 2h", deadline, remainingMinutes,
-                    targetType, targetUserId, title, message, null, null, null);
+                    recipients, title, message, null, "Manager", null);
         }
     }
 
@@ -137,8 +145,7 @@ public class SLATrackingService {
                                    String stageLabel,
                                    Date deadline,
                                    Integer remainingMinutes,
-                                   String notificationTargetType,
-                                   Integer notificationTargetId,
+                                   List<Integer> recipientUserIds,
                                    String notificationTitle,
                                    String notificationMessage,
                                    String autoAction,
@@ -153,28 +160,33 @@ public class SLATrackingService {
             return;
         }
 
-        boolean notificationSent;
-        if ("USER".equalsIgnoreCase(notificationTargetType) && notificationTargetId != null) {
-            notificationSent = notificationDao.addNotification(
-                    notificationTargetId,
+        if (recipientUserIds == null || recipientUserIds.isEmpty()) {
+            return;
+        }
+
+        int sentCount = 0;
+        for (Integer recipientId : recipientUserIds) {
+            if (recipientId == null || recipientId <= 0) {
+                continue;
+            }
+            boolean sent = notificationDao.addNotification(
+                    recipientId,
                     notificationMessage,
                     ticketId,
                     false,
                     notificationTitle,
                     "Ticket");
-        } else {
-            notificationSent = notificationDao.addBroadcastNotification(
-                    notificationMessage,
-                    ticketId,
-                    notificationTitle,
-                    "Ticket");
-            notificationTargetType = "BROADCAST";
-            notificationTargetId = null;
+            if (sent) {
+                sentCount++;
+            }
         }
 
-        if (!notificationSent) {
+        if (sentCount <= 0) {
             return;
         }
+
+        String notificationTargetType = recipientUserIds.size() == 1 ? "USER" : "GROUP";
+        Integer notificationTargetId = recipientUserIds.size() == 1 ? recipientUserIds.get(0) : null;
 
         slaTrackingDao.addEscalationHistory(
                 ticketId,
@@ -189,6 +201,26 @@ public class SLATrackingService {
                 autoAction,
                 escalatedToRole,
                 escalatedToUserId);
+    }
+
+    private List<Integer> collectRecipientUserIds(Integer createdBy, Integer assignedTo, List<Integer> managerIds) {
+        Set<Integer> recipients = new LinkedHashSet<>();
+
+        if (createdBy != null && createdBy > 0) {
+            recipients.add(createdBy);
+        }
+        if (assignedTo != null && assignedTo > 0) {
+            recipients.add(assignedTo);
+        }
+        if (managerIds != null) {
+            for (Integer managerId : managerIds) {
+                if (managerId != null && managerId > 0) {
+                    recipients.add(managerId);
+                }
+            }
+        }
+
+        return new ArrayList<>(recipients);
     }
 
     private Integer toInteger(Object value) {
