@@ -40,11 +40,15 @@ public class UserService {
     }
     
     public boolean createUser(String username, String email, String rawPassword, String fullName, String role, Integer departmentId) {
-        if (username == null || email == null || rawPassword == null || role == null) {
-            return false;
-        }
         int locationId = dao.getDefaultLocationId();
         if (locationId <= 0) {
+            return false;
+        }
+        return createUser(username, email, rawPassword, fullName, role, departmentId, locationId);
+    }
+
+    public boolean createUser(String username, String email, String rawPassword, String fullName, String role, Integer departmentId, Integer locationId) {
+        if (username == null || email == null || rawPassword == null || role == null || locationId == null || locationId <= 0) {
             return false;
         }
         // [PASSWORD_HASH] hash trước khi insert; khi bỏ hash: truyền rawPassword.trim() và đổi UserDao/DB dùng cột Password

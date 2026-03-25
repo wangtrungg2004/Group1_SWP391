@@ -39,6 +39,12 @@ public class SLABreachList extends HttpServlet {
             return;
         }
 
+        // Only Admin and Manager can access this screen
+        if (role == null || (!"Admin".equals(role) && !"Manager".equals(role))) {
+            response.sendRedirect("Login.jsp");
+            return;
+        }
+
         // Get Parameters
         String searchAgent = request.getParameter("agent");
         String priority = request.getParameter("priority");

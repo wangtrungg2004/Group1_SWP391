@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import model.TicketComments;
 import model.Tickets;
 import model.Users;
@@ -98,18 +100,18 @@ public class TicketReopenController extends HttpServlet {
         String title = "Ticket Reopened";
         String message = "Requester reopened ticket " + ticketNumber + ". Reason: " + compactReason;
 
+        Set<Integer> recipientIds = new LinkedHashSet<>();
+        if (ticket.getCreatedBy() > 0) {
+            recipientIds.add(ticket.getCreatedBy());
+        }
         Integer assignedTo = ticket.getAssignedTo();
         if (assignedTo != null && assignedTo > 0) {
-            notificationDao.addNotification(assignedTo, message, ticketId, false, title, "Ticket");
-            return;
+            recipientIds.add(assignedTo);
         }
 
-        notificationDao.addBroadcastNotification(
-                "Ticket " + ticketNumber + " has been reopened and is waiting for assignment. Reason: " + compactReason,
-                ticketId,
-                title,
-                "Ticket"
-        );
+        for (Integer recipientId : recipientIds) {
+            notificationDao.addNotification(recipientId, message, ticketId, false, title, "Ticket");
+        }
     }
 
     private int parseInt(String value) {
