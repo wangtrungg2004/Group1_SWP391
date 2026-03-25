@@ -6,12 +6,12 @@
 <%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
 <%
     if (session.getAttribute("user") == null) {
-        response.sendRedirect(request.getContextPath() + "/Login.jsp");
+        response.sendRedirect("Login.jsp");
         return;
     }
     String role = (String) session.getAttribute("role");
     if (!"Admin".equals(role)) {
-        response.sendRedirect(request.getContextPath() + "/Login.jsp");
+        response.sendRedirect("Login.jsp");
         return;
     }
     model.Users currentUser = (model.Users) session.getAttribute("user");
@@ -24,18 +24,14 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <title>Admin Dashboard — IT ServiceFlow</title>
 
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/fonts/fontawesome/css/fontawesome-all.min.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/plugins/animation/css/animate.min.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/plugins/bootstrap/css/bootstrap.min.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
-
-        <%-- Scripts loaded early so Bootstrap dropdowns work in included header --%>
-        <script src="${pageContext.request.contextPath}/assets/plugins/jquery/js/jquery.min.js"></script>
-        <script src="${pageContext.request.contextPath}/assets/js/vendor-all.min.js"></script>
-        <script src="${pageContext.request.contextPath}/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-        <script src="${pageContext.request.contextPath}/assets/js/pcoded.min.js"></script>
+        <link rel="stylesheet" href="assets/fonts/fontawesome/css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="assets/plugins/animation/css/animate.min.css">
+        <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="assets/css/style.css">
 
         <style>
+            /* Fallback: prevent stuck gray preloader overlay */
+            .loader-bg { display: none !important; }
             /* ── Page background ───────────────────────────────────────── */
             .admin-dash .pcoded-content {
                 background: #f4f5f7;
@@ -347,8 +343,112 @@
     </head>
 
     <body class="">
-        
+        <!-- [ Pre-loader ] start -->
+        <div class="loader-bg">
+            <div class="loader-track">
+                <div class="loader-fill"></div>
+            </div>
+        </div>
         <!-- [ Pre-loader ] End -->
+	<!-- [ navigation menu ] start -->
+	<nav class="pcoded-navbar menupos-fixed menu-light brand-blue ">
+		<div class="navbar-wrapper ">
+			<div class="navbar-brand header-logo">
+				<a href="${pageContext.request.contextPath}/AdminDashboard" class="b-brand">
+<!--					<img src="assets/images/logo.svg" alt="" class="logo images">
+					<img src="assets/images/logo-icon.svg" alt="" class="logo-thumb images">-->
+				</a>
+				<a class="mobile-menu" id="mobile-collapse" href="#!"><span></span></a>
+			</div>
+			<div class="navbar-content scroll-div">
+				<ul class="nav pcoded-inner-navbar">
+					<li class="nav-item pcoded-menu-caption">
+						<label>Navigation</label>
+					</li>
+					<li class="nav-item">
+						<a href="${pageContext.request.contextPath}/AdminDashboard" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
+					</li>
+					<li class="nav-item pcoded-menu-caption">
+						<label>UI Element</label>
+					</li>
+					<li class="nav-item pcoded-hasmenu">
+						<a href="#!" class="nav-link"><span class="pcoded-micon"><i class="feather icon-box"></i></span><span class="pcoded-mtext">Componant</span></a>
+						<ul class="pcoded-submenu">
+							<li class=""><a href="bc_button.html" class="">Button</a></li>
+							<li class=""><a href="bc_badges.html" class="">Badges</a></li>
+							<li class=""><a href="bc_breadcrumb-pagination.html" class="">Breadcrumb & paggination</a></li>
+							<li class=""><a href="bc_collapse.html" class="">Collapse</a></li>
+							<li class=""><a href="bc_progress.html" class="">Progress</a></li>
+							<li class=""><a href="bc_tabs.html" class="">Tabs & pills</a></li>
+							<li class=""><a href="bc_typography.html" class="">Typography</a></li>
+						</ul>
+					</li>
+					<li class="nav-item pcoded-menu-caption">
+						<label>Forms &amp; table</label>
+					</li>
+					<li class="nav-item">
+						<a href="ProblemList" class="nav-link"><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Problem List</span></a>
+					</li>
+					<li class="nav-item">
+						<a href="tbl_bootstrap.html" class="nav-link"><span class="pcoded-micon"><i class="feather icon-align-justify"></i></span><span class="pcoded-mtext">Bootstrap table</span></a>
+					</li>
+					<li class="nav-item pcoded-menu-caption">
+						<label>Chart & Maps</label>
+					</li>
+					<li class="nav-item">
+						<a href="chart-morris.html" class="nav-link"><span class="pcoded-micon"><i class="feather icon-pie-chart"></i></span><span class="pcoded-mtext">Chart</span></a>
+					</li>
+					<li class="nav-item">
+						<a href="map-google.html" class="nav-link"><span class="pcoded-micon"><i class="feather icon-map"></i></span><span class="pcoded-mtext">Maps</span></a>
+					</li>
+					<c:if test="${role == 'Admin'}">
+						<li class="nav-item pcoded-menu-caption">
+							<label>Quan tri he thong</label>
+						</li>
+						<li class="nav-item">
+							<a href="UserManagement" class="nav-link"><span class="pcoded-micon"><i class="feather icon-users"></i></span><span class="pcoded-mtext">User Management</span></a>
+						</li>
+                                            <li class="nav-item">
+                                                    <a href="CIListServlet" class="nav-link"><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">List Configuration Items</span></a>
+                                            </li>
+                                            <li class="nav-item">
+                                                    <a href="Long_TicketListServlet" class="nav-link"><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">List Tickets</span></a>
+                                            </li>
+					</c:if>
+					<c:if test="${role == 'Admin' || role == 'Manager'}">
+						<li class="nav-item pcoded-menu-caption">
+							<label>Bao cao</label>
+						</li>
+						<li class="nav-item">
+							<a href="Reports" class="nav-link"><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Xem bao cao</span></a>
+						</li>
+					</c:if>
+					<c:if test="${role == 'IT Support' || role == 'Admin'}">
+						<li class="nav-item pcoded-menu-caption">
+							<label>Ho tro</label>
+						</li>
+						<li class="nav-item">
+							<a href="Tickets" class="nav-link"><span class="pcoded-micon"><i class="feather icon-help-circle"></i></span><span class="pcoded-mtext">Quan ly Ticket</span></a>
+						</li>
+					</c:if>
+					<li class="nav-item pcoded-menu-caption">
+						<label>Pages</label>
+					</li>
+					<li class="nav-item pcoded-hasmenu">
+						<a href="#!" class="nav-link"><span class="pcoded-micon"><i class="feather icon-lock"></i></span><span class="pcoded-mtext">Authentication</span></a>
+						<ul class="pcoded-submenu">
+							<li class=""><a href="auth-signup.html" class="" target="_blank">Sign up</a></li>
+							<li class=""><a href="auth-signin.html" class="" target="_blank">Sign in</a></li>
+						</ul>
+					</li>
+					<li class="nav-item"><a href="sample-page.html" class="nav-link"><span class="pcoded-micon"><i class="feather icon-sidebar"></i></span><span class="pcoded-mtext">Sample page</span></a></li>
+					<li class="nav-item disabled"><a href="#!" class="nav-link"><span class="pcoded-micon"><i class="feather icon-power"></i></span><span class="pcoded-mtext">Disabled menu</span></a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!-- [ navigation menu ] end -->
+
         <!-- [ navigation menu ] start -->
         <nav class="pcoded-navbar menupos-fixed menu-light brand-blue ">
             <div class="navbar-wrapper ">
@@ -450,9 +550,6 @@
         </nav>
         <!-- [ navigation menu ] end -->
 
-        <%-- ── Top header bar (notifications + logout dropdown) ── --%>
-        <jsp:include page="includes/header.jsp"/>
-
         <!-- ════════════════════════════════════════════════════════════════════
              MAIN CONTENT
         ════════════════════════════════════════════════════════════════════ -->
@@ -472,7 +569,7 @@
                                                     <h5 class="m-b-10">Admin Dashboard</h5>
                                                 </div>
                                                 <ul class="breadcrumb">
-                                                    <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/AdminDashboard"><i class="feather icon-home"></i></a></li>
+                                                    <li class="breadcrumb-item"><a href="AdminDashboard"><i class="feather icon-home"></i></a></li>
                                                     <li class="breadcrumb-item">System Overview</li>
                                                 </ul>
                                             </div>
@@ -506,7 +603,7 @@
                                             <div>
                                                 <div class="kpi-lbl">Active Users</div>
                                                 <div class="kpi-val">${totalActiveUsers}</div>
-<!--                                                <div class="kpi-sub">IsActive = true</div>-->
+                                                <div class="kpi-sub">IsActive = true</div>
                                             </div>
                                         </div>
                                     </div>
@@ -971,7 +1068,8 @@
                                                 </div>
                                             </div>
                                             <!-- Rating distribution bars -->
-                                            <c:forEach begin="5" end="1" step="-1" var="star">
+                                            <c:forEach begin="1" end="5" var="i">
+                                                <c:set var="star" value="${6 - i}" />
                                                 <c:set var="distIdx" value="${star - 1}" />
 
                                                 <div class="prow">
@@ -992,7 +1090,8 @@
                                                     <span class="pnum">${csatDist[distIdx]}</span>
                                                 </div>
                                             </c:forEach>
-                                            <c:forEach begin="5" end="1" step="-1" var="star">
+                                            <c:forEach begin="1" end="5" var="i">
+                                                <c:set var="star" value="${6 - i}" />
                                                 <c:set var="distIdx" value="${star - 1}" />
                                                 <div class="prow">
                                                     <span class="plabel" style="width:30px">★${star}</span>
@@ -1067,6 +1166,10 @@
         <!-- ════════════════════════════════════════════════════════════════════
              SCRIPTS
         ════════════════════════════════════════════════════════════════════ -->
+        <script src="assets/plugins/jquery/js/jquery.min.js"></script>
+        <script src="assets/js/vendor-all.min.js"></script>
+        <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+        <script src="assets/js/pcoded.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
         <%-- Pass server-side data into JS --%>

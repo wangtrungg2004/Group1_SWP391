@@ -114,6 +114,10 @@
     </filter-mapping>
     <filter-mapping>
         <filter-name>AuthorizationFilter</filter-name>
+        <url-pattern>/AdminDashboard</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthorizationFilter</filter-name>
         <url-pattern>/AdminDashboard.jsp</url-pattern>
     </filter-mapping>
     <filter-mapping>

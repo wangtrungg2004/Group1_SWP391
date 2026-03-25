@@ -15,7 +15,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.util.ArrayList;
 import service.TimeLogService;
 
 @WebServlet(name = "AgentTicketDetail", urlPatterns = {"/TicketAgentDetail"})
@@ -63,43 +62,9 @@ public class AgentTicketDetailController extends HttpServlet {
             request.setAttribute("isSlaBreached", new Date().after(slaTracking.getResolutionDeadline()));
         }
 
-
         // 4. Related Problem
         ProblemDao problemDao = new ProblemDao();
         request.setAttribute("relatedProblem", problemDao.getProblemByTicketId(ticketId));
-
-        // ==========================================
-        // THÊM MỚI: LẤY VÀ GOM NHÓM CATEGORY (DỰA VÀO PARENT ID)
-        // ==========================================
-        CategoryDao catDao = new CategoryDao();
-            List<Category> allCategories = catDao.getAllCategories();
-            
-            List<Category> mainCategories = new ArrayList<>(); // Cho ô 1 (Parent IS NULL)
-            List<Category> subCategories = new ArrayList<>(); // Cho ô 2 (Parent IS NOT NULL)
-            
-            // Phân loại danh mục
-            for (Category cat : allCategories) {
-                if (cat.getParentId() == null || cat.getParentId() == 0) {
-                    mainCategories.add(cat);
-                } else {
-                    subCategories.add(cat);
-                }
-            }
-            
-            // Xác định danh mục cha của vé
-            Integer ticketParentCatId = 0;
-            for (Category cat : subCategories) {
-                if (cat.getId() == ticket.getCategoryId()) {
-                    ticketParentCatId = cat.getParentId();
-                    break;
-                }
-            }
-            
-            request.setAttribute("mainCategories", mainCategories);
-            request.setAttribute("subCategories", subCategories); // Gửi hết để filter ở client-side
-            request.setAttribute("ticketParentCatId", ticketParentCatId); // Cho logic pre-select
-            // ==========================================
-
 
         
         // ==========================================
@@ -159,24 +124,8 @@ if (parentId != null && parentId > 0) {
             }
             session.removeAttribute("timeLogFlash");
         }
-        
-        // Nếu là Manager, lấy danh sách IT Support để phục vụ Modal "Assign To..."
-        // Sửa trong cả 2 file Controller (AgentTicketDetail và AgentQueue)
-        if ("Manager".equals(session.getAttribute("role")) || "Admin".equals(session.getAttribute("role"))) {
-            request.setAttribute("itSupportList", ticketDao.getActiveAgents());
-        }
-
-       
 
         request.setAttribute("ticket", ticket);
-        
-        // BỘ ĐỊNH TUYẾN GIAO DIỆN (Y-FORK ROUTING)
-        if ("ServiceRequest".equals(ticket.getTicketType())) {
-            // Nếu là Yêu cầu dịch vụ -> Trả về giao diện chuyên biệt cho Request
-            request.getRequestDispatcher("/ticket/service_request_detail.jsp").forward(request, response);
-        } else {
-            // Mặc định là Incident -> Trả về giao diện Xử lý sự cố (bản đã làm)
-            request.getRequestDispatcher("/ticket/agent_ticket_detail.jsp").forward(request, response);
-        }
+        request.getRequestDispatcher("/ticket/agent_ticket_detail.jsp").forward(request, response);
     }
 }

@@ -1,0 +1,26 @@
+﻿@startuml
+skinparam shadowing false
+title Sequence Diagram - User Management Edit and Status Control
+autonumber
+
+participant "Admin" as Admin_0
+participant "UserManagement.jsp" as UserManagement_jsp_1
+participant "UserManagementController" as UserManagementController_2
+participant "UserDao" as UserDao_3
+participant "UserService" as UserService_4
+participant "AuditLogService" as AuditLogService_5
+participant "EmailUtil" as EmailUtil_6
+
+Admin_0 -> UserManagement_jsp_1 : open list with filters
+UserManagement_jsp_1 -> UserManagementController_2 : GET /UserManagement
+UserManagementController_2 -> UserDao_3 : countUsersForManagement(...)
+UserManagementController_2 -> UserDao_3 : searchUsersForManagement(...)
+UserManagementController_2 -> UserManagement_jsp_1 : render list + paging
+Admin_0 -> UserManagement_jsp_1 : submit action(update/role/status/reset)
+UserManagement_jsp_1 -> UserManagementController_2 : POST action
+UserManagementController_2 -> UserDao_3 : update user or active status
+UserManagementController_2 -> AuditLogService_5 : createAuditLog(...)
+UserManagementController_2 -> UserService_4 : createPasswordResetToken(...) [optional]
+UserManagementController_2 -> EmailUtil_6 : sendForgotPasswordEmail(...) [optional]
+UserManagementController_2 -> Admin_0 : redirect with flash
+@enduml

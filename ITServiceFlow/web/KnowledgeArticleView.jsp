@@ -2,11 +2,8 @@
     <%@ taglib uri="jakarta.tags.core" prefix="c" %>
         <% if (session.getAttribute("user")==null) { response.sendRedirect("Login.jsp"); return; } 
            String role=(String) session.getAttribute("role"); 
-           if (role==null) { response.sendRedirect("Login.jsp"); return; }
-           // Normalize role so "IT Support" and "itsupport" are treated the same.
-           String roleNormalized = role.trim().replaceAll("\\s+", "").toLowerCase();
-           boolean isItsupport = roleNormalized.equals("itsupport");
-        %>
+           // Allow all roles to view knowledge articles
+           if (role==null) { response.sendRedirect("Login.jsp"); return; } %>
             <!DOCTYPE html>
             <html lang="vi">
 
@@ -86,27 +83,25 @@
                         <div class="pcoded-content">
                             <div class="pcoded-inner-content">
 
-                                <% if (!isItsupport) { %>
-                                    <!-- Breadcrumb -->
-                                    <div class="page-header">
-                                        <div class="page-block">
-                                            <div class="row align-items-center">
-                                                <div class="col-md-12">
-                                                    <div class="page-header-title">
-                                                        <h5 class="m-b-10">Knowledge Article</h5>
-                                                    </div>
-                                                    <ul class="breadcrumb">
-                                                        <li class="breadcrumb-item"><a href="UserDashboard.jsp"><i
-                                                                    class="feather icon-home"></i></a></li>
-                                                        <li class="breadcrumb-item"><a href="KnowledgeSearch">Knowledge
-                                                                Search</a></li>
-                                                        <li class="breadcrumb-item active">Chi tiết bài viết</li>
-                                                    </ul>
+                                <!-- Breadcrumb -->
+                                <div class="page-header">
+                                    <div class="page-block">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-12">
+                                                <div class="page-header-title">
+                                                    <h5 class="m-b-10">Knowledge Article</h5>
                                                 </div>
+                                                <ul class="breadcrumb">
+                                                    <li class="breadcrumb-item"><a href="UserDashboard.jsp"><i
+                                                                class="feather icon-home"></i></a></li>
+                                                    <li class="breadcrumb-item"><a href="KnowledgeSearch">Knowledge
+                                                            Search</a></li>
+                                                    <li class="breadcrumb-item active">Chi tiết bài viết</li>
+                                                </ul>
                                             </div>
                                         </div>
                                     </div>
-                                <% } %>
+                                </div>
 
                                 <div class="main-body">
                                     <div class="page-wrapper">
@@ -121,17 +116,10 @@
 
                                         <div class="row">
                                             <div class="col-xl-12">
-                                                <% if (!isItsupport) { %>
-                                                    <a href="KnowledgeSearch" class="btn btn-light btn-sm mb-3"
-                                                       id="btn-back-search">
-                                                        <i class="feather icon-arrow-left mr-1"></i> Quay lại tìm kiếm
-                                                    </a>
-                                                <% } else { %>
-                                                    <a href="KnowledgeArticleManage" class="btn btn-light btn-sm mb-3"
-                                                       id="btn-back-manage">
-                                                        <i class="feather icon-arrow-left mr-1"></i> Quay lại
-                                                    </a>
-                                                <% } %>
+                                                <a href="KnowledgeSearch" class="btn btn-light btn-sm mb-3"
+                                                    id="btn-back-search">
+                                                    <i class="feather icon-arrow-left mr-1"></i> Quay lại tìm kiếm
+                                                </a>
 
                                                 <c:choose>
                                                     <c:when test="${not empty article}">
@@ -191,25 +179,17 @@
                                                             <hr class="mt-4" />
                                                             <div
                                                                 class="d-flex justify-content-between align-items-center flex-wrap pt-2">
-                                                                <% if (!isItsupport) { %>
-                                                                    <a href="KnowledgeSearch"
-                                                                       class="btn btn-outline-secondary btn-sm"
-                                                                       id="btn-back-bottom">
-                                                                        <i class="feather icon-arrow-left mr-1"></i> Quay
-                                                                        lại tìm kiếm
-                                                                    </a>
-                                                                    <a href="CreateTicket" class="btn btn-primary btn-sm"
-                                                                       id="btn-create-ticket">
-                                                                        <i class="feather icon-plus-circle mr-1"></i> Vẫn
-                                                                        cần hỗ trợ? Tạo Ticket
-                                                                    </a>
-                                                                <% } else { %>
-                                                                    <a href="KnowledgeArticleManage"
-                                                                       class="btn btn-outline-secondary btn-sm"
-                                                                       id="btn-back-manage-bottom">
-                                                                        <i class="feather icon-arrow-left mr-1"></i> Quay lại
-                                                                    </a>
-                                                                <% } %>
+                                                                <a href="KnowledgeSearch"
+                                                                    class="btn btn-outline-secondary btn-sm"
+                                                                    id="btn-back-bottom">
+                                                                    <i class="feather icon-arrow-left mr-1"></i> Quay
+                                                                    lại tìm kiếm
+                                                                </a>
+                                                                <a href="CreateTicket" class="btn btn-primary btn-sm"
+                                                                    id="btn-create-ticket">
+                                                                    <i class="feather icon-plus-circle mr-1"></i> Vẫn
+                                                                    cần hỗ trợ? Tạo Ticket
+                                                                </a>
                                                             </div>
                                                         </div>
                                                     </c:when>
@@ -220,10 +200,8 @@
                                                                     style="font-size:3rem; color:#dee2e6;"></i>
                                                                 <h6 class="mt-3 text-muted">Bài viết không tồn tại hoặc
                                                                     đã bị xóa.</h6>
-                                                                <% if (!isItsupport) { %>
-                                                                    <a href="KnowledgeSearch" class="btn btn-primary mt-3"
-                                                                       id="btn-go-search">Quay lại tìm kiếm</a>
-                                                                <% } %>
+                                                                <a href="KnowledgeSearch" class="btn btn-primary mt-3"
+                                                                    id="btn-go-search">Quay lại tìm kiếm</a>
                                                             </div>
                                                         </div>
                                                     </c:otherwise>

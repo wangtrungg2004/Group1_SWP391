@@ -32,6 +32,10 @@ public class Tickets {
     private String priorityLevel;
     private String assigneeName;
     private String serviceName;
+    private String assetTag;
+    private String assetName;
+    private String assetType;
+    private List<Assets> linkedAssets;
 
     private String assetTag;
     private String assetName;
@@ -314,6 +318,38 @@ public class Tickets {
 
     public void setResolutionDeadline(java.util.Date resolutionDeadline) {
         this.resolutionDeadline = resolutionDeadline;
+    }
+
+    public String getAssetTag() {
+        return assetTag;
+    }
+
+    public void setAssetTag(String assetTag) {
+        this.assetTag = assetTag;
+    }
+
+    public String getAssetName() {
+        return assetName;
+    }
+
+    public void setAssetName(String assetName) {
+        this.assetName = assetName;
+    }
+
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
+    }
+
+    public List<Assets> getLinkedAssets() {
+        return linkedAssets;
+    }
+
+    public void setLinkedAssets(List<Assets> linkedAssets) {
+        this.linkedAssets = linkedAssets;
     }
 
     public String getAssetTag() {

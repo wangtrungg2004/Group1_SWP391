@@ -1,0 +1,43 @@
+﻿@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+title Class Diagram - SLA Breach Escalation Rule Engine
+
+class "SLAEscalationFilter" as SLAEscalationFilter_0 {
+  +doFilter()
+  +runSweepIfDue()
+  +isIgnoredPath()
+}
+
+class "SLATrackingService" as SLATrackingService_1 {
+  +runEscalationSweep()
+  +processEscalationCandidate()
+  +triggerEscalation()
+}
+
+class "SLATrackingDao" as SLATrackingDao_2 {
+  +markBreachedTickets()
+  +isEscalationHistoryEnabled()
+  +getEscalationCandidates()
+  +hasEscalationHistory()
+  +addEscalationHistory()
+}
+
+class "NotificationDao" as NotificationDao_3 {
+  +addNotification()
+  +addBroadcastNotification()
+}
+
+class "SLAEscalationHistory" as SLAEscalationHistory_4 {
+  +ticketId
+  +stageCode
+  +stageLabel
+  +remainingMinutes
+  +triggeredAt
+}
+
+SLAEscalationFilter_0 --> SLATrackingService_1 : runEscalationSweep on interval
+SLATrackingService_1 --> SLATrackingDao_2 : breach and candidate queries
+SLATrackingService_1 --> NotificationDao_3 : send warning/escalation notifications
+SLATrackingDao_2 --> SLAEscalationHistory_4 : persist escalation event history
+@enduml

@@ -1,10 +1,28 @@
 <%-- Left sidebar - phn quy?n theo session attribute "role" --%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<c:set var="role" value="${sessionScope.role}" />
+<c:choose>
+    <c:when test="${role == 'Admin'}">
+        <c:set var="dashboardHref" value="${pageContext.request.contextPath}/AdminDashboard" />
+    </c:when>
+    <c:when test="${role == 'Manager'}">
+        <c:set var="dashboardHref" value="${pageContext.request.contextPath}/ManagerDashboard" />
+    </c:when>
+    <c:when test="${role == 'IT Support'}">
+        <c:set var="dashboardHref" value="${pageContext.request.contextPath}/ITDashboard" />
+    </c:when>
+    <c:when test="${role == 'User'}">
+        <c:set var="dashboardHref" value="${pageContext.request.contextPath}/UserDashboard" />
+    </c:when>
+    <c:otherwise>
+        <c:set var="dashboardHref" value="${pageContext.request.contextPath}/Login" />
+    </c:otherwise>
+</c:choose>
 <!-- [ navigation menu ] start -->
 <nav class="pcoded-navbar menupos-fixed menu-light brand-blue ">
     <div class="navbar-wrapper ">
         <div class="navbar-brand header-logo">
-            <a href="${pageContext.request.contextPath}/AdminDashboard" class="b-brand">
+            <a href="${dashboardHref}" class="b-brand">
                 <img src="assets/images/logo.svg" alt="" class="logo images">
                 <img src="assets/images/logo-icon.svg" alt="" class="logo-thumb images">
             </a>
@@ -231,6 +249,12 @@
                 <!-- ??? ADMIN MENU ??????????????????????????????????????? -->
                 <c:if test="${role == 'Admin'}">
                     <li class="nav-item pcoded-menu-caption"><label>System Administration</label></li>
+                    <li class="nav-item">
+                        <a href="${pageContext.request.contextPath}/AdminDashboard" class="nav-link">
+                            <span class="pcoded-micon"><i class="feather icon-home"></i></span>
+                            <span class="pcoded-mtext">Dashboard</span>
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a href="${pageContext.request.contextPath}/UserManagement" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-users"></i></span>

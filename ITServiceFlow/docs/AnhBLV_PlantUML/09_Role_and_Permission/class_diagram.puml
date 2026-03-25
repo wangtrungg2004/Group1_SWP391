@@ -1,0 +1,46 @@
+﻿@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+title Class Diagram - Role and Permission
+
+class "TemporaryRoleSyncFilter" as TemporaryRoleSyncFilter_0 {
+  +doFilter()
+}
+
+class "AuthorizationFilter" as AuthorizationFilter_1 {
+  +doFilter()
+  +path-role access rules
+}
+
+class "TemporaryRoleAccessService" as TemporaryRoleAccessService_2 {
+  +synchronizeSessionRole()
+  +role ranking logic
+}
+
+class "UserDao" as UserDao_3 {
+  +getUserById()
+}
+
+class "HttpSession" as HttpSession_4 {
+  +user
+  +userId
+  +baseRole
+  +effectiveRole
+  +role
+}
+
+class "ProtectedServletOrJSP" as ProtectedServletOrJSP_5 {
+  +AdminDashboard
+  +UserDashboard
+  +ITDashboard
+  +admin/*
+  +user/*
+  +it/*
+}
+
+TemporaryRoleSyncFilter_0 --> TemporaryRoleAccessService_2 : sync role every request
+AuthorizationFilter_1 --> TemporaryRoleAccessService_2 : get current effective role
+AuthorizationFilter_1 --> UserDao_3 : validate active account
+TemporaryRoleAccessService_2 --> HttpSession_4 : write role attributes
+AuthorizationFilter_1 --> ProtectedServletOrJSP_5 : allow/deny by role
+@enduml

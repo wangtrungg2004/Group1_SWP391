@@ -1,0 +1,42 @@
+﻿@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+title Class Diagram - Reopen Ticket
+
+class "TicketReopenController" as TicketReopenController_0 {
+  +doPost()
+  +sendReopenNotifications()
+}
+
+class "TicketDAO" as TicketDAO_1 {
+  +getTicketById()
+  +reopenTicketForUser()
+}
+
+class "TicketCommentsDAO" as TicketCommentsDAO_2 {
+  +addComment()
+}
+
+class "NotificationDao" as NotificationDao_3 {
+  +addNotification()
+  +addBroadcastNotification()
+}
+
+class "AuditLogService" as AuditLogService_4 {
+  +createAuditLog()
+}
+
+class "Tickets" as Tickets_5 {
+  +id
+  +ticketNumber
+  +status
+  +createdBy
+  +assignedTo
+}
+
+TicketReopenController_0 --> TicketDAO_1 : validate and reopen ticket
+TicketReopenController_0 --> TicketCommentsDAO_2 : store reopen reason comment
+TicketReopenController_0 --> NotificationDao_3 : send assignee/broadcast notification
+TicketReopenController_0 --> AuditLogService_4 : record reopen audit
+TicketDAO_1 --> Tickets_5 : load ticket entity
+@enduml

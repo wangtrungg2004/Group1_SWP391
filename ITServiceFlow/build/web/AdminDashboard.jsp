@@ -971,7 +971,8 @@
                                                 </div>
                                             </div>
                                             <!-- Rating distribution bars -->
-                                            <c:forEach begin="5" end="1" step="-1" var="star">
+                                            <c:forEach begin="1" end="5" var="i">
+                                                <c:set var="star" value="${6 - i}" />
                                                 <c:set var="distIdx" value="${star - 1}" />
 
                                                 <div class="prow">
@@ -992,7 +993,8 @@
                                                     <span class="pnum">${csatDist[distIdx]}</span>
                                                 </div>
                                             </c:forEach>
-                                            <c:forEach begin="5" end="1" step="-1" var="star">
+                                            <c:forEach begin="1" end="5" var="i">
+                                                <c:set var="star" value="${6 - i}" />
                                                 <c:set var="distIdx" value="${star - 1}" />
                                                 <div class="prow">
                                                     <span class="plabel" style="width:30px">★${star}</span>

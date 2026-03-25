@@ -1,0 +1,24 @@
+﻿@startuml
+skinparam shadowing false
+title Sequence Diagram - Login and Auth
+autonumber
+
+participant "User" as User_0
+participant "Login.jsp" as Login_jsp_1
+participant "LoginServlet" as LoginServlet_2
+participant "UserService" as UserService_3
+participant "UserDao" as UserDao_4
+participant "TemporaryRoleService" as TemporaryRoleService_5
+participant "Session" as Session_6
+
+User_0 -> Login_jsp_1 : enter username/password
+Login_jsp_1 -> LoginServlet_2 : POST /Login
+LoginServlet_2 -> UserService_3 : getUserByUsername(username)
+UserService_3 -> UserDao_4 : getUserByUsername(username)
+LoginServlet_2 -> UserService_3 : login(username, rawPassword)
+UserService_3 -> UserDao_4 : login(username, sha256(password))
+UserService_3 -> LoginServlet_2 : auth result
+LoginServlet_2 -> TemporaryRoleService_5 : synchronizeSessionRole(session)
+TemporaryRoleService_5 -> Session_6 : set baseRole/effectiveRole
+LoginServlet_2 -> User_0 : redirect dashboard by role
+@enduml

@@ -1,0 +1,23 @@
+﻿@startuml
+skinparam shadowing false
+title Sequence Diagram - Forgot Password and Reset Password
+autonumber
+
+participant "User" as User_0
+participant "ForgotPasswordServlet" as ForgotPasswordServlet_1
+participant "UserService" as UserService_2
+participant "UserDao" as UserDao_3
+participant "EmailUtil" as EmailUtil_4
+participant "ResetPasswordServlet" as ResetPasswordServlet_5
+participant "Login.jsp" as Login_jsp_6
+
+User_0 -> ForgotPasswordServlet_1 : submit email
+ForgotPasswordServlet_1 -> UserService_2 : getUserByEmail(email)
+ForgotPasswordServlet_1 -> UserService_2 : createPasswordResetToken(email)
+UserService_2 -> UserDao_3 : savePasswordResetToken(...)
+ForgotPasswordServlet_1 -> EmailUtil_4 : sendForgotPasswordEmail(resetLink)
+User_0 -> ResetPasswordServlet_5 : open link and submit new password
+ResetPasswordServlet_5 -> UserService_2 : resetPasswordByToken(token,newPwd)
+UserService_2 -> UserDao_3 : validate token + update hash + mark used
+ResetPasswordServlet_5 -> Login_jsp_6 : forward success message
+@enduml
