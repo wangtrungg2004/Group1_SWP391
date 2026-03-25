@@ -1,0 +1,23 @@
+﻿@startuml
+skinparam shadowing false
+title Sequence Diagram - Login with Google
+autonumber
+
+participant "User" as User_0
+participant "Login.jsp" as Login_jsp_1
+participant "GoogleLoginServlet" as GoogleLoginServlet_2
+participant "GoogleAuthUtil" as GoogleAuthUtil_3
+participant "UserService" as UserService_4
+participant "UserDao" as UserDao_5
+participant "Session" as Session_6
+
+User_0 -> Login_jsp_1 : click Google Sign-In
+Login_jsp_1 -> GoogleLoginServlet_2 : POST /GoogleLogin(credential)
+GoogleLoginServlet_2 -> GoogleAuthUtil_3 : verifyIdToken(idToken, clientId)
+GoogleAuthUtil_3 -> GoogleLoginServlet_2 : GoogleUserInfo(email)
+GoogleLoginServlet_2 -> UserService_4 : loginWithGoogleEmail(email)
+UserService_4 -> UserDao_5 : getUserByEmail(email)
+UserDao_5 -> UserService_4 : active user or null
+GoogleLoginServlet_2 -> Session_6 : set user + role attributes
+GoogleLoginServlet_2 -> User_0 : redirect role dashboard
+@enduml

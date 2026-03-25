@@ -24,6 +24,24 @@
         request.setAttribute("headerNotifications", list);
     }
 %>
+<c:set var="role" value="${sessionScope.role}" />
+<c:choose>
+    <c:when test="${role == 'Admin'}">
+        <c:set var="dashboardHref" value="${pageContext.request.contextPath}/AdminDashboard" />
+    </c:when>
+    <c:when test="${role == 'Manager'}">
+        <c:set var="dashboardHref" value="${pageContext.request.contextPath}/ManagerDashboard" />
+    </c:when>
+    <c:when test="${role == 'IT Support'}">
+        <c:set var="dashboardHref" value="${pageContext.request.contextPath}/ITDashboard" />
+    </c:when>
+    <c:when test="${role == 'User'}">
+        <c:set var="dashboardHref" value="${pageContext.request.contextPath}/UserDashboard" />
+    </c:when>
+    <c:otherwise>
+        <c:set var="dashboardHref" value="${pageContext.request.contextPath}/Login" />
+    </c:otherwise>
+</c:choose>
 <!-- [ Header ] start -->
 <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed">
     <style>
@@ -33,7 +51,7 @@
     </style>
     <div class="m-header">
         <a class="mobile-menu" id="mobile-collapse1" href="#!"><span></span></a>
-        <a href="AdminDashboard.jsp" class="b-brand">
+        <a href="${dashboardHref}" class="b-brand">
             <img src="assets/images/logo.svg" alt="" class="logo images">
             <img src="assets/images/logo-icon.svg" alt="" class="logo-thumb images">
         </a>

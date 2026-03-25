@@ -1,0 +1,49 @@
+﻿@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+title Class Diagram - Temporary Permission Assignment
+
+class "TemporaryAccessRequestController" as TemporaryAccessRequestController_0 {
+  +doGet()
+  +doPost()
+  +handleActivate()
+  +handleDeactivate()
+}
+
+class "TemporaryAccessApprovalController" as TemporaryAccessApprovalController_1 {
+  +doGet()
+  +doPost()
+  +isApprover()
+}
+
+class "TemporaryRoleAccessService" as TemporaryRoleAccessService_2 {
+  +submitRequest()
+  +processDecision()
+  +activateTemporaryRole()
+  +deactivateTemporaryRole()
+  +synchronizeSessionRole()
+}
+
+class "TemporaryRoleRequestDao" as TemporaryRoleRequestDao_3 {
+  +createRequest()
+  +getPendingRequests()
+  +approveRequest()
+  +rejectRequest()
+  +revokeRequest()
+  +expireApprovedRequests()
+}
+
+class "UserDao" as UserDao_4 {
+  +getUserById()
+}
+
+class "AuditLogService" as AuditLogService_5 {
+  +createAuditLog()
+}
+
+TemporaryAccessRequestController_0 --> TemporaryRoleAccessService_2 : submit and activate/deactivate flow
+TemporaryAccessApprovalController_1 --> TemporaryRoleAccessService_2 : approve/reject/revoke flow
+TemporaryRoleAccessService_2 --> TemporaryRoleRequestDao_3 : request lifecycle CRUD
+TemporaryRoleAccessService_2 --> UserDao_4 : resolve base role from DB
+TemporaryRoleAccessService_2 --> AuditLogService_5 : audit request and decision
+@enduml

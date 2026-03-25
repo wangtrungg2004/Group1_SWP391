@@ -1,0 +1,22 @@
+﻿@startuml
+skinparam shadowing false
+title Sequence Diagram - Reopen Ticket
+autonumber
+
+participant "User" as User_0
+participant "TicketDetailUser.jsp" as TicketDetailUser_jsp_1
+participant "TicketReopenController" as TicketReopenController_2
+participant "TicketDAO" as TicketDAO_3
+participant "TicketCommentsDAO" as TicketCommentsDAO_4
+participant "NotificationDao" as NotificationDao_5
+participant "AuditLogService" as AuditLogService_6
+
+User_0 -> TicketDetailUser_jsp_1 : submit reopen reason
+TicketDetailUser_jsp_1 -> TicketReopenController_2 : POST /TicketReopen
+TicketReopenController_2 -> TicketDAO_3 : getTicketById(ticketId)
+TicketReopenController_2 -> TicketDAO_3 : reopenTicketForUser(ticketId,userId)
+TicketReopenController_2 -> TicketCommentsDAO_4 : addComment([Ticket Reopen Request] ...)
+TicketReopenController_2 -> NotificationDao_5 : notify assigned user or queue
+TicketReopenController_2 -> AuditLogService_6 : createAuditLog(TICKET_REOPEN_REQUEST)
+TicketReopenController_2 -> User_0 : redirect TicketDetailUser?id=...
+@enduml

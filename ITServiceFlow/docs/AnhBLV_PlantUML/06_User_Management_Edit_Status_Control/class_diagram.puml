@@ -1,0 +1,39 @@
+﻿@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+title Class Diagram - User Management Edit and Status Control
+
+class "UserManagementController" as UserManagementController_0 {
+  +doGet()
+  +doPost()
+  +handleUpdateInfo()
+  +handleChangeRole()
+  +handleSetActive()
+  +handleResetPasswordEmail()
+}
+
+class "UserDao" as UserDao_1 {
+  +searchUsersForManagement()
+  +countUsersForManagement()
+  +updateUserInfoForAdmin()
+  +updateUserRoleForAdmin()
+  +setUserActiveStatus()
+}
+
+class "UserService" as UserService_2 {
+  +createPasswordResetToken()
+}
+
+class "AuditLogService" as AuditLogService_3 {
+  +createAuditLog()
+}
+
+class "EmailUtil" as EmailUtil_4 {
+  +sendForgotPasswordEmail()
+}
+
+UserManagementController_0 --> UserDao_1 : search and update users
+UserManagementController_0 --> AuditLogService_3 : write admin audit logs
+UserManagementController_0 --> UserService_2 : generate reset token
+UserManagementController_0 --> EmailUtil_4 : send reset password email
+@enduml

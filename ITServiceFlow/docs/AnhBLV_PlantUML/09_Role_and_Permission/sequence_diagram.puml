@@ -1,0 +1,23 @@
+﻿@startuml
+skinparam shadowing false
+title Sequence Diagram - Role and Permission
+autonumber
+
+participant "User" as User_0
+participant "HTTPRequest" as HTTPRequest_1
+participant "TemporaryRoleSyncFilter" as TemporaryRoleSyncFilter_2
+participant "AuthorizationFilter" as AuthorizationFilter_3
+participant "TemporaryRoleAccessService" as TemporaryRoleAccessService_4
+participant "UserDao" as UserDao_5
+participant "ProtectedServletOrJSP" as ProtectedServletOrJSP_6
+
+User_0 -> HTTPRequest_1 : access protected URL
+HTTPRequest_1 -> TemporaryRoleSyncFilter_2 : doFilter()
+TemporaryRoleSyncFilter_2 -> TemporaryRoleAccessService_4 : synchronizeSessionRole(session)
+TemporaryRoleAccessService_4 -> UserDao_5 : getUserById(userId)
+TemporaryRoleSyncFilter_2 -> AuthorizationFilter_3 : continue chain
+AuthorizationFilter_3 -> TemporaryRoleAccessService_4 : synchronizeSessionRole(session)
+AuthorizationFilter_3 -> UserDao_5 : getUserById + active check
+AuthorizationFilter_3 -> ProtectedServletOrJSP_6 : chain.doFilter() if has access
+AuthorizationFilter_3 -> User_0 : 403 or redirect Login when denied
+@enduml
