@@ -41,20 +41,22 @@
 </head>
 <body class="bg-background-light font-sans antialiased text-text-light min-h-screen flex flex-col md:flex-row">
     <div class="md:hidden bg-surface-light border-b border-border-light p-4 flex justify-between items-center sticky top-0 z-20">
-        <div class="flex items-center space-x-2">
+        <a href="${pageContext.request.contextPath}/AdminDashboard.jsp" class="flex items-center space-x-2">
             <span class="material-icons text-primary text-3xl">dns</span>
             <span class="font-bold text-lg">IT ServiceFlow</span>
-        </div>
+        </a>
         <button class="text-text-muted-light"><span class="material-icons">menu</span></button>
     </div>
 
     <aside class="hidden md:flex w-64 flex-col fixed inset-y-0 left-0 z-10 bg-surface-light border-r border-border-light">
         <div class="h-16 flex items-center px-6 border-b border-border-light">
-            <span class="material-icons text-primary text-3xl mr-2">dns</span>
-            <span class="font-bold text-xl tracking-tight">IT ServiceFlow</span>
+            <a href="${pageContext.request.contextPath}/AdminDashboard.jsp" class="flex items-center">
+                <span class="material-icons text-primary text-3xl mr-2">dns</span>
+                <span class="font-bold text-xl tracking-tight">IT ServiceFlow</span>
+            </a>
         </div>
         <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1">
-            <a class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-text-muted-light hover:bg-background-light hover:text-primary transition group" href="AdminDashboard.jsp">
+            <a class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-text-muted-light hover:bg-background-light hover:text-primary transition group" href="${pageContext.request.contextPath}/AdminDashboard.jsp">
                 <span class="material-icons mr-3 text-xl text-gray-400 group-hover:text-primary">dashboard</span>
                 Dashboard
             </a>
@@ -64,10 +66,6 @@
             <a class="flex items-center px-3 py-2 text-sm font-medium rounded-md bg-primary bg-opacity-10 text-primary transition" href="UserManagement">
                 <span class="material-icons mr-3 text-xl text-primary">people</span>
                 User Management
-            </a>
-            <a class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-text-muted-light hover:bg-background-light hover:text-primary transition group" href="#!">
-                <span class="material-icons mr-3 text-xl text-gray-400 group-hover:text-primary">settings</span>
-                Settings
             </a>
         </nav>
         <div class="border-t border-border-light p-4 relative">
@@ -84,10 +82,6 @@
                     <p class="font-medium"><c:out value="${sessionScope.user.fullName}"/></p>
                     <p class="text-xs opacity-90">Admin</p>
                 </div>
-                <a href="#!" class="flex items-center px-4 py-3 text-sm hover:bg-gray-50">
-                    <span class="material-icons mr-3 text-base text-gray-500">settings</span>
-                    Settings
-                </a>
                 <a href="#!" class="flex items-center px-4 py-3 text-sm hover:bg-gray-50">
                     <span class="material-icons mr-3 text-base text-gray-500">person_outline</span>
                     Profile
@@ -108,7 +102,7 @@
         <nav aria-label="Breadcrumb" class="flex mb-6">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a class="inline-flex items-center text-sm font-medium text-text-muted-light hover:text-primary" href="AdminDashboard.jsp">
+                    <a class="inline-flex items-center text-sm font-medium text-text-muted-light hover:text-primary" href="${pageContext.request.contextPath}/AdminDashboard.jsp">
                         <span class="material-icons text-base mr-1">home</span>
                         Home
                     </a>
@@ -149,11 +143,11 @@
                 <div class="grid grid-cols-1 gap-y-6 gap-x-6 sm:grid-cols-2">
                     <div class="sm:col-span-1">
                         <label class="block text-sm font-medium mb-1" for="username">Username <span class="text-red-500">*</span></label>
-                        <input class="block w-full sm:text-sm border-border-light rounded-md h-10 px-3" id="username" name="username" placeholder="jdoe" required="" type="text"/>
+                        <input class="block w-full sm:text-sm border-border-light rounded-md h-10 px-3" id="username" name="username" placeholder="jdoe" required="" type="text" value="<c:out value='${formUsername}'/>"/>
                     </div>
                     <div class="sm:col-span-1">
                         <label class="block text-sm font-medium mb-1" for="email">Email Address <span class="text-red-500">*</span></label>
-                        <input class="block w-full sm:text-sm border-border-light rounded-md h-10 px-3" id="email" name="email" placeholder="john.doe@itserviceflow.com" required="" type="email"/>
+                        <input class="block w-full sm:text-sm border-border-light rounded-md h-10 px-3" id="email" name="email" placeholder="john.doe@itserviceflow.com" required="" type="text" value="<c:out value='${formEmail}'/>"/>
                     </div>
                     <div class="sm:col-span-1">
                         <label class="block text-sm font-medium mb-1" for="password">Password <span class="text-red-500">*</span></label>
@@ -165,25 +159,38 @@
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block text-sm font-medium mb-1" for="fullName">Full Name</label>
-                        <input class="block w-full sm:text-sm border-border-light rounded-md h-10 px-3" id="fullName" name="fullName" placeholder="John Doe" type="text"/>
+                        <input class="block w-full sm:text-sm border-border-light rounded-md h-10 px-3" id="fullName" name="fullName" placeholder="John Doe" type="text" value="<c:out value='${formFullName}'/>"/>
                     </div>
                     <div class="sm:col-span-1">
                         <label class="block text-sm font-medium mb-1" for="role">Role <span class="text-red-500">*</span></label>
                         <select class="block w-full sm:text-sm border-border-light rounded-md h-10 px-3" id="role" name="role" required>
-                            <option disabled="" selected="" value="">Select a role...</option>
-                            <option value="Admin">Admin</option>
-                            <option value="IT Support">IT Support</option>
-                            <option value="Manager">Manager</option>
-                            <option value="User">User</option>
+                            <option value="" ${empty formRole ? 'selected' : ''}>Select a role...</option>
+                            <c:forEach var="r" items="${roleOptions}">
+                                <option value="${r}" ${formRole eq r ? 'selected' : ''}>${r}</option>
+                            </c:forEach>
                         </select>
                     </div>
                     <div class="sm:col-span-1">
-                        <label class="block text-sm font-medium mb-1" for="department">Department <span class="text-xs text-text-muted-light">(Optional)</span></label>
-                        <input class="block w-full sm:text-sm border-border-light rounded-md h-10 px-3" id="department" name="department" placeholder="e.g. Finance" type="text"/>
+                        <label class="block text-sm font-medium mb-1" for="departmentId">Department</label>
+                        <select class="block w-full sm:text-sm border-border-light rounded-md h-10 px-3" id="departmentId" name="departmentId">
+                            <option value="" ${empty formDepartmentId ? 'selected' : ''}>Select a department...</option>
+                            <c:forEach var="dep" items="${departmentOptions}">
+                                <option value="${dep.key}" ${formDepartmentId == dep.key ? 'selected' : ''}>${dep.value}</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                    <div class="sm:col-span-1">
+                        <label class="block text-sm font-medium mb-1" for="locationId">Location <span class="text-red-500">*</span></label>
+                        <select class="block w-full sm:text-sm border-border-light rounded-md h-10 px-3" id="locationId" name="locationId" required>
+                            <option value="" ${empty formLocationId ? 'selected' : ''}>Select a location...</option>
+                            <c:forEach var="loc" items="${locationOptions}">
+                                <option value="${loc.key}" ${formLocationId == loc.key ? 'selected' : ''}>${loc.value}</option>
+                            </c:forEach>
+                        </select>
                     </div>
                 </div>
                 <div class="pt-6 flex items-center justify-end space-x-3 border-t border-border-light mt-6">
-                    <a class="bg-white py-2 px-4 border border-border-light rounded-md shadow-sm text-sm font-medium hover:bg-gray-50" href="AdminDashboard.jsp">Cancel</a>
+                    <a class="bg-white py-2 px-4 border border-border-light rounded-md shadow-sm text-sm font-medium hover:bg-gray-50" href="${pageContext.request.contextPath}/AdminDashboard.jsp">Cancel</a>
                     <button class="bg-primary border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-blue-700" type="submit">
                         <span class="material-icons text-sm mr-2">save</span>
                         Save User

@@ -66,14 +66,33 @@ public class AgentTicketDetailController extends HttpServlet {
         ProblemDao problemDao = new ProblemDao();
         request.setAttribute("relatedProblem", problemDao.getProblemByTicketId(ticketId));
 
+        
+        // ==========================================
+        // 8. LẤY DỮ LIỆU CHO US03: PARENT - CHILD
+        // ==========================================
+        // Nếu vé này là vé con (Có ParentId) -> Lấy thông tin vé Cha
+        Integer parentId = ticket.getParentTicketId();
+if (parentId != null && parentId > 0) {
+    Tickets parentTicket = ticketDao.getParentTicket(parentId);
+    request.setAttribute("parentTicket", parentTicket);
+} else {
+    List<Tickets> childTickets = ticketDao.getLinkedChildTickets(ticketId);
+    request.setAttribute("childTickets", childTickets);
+
+    List<Tickets> availableTicketsForLinking = ticketDao.getAvailableTicketsForLinking(ticketId);
+    request.setAttribute("availableTicketsForLinking", availableTicketsForLinking);
+}
+        
+        // Lấy danh sách Comment
+        TicketCommentsDAO commentDao = new TicketCommentsDAO();
+        // Truyền 'true' vì Agent có quyền xem Internal Note
+        List<TicketComments> comments = commentDao.getCommentsByTicketId(ticketId, true);
+        request.setAttribute("comments", comments);
         // 5. Linked Assets
         TicketAssetsDAO assetDao = new TicketAssetsDAO();
         request.setAttribute("linkedAssets", assetDao.getLinkedCIsByTicketId(ticketId));
 
-        // 6. Comments
-        TicketCommentsDAO commentDao = new TicketCommentsDAO();
-        request.setAttribute("comments", commentDao.getCommentsByTicketId(ticketId, true));
-
+        
         // 7. ── TIME TRACKING ──────────────────────────────────
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId != null) {

@@ -1,7 +1,11 @@
 package controller.ticket.user;
 
+import dao.AssetsDAO;
 import dao.CategoryDao;
 import dao.ServiceCatalogDao;
+import dao.TicketAssetsDAO;
+import dao.TicketDAO;
+import model.Assets;
 import model.ServiceCatalog;
 import model.Tickets;
 import model.Users;
@@ -13,7 +17,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import service.TicketService;
 
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024 * 2, // 2MB
@@ -137,30 +140,59 @@ public class TicketCreateController extends HttpServlet {
             }
         }
 
-        TicketService ticketService = new TicketService();
-        boolean isCreated = ticketService.createTicket(t);
+        String assetTag = request.getParameter("assetTag");
+        if (assetTag == null || assetTag.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Vui lòng nhập Asset tag.");
+            doGet(request, response);
+            return;
+        }
 
-        if (isCreated) {
-            // Redirect đúng trang theo role
-            String role = (String) session.getAttribute("role");
-            if ("IT Support".equals(role) || "Manager".equals(role)) {
-                response.sendRedirect(request.getContextPath() + "/Queues");
-            } else {
-                response.sendRedirect(request.getContextPath() + "/Tickets");
+        AssetsDAO assetsDAO = new AssetsDAO();
+        Assets asset = assetsDAO.getAssetByTag(assetTag.trim());
+        if (asset == null) {
+            request.setAttribute("errorMessage", "Asset tag is wrong.");
+            preserveFormForError(request, ticketType);
+            doGet(request, response);
+            return;
+        }
+
+        TicketDAO dao = new TicketDAO();
+        String isCreated = dao.createTicket(t);
+
+        if ("ok".equals(isCreated)) {
+            Tickets created = dao.getTicketByNumber(t.getTicketNumber());
+            if (created != null) {
+                TicketAssetsDAO ticketAssetsDAO = new TicketAssetsDAO();
+                boolean linked = ticketAssetsDAO.addLink(created.getId(), asset.getId());
+                if (!linked) {
+                    request.setAttribute("errorMessage", "Could not link asset to ticket. Please try again from ticket detail.");
+                    preserveFormForError(request, ticketType);
+                    doGet(request, response);
+                    return;
+                }
+                response.sendRedirect(request.getContextPath() + "/Tickets?created=1");
+                return;
             }
+            request.setAttribute("errorMessage", "Could not load the new ticket after creation.");
+            preserveFormForError(request, ticketType);
+            doGet(request, response);
+            return;
         } else {
-            // Preserve form data
-            request.setAttribute("ticketType_val", ticketType);
-            request.setAttribute("title_val", request.getParameter("title"));
-            request.setAttribute("description_val", request.getParameter("description"));
-            request.setAttribute("categoryId_val", request.getParameter("categoryId"));
-            request.setAttribute("impact_val", request.getParameter("impact"));
-            request.setAttribute("urgency_val", request.getParameter("urgency"));
-            request.setAttribute("serviceCatalogId_val", request.getParameter("serviceCatalogId"));
-            
+            preserveFormForError(request, ticketType);
             request.setAttribute("errorMessage", "Lỗi hệ thống: " + isCreated);
             doGet(request, response);
         }
 
+    }
+
+    private void preserveFormForError(HttpServletRequest request, String ticketType) {
+        request.setAttribute("ticketType_val", ticketType);
+        request.setAttribute("title_val", request.getParameter("title"));
+        request.setAttribute("description_val", request.getParameter("description"));
+        request.setAttribute("categoryId_val", request.getParameter("categoryId"));
+        request.setAttribute("impact_val", request.getParameter("impact"));
+        request.setAttribute("urgency_val", request.getParameter("urgency"));
+        request.setAttribute("serviceCatalogId_val", request.getParameter("serviceCatalogId"));
+        request.setAttribute("assetTag_val", request.getParameter("assetTag"));
     }
 }
