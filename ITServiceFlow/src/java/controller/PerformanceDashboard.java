@@ -38,7 +38,7 @@ public class PerformanceDashboard extends HttpServlet {
         // Default Date Range: Last 30 Days
         Date toDate = new Date(System.currentTimeMillis());
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_MONTH, -30);
+        cal.add(Calendar.DAY_OF_MONTH, -1);
         Date fromDate = new Date(cal.getTimeInMillis());
 
         String fromParam = request.getParameter("from");

@@ -48,7 +48,7 @@ public class SLADashboard extends HttpServlet {
         // Default Date Range: Last 30 Days
         java.sql.Date toDate = new java.sql.Date(System.currentTimeMillis());
         java.util.Calendar cal = java.util.Calendar.getInstance();
-        cal.add(java.util.Calendar.DAY_OF_MONTH, -30);
+        cal.add(java.util.Calendar.DAY_OF_MONTH, -1);
         java.sql.Date fromDate = new java.sql.Date(cal.getTimeInMillis());
 
         String fromParam = request.getParameter("from");
