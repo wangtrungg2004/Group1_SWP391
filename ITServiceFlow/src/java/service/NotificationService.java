@@ -46,6 +46,13 @@ public class NotificationService {
         return dao.addNotification(userId, message, relatedTicketId, isRead, title, type);
     }
     
+    public List<Notifications> searchAllNotifications(String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return dao.getAllNotifications();
+        }
+        return dao.searchAllNotifications(keyword.trim());
+    }
+    
     /** Gui notification cho nhieu user (moi user 1 dong). Dung khi chon "One user" nhap 1 id. */
     public int addNotificationToUsers(List<Integer> userIds, String message,
                                   Integer relatedTicketId, String title, String type) {
