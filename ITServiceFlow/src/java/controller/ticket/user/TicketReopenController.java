@@ -2,7 +2,7 @@ package controller.ticket.user;
 
 import dao.NotificationDao;
 import dao.TicketCommentsDAO;
-import dao.TicketDAO;
+import dao.TicketDao;
 import dao.UserDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -57,7 +57,7 @@ public class TicketReopenController extends HttpServlet {
             return;
         }
 
-        TicketDAO ticketDao = new TicketDAO();
+        TicketDao ticketDao = new TicketDao();
         Tickets ticket = ticketDao.getTicketById(ticketId);
 
         if (ticket == null || ticket.getCreatedBy() != currentUser.getId()) {

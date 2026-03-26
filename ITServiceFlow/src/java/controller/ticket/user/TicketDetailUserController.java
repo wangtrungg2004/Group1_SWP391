@@ -5,7 +5,7 @@ import dao.CategoryDao;
 import dao.CsatSurveyDAO;
 import dao.ServiceCatalogDao;
 import dao.TicketCommentsDAO;
-import dao.TicketDAO;
+import dao.TicketDao;
 import model.AuditLog;
 import model.CsatSurvey;
 import model.Tickets;
@@ -58,7 +58,7 @@ public class TicketDetailUserController extends HttpServlet {
             return;
         }
 
-        TicketDAO ticketDao = new TicketDAO();
+        TicketDao ticketDao = new TicketDao();
 
         // Ly ticket t bng Tickets (dng method c sn)
         Tickets ticket = ticketDao.getTicketById(ticketId);

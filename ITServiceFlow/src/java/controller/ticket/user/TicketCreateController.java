@@ -4,7 +4,7 @@ import dao.AssetsDAO;
 import dao.CategoryDao;
 import dao.ServiceCatalogDao;
 import dao.TicketAssetsDAO;
-import dao.TicketDAO;
+import dao.TicketDao;
 import model.Assets;
 import model.ServiceCatalog;
 import model.Tickets;
@@ -156,7 +156,7 @@ public class TicketCreateController extends HttpServlet {
             return;
         }
 
-        TicketDAO dao = new TicketDAO();
+        TicketDao dao = new TicketDao();
         String isCreated = dao.createTicket(t);
 
         if ("ok".equals(isCreated)) {

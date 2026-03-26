@@ -5,7 +5,7 @@
 package controller.Problems;
 
 import dao.NotificationDao;
-import dao.TicketDAO;
+import dao.TicketDao;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;

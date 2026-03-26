@@ -1,7 +1,7 @@
 package controller;
 
 import dao.AssetsDAO;
-import dao.TicketDAO;
+import dao.TicketDao;
 import dao.UsersDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -19,14 +19,14 @@ import model.Users;
 @WebServlet(name = "TicketAssetsPickerServlet", urlPatterns = {"/TicketAssetsPickerServlet"})
 public class TicketAssetsPickerServlet extends HttpServlet {
 
-    private TicketDAO ticketDAO;
+    private TicketDao ticketDAO;
     private UsersDAO usersDAO;
     private AssetsDAO assetsDAO;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        ticketDAO = new TicketDAO();
+        ticketDAO = new TicketDao();
         usersDAO = new UsersDAO();
         assetsDAO = new AssetsDAO();
     }

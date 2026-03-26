@@ -10,7 +10,7 @@ package controller.ticket.user;
  */
 
 import dao.CsatSurveyDAO;
-import dao.TicketDAO;
+import dao.TicketDao;
 import model.Tickets;
 import model.Users;
 import java.io.IOException;
@@ -55,7 +55,7 @@ public class MyTicketsController extends HttpServlet {
     }
     
     int offset = (page - 1) * pageSize;
-    TicketDAO ticketDao = new TicketDAO();
+    TicketDao ticketDao = new TicketDao();
 
     // 2. Thực hiện truy vấn Server-side với các tham số bộ lọc
     int totalTickets = ticketDao.getTotalTicketsCount(currentUser.getId(), search, status, type);

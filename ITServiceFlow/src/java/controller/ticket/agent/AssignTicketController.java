@@ -11,7 +11,7 @@ package controller.ticket.agent;
 
 
 
-import dao.TicketDAO;
+import dao.TicketDao;
 import model.Users;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -62,7 +62,7 @@ public class AssignTicketController extends HttpServlet {
                 agentId = Integer.parseInt(request.getParameter("agentId"));
             }
 
-            TicketDAO dao = new TicketDAO();
+            TicketDao dao = new TicketDao();
             dao.assignTicket(ticketId, agentId);
 
             // Nguồn request từ đâu thì trả về trang đó (Queue hoặc Detail)

@@ -19,6 +19,7 @@
                     <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
                     <!-- vendor css -->
                     <link rel="stylesheet" href="assets/css/style.css">
+                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
                 </head>
 
@@ -63,6 +64,46 @@
                                                 </div>
                                             </div>
                                             <!-- [ breadcrumb ] end -->
+                                            
+                                            <!-- [ Main Content ] start -->
+                                            <div class="row">
+                                                <!-- Filter -->
+                                                <div class="col-sm-12">
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <form action="SLADashboard" method="get" class="form-inline">
+                                                                <div class="form-group mb-2">
+                                                                    <label for="from" class="mr-2">From:</label>
+                                                                    <input type="date" class="form-control mr-3" name="from" value="${fromDate}">
+                                                                </div>
+                                                                <div class="form-group mb-2">
+                                                                    <label for="to" class="mr-2">To:</label>
+                                                                    <input type="date" class="form-control mr-3" name="to" value="${toDate}">
+                                                                </div>
+                                                                <div class="form-group mb-2">
+                                                                    <label for="categoryId" class="mr-2">Category:</label>
+                                                                    <select name="categoryId" class="form-control mr-3">
+                                                                        <option value="">All Categories</option>
+                                                                        <c:forEach items="${categories}" var="cat">
+                                                                            <option value="${cat.Id}" ${categoryId == cat.Id ? 'selected' : ''}>${cat.Name}</option>
+                                                                        </c:forEach>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group mb-2">
+                                                                    <label for="locationId" class="mr-2">Location:</label>
+                                                                    <select name="locationId" class="form-control mr-3">
+                                                                        <option value="">All Locations</option>
+                                                                        <c:forEach items="${locations}" var="loc">
+                                                                            <option value="${loc.Id}" ${locationId == loc.Id ? 'selected' : ''}>${loc.Name}</option>
+                                                                        </c:forEach>
+                                                                    </select>
+                                                                </div>
+                                                                <button type="submit" class="btn btn-primary mb-2">Filter</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
 
                                             <!-- [ Main Content ] start -->
                                             <!-- KPI Cards -->
@@ -108,6 +149,55 @@
                                                 </div>
                                             </div>
 
+                                            <!-- [ Main Content ] start -->
+                                            <!-- Ticket Type Distribution -->
+                                            <div class="row">
+                                                <div class="col-md-6 col-xl-4">
+                                                    <div class="card">
+                                                        <div class="card-header">
+                                                            <h5>📊 Ticket Type distribution</h5>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <div style="height: 300px;">
+                                                                <canvas id="ticketTypeChart"></canvas>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 col-xl-8">
+                                                    <div class="card">
+                                                        <div class="card-header">
+                                                            <h5>📝 Ticket Type Summary</h5>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <div class="table-responsive">
+                                                                <table class="table table-hover">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Ticket Type</th>
+                                                                            <th>Count</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <c:forEach items="${ticketTypeStats}" var="entry">
+                                                                            <tr>
+                                                                                <td>${entry.key}</td>
+                                                                                <td><span class="badge badge-primary">${entry.value}</span></td>
+                                                                            </tr>
+                                                                        </c:forEach>
+                                                                        <c:if test="${empty ticketTypeStats}">
+                                                                            <tr>
+                                                                                <td colspan="2" class="text-center">No tickets found in this period.</td>
+                                                                            </tr>
+                                                                        </c:if>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                             <!-- Alert Tables -->
                                             <div class="row">
                                                 <!-- Near Breach Tickets -->
@@ -136,7 +226,9 @@
                                                                         </c:if>
                                                                         <c:forEach items="${nearBreachTickets}" var="t">
                                                                             <tr>
-                                                                                <td><a href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a></td>
+                                                                                <td><a
+                                                                                        href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a>
+                                                                                </td>
                                                                                 <td>${t['Title']}</td>
                                                                                 <td class="text-warning">
                                                                                     <fmt:formatDate
@@ -179,7 +271,9 @@
                                                                         </c:if>
                                                                         <c:forEach items="${breachedTickets}" var="t">
                                                                             <tr>
-                                                                                <td><a href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a></td>
+                                                                                <td><a
+                                                                                        href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a>
+                                                                                </td>
                                                                                 <td>${t['Title']}</td>
                                                                                 <td>${t['Priority']}</td>
                                                                                 <td class="text-danger">
@@ -212,6 +306,53 @@
                     <script src="assets/js/vendor-all.min.js"></script>
                     <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
                     <script src="assets/js/pcoded.min.js"></script>
+                    
+                    <!-- Chart Initialization -->
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function() {
+                            const ctx = document.getElementById('ticketTypeChart').getContext('2d');
+                            
+                            const labels = [];
+                            const data = [];
+                            <c:forEach items="${ticketTypeStats}" var="entry">
+                                labels.push("${entry.key}");
+                                data.push(${entry.value});
+                            </c:forEach>
+                            
+                            if (labels.length === 0) {
+                                // Add dummy data if empty for visual
+                                labels.push("No Data");
+                                data.push(1);
+                            }
+
+                            new Chart(ctx, {
+                                type: 'pie',
+                                data: {
+                                    labels: labels,
+                                    datasets: [{
+                                        data: data,
+                                        backgroundColor: [
+                                            '#04a9f5', // Blue
+                                            '#1de9b6', // Green
+                                            '#f44236', // Red
+                                            '#f4c22b', // Yellow
+                                            '#a389d4'  // Purple
+                                        ],
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            position: 'bottom'
+                                        }
+                                    }
+                                }
+                            });
+                        });
+                    </script>
                 </body>
 
                 </html>

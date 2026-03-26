@@ -1,7 +1,7 @@
 package controller;
 
 import dao.ProblemDao;
-import dao.TicketDAO;
+import dao.TicketDao;
 import model.Tickets;
 import model.Users;
 import jakarta.servlet.ServletException;
@@ -47,7 +47,7 @@ public class ITDashboardController extends HttpServlet {
         }
 
         int agentId = user.getId();
-        TicketDAO ticketDAO = new TicketDAO();
+        TicketDao ticketDAO = new TicketDao();
         ProblemDao problemDao = new ProblemDao();
 
        // 1. KPI cá nhân của agent

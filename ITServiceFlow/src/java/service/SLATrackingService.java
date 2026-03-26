@@ -259,4 +259,27 @@ public class SLATrackingService {
         SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.ENGLISH);
         return fmt.format(date);
     }
+   
+
+    public java.util.Map<String, Integer> getSLAStatistics(java.sql.Date from, java.sql.Date to, Integer categoryId, Integer locationId) {
+        return slaTrackingDao.getSLAStatistics(from, to, categoryId, locationId);
+    }
+
+    public java.util.List<java.util.Map<String, Object>> getBreachedTickets(int limit, java.sql.Date from, java.sql.Date to, Integer categoryId, Integer locationId) {
+        return slaTrackingDao.getBreachedTickets(limit, from, to, categoryId, locationId);
+    }
+
+    public java.util.List<java.util.Map<String, Object>> getNearBreachTickets(int limit, java.sql.Date from, java.sql.Date to, Integer categoryId, Integer locationId) {
+        return slaTrackingDao.getNearBreachTickets(limit, from, to, categoryId, locationId);
+    }
+
+
+
+    public int countBreachList(String team, String priority, String agent, String status) {
+        return slaTrackingDao.countBreachList(team, priority, agent, status);
+    }
+
+    public java.util.Map<String, Integer> getTicketTypeDistribution(java.sql.Date from, java.sql.Date to, Integer categoryId, Integer locationId) {
+        return slaTrackingDao.getTicketTypeDistribution(from, to, categoryId, locationId);
+    }
 }

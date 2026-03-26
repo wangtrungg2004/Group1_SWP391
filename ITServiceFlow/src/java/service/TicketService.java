@@ -1,28 +1,25 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package service;
 
-import dao.ProblemDao;
-import dao.TicketDAO;
-import java.sql.Date;
+import dao.TicketDao;
 import java.util.List;
 import java.util.Map;
-import model.Problems;
 import model.Tickets;
 
 /**
+ *
  * @author DELL
  */
 public class TicketService {
-    
-    private TicketDAO ticketDao;
+    private TicketDao ticketDao;
     private SLATrackingService slaTrackingService;
 
     public TicketService() {
-        this.ticketDao = new TicketDAO();
+        this.ticketDao = new TicketDao();
         this.slaTrackingService = new SLATrackingService();
-    }
-
-    public List<Tickets> getAllTicket() {
-        return ticketDao.getAllTickets();
     }
 
     public boolean createTicket(Tickets ticket) {
@@ -31,36 +28,33 @@ public class TicketService {
             ticket.setTicketNumber(ticketDao.getNextTicketNumber(ticket.getTicketType()));
         }
 
-        // 2. Create Ticket
-        int ticketId = ticketDao.createTicket2(ticket);
+        // 2. Determine Priority if Impact/Urgency provided (Logic could be here or DB)
+        // For now assuming PriorityId is set or derived in controller
+
+        // 3. Create Ticket
+        int ticketId = Integer.parseInt(ticketDao.createTicket(ticket));
 
         if (ticketId > 0) {
-            // 3. Apply SLA
+            // 4. Apply SLA
             if (ticket.getPriorityId() != null && ticket.getPriorityId() > 0) {
                 slaTrackingService.applySLARuleToTicket(ticketId, ticket.getTicketType(), ticket.getPriorityId());
             }
             return true;
         }
         return false;
+        
     }
-    
+
     public Tickets getTicketById(int id) {
         return ticketDao.getTicketById(id);
     }
-    
-    public List<Tickets> getIncidentsNotInProblem()
-    {
-        return ticketDao.getIncidentsNotInProblem();
-    }
-    
-    public List<Tickets> searchIncidentsNotProblem(String keyword)
-    {
-        return ticketDao.searchIncidentsNotInProblem(keyword);
-    }
-    
-    public int getTotalTicket()
+     public int getTotalTicket()
     {
         return ticketDao.getTotalTicket();
+    }
+     
+    public List<Tickets> getAllTicket() {
+        return ticketDao.getAllTickets();
     }
     
     public int getTotalTicketThisMonth()
@@ -75,5 +69,14 @@ public class TicketService {
     public List<Tickets> get10UnAssignedTicket()
     {
         return ticketDao.get10UnassignedTickets();
+    }
+      public List<Tickets> getIncidentsNotInProblem()
+    {
+        return ticketDao.getIncidentsNotInProblem();
+    }
+    
+    public List<Tickets> searchIncidentsNotProblem(String keyword)
+    {
+        return ticketDao.searchIncidentsNotInProblem(keyword);
     }
 }

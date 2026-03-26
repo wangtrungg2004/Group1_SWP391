@@ -1,7 +1,7 @@
 package controller;
 
 import dao.KnowledgeArticleDAO;
-import dao.TicketDAO;
+import dao.TicketDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,13 +15,13 @@ import java.util.List;
 @WebServlet(name = "TicketResolutionReviewServlet", urlPatterns = { "/TicketResolutionReview" })
 public class TicketResolutionReviewServlet extends HttpServlet {
 
-    private TicketDAO ticketDAO;
+    private TicketDao ticketDAO;
     private KnowledgeArticleDAO knowledgeDAO;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        ticketDAO = new TicketDAO();
+        ticketDAO = new TicketDao();
         knowledgeDAO = new KnowledgeArticleDAO();
     }
 

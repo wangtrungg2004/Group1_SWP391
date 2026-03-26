@@ -10,7 +10,7 @@ package controller.ticket.agent;
  */
 
 
-import dao.TicketDAO;
+import dao.TicketDao;
 import model.Tickets;
 import model.Users;
 import java.io.IOException;
@@ -64,7 +64,7 @@ public class AgentQueueController extends HttpServlet {
         if (pageStr != null && !pageStr.isEmpty()) { try { page = Integer.parseInt(pageStr); } catch (Exception e) { page = 1; } }
         
      int offset = (page - 1) * pageSize;
-        TicketDAO ticketDao = new TicketDAO();
+        TicketDao ticketDao = new TicketDao();
 
         // XÁC ĐỊNH LEVEL CỦA AGENT ĐANG ĐĂNG NHẬP
         int currentLevel = ("Manager".equals(role) || "Admin".equals(role)) ? 2 : 1;

@@ -24,6 +24,7 @@ import jakarta.servlet.http.HttpSession;
 public class PerformanceDashboard extends HttpServlet {
 
     private SLATrackingDao slaDao = new SLATrackingDao();
+    private dao.GeneralDao generalDao = new dao.GeneralDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -42,6 +43,11 @@ public class PerformanceDashboard extends HttpServlet {
 
         String fromParam = request.getParameter("from");
         String toParam = request.getParameter("to");
+        String catParam = request.getParameter("categoryId");
+        String locParam = request.getParameter("locationId");
+
+        Integer categoryId = (catParam != null && !catParam.isEmpty()) ? Integer.parseInt(catParam) : null;
+        Integer locationId = (locParam != null && !locParam.isEmpty()) ? Integer.parseInt(locParam) : null;
 
         if (fromParam != null && !fromParam.isEmpty()) {
             try {
@@ -58,9 +64,9 @@ public class PerformanceDashboard extends HttpServlet {
             }
         }
 
-        Map<String, Object> performanceStats = slaDao.getPerformanceStats(fromDate, toDate);
-        Map<String, Object> complianceStats = slaDao.getSLAComplianceStats(fromDate, toDate);
-        java.util.List<Map<String, Object>> trendData = slaDao.getTrendData(fromDate, toDate);
+        Map<String, Object> performanceStats = slaDao.getPerformanceStats(fromDate, toDate, categoryId, locationId);
+        Map<String, Object> complianceStats = slaDao.getSLAComplianceStats(fromDate, toDate, categoryId, locationId);
+        java.util.List<Map<String, Object>> trendData = slaDao.getTrendData(fromDate, toDate, categoryId, locationId);
 
         request.setAttribute("performanceStats", performanceStats);
         request.setAttribute("complianceStats", complianceStats);
@@ -68,6 +74,11 @@ public class PerformanceDashboard extends HttpServlet {
 
         request.setAttribute("fromDate", fromDate);
         request.setAttribute("toDate", toDate);
+        request.setAttribute("categoryId", categoryId);
+        request.setAttribute("locationId", locationId);
+        
+        request.setAttribute("categories", generalDao.getCategories());
+        request.setAttribute("locations", generalDao.getLocations());
 
         request.getRequestDispatcher("performance-dashboard.jsp").forward(request, response);
     }
