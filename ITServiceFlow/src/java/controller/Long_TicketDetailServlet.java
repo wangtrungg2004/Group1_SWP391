@@ -1,6 +1,6 @@
 package controller;
 
-import dao.TicketDAO;
+import dao.TicketDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,11 +13,11 @@ import model.Tickets;
         urlPatterns = {"/Long_TicketDetailServlet", "/TicketDetailServlet", "/TicketDetail"})
 public class Long_TicketDetailServlet extends HttpServlet {
 
-    private TicketDAO ticketDAO;
+    private TicketDao ticketDAO;
 
     @Override
     public void init() throws ServletException {
-        ticketDAO = new TicketDAO();
+        ticketDAO = new TicketDao();
     }
 
     @Override

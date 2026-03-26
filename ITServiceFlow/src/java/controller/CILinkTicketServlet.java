@@ -2,7 +2,7 @@ package controller;
 
 import dao.AssetsDAO;
 import dao.TicketAssetsDAO;
-import dao.TicketDAO;
+import dao.TicketDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,14 +15,14 @@ import model.Tickets;
 @WebServlet(name = "CILinkTicketServlet", urlPatterns = {"/CILinkTicketServlet"})
 public class CILinkTicketServlet extends HttpServlet {
 
-    private TicketDAO ticketDAO;
+    private TicketDao ticketDAO;
     private TicketAssetsDAO ticketAssetsDAO;
     private AssetsDAO assetsDAO;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        ticketDAO = new TicketDAO();
+        ticketDAO = new TicketDao();
         ticketAssetsDAO = new TicketAssetsDAO();
         assetsDAO = new AssetsDAO();
     }

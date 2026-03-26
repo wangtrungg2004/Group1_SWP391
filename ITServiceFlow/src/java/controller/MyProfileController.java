@@ -2,7 +2,7 @@ package controller;
  
 import Utils.PasswordUtil;
 import dao.LocationsDAO;
-import dao.TicketDAO;
+import dao.TicketDao;
 import dao.UsersDAO;
 import dao.UserDao;
 import model.Locations;
@@ -31,7 +31,7 @@ public class MyProfileController extends HttpServlet {
  
     private final UsersDAO  usersDAO  = new UsersDAO();
     private final UserDao   userDao   = new UserDao();
-    private final TicketDAO ticketDAO = new TicketDAO();
+    private final TicketDao ticketDAO = new TicketDao();
  
     // ─── GET ─────────────────────────────────────────────────────────────────
     @Override

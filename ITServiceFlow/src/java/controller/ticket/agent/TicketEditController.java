@@ -9,7 +9,7 @@ package controller.ticket.agent;
  * @author Dumb Trung
  */
 
-import dao.TicketDAO;
+import dao.TicketDao;
 import dao.SLATrackingDao;
 import model.Tickets;
 import model.Users;
@@ -49,7 +49,7 @@ public class TicketEditController extends HttpServlet {
             int ticketId = Integer.parseInt(request.getParameter("ticketId"));
             int categoryId = Integer.parseInt(request.getParameter("categoryId"));
             
-            TicketDAO dao = new TicketDAO();
+            TicketDao dao = new TicketDao();
             Tickets t = dao.getTicketById(ticketId);
 
             // BẢO MẬT VẤN ĐỀ 4: Chỉ Owner (người được gán vé) HOẶC Manager mới được sửa

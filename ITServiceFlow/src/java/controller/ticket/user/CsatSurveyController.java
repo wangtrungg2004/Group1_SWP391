@@ -1,7 +1,7 @@
 package controller.ticket.user;
 
 import dao.CsatSurveyDAO;
-import dao.TicketDAO;
+import dao.TicketDao;
 import model.CsatSurvey;
 import model.Tickets;
 import model.Users;
@@ -61,7 +61,7 @@ public class CsatSurveyController extends HttpServlet {
             return;
         }
 
-        TicketDAO ticketDao = new TicketDAO();
+        TicketDao ticketDao = new TicketDao();
         Tickets ticket = ticketDao.getTicketById(ticketId);
 
         // Kiểm tra ticket thuộc về user (Tickets.CreatedBy = Users.Id)
@@ -125,7 +125,7 @@ public class CsatSurveyController extends HttpServlet {
             return;
         }
 
-        TicketDAO ticketDao = new TicketDAO();
+        TicketDao ticketDao = new TicketDao();
         Tickets ticket = ticketDao.getTicketById(ticketId);
 
         if (ticket == null
