@@ -19,54 +19,6 @@
         <servlet-class>controller.Problems.ProblemAdd</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>MyTickets</servlet-name>
-        <servlet-class>controller.ticket.user.MyTicketsController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>CreateTicket</servlet-name>
-        <servlet-class>controller.ticket.user.TicketCreateController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>TicketDetailUser</servlet-name>
-        <servlet-class>controller.ticket.user.TicketDetailUserController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>TicketReopen</servlet-name>
-        <servlet-class>controller.ticket.user.TicketReopenController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>UserDashboard</servlet-name>
-        <servlet-class>controller.ticket.user.UserDashboardController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>AgentQueue</servlet-name>
-        <servlet-class>controller.ticket.agent.AgentQueueController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>AgentTicketDetail</servlet-name>
-        <servlet-class>controller.ticket.agent.AgentTicketDetailController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>AssignTicket</servlet-name>
-        <servlet-class>controller.ticket.agent.AssignTicketController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>UpdateTicketStatus</servlet-name>
-        <servlet-class>controller.ticket.agent.UpdateStatusController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ProcessApproval</servlet-name>
-        <servlet-class>controller.ticket.agent.ProcessApprovalController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>CsatSurvey</servlet-name>
-        <servlet-class>controller.ticket.user.CsatSurveyController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>TicketTimeLog</servlet-name>
-        <servlet-class>controller.ticket.agent.TicketTimeLogController</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>TemporaryAccessRequest</servlet-name>
         <servlet-class>controller.Security.TemporaryAccessRequestController</servlet-class>
     </servlet>
@@ -75,12 +27,12 @@
         <servlet-class>controller.Security.TemporaryAccessApprovalController</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>TicketTimeLog</servlet-name>
-        <url-pattern>/TicketTimeLog</url-pattern>
+        <servlet-name>Login</servlet-name>
+        <url-pattern>/Login</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>TicketReopen</servlet-name>
-        <url-pattern>/TicketReopen</url-pattern>
+        <servlet-name>Logout</servlet-name>
+        <url-pattern>/Logout</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>TemporaryAccessRequest</servlet-name>
@@ -89,14 +41,6 @@
     <servlet-mapping>
         <servlet-name>TemporaryAccessApproval</servlet-name>
         <url-pattern>/TemporaryAccessApproval</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>Login</servlet-name>
-        <url-pattern>/Login</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>Logout</servlet-name>
-        <url-pattern>/Logout</url-pattern>
     </servlet-mapping>
     <!-- Filter Declaration -->
     <filter>
@@ -114,10 +58,6 @@
     </filter-mapping>
     <filter-mapping>
         <filter-name>AuthorizationFilter</filter-name>
-        <url-pattern>/AdminDashboard</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AuthorizationFilter</filter-name>
         <url-pattern>/AdminDashboard.jsp</url-pattern>
     </filter-mapping>
     <filter-mapping>
@@ -127,14 +67,6 @@
     <filter-mapping>
         <filter-name>AuthorizationFilter</filter-name>
         <url-pattern>/ITDashboard.jsp</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AuthorizationFilter</filter-name>
-        <url-pattern>/ManagerDashboard</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AuthorizationFilter</filter-name>
-        <url-pattern>/ManagerDashboard.jsp</url-pattern>
     </filter-mapping>
     <filter-mapping>
         <filter-name>AuthorizationFilter</filter-name>
@@ -163,47 +95,8 @@
         <servlet-name>ProblemAdd</servlet-name>
         <url-pattern>/ProblemAdd</url-pattern>
     </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>MyTickets</servlet-name>
-        <url-pattern>/Tickets</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>CreateTicket</servlet-name>
-        <url-pattern>/CreateTicket</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>TicketDetailUser</servlet-name>
-        <url-pattern>/TicketDetailUser</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>UserDashboard</servlet-name>
-        <url-pattern>/UserDashboard</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>AgentQueue</servlet-name>
-        <url-pattern>/Queues</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>AgentTicketDetail</servlet-name>
-        <url-pattern>/TicketAgentDetail</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>AssignTicket</servlet-name>
-        <url-pattern>/AssignTicket</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>UpdateTicketStatus</servlet-name>
-        <url-pattern>/UpdateStatus</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ProcessApproval</servlet-name>
-        <url-pattern>/ProcessApproval</url-pattern>
-    </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
-    <servlet-mapping>
-        <servlet-name>CsatSurvey</servlet-name>
-        <url-pattern>/CsatSurvey</url-pattern>
-    </servlet-mapping>
+
 </web-app>

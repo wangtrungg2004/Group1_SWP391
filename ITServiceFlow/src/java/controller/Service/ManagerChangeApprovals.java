@@ -24,8 +24,8 @@ public class ManagerChangeApprovals extends HttpServlet {
 
         HttpSession session = request.getSession();
         Users user = (Users) session.getAttribute("user");
-        if (user == null || !"Manager".equals(user.getRole())) {
-            response.sendRedirect(request.getContextPath() + "/Login");
+        if (!hasManagerApprovalPermission(session, user)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have permission to access this page.");
             return;
         }
 
@@ -90,8 +90,8 @@ public class ManagerChangeApprovals extends HttpServlet {
 
         HttpSession session = request.getSession();
         Users user = (Users) session.getAttribute("user");
-        if (user == null || !"Manager".equals(user.getRole())) {
-            response.sendRedirect(request.getContextPath() + "/Login");
+        if (!hasManagerApprovalPermission(session, user)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have permission to perform this action.");
             return;
         }
 
@@ -137,5 +137,26 @@ public class ManagerChangeApprovals extends HttpServlet {
         }
 
         response.sendRedirect(request.getContextPath() + "/ManagerChangeApprovals");
+    }
+
+    private boolean hasManagerApprovalPermission(HttpSession session, Users user) {
+        if (session == null || user == null) {
+            return false;
+        }
+
+        String effectiveRole = toRole(session.getAttribute("role"));
+        String baseRole = toRole(session.getAttribute("baseRole"));
+        return isManagerRole(effectiveRole) && isManagerRole(baseRole);
+    }
+
+    private boolean isManagerRole(String role) {
+        return "Manager".equalsIgnoreCase(role);
+    }
+
+    private String toRole(Object roleObj) {
+        if (roleObj == null) {
+            return null;
+        }
+        return roleObj.toString().trim();
     }
 }

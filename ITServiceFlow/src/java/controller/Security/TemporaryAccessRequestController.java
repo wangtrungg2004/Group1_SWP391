@@ -33,7 +33,12 @@ public class TemporaryAccessRequestController extends HttpServlet {
             return;
         }
 
-        List<String> requestableRoles = temporaryRoleAccessService.getRequestableRolesFor(currentRole);
+        String baseRole = trim((String) session.getAttribute("baseRole"));
+        if (baseRole == null || baseRole.isEmpty()) {
+            baseRole = currentRole;
+        }
+
+        List<String> requestableRoles = temporaryRoleAccessService.getRequestableRolesFor(baseRole);
         List<Integer> durationOptions = temporaryRoleAccessService.getDurationOptions();
         List<TemporaryRoleRequest> myRequests = temporaryRoleAccessService.getMyRequests(userId);
         TemporaryRoleRequest activeRequest = temporaryRoleAccessService.getActiveRequestForUser(userId);
@@ -43,6 +48,7 @@ public class TemporaryAccessRequestController extends HttpServlet {
 
         pullFlashMessage(session, request);
         request.setAttribute("currentRole", currentRole);
+        request.setAttribute("baseRole", baseRole);
         request.setAttribute("dashboardUrl", resolveDashboardUrl(currentRole));
         request.setAttribute("temporaryRoleActivated", temporaryRoleActivated);
         request.setAttribute("baseDashboardUrl", resolveDashboardUrl(session.getAttribute("baseRole")));
@@ -50,6 +56,7 @@ public class TemporaryAccessRequestController extends HttpServlet {
         request.setAttribute("durationOptions", durationOptions);
         request.setAttribute("myRequests", myRequests);
         request.setAttribute("activeRequest", activeRequest);
+        request.setAttribute("activeScopeSummary", resolveScopeSummary(activeRequest == null ? null : activeRequest.getRequestedRole()));
         request.getRequestDispatcher("TemporaryAccessRequest.jsp").forward(request, response);
     }
 
@@ -60,6 +67,13 @@ public class TemporaryAccessRequestController extends HttpServlet {
         HttpSession session = request.getSession(false);
         Integer userId = getSessionUserId(session);
         if (session == null || userId == null || session.getAttribute("user") == null) {
+            response.sendRedirect("Login.jsp");
+            return;
+        }
+
+        String synchronizedRole = temporaryRoleAccessService.synchronizeSessionRole(session);
+        if (synchronizedRole == null) {
+            session.invalidate();
             response.sendRedirect("Login.jsp");
             return;
         }
@@ -75,31 +89,43 @@ public class TemporaryAccessRequestController extends HttpServlet {
             return;
         }
 
+        if ("request_extension".equals(action)) {
+            handleRequestExtension(request, session, userId, response);
+            return;
+        }
+
         if (!"create".equals(action)) {
             pushFlashMessage(session, "error", "Unsupported action.");
             response.sendRedirect("TemporaryAccessRequest");
             return;
         }
 
-        String currentRole = temporaryRoleAccessService.synchronizeSessionRole(session);
-        if (currentRole == null) {
-            session.invalidate();
-            response.sendRedirect("Login.jsp");
-            return;
-        }
-
         String requestedRole = trim(request.getParameter("requestedRole"));
         int durationMinutes = parseInt(request.getParameter("durationMinutes"));
         String reason = trim(request.getParameter("reason"));
+        String baseRole = trim((String) session.getAttribute("baseRole"));
+        if (baseRole == null || baseRole.isEmpty()) {
+            baseRole = synchronizedRole;
+        }
 
         TemporaryRoleAccessService.ActionResult result = temporaryRoleAccessService.submitRequest(
                 userId,
-                currentRole,
+                baseRole,
                 requestedRole,
                 durationMinutes,
                 reason
         );
 
+        pushFlashMessage(session, result.isSuccess() ? "success" : "error", result.getMessage());
+        response.sendRedirect("TemporaryAccessRequest");
+    }
+
+    private void handleRequestExtension(HttpServletRequest request, HttpSession session, int userId, HttpServletResponse response)
+            throws IOException {
+        int sourceRequestId = parseInt(request.getParameter("sourceRequestId"));
+        int durationMinutes = parseInt(request.getParameter("durationMinutes"));
+        String reason = trim(request.getParameter("reason"));
+        ActionResult result = temporaryRoleAccessService.requestExtension(userId, sourceRequestId, durationMinutes, reason);
         pushFlashMessage(session, result.isSuccess() ? "success" : "error", result.getMessage());
         response.sendRedirect("TemporaryAccessRequest");
     }
@@ -196,5 +222,22 @@ public class TemporaryAccessRequestController extends HttpServlet {
 
     private String resolveDashboardUrl(Object roleObj) {
         return resolveDashboardUrl(roleObj == null ? null : roleObj.toString());
+    }
+
+    private String resolveScopeSummary(String requestedRole) {
+        if (requestedRole == null) {
+            return "No scope assigned.";
+        }
+        String normalized = requestedRole.trim();
+        if ("IT Support".equalsIgnoreCase(normalized)) {
+            return "Operational support scope: queue handling, assignment, and ticket processing.";
+        }
+        if ("Manager".equalsIgnoreCase(normalized)) {
+            return "Managerial approval scope: RFC and temporary access approval functions.";
+        }
+        if ("Admin".equalsIgnoreCase(normalized)) {
+            return "Administrative scope: system-wide management and configuration.";
+        }
+        return "Scope follows permissions of role: " + requestedRole + ".";
     }
 }

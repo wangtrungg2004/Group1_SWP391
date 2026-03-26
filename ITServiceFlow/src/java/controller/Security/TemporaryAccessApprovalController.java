@@ -31,7 +31,7 @@ public class TemporaryAccessApprovalController extends HttpServlet {
             response.sendRedirect("Login.jsp");
             return;
         }
-        if (!isApprover(role)) {
+        if (!isApprover(role) || !isBaseApprover(session)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have permission to access this page.");
             return;
         }
@@ -46,6 +46,7 @@ public class TemporaryAccessApprovalController extends HttpServlet {
                 : temporaryRoleAccessService.getPendingRequests();
 
         pullFlashMessage(session, request);
+        request.setAttribute("canApproveTemporaryAccess", Boolean.TRUE);
         request.setAttribute("tab", tab);
         request.setAttribute("requests", requests);
         request.getRequestDispatcher("TemporaryAccessApproval.jsp").forward(request, response);
@@ -68,7 +69,7 @@ public class TemporaryAccessApprovalController extends HttpServlet {
             response.sendRedirect("Login.jsp");
             return;
         }
-        if (!isApprover(role)) {
+        if (!isApprover(role) || !isBaseApprover(session)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have permission to perform this action.");
             return;
         }
@@ -95,7 +96,19 @@ public class TemporaryAccessApprovalController extends HttpServlet {
     }
 
     private boolean isApprover(String role) {
-        return "Admin".equals(role) || "Manager".equals(role);
+        if (role == null) {
+            return false;
+        }
+        String normalized = role.trim();
+        return "Admin".equalsIgnoreCase(normalized) || "Manager".equalsIgnoreCase(normalized);
+    }
+
+    private boolean isBaseApprover(HttpSession session) {
+        if (session == null) {
+            return false;
+        }
+        Object baseRoleObj = session.getAttribute("baseRole");
+        return isApprover(baseRoleObj == null ? null : baseRoleObj.toString());
     }
 
     private Integer getSessionUserId(HttpSession session) {

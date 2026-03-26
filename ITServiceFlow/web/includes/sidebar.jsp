@@ -1,6 +1,8 @@
 <%-- Left sidebar - phn quy?n theo session attribute "role" --%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <c:set var="role" value="${sessionScope.role}" />
+<c:set var="baseRole" value="${sessionScope.baseRole}" />
+<c:set var="canManagerApproval" value="${baseRole == 'Manager'}" />
 <c:choose>
     <c:when test="${role == 'Admin'}">
         <c:set var="dashboardHref" value="${pageContext.request.contextPath}/AdminDashboard" />
@@ -70,7 +72,7 @@
                     <li class="nav-item">
                         <a href="${pageContext.request.contextPath}/TemporaryAccessRequest" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-unlock"></i></span>
-                            <span class="pcoded-mtext">Temporary Access</span>
+                            <span class="pcoded-mtext">My Temporary Access</span>
                         </a>
                     </li>
                 </c:if>
@@ -141,7 +143,7 @@
                     <li class="nav-item">
                         <a href="${pageContext.request.contextPath}/TemporaryAccessRequest" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-unlock"></i></span>
-                            <span class="pcoded-mtext">Temporary Access</span>
+                            <span class="pcoded-mtext">My Temporary Access</span>
                         </a>
                     </li>
 
@@ -225,19 +227,31 @@
                     </li>
 
 
-                    <li class="nav-item pcoded-menu-caption"><label>Change Management</label></li>
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/ManagerChangeApprovals" class="nav-link">
-                            <span class="pcoded-micon"><i class="feather icon-check-square"></i></span>
-                            <span class="pcoded-mtext">Approve RFC</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/TemporaryAccessApproval" class="nav-link">
-                            <span class="pcoded-micon"><i class="feather icon-shield"></i></span>
-                            <span class="pcoded-mtext">Approve Temp Access</span>
-                        </a>
-                    </li>
+                                        <li class="nav-item pcoded-menu-caption"><label>Change Management</label></li>
+                    <c:choose>
+                        <c:when test="${canManagerApproval}">
+                            <li class="nav-item">
+                                <a href="${pageContext.request.contextPath}/ManagerChangeApprovals" class="nav-link">
+                                    <span class="pcoded-micon"><i class="feather icon-check-square"></i></span>
+                                    <span class="pcoded-mtext">Approve RFC</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="${pageContext.request.contextPath}/TemporaryAccessApproval" class="nav-link">
+                                    <span class="pcoded-micon"><i class="feather icon-shield"></i></span>
+                                    <span class="pcoded-mtext">Approve Temp Access</span>
+                                </a>
+                            </li>
+                        </c:when>
+                        <c:otherwise>
+                            <li class="nav-item">
+                                <a href="${pageContext.request.contextPath}/TemporaryAccessRequest" class="nav-link">
+                                    <span class="pcoded-micon"><i class="feather icon-unlock"></i></span>
+                                    <span class="pcoded-mtext">My Temporary Access</span>
+                                </a>
+                            </li>
+                        </c:otherwise>
+                    </c:choose>
 
 
 
@@ -300,3 +314,6 @@
     </div>
 </nav>
 <!-- [ navigation menu ] end -->
+
+
+

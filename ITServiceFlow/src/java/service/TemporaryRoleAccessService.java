@@ -3,10 +3,12 @@ package service;
 import dao.TemporaryRoleRequestDao;
 import dao.UserDao;
 import jakarta.servlet.http.HttpSession;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +43,72 @@ public class TemporaryRoleAccessService {
     }
 
     public ActionResult submitRequest(int userId, String currentRole, String requestedRole, int durationMinutes, String reason) {
+        return submitRequestInternal(
+                userId,
+                currentRole,
+                requestedRole,
+                durationMinutes,
+                reason,
+                false,
+                "JIT_REQUEST_CREATE",
+                "Temporary access request submitted successfully."
+        );
+    }
+
+    public ActionResult requestExtension(int userId, int sourceRequestId, int durationMinutes, String reason) {
+        if (userId <= 0 || sourceRequestId <= 0) {
+            return ActionResult.fail("Invalid request.");
+        }
+
+        TemporaryRoleRequest source = temporaryRoleDao.getById(sourceRequestId);
+        if (source == null || source.getUserId() != userId) {
+            return ActionResult.fail("Request not found.");
+        }
+
+        TemporaryRoleRequest activeApproved = temporaryRoleDao.getActiveApprovedRequestForUser(userId);
+        if (activeApproved == null) {
+            return ActionResult.fail("No active temporary access found to extend.");
+        }
+
+        String activeRole = normalizeRole(activeApproved.getRequestedRole());
+        String sourceRole = normalizeRole(source.getRequestedRole());
+        if (activeRole == null || !activeRole.equals(sourceRole)) {
+            return ActionResult.fail("You can only extend your current active temporary role.");
+        }
+
+        Users dbUser = userDao.getUserById(userId);
+        String currentBaseRole = dbUser == null ? null : normalizeRole(dbUser.getRole());
+        if (currentBaseRole == null) {
+            return ActionResult.fail("Cannot determine your current base role.");
+        }
+
+        String normalizedReason = reason == null ? "" : reason.trim();
+        if (normalizedReason.isEmpty()) {
+            normalizedReason = "Request extension for temporary role " + activeRole + ".";
+        }
+
+        return submitRequestInternal(
+                userId,
+                currentBaseRole,
+                activeRole,
+                durationMinutes,
+                normalizedReason,
+                true,
+                "JIT_REQUEST_EXTENSION",
+                "Temporary access extension request submitted successfully."
+        );
+    }
+
+    private ActionResult submitRequestInternal(
+            int userId,
+            String currentRole,
+            String requestedRole,
+            int durationMinutes,
+            String reason,
+            boolean allowWhenActive,
+            String auditAction,
+            String successMessage
+    ) {
         if (userId <= 0) {
             return ActionResult.fail("Invalid user.");
         }
@@ -70,12 +138,25 @@ public class TemporaryRoleAccessService {
         if (temporaryRoleDao.hasPendingRequest(userId)) {
             return ActionResult.fail("You already have a pending temporary access request.");
         }
+
         TemporaryRoleRequest activeApproved = temporaryRoleDao.getActiveApprovedRequestForUser(userId);
         if (activeApproved != null) {
-            String expiresAtText = formatDateTime(activeApproved.getExpiresAt());
-            return ActionResult.fail("You already have an active temporary role: "
-                    + activeApproved.getRequestedRole()
-                    + " (expires at " + expiresAtText + "). Revoke it or wait until expiry.");
+            String activeRole = normalizeRole(activeApproved.getRequestedRole());
+            boolean sameTargetRole = activeRole != null && activeRole.equals(normalizedRequestedRole);
+            if (!allowWhenActive || !sameTargetRole) {
+                String expiresAtText = formatDateTime(activeApproved.getExpiresAt());
+                return ActionResult.fail("You already have an active temporary role: "
+                        + activeApproved.getRequestedRole()
+                        + " (expires at " + expiresAtText + "). Revoke it or wait until expiry.");
+            }
+
+            normalizedReason = "[Extension] " + normalizedReason;
+            if (normalizedReason.length() > 500) {
+                normalizedReason = normalizedReason.substring(0, 500);
+            }
+            if (normalizedReason.trim().isEmpty()) {
+                return ActionResult.fail("Extension reason is required.");
+            }
         }
 
         boolean created = temporaryRoleDao.createRequest(
@@ -92,10 +173,10 @@ public class TemporaryRoleAccessService {
 
         TemporaryRoleRequest createdRequest = temporaryRoleDao.getLatestRequestByUser(userId);
         if (createdRequest != null) {
-            auditLogService.createAuditLog(userId, "JIT_REQUEST_CREATE", "TemporaryRoleRequest", createdRequest.getId());
+            auditLogService.createAuditLog(userId, auditAction, "TemporaryRoleRequest", createdRequest.getId());
         }
 
-        return ActionResult.ok("Temporary access request submitted successfully.");
+        return ActionResult.ok(successMessage);
     }
 
     public ActionResult processDecision(int requestId, int approverId, String decision, String comment) {
@@ -131,14 +212,43 @@ public class TemporaryRoleAccessService {
         }
 
         boolean changed;
+        boolean extensionApproval = false;
         if ("approve".equals(normalizedDecision)) {
             TemporaryRoleRequest activeApproved = temporaryRoleDao.getActiveApprovedRequestForUser(request.getUserId());
             if (activeApproved != null) {
-                return ActionResult.fail("User already has an active temporary role: "
-                        + activeApproved.getRequestedRole()
-                        + " (expires at " + formatDateTime(activeApproved.getExpiresAt()) + ").");
+                String activeRole = normalizeRole(activeApproved.getRequestedRole());
+                String requestRole = normalizeRole(request.getRequestedRole());
+                boolean isExtensionApproval = activeRole != null && activeRole.equals(requestRole);
+                if (!isExtensionApproval) {
+                    return ActionResult.fail("User already has an active temporary role: "
+                            + activeApproved.getRequestedRole()
+                            + " (expires at " + formatDateTime(activeApproved.getExpiresAt()) + ").");
+                }
+
+                Date now = new Date();
+                Date baseExpiry = activeApproved.getExpiresAt() != null && activeApproved.getExpiresAt().after(now)
+                        ? activeApproved.getExpiresAt()
+                        : now;
+                long extensionMillis = request.getDurationMinutes() * 60L * 1000L;
+                Date newExpiry = new Date(baseExpiry.getTime() + extensionMillis);
+
+                changed = temporaryRoleDao.approveRequestWithCustomExpiry(
+                        requestId,
+                        approverId,
+                        normalizedComment,
+                        new Timestamp(newExpiry.getTime())
+                );
+                if (changed) {
+                    temporaryRoleDao.revokeRequest(
+                            activeApproved.getId(),
+                            approverId,
+                            "Superseded by approved extension request #" + requestId
+                    );
+                    extensionApproval = true;
+                }
+            } else {
+                changed = temporaryRoleDao.approveRequest(requestId, approverId, normalizedComment);
             }
-            changed = temporaryRoleDao.approveRequest(requestId, approverId, normalizedComment);
         } else if ("revoke".equals(normalizedDecision)) {
             changed = temporaryRoleDao.revokeRequest(requestId, approverId, normalizedComment);
         } else {
@@ -155,8 +265,13 @@ public class TemporaryRoleAccessService {
         String auditAction;
         String successMessage;
         if ("approve".equals(normalizedDecision)) {
-            auditAction = "JIT_REQUEST_APPROVE";
-            successMessage = "Temporary access request approved.";
+            if (extensionApproval) {
+                auditAction = "JIT_REQUEST_EXTENSION_APPROVE";
+                successMessage = "Temporary access extension approved.";
+            } else {
+                auditAction = "JIT_REQUEST_APPROVE";
+                successMessage = "Temporary access request approved.";
+            }
         } else if ("revoke".equals(normalizedDecision)) {
             auditAction = "JIT_ROLE_MANUAL_REVOKE";
             successMessage = "Temporary access revoked successfully.";

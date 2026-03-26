@@ -1,6 +1,8 @@
 <%-- Left sidebar - phn quy?n theo session attribute "role" --%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <c:set var="role" value="${sessionScope.role}" />
+<c:set var="baseRole" value="${sessionScope.baseRole}" />
+<c:set var="canManagerApproval" value="${baseRole == 'Manager'}" />
 <c:choose>
     <c:when test="${role == 'Admin'}">
         <c:set var="dashboardHref" value="${pageContext.request.contextPath}/AdminDashboard" />
@@ -70,7 +72,7 @@
                     <li class="nav-item">
                         <a href="${pageContext.request.contextPath}/TemporaryAccessRequest" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-unlock"></i></span>
-                            <span class="pcoded-mtext">Temporary Access</span>
+                            <span class="pcoded-mtext">My Temporary Access</span>
                         </a>
                     </li>
                 </c:if>
@@ -99,8 +101,8 @@
                             <span class="pcoded-mtext">Ticket - Assets</span>
                         </a>
                     </li>
-                    
-                    
+
+
 
                     <li class="nav-item pcoded-menu-caption"><label>Problem & Knowledge</label></li>
                     <li class="nav-item">
@@ -141,7 +143,7 @@
                     <li class="nav-item">
                         <a href="${pageContext.request.contextPath}/TemporaryAccessRequest" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-unlock"></i></span>
-                            <span class="pcoded-mtext">Temporary Access</span>
+                            <span class="pcoded-mtext">My Temporary Access</span>
                         </a>
                     </li>
 
@@ -157,7 +159,7 @@
                             <span class="pcoded-mtext">Dashboard</span>
                         </a>
                     </li>
-                     <li class="nav-item">
+                    <li class="nav-item">
                         <a href="${pageContext.request.contextPath}/Queues" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-inbox"></i></span>
                             <span class="pcoded-mtext">Ticket Queues</span>
@@ -184,6 +186,15 @@
                         </a>
                     </li>
 
+
+
+                    <li class="nav-item">
+                        <a href="${pageContext.request.contextPath}/AuditLogs" class="nav-link">
+                            <span class="pcoded-micon"><i class="feather icon-alert-circle"></i></span>
+                            <span class="pcoded-mtext">System Audit Logs</span>
+                        </a>
+                    </li>
+
                     <li class="nav-item pcoded-menu-caption"><label>Problem Management</label></li>
                     <li class="nav-item pcoded-hasmenu">
                         <a href="#!" class="nav-link">
@@ -205,8 +216,8 @@
                             </li>
                         </ul>
                     </li>
-                    
-                    
+
+
                     <li class="nav-item pcoded-menu-caption"><label>Configuration Items Management</label></li>
                     <li class="nav-item">
                         <a href="${pageContext.request.contextPath}/CIListServlet" class="nav-link">
@@ -214,29 +225,52 @@
                             <span class="pcoded-mtext">Configuration Items</span>
                         </a>
                     </li>
-                    
 
-                    <li class="nav-item pcoded-menu-caption"><label>Change Management</label></li>
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/ManagerChangeApprovals" class="nav-link">
-                            <span class="pcoded-micon"><i class="feather icon-check-square"></i></span>
-                            <span class="pcoded-mtext">Approve RFC</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/TemporaryAccessApproval" class="nav-link">
-                            <span class="pcoded-micon"><i class="feather icon-shield"></i></span>
-                            <span class="pcoded-mtext">Approve Temp Access</span>
-                        </a>
-                    </li>
+
+                                        <li class="nav-item pcoded-menu-caption"><label>Change Management</label></li>
+                    <c:choose>
+                        <c:when test="${canManagerApproval}">
+                            <li class="nav-item">
+                                <a href="${pageContext.request.contextPath}/ManagerChangeApprovals" class="nav-link">
+                                    <span class="pcoded-micon"><i class="feather icon-check-square"></i></span>
+                                    <span class="pcoded-mtext">Approve RFC</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="${pageContext.request.contextPath}/TemporaryAccessApproval" class="nav-link">
+                                    <span class="pcoded-micon"><i class="feather icon-shield"></i></span>
+                                    <span class="pcoded-mtext">Approve Temp Access</span>
+                                </a>
+                            </li>
+                        </c:when>
+                        <c:otherwise>
+                            <li class="nav-item">
+                                <a href="${pageContext.request.contextPath}/TemporaryAccessRequest" class="nav-link">
+                                    <span class="pcoded-micon"><i class="feather icon-unlock"></i></span>
+                                    <span class="pcoded-mtext">My Temporary Access</span>
+                                </a>
+                            </li>
+                        </c:otherwise>
+                    </c:choose>
+
+
+
 
                     <li class="nav-item pcoded-menu-caption"><label>Reports</label></li>
                     <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/PerformanceDashboard" class="nav-link">
-                            <span class="pcoded-micon"><i class="feather icon-bar-chart-2"></i></span>
-                            <span class="pcoded-mtext">Performance</span>
+                        <a href="${pageContext.request.contextPath}/AgentPerformanceReport" class="nav-link">
+                            <span class="pcoded-micon"><i class="feather icon-alert-circle"></i></span>
+                            <span class="pcoded-mtext">Agent Performance Report</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="${pageContext.request.contextPath}/PerformanceDashboard" class="nav-link">
+                            <span class="pcoded-micon"><i class="feather icon-bar-chart-2"></i></span>
+                            <span class="pcoded-mtext">Performance Dashboard</span>
+                        </a>
+                    </li>
+
+
                     <li class="nav-item">
                         <a href="${pageContext.request.contextPath}/CsatReport" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-star"></i></span>
@@ -280,3 +314,6 @@
     </div>
 </nav>
 <!-- [ navigation menu ] end -->
+
+
+

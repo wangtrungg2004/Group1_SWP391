@@ -3,6 +3,7 @@ package dao;
 import Utils.DbContext;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -208,6 +209,40 @@ public class TemporaryRoleRequestDao extends DbContext {
                 ps.setString(2, comment.trim());
             }
             ps.setInt(3, requestId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean approveRequestWithCustomExpiry(int requestId, int approverId, String comment, Timestamp customExpiresAt) {
+        if (connection == null || requestId <= 0 || approverId <= 0 || customExpiresAt == null) {
+            return false;
+        }
+
+        String sql = """
+            UPDATE TemporaryRoleRequests
+            SET Status = 'Approved',
+                ReviewedBy = ?,
+                ReviewComment = ?,
+                ReviewedAt = GETDATE(),
+                ApprovedAt = GETDATE(),
+                ExpiresAt = ?,
+                RevokedAt = NULL
+            WHERE Id = ?
+              AND Status = 'Pending'
+        """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, approverId);
+            if (comment == null || comment.trim().isEmpty()) {
+                ps.setNull(2, Types.NVARCHAR);
+            } else {
+                ps.setString(2, comment.trim());
+            }
+            ps.setTimestamp(3, customExpiresAt);
+            ps.setInt(4, requestId);
             return ps.executeUpdate() > 0;
         } catch (Exception ex) {
             ex.printStackTrace();

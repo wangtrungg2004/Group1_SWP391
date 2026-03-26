@@ -6,10 +6,19 @@
         response.sendRedirect("Login.jsp");
         return;
     }
-    String currentRole = (String) session.getAttribute("role");
-    if (!"Admin".equals(currentRole) && !"Manager".equals(currentRole)) {
-        response.sendError(403, "You do not have permission to access this page.");
-        return;
+
+    boolean canApproveTemporaryAccess = Boolean.TRUE.equals(request.getAttribute("canApproveTemporaryAccess"));
+    if (!canApproveTemporaryAccess) {
+        String currentRole = (String) session.getAttribute("role");
+        String baseRole = (String) session.getAttribute("baseRole");
+        currentRole = currentRole == null ? null : currentRole.trim();
+        baseRole = baseRole == null ? null : baseRole.trim();
+        boolean currentCanApprove = "Admin".equalsIgnoreCase(currentRole) || "Manager".equalsIgnoreCase(currentRole);
+        boolean baseCanApprove = "Admin".equalsIgnoreCase(baseRole) || "Manager".equalsIgnoreCase(baseRole);
+        if (!currentCanApprove || !baseCanApprove) {
+            response.sendError(403, "You do not have permission to access this page.");
+            return;
+        }
     }
 %>
 <c:set var="role" value="${sessionScope.role}" />
