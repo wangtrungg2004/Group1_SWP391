@@ -354,7 +354,7 @@
 	<nav class="pcoded-navbar menupos-fixed menu-light brand-blue ">
 		<div class="navbar-wrapper ">
 			<div class="navbar-brand header-logo">
-				<a href="${pageContext.request.contextPath}/AdminDashboard" class="b-brand">
+				<a href="AdminDashboard.jsp" class="b-brand">
 <!--					<img src="assets/images/logo.svg" alt="" class="logo images">
 					<img src="assets/images/logo-icon.svg" alt="" class="logo-thumb images">-->
 				</a>
@@ -366,7 +366,7 @@
 						<label>Navigation</label>
 					</li>
 					<li class="nav-item">
-						<a href="${pageContext.request.contextPath}/AdminDashboard" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
+						<a href="AdminDashboard.jsp" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
 					</li>
 					<li class="nav-item pcoded-menu-caption">
 						<label>UI Element</label>
@@ -406,13 +406,16 @@
 							<label>Quan tri he thong</label>
 						</li>
 						<li class="nav-item">
-							<a href="UserManagement" class="nav-link"><span class="pcoded-micon"><i class="feather icon-users"></i></span><span class="pcoded-mtext">User Management</span></a>
+							<a href="UserCreate" class="nav-link"><span class="pcoded-micon"><i class="feather icon-user-plus"></i></span><span class="pcoded-mtext">Tao User</span></a>
 						</li>
                                             <li class="nav-item">
                                                     <a href="CIListServlet" class="nav-link"><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">List Configuration Items</span></a>
                                             </li>
                                             <li class="nav-item">
                                                     <a href="Long_TicketListServlet" class="nav-link"><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">List Tickets</span></a>
+                                            </li>
+                                            <li class="nav-item">
+                                                    <a href="TicketLinkCIListServlet" class="nav-link"><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">List Tickets Link CI</span></a>
                                             </li>
 					</c:if>
 					<c:if test="${role == 'Admin' || role == 'Manager'}">

@@ -151,8 +151,9 @@
                                                         <select name="AssignedTo" class="form-control">
                                                             <option value="">-- Select assignee --</option>
                                                             <c:forEach items="${assignees}" var="u">
-                                                                 <c:if test="${u.role == 'IT Support' or u.role == 'Manager'}">
-                                                                    <option value="${u.id}" ${u.id == savedAssignedTo ? 'selected' : ''}>
+                                                                <%-- Nếu muốn lọc theo role, ví dụ chỉ IT Support: --%>
+                                                                 <c:if test="${u.role == 'IT Support' or u.role == 'Manager'}"> 
+                                                                    <option value="${u.id}">
                                                                         ${u.fullName} (${u.username})
                                                                     </option>
                                                                  </c:if>
