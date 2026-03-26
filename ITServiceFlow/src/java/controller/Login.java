@@ -14,6 +14,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Users;
 import service.UserService;
+import dao.AuditLogDao;
+import model.AuditLog;
 
 /**
  *
@@ -72,6 +74,8 @@ public class Login extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    private AuditLogDao auditLogDao = new AuditLogDao();
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -99,6 +103,15 @@ public class Login extends HttpServlet {
         session.setAttribute("user", user);
         session.setAttribute("role", user.getRole());
         session.setAttribute("userId", user.getId());
+        
+        // Add audit log
+        AuditLog log = new AuditLog();
+        log.setUserId(user.getId());
+        log.setAction("LOGIN");
+        log.setScreen("Login");
+        log.setDataBefore("N/A");
+        log.setDataAfter("User logged in: " + user.getUsername());
+        auditLogDao.insertLog(log);
         
         // Redirect theo role
         String role = user.getRole();

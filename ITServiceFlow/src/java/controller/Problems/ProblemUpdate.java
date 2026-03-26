@@ -11,9 +11,12 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.List;
 import model.Problems;
 import service.ProblemService;
+import dao.AuditLogDao;
+import jakarta.servlet.http.HttpSession;
+import model.AuditLog;
+import model.Users;
 /**
  *
  * @author DELL
@@ -57,6 +60,7 @@ public class ProblemUpdate extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     ProblemService problemService = new ProblemService();
+    AuditLogDao auditLogDao = new AuditLogDao();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -111,6 +115,7 @@ public class ProblemUpdate extends HttpServlet {
             int id = Integer.parseInt(request.getParameter("Id"));
 
         Problems pro = problemService.getProblemById(id);
+        String dataBefore = "Title: " + pro.getTitle() + ", Status: " + pro.getStatus() + ", AssignedTo: " + pro.getAssignedTo();
 
             pro.setTitle(request.getParameter("Title"));
             pro.setDescription(request.getParameter("Description"));
@@ -126,6 +131,21 @@ public class ProblemUpdate extends HttpServlet {
         boolean success = problemService.updateProblem(pro);
 
         if (success) {
+            // Add Audit Log
+            String dataAfter = "Title: " + pro.getTitle() + ", Status: " + pro.getStatus() + ", AssignedTo: " + pro.getAssignedTo();
+            HttpSession session = request.getSession();
+            Users currentUser = (Users) session.getAttribute("user");
+            
+            AuditLog log = new AuditLog();
+            log.setUserId(currentUser != null ? currentUser.getId() : 1);
+            log.setAction("UPDATE_PROBLEM");
+            log.setScreen("Problem Update");
+            log.setDataBefore(dataBefore);
+            log.setDataAfter(dataAfter);
+            log.setEntity("Problems");
+            log.setEntityId(id);
+            auditLogDao.insertLog(log);
+            
             response.sendRedirect("ProblemDetail?Id=" + id);
         } else {
             request.setAttribute("error", "Update failed");
