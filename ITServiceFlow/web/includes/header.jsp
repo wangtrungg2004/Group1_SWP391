@@ -41,11 +41,31 @@
             word-break: break-word;
         }
     </style>
+    <c:set var="role" value="${sessionScope.role}" />
+
     <div class="m-header">
         <a class="mobile-menu" id="mobile-collapse1" href="#!"><span></span></a>
-        <a href="AdminDashboard.jsp" class="b-brand">
-            <img src="assets/images/logo.svg" alt="" class="logo images">
-            <img src="assets/images/logo-icon.svg" alt="" class="logo-thumb images">
+
+        <c:choose>
+            <c:when test="${role == 'Admin'}">
+                <a href="${pageContext.request.contextPath}/AdminDashboard.jsp" class="b-brand">
+            </c:when>
+            <c:when test="${role == 'Manager'}">
+                <a href="${pageContext.request.contextPath}/ManagerDashboard" class="b-brand">
+            </c:when>
+            <c:when test="${role == 'IT Support'}">
+                <a href="${pageContext.request.contextPath}/ITDashboard.jsp" class="b-brand">
+            </c:when>
+            <c:when test="${role == 'User'}">
+                <a href="${pageContext.request.contextPath}/UserDashboard" class="b-brand">
+            </c:when>
+            <c:otherwise>
+                <a href="${pageContext.request.contextPath}/Login" class="b-brand">
+            </c:otherwise>
+        </c:choose>
+
+            <img src="${pageContext.request.contextPath}/assets/images/logo.svg" alt="" class="logo images">
+            <img src="${pageContext.request.contextPath}/assets/images/logo-icon.svg" alt="" class="logo-thumb images">
         </a>
     </div>
     <a class="mobile-menu" id="mobile-header" href="#!">
@@ -56,7 +76,7 @@
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
                 <div class="main-search open">
-                    <div class="input-group">
+<!--                    <div class="input-group">
                         <input type="text" id="m-search" class="form-control" placeholder="Search . . .">
                         <a href="#!" class="input-group-append search-close">
                             <i class="feather icon-x input-group-text"></i>
@@ -64,7 +84,7 @@
                         <span class="input-group-append search-btn btn btn-primary">
                             <i class="feather icon-search input-group-text"></i>
                         </span>
-                    </div>
+                    </div>-->
                 </div>
             </li>
         </ul>

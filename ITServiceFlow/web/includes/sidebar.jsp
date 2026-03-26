@@ -3,18 +3,35 @@
 <!-- [ navigation menu ] start -->
 <nav class="pcoded-navbar menupos-fixed menu-light brand-blue ">
     <div class="navbar-wrapper ">
+        <c:set var="role" value="${sessionScope.role}" />
+
         <div class="navbar-brand header-logo">
-            <a href="AdminDashboard.jsp" class="b-brand">
-                <img src="assets/images/logo.svg" alt="" class="logo images">
-                <img src="assets/images/logo-icon.svg" alt="" class="logo-thumb images">
+            <c:choose>
+                <c:when test="${role eq 'Admin'}">
+                    <a href="${pageContext.request.contextPath}/AdminDashboard.jsp" class="b-brand">
+                </c:when>
+                <c:when test="${role eq 'Manager'}">
+                    <a href="${pageContext.request.contextPath}/ManagerDashboard" class="b-brand">
+                </c:when>
+                <c:when test="${role eq 'IT Support'}">
+                    <a href="${pageContext.request.contextPath}/ITDashboard.jsp" class="b-brand">
+                </c:when>
+                <c:when test="${role eq 'User'}">
+                    <a href="${pageContext.request.contextPath}/UserDashboard" class="b-brand">
+                </c:when>
+                <c:otherwise>
+                    <a href="${pageContext.request.contextPath}/Login" class="b-brand">
+                </c:otherwise>
+            </c:choose>
+
+                <img src="${pageContext.request.contextPath}/assets/images/logo.svg" alt="" class="logo images">
+                <img src="${pageContext.request.contextPath}/assets/images/logo-icon.svg" alt="" class="logo-thumb images">
             </a>
             <a class="mobile-menu" id="mobile-collapse" href="#!"><span></span></a>
         </div>
         <div class="navbar-content scroll-div">
             <ul class="nav pcoded-inner-navbar">
-                <li class="nav-item pcoded-menu-caption">
-                    <label>Navigation</label>
-                </li>
+               
 
                 <!-- ??? USER MENU ??????????????????????????????????????? -->
                 <c:if test="${role == 'User'}">
