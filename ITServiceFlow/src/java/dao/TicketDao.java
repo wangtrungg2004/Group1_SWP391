@@ -835,7 +835,7 @@ public class TicketDao extends DbContext {
     // CODE DNH CHO LUNG AGENT (DEV 2)
     // =========================================================================
     // 7. Ly danh sch Hng i (Queue) cho Agent c Filter
-    public List<Tickets> getAgentQueues(int agentId, String queueType, int offset, int limit, String search, String status, String type) {
+ public List<Tickets> getAgentQueues(int agentId, int currentLevel, String queueType, int offset, int limit, String search, String status, String type, String sortOrder) {
         List<Tickets> list = new ArrayList<>();
 
         StringBuilder sql = new StringBuilder(
@@ -846,7 +846,7 @@ public class TicketDao extends DbContext {
                 + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id WHERE 1=1 "
         );
 
-        // Lc theo Queue Type
+        // Lọc theo Queue Type
         if ("unassigned".equals(queueType)) {
             sql.append("AND t.AssignedTo IS NULL AND t.Status != 'Closed' AND t.Status != 'Resolved' ");
         } else if ("mine".equals(queueType)) {
@@ -857,7 +857,7 @@ public class TicketDao extends DbContext {
             sql.append("AND t.Status != 'Closed' AND t.Status != 'Resolved' ");
         }
 
-        // Lc theo thanh Search & Filter
+        // Lọc theo thanh Search & Filter
         if (search != null && !search.trim().isEmpty()) {
             sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
         }
@@ -868,10 +868,21 @@ public class TicketDao extends DbContext {
             sql.append("AND t.TicketType = ? ");
         }
 
-        sql.append("ORDER BY t.CreatedAt ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        // Xử lý tham số sortOrder (Sắp xếp theo thời gian)
+        if ("asc".equalsIgnoreCase(sortOrder)) {
+            sql.append("ORDER BY t.CreatedAt ASC ");
+        } else {
+            sql.append("ORDER BY t.CreatedAt DESC "); // Mặc định là mới nhất lên đầu
+        }
+
+        sql.append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIdx = 1;
+            
+            // Lưu ý: Mình đã nhận tham số currentLevel vào hàm cho khớp với Controller.
+            // Nếu DB của bạn có cột phân loại Ticket theo Level thì bổ sung logic ps.setInt ở đây. 
+
             if ("mine".equals(queueType)) {
                 ps.setInt(paramIdx++, agentId);
             }
@@ -893,7 +904,7 @@ public class TicketDao extends DbContext {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Tickets t = new Tickets();
-                // Map d liu
+                // Map dữ liệu
                 t.setId(rs.getInt("Id"));
                 t.setTicketNumber(rs.getString("TicketNumber"));
                 t.setTicketType(rs.getString("TicketType"));
