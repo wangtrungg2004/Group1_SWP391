@@ -9,7 +9,7 @@ package model;
 
 import java.sql.Timestamp;
 
-
+<<<<<<< HEAD
 public class AuditLog {
     private int id;
     private int userId;
@@ -36,7 +36,7 @@ public class AuditLog {
         this.entityId = entityId;
         this.createdAt = createdAt;
         this.userName = userName;
-
+=======
 /**
  *
  * @author DELL
@@ -79,7 +79,7 @@ public class AuditLog {
 
     public void setUserId(int userId) {
         this.userId = userId;
-
+>>>>>>> HoangNV4
     }
 
     public String getUserName() {
@@ -89,7 +89,7 @@ public class AuditLog {
     public void setUserName(String userName) {
         this.userName = userName;
     }
-
+<<<<<<< HEAD
     
     
     // Getters & Setters
@@ -111,7 +111,7 @@ public class AuditLog {
     public Timestamp getCreatedAt() { return createdAt; }
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
 }
-
+=======
 
     public String getAction() {
         return action;
@@ -169,4 +169,4 @@ public class AuditLog {
         this.entityId = entityId;
     }
 }
-
+>>>>>>> HoangNV4
