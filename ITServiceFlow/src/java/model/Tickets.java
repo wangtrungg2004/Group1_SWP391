@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 public class Tickets {
+
     private int id;
     private String ticketNumber;
     private String ticketType;
@@ -37,15 +38,8 @@ public class Tickets {
     private String assetType;
     private List<Assets> linkedAssets;
 
-    private String assetTag;
-    private String assetName;
-    private String assetType;
-    private List<Assets> linkedAssets;
-
-    
     // Thêm thuộc tính này vào model
     private java.util.Date resolutionDeadline;
-
 
     public Tickets() {
     }
@@ -308,8 +302,6 @@ public class Tickets {
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }
-    
-    
 
     // Thêm Getter / Setter
     public java.util.Date getResolutionDeadline() {
@@ -318,38 +310,6 @@ public class Tickets {
 
     public void setResolutionDeadline(java.util.Date resolutionDeadline) {
         this.resolutionDeadline = resolutionDeadline;
-    }
-
-    public String getAssetTag() {
-        return assetTag;
-    }
-
-    public void setAssetTag(String assetTag) {
-        this.assetTag = assetTag;
-    }
-
-    public String getAssetName() {
-        return assetName;
-    }
-
-    public void setAssetName(String assetName) {
-        this.assetName = assetName;
-    }
-
-    public String getAssetType() {
-        return assetType;
-    }
-
-    public void setAssetType(String assetType) {
-        this.assetType = assetType;
-    }
-
-    public List<Assets> getLinkedAssets() {
-        return linkedAssets;
-    }
-
-    public void setLinkedAssets(List<Assets> linkedAssets) {
-        this.linkedAssets = linkedAssets;
     }
 
     public String getAssetTag() {

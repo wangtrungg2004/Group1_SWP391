@@ -1304,4 +1304,174 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         return list;
     }
     
+    public List<Tickets> getAgentQueues(int agentId, int currentLevel, String queueType, int offset, int limit, String search, String status, String type) {
+        List<Tickets> list = new ArrayList<>();
+        
+        StringBuilder sql = new StringBuilder(
+            "SELECT t.*, p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName, st.ResolutionDeadline " +
+            "FROM [dbo].[Tickets] t " +
+            "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id " +
+            "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id " +
+            "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id " +
+            "LEFT JOIN [dbo].[SLATracking] st ON t.Id = st.TicketId WHERE 1=1 "
+        );
+        if ("unassigned".equals(queueType)) {
+            sql.append("AND t.AssignedTo IS NULL AND t.Status NOT IN ('Closed', 'Resolved') ");
+        } else if ("mine".equals(queueType)) {
+            sql.append("AND t.AssignedTo = ? AND t.Status NOT IN ('Closed', 'Resolved') ");
+        } else if ("resolved".equals(queueType)) {
+            sql.append("AND t.Status = 'Resolved' ");
+        } else { 
+            sql.append("AND t.Status NOT IN ('Closed', 'Resolved') ");
+        }
+
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
+        }
+        if (status != null && !status.equals("all")) sql.append("AND t.Status = ? ");
+        if (type != null && !type.equals("all")) sql.append("AND t.TicketType = ? ");
+
+        sql.append("ORDER BY t.CreatedAt ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int paramIdx = 1;
+            if ("mine".equals(queueType)) ps.setInt(paramIdx++, agentId);
+            
+            if (search != null && !search.trim().isEmpty()) {
+                ps.setString(paramIdx++, "%" + search + "%");
+                ps.setString(paramIdx++, "%" + search + "%");
+            }
+            if (status != null && !status.equals("all")) ps.setString(paramIdx++, status);
+            if (type != null && !type.equals("all")) ps.setString(paramIdx++, type);
+            
+            ps.setInt(paramIdx++, offset);
+            ps.setInt(paramIdx++, limit);
+            
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Tickets t = new Tickets();
+                t.setId(rs.getInt("Id"));
+                t.setTicketNumber(rs.getString("TicketNumber"));
+                t.setTicketType(rs.getString("TicketType"));
+                t.setTitle(rs.getString("Title"));
+                t.setStatus(rs.getString("Status"));
+                t.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                t.setPriorityLevel(rs.getString("PriorityLevel"));
+                t.setAssigneeName(rs.getString("AssigneeName"));
+                
+                // Lấy SLA Deadline từ DB
+                t.setResolutionDeadline(rs.getTimestamp("ResolutionDeadline"));
+                list.add(t);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
+    }
+
+    public boolean processApproval(int ticketId, int managerId, boolean isApproved) {
+        String sql;
+        if (isApproved) {
+            // DUYỆT: Lưu người duyệt, đổi trạng thái thành New, trả về Level 1 cho IT Support xử lý
+            sql = "UPDATE [dbo].[Tickets] SET "
+                + "ApprovedBy = ?, ApprovedAt = GETDATE(), "
+                + "Status = 'New', CurrentLevel = 1, UpdatedAt = GETDATE() "
+                + "WHERE Id = ?";
+        } else {
+            // TỪ CHỐI: Đóng vé luôn, giữ nguyên Level
+            sql = "UPDATE [dbo].[Tickets] SET "
+                + "ApprovedBy = ?, ApprovedAt = GETDATE(), "
+                + "Status = 'Closed', UpdatedAt = GETDATE() "
+                + "WHERE Id = ?";
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, managerId);
+            ps.setInt(2, ticketId);
+            int rows = ps.executeUpdate();
+            
+            if (rows > 0 && isApproved) {
+                // Query ngược lại để lấy thông tin PriorityId và Type của vé
+                Tickets t = getTicketById(ticketId); 
+                if (t != null && t.getPriorityId() != null && t.getPriorityId() > 0) {
+                    SLATrackingDao slaDao = new SLATrackingDao();
+                    // Tính thời gian SLA bắt đầu từ giây phút này!
+                    slaDao.applySLAForTicket(ticketId, t.getTicketType(), t.getPriorityId());
+                }
+            }
+            
+            return rows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+       public boolean updateTicketTriage(int ticketId, int categoryId, Integer impact, Integer urgency, Integer priorityId) {
+        String sql = "UPDATE [dbo].[Tickets] SET CategoryId = ?, Impact = ?, Urgency = ?, PriorityId = ?, UpdatedAt = GETDATE() WHERE Id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, categoryId);
+            
+            // Xử lý an toàn cho Integer có thể Null (trường hợp Service Request)
+            if (impact != null) ps.setInt(2, impact); else ps.setNull(2, Types.INTEGER);
+            if (urgency != null) ps.setInt(3, urgency); else ps.setNull(3, Types.INTEGER);
+            if (priorityId != null) ps.setInt(4, priorityId); else ps.setNull(4, Types.INTEGER);
+            
+            ps.setInt(5, ticketId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+        public List<model.Users> getActiveAgents() {
+        List<model.Users> list = new ArrayList<>();
+        // Lấy tất cả trừ End User, sắp xếp theo Role để dễ nhìn
+        String sql = "SELECT Id, FullName, Role FROM [dbo].[Users] "
+                   + "WHERE Role IN ('IT Support', 'Manager') AND IsActive = 1 "
+                   + "ORDER BY Role, FullName";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                model.Users u = new model.Users();
+                u.setId(rs.getInt("Id"));
+                // Format tên hiển thị: Nguyễn Văn A (IT Support)
+                u.setFullName(rs.getString("FullName") + " (" + rs.getString("Role") + ")");
+                list.add(u);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+         public int getTotalAgentQueuesCount(int agentId, int currentLevel, String queueType, String search, String status, String type) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM [dbo].[Tickets] t WHERE 1=1 ");
+
+        // ĐÃ SỬA: Bỏ lọc theo CurrentLevel
+        if ("unassigned".equals(queueType)) {
+            sql.append("AND t.AssignedTo IS NULL AND t.Status NOT IN ('Closed', 'Resolved') ");
+        } else if ("mine".equals(queueType)) {
+            sql.append("AND t.AssignedTo = ? AND t.Status NOT IN ('Closed', 'Resolved') ");
+        } else if ("resolved".equals(queueType)) {
+            sql.append("AND t.Status = 'Resolved' ");
+        } else {
+            sql.append("AND t.Status NOT IN ('Closed', 'Resolved') ");
+        }
+
+        if (search != null && !search.trim().isEmpty()) sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
+        if (status != null && !status.equals("all")) sql.append("AND t.Status = ? ");
+        if (type != null && !type.equals("all")) sql.append("AND t.TicketType = ? ");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int paramIdx = 1;
+            if ("mine".equals(queueType)) ps.setInt(paramIdx++, agentId);
+            if (search != null && !search.trim().isEmpty()) {
+                ps.setString(paramIdx++, "%" + search + "%");
+                ps.setString(paramIdx++, "%" + search + "%");
+            }
+            if (status != null && !status.equals("all")) ps.setString(paramIdx++, status);
+            if (type != null && !type.equals("all")) ps.setString(paramIdx++, type);
+            
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) { e.printStackTrace(); }
+        return 0;
+    }
 }
