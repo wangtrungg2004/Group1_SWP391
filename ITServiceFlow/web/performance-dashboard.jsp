@@ -84,27 +84,6 @@
                                                                     <input type="date" class="form-control mr-3"
                                                                         name="to" value="${toDate}">
                                                                 </div>
-<<<<<<< HEAD
-=======
-                                                                <div class="form-group mb-2">
-                                                                    <label for="categoryId" class="mr-2">Category:</label>
-                                                                    <select name="categoryId" class="form-control mr-3">
-                                                                        <option value="">All Categories</option>
-                                                                        <c:forEach items="${categories}" var="cat">
-                                                                            <option value="${cat.Id}" ${categoryId == cat.Id ? 'selected' : ''}>${cat.Name}</option>
-                                                                        </c:forEach>
-                                                                    </select>
-                                                                </div>
-                                                                <div class="form-group mb-2">
-                                                                    <label for="locationId" class="mr-2">Location:</label>
-                                                                    <select name="locationId" class="form-control mr-3">
-                                                                        <option value="">All Locations</option>
-                                                                        <c:forEach items="${locations}" var="loc">
-                                                                            <option value="${loc.Id}" ${locationId == loc.Id ? 'selected' : ''}>${loc.Name}</option>
-                                                                        </c:forEach>
-                                                                    </select>
-                                                                </div>
->>>>>>> HoangNV4
                                                                 <button type="submit"
                                                                     class="btn btn-primary mb-2">Filter</button>
                                                             </form>
@@ -210,15 +189,7 @@
                             // Line Chart
                             var trendData = [
                                 <c:forEach items="${trendData}" var="d" varStatus="loop">
-<<<<<<< HEAD
                                     {y: '${d.Date}', a: ${d.Created}, b: ${d.Resolved} }${!loop.last ? ',' : ''}
-=======
-                                    {
-                                        y: '${d.Date}',
-                                        a: ${d.Created != null ? d.Created : 0},
-                                        b: ${d.Resolved != null ? d.Resolved : 0}
-                                    }${!loop.last ? ',' : ''}
->>>>>>> HoangNV4
                                 </c:forEach>
                             ];
 
@@ -240,7 +211,6 @@
                             Morris.Donut({
                                 element: 'morris-donut-chart',
                                 data: [
-<<<<<<< HEAD
                                     { label: "Met SLA", value: ${ complianceStats.Met }},
                                 { label: "Breached SLA", value: ${ complianceStats.Breached }}
                 ],
@@ -248,15 +218,6 @@
                             resize: true,
                             formatter: function (x) { return x + " Tickets" }
             });
-=======
-                                    { label: "Met SLA", value: ${complianceStats.Met != null ? complianceStats.Met : 0} },
-                                    { label: "Breached SLA", value: ${complianceStats.Breached != null ? complianceStats.Breached : 0} }
-                                ],
-                                colors: ['#1de9b6', '#f44236'],
-                                resize: true,
-                                formatter: function (x) { return x + " Tickets" }
-                            });
->>>>>>> HoangNV4
         });
                     </script>
 

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 package dao;
 
 import model.Tickets;
@@ -539,30 +538,6 @@ public class TicketDAO extends DbContext {
 
     // 5. Tạo ticket và trả về ID sinh ra (cho SLA tracking)
     public int createTicket2(Tickets ticket) {
-=======
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package dao;
-
-import Utils.DbContext;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import model.Tickets;
-
-/**
- *
- * @author DELL
- */
-public class TicketDao extends DbContext {
-
-    // This method returns the generated ID for SLA tracking
-    public int createTicket(Tickets ticket) {
->>>>>>> HoangNV4
         String sql = "INSERT INTO [dbo].[Tickets] (TicketNumber, TicketType, Title, Description, CategoryId, LocationId, Impact, Urgency, PriorityId, ServiceCatalogId, RequiresApproval, Status, CreatedBy, CreatedAt) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE())";
         try {
@@ -615,7 +590,6 @@ public class TicketDao extends DbContext {
     // Helper to generate Ticket Number
     public String getNextTicketNumber(String type) {
         String prefix = type.equals("Incident") ? "INC-" : "SR-";
-<<<<<<< HEAD
         return prefix + System.currentTimeMillis();
     }
 
@@ -1501,57 +1475,3 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         return 0;
     }
 }
-=======
-        // Simple logic for demo, better use DB sequence or Max check
-        return prefix + System.currentTimeMillis();
-    }
-
-    public Tickets getTicketById(int id) {
-        String sql = "SELECT * FROM [dbo].[Tickets] WHERE Id = ?";
-        try {
-            PreparedStatement stm = connection.prepareStatement(sql);
-            stm.setInt(1, id);
-            ResultSet rs = stm.executeQuery();
-            if (rs.next()) {
-                Tickets t = new Tickets();
-                t.setId(rs.getInt("Id"));
-                t.setTicketNumber(rs.getString("TicketNumber"));
-                t.setTicketType(rs.getString("TicketType"));
-                t.setTitle(rs.getString("Title"));
-                t.setDescription(rs.getString("Description"));
-                t.setCategoryId(rs.getInt("CategoryId"));
-                t.setLocationId(rs.getInt("LocationId"));
-                t.setImpact(rs.getObject("Impact") != null ? rs.getInt("Impact") : null);
-                t.setUrgency(rs.getObject("Urgency") != null ? rs.getInt("Urgency") : null);
-                t.setPriorityId(rs.getObject("PriorityId") != null ? rs.getInt("PriorityId") : null);
-                t.setServiceCatalogId(rs.getObject("ServiceCatalogId") != null ? rs.getInt("ServiceCatalogId") : null);
-                t.setRequiresApproval(
-                        rs.getObject("RequiresApproval") != null ? rs.getBoolean("RequiresApproval") : null);
-                t.setStatus(rs.getString("Status"));
-                t.setCreatedBy(rs.getInt("CreatedBy"));
-                t.setAssignedTo(rs.getObject("AssignedTo") != null ? rs.getInt("AssignedTo") : null);
-                t.setCreatedAt(rs.getTimestamp("CreatedAt"));
-                // Add other fields if necessary
-                return t;
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
-    public List<String> getDistinctStatuses() {
-        List<String> list = new ArrayList<>();
-        String sql = "SELECT DISTINCT Status FROM [dbo].[Tickets] WHERE Status IS NOT NULL ORDER BY Status";
-        try {
-            PreparedStatement stm = connection.prepareStatement(sql);
-            ResultSet rs = stm.executeQuery();
-            while (rs.next()) {
-                list.add(rs.getString("Status"));
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return list;
-    }
-}
->>>>>>> HoangNV4

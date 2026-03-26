@@ -56,19 +56,4 @@ public class SLARuleService {
     public int countSLARules(String name, String type, Integer priorityId, String status) {
         return slaRuleDao.countSLARules(name, type, priorityId, status);
     }
-<<<<<<< HEAD
-=======
-
-    public List<String> getDistinctTypes() {
-        return slaRuleDao.getDistinctTypes();
-    }
-
-    public List<String> getDistinctStatuses() {
-        return slaRuleDao.getDistinctStatuses();
-    }
-
-    public boolean isSlaNameExists(String name, Integer excludeId) {
-        return slaRuleDao.isSlaNameExists(name, excludeId);
-    }
->>>>>>> HoangNV4
 }
