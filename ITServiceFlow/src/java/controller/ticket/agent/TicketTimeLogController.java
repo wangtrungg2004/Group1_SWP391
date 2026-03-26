@@ -107,7 +107,7 @@ public class TicketTimeLogController extends HttpServlet {
                 response.sendRedirect(redirectUrl); return;
             }
             String ticketStatus = ticket.getStatus();
-            if (!"Resolved".equals(ticketStatus) && !"Closed".equals(ticketStatus)) {
+            if (!"Resolved".equals(ticketStatus)) {
                 setFlash(session, "error", "Chỉ được log time sau khi ticket đã Resolved hoặc Closed.");
                 response.sendRedirect(redirectUrl); return;
             }

@@ -500,7 +500,7 @@
 
                                                         <%-- Nút mở popup log time - chỉ hiện khi ticket đã Resolved hoặc Closed --%>
                                                         <c:choose>
-                                                            <c:when test="${ticket.status eq 'Resolved' or ticket.status eq 'Closed'}">
+                                                            <c:when test="${ticket.status eq 'Resolved'}">
                                                                 <button type="button" class="btn btn-sm btn-outline-primary btn-block mb-3"
                                                                         onclick="openTimeLogModal()">
                                                                     <i class="feather icon-plus mr-1"></i> Log Time
