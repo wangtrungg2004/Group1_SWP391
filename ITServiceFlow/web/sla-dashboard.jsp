@@ -149,54 +149,7 @@
                                                 </div>
                                             </div>
 
-                                            <!-- [ Main Content ] start -->
-                                            <!-- Ticket Type Distribution -->
-                                            <div class="row">
-                                                <div class="col-md-6 col-xl-4">
-                                                    <div class="card">
-                                                        <div class="card-header">
-                                                            <h5>📊 Ticket Type distribution</h5>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            <div style="height: 300px;">
-                                                                <canvas id="ticketTypeChart"></canvas>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6 col-xl-8">
-                                                    <div class="card">
-                                                        <div class="card-header">
-                                                            <h5>📝 Ticket Type Summary</h5>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            <div class="table-responsive">
-                                                                <table class="table table-hover">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th>Ticket Type</th>
-                                                                            <th>Count</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        <c:forEach items="${ticketTypeStats}" var="entry">
-                                                                            <tr>
-                                                                                <td>${entry.key}</td>
-                                                                                <td><span class="badge badge-primary">${entry.value}</span></td>
-                                                                            </tr>
-                                                                        </c:forEach>
-                                                                        <c:if test="${empty ticketTypeStats}">
-                                                                            <tr>
-                                                                                <td colspan="2" class="text-center">No tickets found in this period.</td>
-                                                                            </tr>
-                                                                        </c:if>
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+
 
                                             <!-- Alert Tables -->
                                             <div class="row">
@@ -307,52 +260,6 @@
                     <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
                     <script src="assets/js/pcoded.min.js"></script>
                     
-                    <!-- Chart Initialization -->
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function() {
-                            const ctx = document.getElementById('ticketTypeChart').getContext('2d');
-                            
-                            const labels = [];
-                            const data = [];
-                            <c:forEach items="${ticketTypeStats}" var="entry">
-                                labels.push("${entry.key}");
-                                data.push(${entry.value});
-                            </c:forEach>
-                            
-                            if (labels.length === 0) {
-                                // Add dummy data if empty for visual
-                                labels.push("No Data");
-                                data.push(1);
-                            }
-
-                            new Chart(ctx, {
-                                type: 'pie',
-                                data: {
-                                    labels: labels,
-                                    datasets: [{
-                                        data: data,
-                                        backgroundColor: [
-                                            '#04a9f5', // Blue
-                                            '#1de9b6', // Green
-                                            '#f44236', // Red
-                                            '#f4c22b', // Yellow
-                                            '#a389d4'  // Purple
-                                        ],
-                                        borderWidth: 1
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        legend: {
-                                            position: 'bottom'
-                                        }
-                                    }
-                                }
-                            });
-                        });
-                    </script>
                 </body>
 
                 </html>
