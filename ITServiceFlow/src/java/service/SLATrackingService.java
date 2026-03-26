@@ -4,7 +4,6 @@
  */
 package service;
 
-
 import dao.NotificationDao;
 import dao.SLARuleDao;
 import dao.SLATrackingDao;
@@ -19,11 +18,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import dao.SLARuleDao;
-import dao.SLATrackingDao;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 import model.SLARule;
 import model.SLATracking;
 
@@ -34,18 +28,14 @@ import model.SLATracking;
 public class SLATrackingService {
     private SLATrackingDao slaTrackingDao;
     private SLARuleDao slaRuleDao;
-
     private NotificationDao notificationDao;
     private UserDao userDao;
-
 
     public SLATrackingService() {
         this.slaTrackingDao = new SLATrackingDao();
         this.slaRuleDao = new SLARuleDao();
-
         this.notificationDao = new NotificationDao();
         this.userDao = new UserDao();
-
     }
 
     public void applySLARuleToTicket(int ticketId, String ticketType, int priorityId) {
@@ -75,7 +65,6 @@ public class SLATrackingService {
         }
     }
 
-
     public java.util.Map<String, Integer> getSLAStatistics() {
         return slaTrackingDao.getSLAStatistics();
     }
@@ -86,25 +75,12 @@ public class SLATrackingService {
 
     public java.util.List<java.util.Map<String, Object>> getNearBreachTickets(int limit) {
         return slaTrackingDao.getNearBreachTickets(limit);
-
-    public java.util.Map<String, Integer> getSLAStatistics(java.sql.Date from, java.sql.Date to, Integer categoryId, Integer locationId) {
-        return slaTrackingDao.getSLAStatistics(from, to, categoryId, locationId);
-    }
-
-    public java.util.List<java.util.Map<String, Object>> getBreachedTickets(int limit, java.sql.Date from, java.sql.Date to, Integer categoryId, Integer locationId) {
-        return slaTrackingDao.getBreachedTickets(limit, from, to, categoryId, locationId);
-    }
-
-    public java.util.List<java.util.Map<String, Object>> getNearBreachTickets(int limit, java.sql.Date from, java.sql.Date to, Integer categoryId, Integer locationId) {
-        return slaTrackingDao.getNearBreachTickets(limit, from, to, categoryId, locationId);
-
     }
 
     public java.util.List<java.util.Map<String, Object>> getBreachList(String team, String priority, String agent,
             String status, String sortBy, int offset, int limit) {
         return slaTrackingDao.getBreachList(team, priority, agent, status, sortBy, offset, limit);
     }
-
 
     public void runEscalationSweep() {
         // Always keep IsBreached in sync for unresolved tickets.
@@ -282,13 +258,5 @@ public class SLATrackingService {
     private String formatDateTime(Date date) {
         SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.ENGLISH);
         return fmt.format(date);
-
-    public int countBreachList(String team, String priority, String agent, String status) {
-        return slaTrackingDao.countBreachList(team, priority, agent, status);
-    }
-
-    public java.util.Map<String, Integer> getTicketTypeDistribution(java.sql.Date from, java.sql.Date to, Integer categoryId, Integer locationId) {
-        return slaTrackingDao.getTicketTypeDistribution(from, to, categoryId, locationId);
-
     }
 }

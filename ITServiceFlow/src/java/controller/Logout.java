@@ -11,9 +11,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import dao.AuditLogDao;
-import model.AuditLog;
-import model.Users;
 
 /**
  *
@@ -21,7 +18,6 @@ import model.Users;
  */
 @WebServlet(name = "Logout", urlPatterns = {"/Logout"})
 public class Logout extends HttpServlet {
-    private AuditLogDao auditLogDao = new AuditLogDao();
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -49,17 +45,6 @@ public class Logout extends HttpServlet {
         HttpSession session = request.getSession(false);
         
         if (session != null) {
-            Users user = (Users) session.getAttribute("user");
-            if (user != null) {
-                // Add audit log
-                AuditLog log = new AuditLog();
-                log.setUserId(user.getId());
-                log.setAction("LOGOUT");
-                log.setScreen("Layout");
-                log.setDataBefore("N/A");
-                log.setDataAfter("User logged out: " + user.getUsername());
-                auditLogDao.insertLog(log);
-            }
             // Xóa tất cả các attribute trong session
             session.invalidate();
         }

@@ -13,26 +13,16 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-<<<<<<< HEAD
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
-=======
->>>>>>> HoangNV4
 import model.Problems;
 import model.Tickets;
 import service.AuditLogService;
 import service.ProblemService;
-<<<<<<< HEAD
 import service.TicketService;
 import service.UserService;
 
-=======
-import dao.AuditLogDao;
-import jakarta.servlet.http.HttpSession;
-import model.AuditLog;
-import model.Users;
->>>>>>> HoangNV4
 /**
  *
  * @author DELL
@@ -77,14 +67,10 @@ public class ProblemUpdate extends HttpServlet {
      * @throws IOException      if an I/O error occurs
      */
     ProblemService problemService = new ProblemService();
-<<<<<<< HEAD
     UserService userService = new UserService();
     TicketService ticketService = new TicketService();
     NotificationDao notificationDao = new NotificationDao();
     AuditLogService auditLogService = new AuditLogService();
-=======
-    AuditLogDao auditLogDao = new AuditLogDao();
->>>>>>> HoangNV4
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -154,7 +140,6 @@ public class ProblemUpdate extends HttpServlet {
                 return;
             }
 
-<<<<<<< HEAD
             List<Integer> ticketIds = new ArrayList<>();
             String[] arr = request.getParameterValues("ticketIds");
             if (arr != null) {
@@ -202,46 +187,6 @@ public class ProblemUpdate extends HttpServlet {
                 request.setAttribute("problem", pro);
                 request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
             }
-=======
-        Problems pro = problemService.getProblemById(id);
-        String dataBefore = "Title: " + pro.getTitle() + ", Status: " + pro.getStatus() + ", AssignedTo: " + pro.getAssignedTo();
-
-            pro.setTitle(request.getParameter("Title"));
-            pro.setDescription(request.getParameter("Description"));
-            pro.setRootCause(request.getParameter("RootCause"));
-            pro.setWorkaround(request.getParameter("Workaround"));
-            pro.setStatus(request.getParameter("Status"));
-            
-        String assignedToStr = request.getParameter("AssignedTo");
-        if (assignedToStr != null && !assignedToStr.isEmpty()) {
-            pro.setAssignedTo(Integer.parseInt(assignedToStr));
-        }
-
-        boolean success = problemService.updateProblem(pro);
-
-        if (success) {
-            // Add Audit Log
-            String dataAfter = "Title: " + pro.getTitle() + ", Status: " + pro.getStatus() + ", AssignedTo: " + pro.getAssignedTo();
-            HttpSession session = request.getSession();
-            Users currentUser = (Users) session.getAttribute("user");
-            
-            AuditLog log = new AuditLog();
-            log.setUserId(currentUser != null ? currentUser.getId() : 1);
-            log.setAction("UPDATE_PROBLEM");
-            log.setScreen("Problem Update");
-            log.setDataBefore(dataBefore);
-            log.setDataAfter(dataAfter);
-            log.setEntity("Problems");
-            log.setEntityId(id);
-            auditLogDao.insertLog(log);
-            
-            response.sendRedirect("ProblemDetail?Id=" + id);
-        } else {
-            request.setAttribute("error", "Update failed");
-            request.setAttribute("problem", pro);
-            request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
-        }
->>>>>>> HoangNV4
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid Id format");
         }
