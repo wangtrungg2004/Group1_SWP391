@@ -101,7 +101,7 @@ public class TicketTimeLogController extends HttpServlet {
         } else if ("logManual".equals(action)) {
 
             // Kiểm tra status — chỉ cho log khi ticket đã Resolved hoặc Closed
-            model.Tickets ticket = new dao.TicketDAO().getTicketById(ticketId);
+            model.Tickets ticket = new dao.TicketDao().getTicketById(ticketId);
             if (ticket == null) {
                 setFlash(session, "error", "Không tìm thấy ticket.");
                 response.sendRedirect(redirectUrl); return;

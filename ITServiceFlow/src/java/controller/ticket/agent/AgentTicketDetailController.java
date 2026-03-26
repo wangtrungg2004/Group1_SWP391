@@ -41,7 +41,7 @@ public class AgentTicketDetailController extends HttpServlet {
         }
 
         // 1. Ticket
-        TicketDAO ticketDao = new TicketDAO();
+        TicketDao ticketDao = new TicketDao();
         Tickets ticket = ticketDao.getTicketById(ticketId);
         if (ticket == null) {
             response.sendRedirect(request.getContextPath() + "/Queues");

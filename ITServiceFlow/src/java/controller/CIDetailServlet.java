@@ -3,7 +3,7 @@ package controller;
 import dao.AssetsDAO;
 import dao.CIRelationshipsDAO;
 import dao.TicketAssetsDAO;
-import dao.TicketDAO;
+import dao.TicketDao;
 import dao.UsersDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -24,7 +24,7 @@ public class CIDetailServlet extends HttpServlet {
     private AssetsDAO assetsDAO;
     private CIRelationshipsDAO ciRelationshipsDAO;
     private TicketAssetsDAO ticketAssetsDAO;
-    private TicketDAO ticketDAO;
+    private TicketDao ticketDAO;
     private UsersDAO usersDAO;
 
     @Override
@@ -33,7 +33,7 @@ public class CIDetailServlet extends HttpServlet {
         assetsDAO = new AssetsDAO();
         ciRelationshipsDAO = new CIRelationshipsDAO();
         ticketAssetsDAO = new TicketAssetsDAO();
-        ticketDAO = new TicketDAO();
+        ticketDAO = new TicketDao();
         usersDAO = new UsersDAO();
     }
 

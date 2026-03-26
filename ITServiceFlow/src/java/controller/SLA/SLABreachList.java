@@ -5,6 +5,7 @@
 package controller.SLA;
 
 import dao.SLARuleDao;
+import dao.TicketDao;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -39,12 +40,6 @@ public class SLABreachList extends HttpServlet {
             return;
         }
 
-        // Only Admin and Manager can access this screen
-        if (role == null || (!"Admin".equals(role) && !"Manager".equals(role))) {
-            response.sendRedirect("Login.jsp");
-            return;
-        }
-
         // Get Parameters
         String searchAgent = request.getParameter("agent");
         String priority = request.getParameter("priority");
@@ -53,7 +48,7 @@ public class SLABreachList extends HttpServlet {
         String pageStr = request.getParameter("page");
 
         int page = 1;
-        int limit = 20;
+        int limit = 10;
         if (pageStr != null && !pageStr.isEmpty()) {
             try {
                 page = Integer.parseInt(pageStr);
@@ -66,18 +61,26 @@ public class SLABreachList extends HttpServlet {
         // Get Data
         List<Map<String, Object>> tickets = slaTrackingService.getBreachList(null, priority, searchAgent, status,
                 sortBy, offset, limit);
+        int totalRecords = slaTrackingService.countBreachList(null, priority, searchAgent, status);
+        int totalPages = (int) Math.ceil((double) totalRecords / limit);
+        if (totalPages < 1)
+            totalPages = 1;
 
-        // Get Priorities for Filter
+        // Get Available Filters
         List<Priority> priorities = slaRuleDao.getAllPriorities();
+        TicketDao ticketDao = new TicketDao();
+        List<String> availableStatuses = ticketDao.getDistinctStatuses();
 
         // Set Attributes
         request.setAttribute("tickets", tickets);
         request.setAttribute("priorities", priorities);
+        request.setAttribute("availableStatuses", availableStatuses);
         request.setAttribute("currentPage", page);
-        // Note: Total pages calculation would require a count query, skipping for now
-        // as per simplified requirement or adding later if needed.
-        // For now, simple Previous/Next logic if list size == limit could be used, or
-        // just simple list.
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalRecords", totalRecords);
+        request.setAttribute("paramPriority", priority);
+        request.setAttribute("paramStatus", status);
+        request.setAttribute("paramAgent", searchAgent);
 
         request.getRequestDispatcher("sla-breach-list.jsp").forward(request, response);
     }

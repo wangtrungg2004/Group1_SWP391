@@ -99,8 +99,8 @@
                             <span class="pcoded-mtext">Ticket - Assets</span>
                         </a>
                     </li>
-                    
-                    
+
+
 
                     <li class="nav-item pcoded-menu-caption"><label>Problem & Knowledge</label></li>
                     <li class="nav-item">
@@ -157,7 +157,7 @@
                             <span class="pcoded-mtext">Dashboard</span>
                         </a>
                     </li>
-                     <li class="nav-item">
+                    <li class="nav-item">
                         <a href="${pageContext.request.contextPath}/Queues" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-inbox"></i></span>
                             <span class="pcoded-mtext">Ticket Queues</span>
@@ -184,6 +184,15 @@
                         </a>
                     </li>
 
+
+
+                    <li class="nav-item">
+                        <a href="${pageContext.request.contextPath}/AuditLogs" class="nav-link">
+                            <span class="pcoded-micon"><i class="feather icon-alert-circle"></i></span>
+                            <span class="pcoded-mtext">System Audit Logs</span>
+                        </a>
+                    </li>
+
                     <li class="nav-item pcoded-menu-caption"><label>Problem Management</label></li>
                     <li class="nav-item pcoded-hasmenu">
                         <a href="#!" class="nav-link">
@@ -205,8 +214,8 @@
                             </li>
                         </ul>
                     </li>
-                    
-                    
+
+
                     <li class="nav-item pcoded-menu-caption"><label>Configuration Items Management</label></li>
                     <li class="nav-item">
                         <a href="${pageContext.request.contextPath}/CIListServlet" class="nav-link">
@@ -214,7 +223,7 @@
                             <span class="pcoded-mtext">Configuration Items</span>
                         </a>
                     </li>
-                    
+
 
                     <li class="nav-item pcoded-menu-caption"><label>Change Management</label></li>
                     <li class="nav-item">
@@ -230,13 +239,24 @@
                         </a>
                     </li>
 
+
+
+
                     <li class="nav-item pcoded-menu-caption"><label>Reports</label></li>
+                    <li class="nav-item">
+                        <a href="${pageContext.request.contextPath}/AgentPerformanceReport" class="nav-link">
+                            <span class="pcoded-micon"><i class="feather icon-alert-circle"></i></span>
+                            <span class="pcoded-mtext">Agent Performance Report</span>
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a href="${pageContext.request.contextPath}/PerformanceDashboard" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-bar-chart-2"></i></span>
-                            <span class="pcoded-mtext">Performance</span>
+                            <span class="pcoded-mtext">Performance Dashboard</span>
                         </a>
                     </li>
+
+
                     <li class="nav-item">
                         <a href="${pageContext.request.contextPath}/CsatReport" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-star"></i></span>

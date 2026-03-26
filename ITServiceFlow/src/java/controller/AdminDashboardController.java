@@ -1,4 +1,4 @@
-package controller.Dashboard;
+package controller;
 
 import Utils.DbContext;
 import dao.AuditLogsDAO;
@@ -6,7 +6,7 @@ import dao.ChangeRequestDao;
 import dao.CsatSurveyDAO;
 import dao.ProblemDao;
 import dao.SLATrackingDao;
-import dao.TicketDAO;
+import dao.TicketDao;
 import dao.UserDao;
 import model.AuditLog;
 import model.ChangeRequests;
@@ -65,7 +65,7 @@ public class AdminDashboardController extends HttpServlet {
         }
 
         // ── Tạo DAO mới mỗi request — tránh stale connection ───────────────
-        TicketDAO       ticketDAO = new TicketDAO();
+        TicketDao       ticketDAO = new TicketDao();
         UserDao         userDao   = new UserDao();
         ProblemDao      problemDao= new ProblemDao();
         ChangeRequestDao changeDao= new ChangeRequestDao();
@@ -112,7 +112,7 @@ public class AdminDashboardController extends HttpServlet {
         request.setAttribute("chartResolved", chartData.get("daXuLy"));
         request.setAttribute("chartOpen",     chartData.get("chuaXuLy"));
 
-        // 2b. Status breakdown (new method — see AdminTicketDAO below)
+        // 2b. Status breakdown (new method — see AdminTicketDao below)
         Map<String, Integer> ticketsByStatus = getTicketCountByStatus();
         request.setAttribute("ticketsByStatus", ticketsByStatus);
 

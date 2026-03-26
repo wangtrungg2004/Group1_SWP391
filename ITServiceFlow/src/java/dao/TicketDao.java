@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TicketDAO extends DbContext {
+public class TicketDao extends DbContext {
 
     public String createTicket(Tickets t) {
         // Lưu ý: Các trường ngày tháng như CreatedAt, UpdatedAt sẽ để SQL tự sinh bằng
@@ -31,32 +31,36 @@ public class TicketDAO extends DbContext {
             ps.setInt(6, t.getLocationId());
 
             // Xử lý cẩn thận các trường Integer có thể NULL
-            if (t.getImpact() != null)
+            if (t.getImpact() != null) {
                 ps.setInt(7, t.getImpact());
-            else
+            } else {
                 ps.setNull(7, Types.INTEGER);
+            }
 
-            if (t.getUrgency() != null)
+            if (t.getUrgency() != null) {
                 ps.setInt(8, t.getUrgency());
-            else
+            } else {
                 ps.setNull(8, Types.INTEGER);
+            }
 
-            if (t.getPriorityId() != null)
+            if (t.getPriorityId() != null) {
                 ps.setInt(9, t.getPriorityId());
-            else
+            } else {
                 ps.setNull(9, Types.INTEGER);
+            }
 
-            if (t.getServiceCatalogId() != null)
+            if (t.getServiceCatalogId() != null) {
                 ps.setInt(10, t.getServiceCatalogId());
-            else
+            } else {
                 ps.setNull(10, Types.INTEGER);
+            }
 
             // Xử lý Boolean
-            if (t.getRequiresApproval() != null)
+            if (t.getRequiresApproval() != null) {
                 ps.setBoolean(11, t.getRequiresApproval());
-            else
+            } else {
                 ps.setBoolean(11, false); // Mặc định không cần duyệt
-
+            }
             ps.setInt(12, t.getCreatedBy());
 
             int rowsAffected = ps.executeUpdate();
@@ -299,7 +303,6 @@ public class TicketDAO extends DbContext {
     // );
     // }
     // }
-
     // 3. Lấy danh sách Ticket cho End-User (My Tickets)
     public List<Tickets> getTicketsByCreator(int userId) {
         List<Tickets> list = new ArrayList<>();
@@ -493,9 +496,9 @@ public class TicketDAO extends DbContext {
         List<Tickets> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.ResolvedAt, c.Name as CategoryName "
-                        + "FROM [dbo].[Tickets] t "
-                        + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
-                        + "WHERE t.Status = 'Resolved' ");
+                + "FROM [dbo].[Tickets] t "
+                + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
+                + "WHERE t.Status = 'Resolved' ");
 
         boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
         boolean hasType = type != null && !type.trim().isEmpty() && !type.equalsIgnoreCase("All");
@@ -549,27 +552,32 @@ public class TicketDAO extends DbContext {
             stm.setInt(5, ticket.getCategoryId());
             stm.setInt(6, ticket.getLocationId());
 
-            if (ticket.getImpact() != null && ticket.getImpact() > 0)
+            if (ticket.getImpact() != null && ticket.getImpact() > 0) {
                 stm.setInt(7, ticket.getImpact());
-            else
+            } else {
                 stm.setNull(7, java.sql.Types.INTEGER);
-            if (ticket.getUrgency() != null && ticket.getUrgency() > 0)
+            }
+            if (ticket.getUrgency() != null && ticket.getUrgency() > 0) {
                 stm.setInt(8, ticket.getUrgency());
-            else
+            } else {
                 stm.setNull(8, java.sql.Types.INTEGER);
-            if (ticket.getPriorityId() != null && ticket.getPriorityId() > 0)
+            }
+            if (ticket.getPriorityId() != null && ticket.getPriorityId() > 0) {
                 stm.setInt(9, ticket.getPriorityId());
-            else
+            } else {
                 stm.setNull(9, java.sql.Types.INTEGER);
-            if (ticket.getServiceCatalogId() != null && ticket.getServiceCatalogId() > 0)
+            }
+            if (ticket.getServiceCatalogId() != null && ticket.getServiceCatalogId() > 0) {
                 stm.setInt(10, ticket.getServiceCatalogId());
-            else
+            } else {
                 stm.setNull(10, java.sql.Types.INTEGER);
+            }
 
-            if (ticket.getRequiresApproval() != null)
+            if (ticket.getRequiresApproval() != null) {
                 stm.setBoolean(11, ticket.getRequiresApproval());
-            else
+            } else {
                 stm.setNull(11, java.sql.Types.BIT);
+            }
             stm.setString(12, ticket.getStatus());
             stm.setInt(13, ticket.getCreatedBy());
 
@@ -596,13 +604,13 @@ public class TicketDAO extends DbContext {
     public List<Tickets> getIncidentsNotInProblem() {
         List<Tickets> list = new ArrayList<>();
 
-        String sql = "SELECT t.Id, t.TicketNumber, t.Title, t.Status " +
-                "FROM Tickets t " +
-                "WHERE t.TicketType = 'INCIDENT' " +
-                "AND NOT EXISTS ( " +
-                "    SELECT 1 FROM ProblemTickets pt " +
-                "    WHERE pt.TicketId = t.Id" +
-                ")";
+        String sql = "SELECT t.Id, t.TicketNumber, t.Title, t.Status "
+                + "FROM Tickets t "
+                + "WHERE t.TicketType = 'INCIDENT' "
+                + "AND NOT EXISTS ( "
+                + "    SELECT 1 FROM ProblemTickets pt "
+                + "    WHERE pt.TicketId = t.Id"
+                + ")";
 
         try {
             PreparedStatement stm = connection.prepareStatement(sql);
@@ -627,7 +635,7 @@ public class TicketDAO extends DbContext {
 
     public static void main(String[] args) {
 
-        TicketDAO dao = new TicketDAO();
+        TicketDao dao = new TicketDao();
 
         List<Tickets> list = dao.getIncidentsNotInProblem();
 
@@ -635,54 +643,50 @@ public class TicketDAO extends DbContext {
 
         for (Tickets t : list) {
             System.out.println(
-                    t.getId() + " | " +
-                            t.getTicketNumber() + " | " +
-                            t.getTitle() + " | " +
-                            t.getStatus());
+                    t.getId() + " | "
+                    + t.getTicketNumber() + " | "
+                    + t.getTitle() + " | "
+                    + t.getStatus());
         }
 
     }
-    
-
-    
-    
 
     // 3. Ly danh sch Ticket cho End-User (My Tickets)
-   public List<Tickets> getTicketsByCreator(int userId, int offset, int limit, String search, String status, String type) {
+    public List<Tickets> getTicketsByCreator(int userId, int offset, int limit, String search, String status, String type) {
         List<Tickets> list = new ArrayList<>();
-        
+
         // S dng StringBuilder  linh hot ni chui SQL
         StringBuilder sql = new StringBuilder(
-            "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.CreatedAt, t.UpdatedAt, "
-            + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName "
-            + "FROM [dbo].[Tickets] t "
-            + "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id "
-            + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
-            + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
-            + "WHERE t.CreatedBy = ? "
+                "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.CreatedAt, t.UpdatedAt, "
+                + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName "
+                + "FROM [dbo].[Tickets] t "
+                + "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id "
+                + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
+                + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
+                + "WHERE t.CreatedBy = ? "
         );
 
         // Ni thm iu kin tm kim nu c
         if (search != null && !search.trim().isEmpty()) {
             sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
         }
-        
+
         // Ni thm iu kin Status nu khng phi 'all'
         if (status != null && !status.equals("all")) {
             sql.append("AND t.Status = ? ");
         }
-        
+
         // Ni thm iu kin Type nu khng phi 'all'
         if (type != null && !type.equals("all")) {
             sql.append("AND t.TicketType = ? ");
         }
 
-        sql.append("ORDER BY t.CreatedAt DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"); 
-                   
+        sql.append("ORDER BY t.CreatedAt DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIndex = 1;
             ps.setInt(paramIndex++, userId);
-            
+
             // Set params tng ng vi th t ni chui
             if (search != null && !search.trim().isEmpty()) {
                 ps.setString(paramIndex++, "%" + search + "%");
@@ -694,10 +698,10 @@ public class TicketDAO extends DbContext {
             if (type != null && !type.equals("all")) {
                 ps.setString(paramIndex++, type);
             }
-            
+
             ps.setInt(paramIndex++, offset);
             ps.setInt(paramIndex++, limit);
-            
+
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -720,8 +724,6 @@ public class TicketDAO extends DbContext {
         return list;
     }
 
-    
-    
     // 6. Ly thng k KPI cho Dashboard ca ngi dng
     public java.util.Map<String, Integer> getUserTicketKPIs(int userId) {
         java.util.Map<String, Integer> kpis = new java.util.HashMap<>();
@@ -732,16 +734,16 @@ public class TicketDAO extends DbContext {
 
         // Gp 4 php tnh vo 1 cu query duy nht  ti u tc 
         String sql = "SELECT "
-                   + "SUM(CASE WHEN Status IN ('New', 'Reopened') THEN 1 ELSE 0 END) AS OpenCount, "
-                   + "SUM(CASE WHEN Status = 'In Progress' THEN 1 ELSE 0 END) AS InProgressCount, "
-                   + "SUM(CASE WHEN RequiresApproval = 1 AND ApprovedBy IS NULL AND Status NOT IN ('Closed', 'Resolved') THEN 1 ELSE 0 END) AS AwaitingCount, "
-                   + "SUM(CASE WHEN Status = 'Resolved' AND CreatedAt >= DATEADD(day, -7, GETDATE()) THEN 1 ELSE 0 END) AS Resolved7dCount "
-                   + "FROM [dbo].[Tickets] WHERE CreatedBy = ?";
+                + "SUM(CASE WHEN Status IN ('New', 'Reopened') THEN 1 ELSE 0 END) AS OpenCount, "
+                + "SUM(CASE WHEN Status = 'In Progress' THEN 1 ELSE 0 END) AS InProgressCount, "
+                + "SUM(CASE WHEN RequiresApproval = 1 AND ApprovedBy IS NULL AND Status NOT IN ('Closed', 'Resolved') THEN 1 ELSE 0 END) AS AwaitingCount, "
+                + "SUM(CASE WHEN Status = 'Resolved' AND CreatedAt >= DATEADD(day, -7, GETDATE()) THEN 1 ELSE 0 END) AS Resolved7dCount "
+                + "FROM [dbo].[Tickets] WHERE CreatedBy = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
-            
+
             if (rs.next()) {
                 kpis.put("open", rs.getInt("OpenCount"));
                 kpis.put("inProgress", rs.getInt("InProgressCount"));
@@ -754,13 +756,13 @@ public class TicketDAO extends DbContext {
         }
         return kpis;
     }
-    
+
     // 7. m tng s v  tnh tng s trang
-public int getTotalTicketsCount(int userId, String search, String status, String type) {
+    public int getTotalTicketsCount(int userId, String search, String status, String type) {
         StringBuilder sql = new StringBuilder(
-            "SELECT COUNT(*) FROM [dbo].[Tickets] WHERE CreatedBy = ? "
+                "SELECT COUNT(*) FROM [dbo].[Tickets] WHERE CreatedBy = ? "
         );
-        
+
         if (search != null && !search.trim().isEmpty()) {
             sql.append("AND (TicketNumber LIKE ? OR Title LIKE ?) ");
         }
@@ -774,7 +776,7 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIndex = 1;
             ps.setInt(paramIndex++, userId);
-            
+
             if (search != null && !search.trim().isEmpty()) {
                 ps.setString(paramIndex++, "%" + search + "%");
                 ps.setString(paramIndex++, "%" + search + "%");
@@ -785,7 +787,7 @@ public int getTotalTicketsCount(int userId, String search, String status, String
             if (type != null && !type.equals("all")) {
                 ps.setString(paramIndex++, type);
             }
-            
+
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1);
@@ -796,28 +798,24 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         return 0;
     }
 
-    
-    public List<Tickets> searchIncidentsNotInProblem(String search)
-    {
+    public List<Tickets> searchIncidentsNotInProblem(String search) {
         List<Tickets> list = new ArrayList<>();
-        String  sql = "SELECT t.Id, t.TicketNumber, t.Title, t.Status " +
-                     "FROM Tickets t " +
-                     "WHERE t.TicketType = 'INCIDENT' " +
-                     "AND NOT EXISTS ( " +
-                     "    SELECT 1 FROM ProblemTickets pt " +
-                     "    WHERE pt.TicketId = t.Id" +
-                     ")" +
-                     " AND (t.TicketNumber LIKE ? OR t.Title LIKE ?)";
-        
-        try
-        {
+        String sql = "SELECT t.Id, t.TicketNumber, t.Title, t.Status "
+                + "FROM Tickets t "
+                + "WHERE t.TicketType = 'INCIDENT' "
+                + "AND NOT EXISTS ( "
+                + "    SELECT 1 FROM ProblemTickets pt "
+                + "    WHERE pt.TicketId = t.Id"
+                + ")"
+                + " AND (t.TicketNumber LIKE ? OR t.Title LIKE ?)";
+
+        try {
             PreparedStatement stm = connection.prepareStatement(sql);
             String searchValue = "%" + search + "%";
             stm.setString(1, searchValue);
             stm.setString(2, searchValue);
             ResultSet rs = stm.executeQuery();
-            while(rs.next())
-            {
+            while (rs.next()) {
                 Tickets t = new Tickets();
                 t.setId(rs.getInt("Id"));
                 t.setTicketNumber(rs.getString("TicketNumber"));
@@ -826,29 +824,26 @@ public int getTotalTicketsCount(int userId, String search, String status, String
                 list.add(t);
             }
             return list;
-        }
-        catch(Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return null;
         }
-        
+
     }
-    
+
     // =========================================================================
     // CODE DNH CHO LUNG AGENT (DEV 2)
     // =========================================================================
-
     // 7. Ly danh sch Hng i (Queue) cho Agent c Filter
     public List<Tickets> getAgentQueues(int agentId, String queueType, int offset, int limit, String search, String status, String type) {
         List<Tickets> list = new ArrayList<>();
-        
+
         StringBuilder sql = new StringBuilder(
-            "SELECT t.*, p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName " +
-            "FROM [dbo].[Tickets] t " +
-            "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id " +
-            "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id " +
-            "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id WHERE 1=1 "
+                "SELECT t.*, p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName "
+                + "FROM [dbo].[Tickets] t "
+                + "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id "
+                + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
+                + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id WHERE 1=1 "
         );
 
         // Lc theo Queue Type
@@ -866,25 +861,35 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         if (search != null && !search.trim().isEmpty()) {
             sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
         }
-        if (status != null && !status.equals("all")) sql.append("AND t.Status = ? ");
-        if (type != null && !type.equals("all")) sql.append("AND t.TicketType = ? ");
+        if (status != null && !status.equals("all")) {
+            sql.append("AND t.Status = ? ");
+        }
+        if (type != null && !type.equals("all")) {
+            sql.append("AND t.TicketType = ? ");
+        }
 
         sql.append("ORDER BY t.CreatedAt ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIdx = 1;
-            if ("mine".equals(queueType)) ps.setInt(paramIdx++, agentId);
-            
+            if ("mine".equals(queueType)) {
+                ps.setInt(paramIdx++, agentId);
+            }
+
             if (search != null && !search.trim().isEmpty()) {
                 ps.setString(paramIdx++, "%" + search + "%");
                 ps.setString(paramIdx++, "%" + search + "%");
             }
-            if (status != null && !status.equals("all")) ps.setString(paramIdx++, status);
-            if (type != null && !type.equals("all")) ps.setString(paramIdx++, type);
-            
+            if (status != null && !status.equals("all")) {
+                ps.setString(paramIdx++, status);
+            }
+            if (type != null && !type.equals("all")) {
+                ps.setString(paramIdx++, type);
+            }
+
             ps.setInt(paramIdx++, offset);
             ps.setInt(paramIdx++, limit);
-            
+
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Tickets t = new Tickets();
@@ -899,7 +904,9 @@ public int getTotalTicketsCount(int userId, String search, String status, String
                 t.setAssigneeName(rs.getString("AssigneeName"));
                 list.add(t);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return list;
     }
 
@@ -917,30 +924,45 @@ public int getTotalTicketsCount(int userId, String search, String status, String
             sql.append("AND t.Status != 'Closed' AND t.Status != 'Resolved' ");
         }
 
-        if (search != null && !search.trim().isEmpty()) sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
-        if (status != null && !status.equals("all")) sql.append("AND t.Status = ? ");
-        if (type != null && !type.equals("all")) sql.append("AND t.TicketType = ? ");
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
+        }
+        if (status != null && !status.equals("all")) {
+            sql.append("AND t.Status = ? ");
+        }
+        if (type != null && !type.equals("all")) {
+            sql.append("AND t.TicketType = ? ");
+        }
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIdx = 1;
-            if ("mine".equals(queueType)) ps.setInt(paramIdx++, agentId);
+            if ("mine".equals(queueType)) {
+                ps.setInt(paramIdx++, agentId);
+            }
             if (search != null && !search.trim().isEmpty()) {
                 ps.setString(paramIdx++, "%" + search + "%");
                 ps.setString(paramIdx++, "%" + search + "%");
             }
-            if (status != null && !status.equals("all")) ps.setString(paramIdx++, status);
-            if (type != null && !type.equals("all")) ps.setString(paramIdx++, type);
-            
+            if (status != null && !status.equals("all")) {
+                ps.setString(paramIdx++, status);
+            }
+            if (type != null && !type.equals("all")) {
+                ps.setString(paramIdx++, type);
+            }
+
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt(1);
-        } catch (Exception e) { e.printStackTrace(); }
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return 0;
     }
-    
+
     // =========================================================================
     // CODE ACTION CHO AGENT 
     // =========================================================================
-
     // 9. Phn cng v cho Agent (Assign to me)
     public boolean assignTicket(int ticketId, int agentId) {
         String sql = "UPDATE [dbo].[Tickets] SET AssignedTo = ?, UpdatedAt = GETDATE() WHERE Id = ?";
@@ -958,27 +980,31 @@ public int getTotalTicketsCount(int userId, String search, String status, String
     public boolean updateTicketStatus(int ticketId, String status) {
         // Tu dong set moc thoi gian khi ticket duoc Resolved/Closed.
         String sql = "UPDATE [dbo].[Tickets] SET Status = ?, UpdatedAt = GETDATE() ";
-        
+
         if ("Resolved".equals(status)) {
             sql += ", ResolvedAt = GETDATE() ";
         } else if ("Closed".equals(status)) {
             sql += ", ClosedAt = GETDATE() ";
         }
         sql += "WHERE Id = ?";
-        
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, ticketId);
             int rows = ps.executeUpdate();
-            
+
             // ===== HIỆU ỨNG DOMINO (CASCADE UPDATE) =====
             // Nếu vé cha được Resolved hoặc Closed, TỰ ĐỘNG cập nhật toàn bộ vé con
             if (rows > 0 && ("Resolved".equals(status) || "Closed".equals(status))) {
                 String cascadeSql = "UPDATE [dbo].[Tickets] SET Status = ?, UpdatedAt = GETDATE() ";
-                if ("Resolved".equals(status)) cascadeSql += ", ResolvedAt = GETDATE() ";
-                if ("Closed".equals(status)) cascadeSql += ", ClosedAt = GETDATE() ";
+                if ("Resolved".equals(status)) {
+                    cascadeSql += ", ResolvedAt = GETDATE() ";
+                }
+                if ("Closed".equals(status)) {
+                    cascadeSql += ", ClosedAt = GETDATE() ";
+                }
                 cascadeSql += "WHERE ParentTicketId = ? AND Status NOT IN ('Resolved', 'Closed')";
-                
+
                 try (PreparedStatement psCascade = connection.prepareStatement(cascadeSql)) {
                     psCascade.setString(1, status);
                     psCascade.setInt(2, ticketId);
@@ -1012,13 +1038,12 @@ public int getTotalTicketsCount(int userId, String search, String status, String
     }
 
     /**
-     * KPI dashboard cho IT Support agent c th.
-     * Tr v Map vi cc key:
-     *   - myNew        : ticket mi cha assign hoc assign cho agent ny
-     *   - myInProgress : ticket ang x l (AssignedTo = agentId, Status = In Progress)
-     *   - myResolved   : ticket  resolved trong 7 ngy gn nht
-     *   - myTotal      : tng ticket assign cho agent
-     *   - slaBreaching : ticket sp breach SLA (ResolutionDeadline trong vng 2 gi ti)
+     * KPI dashboard cho IT Support agent c th. Tr v Map vi cc key: - myNew :
+     * ticket mi cha assign hoc assign cho agent ny - myInProgress : ticket ang
+     * x l (AssignedTo = agentId, Status = In Progress) - myResolved : ticket
+     * resolved trong 7 ngy gn nht - myTotal : tng ticket assign cho agent -
+     * slaBreaching : ticket sp breach SLA (ResolutionDeadline trong vng 2 gi
+     * ti)
      */
     public java.util.Map<String, Integer> getAgentKPIs(int agentId) {
         java.util.Map<String, Integer> kpis = new java.util.HashMap<>();
@@ -1029,12 +1054,12 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         kpis.put("slaBreaching", 0);
 
         String sql = "SELECT "
-                   + "  SUM(CASE WHEN t.Status IN ('New','Reopened') AND (t.AssignedTo = ? OR t.AssignedTo IS NULL) THEN 1 ELSE 0 END) AS MyNew, "
-                   + "  SUM(CASE WHEN t.Status = 'In Progress' AND t.AssignedTo = ? THEN 1 ELSE 0 END) AS MyInProgress, "
-                   + "  SUM(CASE WHEN t.Status = 'Resolved' AND t.AssignedTo = ? "
-                   + "       AND t.ResolvedAt >= DATEADD(day, -7, GETDATE()) THEN 1 ELSE 0 END) AS MyResolved, "
-                   + "  SUM(CASE WHEN t.AssignedTo = ? AND t.Status NOT IN ('Closed','Resolved') THEN 1 ELSE 0 END) AS MyTotal "
-                   + "FROM Tickets t";
+                + "  SUM(CASE WHEN t.Status IN ('New','Reopened') AND (t.AssignedTo = ? OR t.AssignedTo IS NULL) THEN 1 ELSE 0 END) AS MyNew, "
+                + "  SUM(CASE WHEN t.Status = 'In Progress' AND t.AssignedTo = ? THEN 1 ELSE 0 END) AS MyInProgress, "
+                + "  SUM(CASE WHEN t.Status = 'Resolved' AND t.AssignedTo = ? "
+                + "       AND t.ResolvedAt >= DATEADD(day, -7, GETDATE()) THEN 1 ELSE 0 END) AS MyResolved, "
+                + "  SUM(CASE WHEN t.AssignedTo = ? AND t.Status NOT IN ('Closed','Resolved') THEN 1 ELSE 0 END) AS MyTotal "
+                + "FROM Tickets t";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, agentId);
             ps.setInt(2, agentId);
@@ -1042,25 +1067,31 @@ public int getTotalTicketsCount(int userId, String search, String status, String
             ps.setInt(4, agentId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                kpis.put("myNew",        rs.getInt("MyNew"));
+                kpis.put("myNew", rs.getInt("MyNew"));
                 kpis.put("myInProgress", rs.getInt("MyInProgress"));
-                kpis.put("myResolved",   rs.getInt("MyResolved"));
-                kpis.put("myTotal",      rs.getInt("MyTotal"));
+                kpis.put("myResolved", rs.getInt("MyResolved"));
+                kpis.put("myTotal", rs.getInt("MyTotal"));
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // SLA breaching: ticket ca agent ny c ResolutionDeadline trong 2 gi ti
         String slaSql = "SELECT COUNT(*) FROM SLATracking st "
-                      + "JOIN Tickets t ON st.TicketId = t.Id "
-                      + "WHERE t.AssignedTo = ? "
-                      + "  AND t.Status NOT IN ('Closed','Resolved') "
-                      + "  AND st.IsBreached = 0 "
-                      + "  AND st.ResolutionDeadline <= DATEADD(hour, 2, GETDATE())";
+                + "JOIN Tickets t ON st.TicketId = t.Id "
+                + "WHERE t.AssignedTo = ? "
+                + "  AND t.Status NOT IN ('Closed','Resolved') "
+                + "  AND st.IsBreached = 0 "
+                + "  AND st.ResolutionDeadline <= DATEADD(hour, 2, GETDATE())";
         try (PreparedStatement ps = connection.prepareStatement(slaSql)) {
             ps.setInt(1, agentId);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) kpis.put("slaBreaching", rs.getInt(1));
-        } catch (Exception e) { e.printStackTrace(); }
+            if (rs.next()) {
+                kpis.put("slaBreaching", rs.getInt(1));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return kpis;
     }
@@ -1068,37 +1099,36 @@ public int getTotalTicketsCount(int userId, String search, String status, String
     // =========================================================================
     // MANAGER DASHBOARD STATS
     // =========================================================================
-
-    public int getTotalTicketThisMonth()
-    {
+    public int getTotalTicketThisMonth() {
         String sql = "SELECT COUNT(*)"
                 + " FROM [dbo].[Tickets]"
                 + "WHERE YEAR(CreatedAt) = YEAR(GETDATE()) AND MONTH(CreatedAt) = MONTH(GETDATE())";
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) return rs.getInt(1);
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return 0;
     }
-    
-    public int getTotalTicket()
-    {
+
+    public int getTotalTicket() {
         String sql = "SELECT COUNT(*) "
                 + "FROM [dbo].[Tickets]";
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) return rs.getInt(1);
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return 0;
     }
-    
-/**
- * 6 thng gn nht (t c  mi), mi thng: s  x l + s cha x l.
- */
+
+    /**
+     * 6 thng gn nht (t c mi), mi thng: s x l + s cha x l.
+     */
     public Map<String, Object> getTicketStatsLast6Months() {
         List<String> labels = new ArrayList<>();
         int[] daXuLy = new int[6];
@@ -1118,10 +1148,10 @@ public int getTotalTicketsCount(int userId, String search, String status, String
             }
 
             // Ngy u thng v ngy u thng sau (dng < thng sau = ht thng ny)
-            Date tuNgay  = Date.valueOf(thang.atDay(1));
+            Date tuNgay = Date.valueOf(thang.atDay(1));
             Date denNgay = Date.valueOf(thang.plusMonths(1).atDay(1));
 
-            daXuLy[i]   = getAllTicketSolvedFromTo(tuNgay, denNgay);
+            daXuLy[i] = getAllTicketSolvedFromTo(tuNgay, denNgay);
             chuaXuLy[i] = getAllTicketUnSolvedFromTo(tuNgay, denNgay);
         }
 
@@ -1131,18 +1161,17 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         ketQua.put("chuaXuLy", chuaXuLy);
         return ketQua;
     }
-    
+
     // =========================================================================
     // CODE US03: PARENT - CHILD INCIDENTS (GOM NHÓM VÉ)
     // =========================================================================
-
     // 1. Lấy danh sách các vé con (Child Tickets) của 1 vé cha
     public List<Tickets> getLinkedChildTickets(int parentId) {
         List<Tickets> list = new ArrayList<>();
-        String sql = "SELECT t.*, u.FullName AS AssigneeName " +
-                     "FROM [dbo].[Tickets] t " +
-                     "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id " +
-                     "WHERE t.ParentTicketId = ? ORDER BY t.CreatedAt DESC";
+        String sql = "SELECT t.*, u.FullName AS AssigneeName "
+                + "FROM [dbo].[Tickets] t "
+                + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
+                + "WHERE t.ParentTicketId = ? ORDER BY t.CreatedAt DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, parentId);
             ResultSet rs = ps.executeQuery();
@@ -1156,13 +1185,17 @@ public int getTotalTicketsCount(int userId, String search, String status, String
                 t.setCreatedAt(rs.getTimestamp("CreatedAt"));
                 list.add(t);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return list;
     }
 
     // 2. Lấy thông tin vé cha (Parent Ticket) của 1 vé con
     public Tickets getParentTicket(int parentTicketId) {
-        if (parentTicketId <= 0) return null;
+        if (parentTicketId <= 0) {
+            return null;
+        }
         String sql = "SELECT * FROM [dbo].[Tickets] WHERE Id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, parentTicketId);
@@ -1175,7 +1208,9 @@ public int getTotalTicketsCount(int userId, String search, String status, String
                 t.setStatus(rs.getString("Status"));
                 return t;
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -1183,9 +1218,9 @@ public int getTotalTicketsCount(int userId, String search, String status, String
     // Điều kiện: Không phải là chính nó, chưa bị đóng, và chưa làm con của thằng nào khác
     public List<Tickets> getAvailableTicketsForLinking(int currentTicketId) {
         List<Tickets> list = new ArrayList<>();
-        String sql = "SELECT Id, TicketNumber, Title, Status FROM [dbo].[Tickets] " +
-                     "WHERE Id != ? AND Status NOT IN ('Resolved', 'Closed') " +
-                     "AND ParentTicketId IS NULL";
+        String sql = "SELECT Id, TicketNumber, Title, Status FROM [dbo].[Tickets] "
+                + "WHERE Id != ? AND Status NOT IN ('Resolved', 'Closed') "
+                + "AND ParentTicketId IS NULL";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, currentTicketId);
             ResultSet rs = ps.executeQuery();
@@ -1197,21 +1232,27 @@ public int getTotalTicketsCount(int userId, String search, String status, String
                 t.setStatus(rs.getString("Status"));
                 list.add(t);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return list;
     }
 
     // 4. Hàm thực thi việc gán vé con vào vé cha
     public boolean linkChildTickets(int parentId, String[] childIds) {
-        if (childIds == null || childIds.length == 0) return false;
-        
+        if (childIds == null || childIds.length == 0) {
+            return false;
+        }
+
         // Tạo chuỗi ?,?,? tương ứng với số lượng vé con được chọn
         StringBuilder placeholders = new StringBuilder();
         for (int i = 0; i < childIds.length; i++) {
             placeholders.append("?");
-            if (i < childIds.length - 1) placeholders.append(",");
+            if (i < childIds.length - 1) {
+                placeholders.append(",");
+            }
         }
-        
+
         String sql = "UPDATE [dbo].[Tickets] SET ParentTicketId = ?, UpdatedAt = GETDATE() WHERE Id IN (" + placeholders.toString() + ")";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, parentId);
@@ -1225,12 +1266,14 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         }
     }
 
-    /**  x l: ng/duyt trong khong [tuNgay, denNgay) */
+    /**
+     * x l: ng/duyt trong khong [tuNgay, denNgay)
+     */
     private int getAllTicketSolvedFromTo(Date from, Date to) {
         // ResolvedAt c th NULL, dng UpdatedAt fallback  chart c d liu.
-        String sql = "SELECT COUNT(*) FROM Tickets " +
-                "WHERE Status IN ('Resolved','Closed','Approved') " +
-                "AND COALESCE(ResolvedAt, UpdatedAt) >= ? AND COALESCE(ResolvedAt, UpdatedAt) < ?";
+        String sql = "SELECT COUNT(*) FROM Tickets "
+                + "WHERE Status IN ('Resolved','Closed','Approved') "
+                + "AND COALESCE(ResolvedAt, UpdatedAt) >= ? AND COALESCE(ResolvedAt, UpdatedAt) < ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
@@ -1250,11 +1293,13 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         return 0;
     }
 
-    /** Cha x l: vn m v c to trong khong [tuNgay, denNgay) */
+    /**
+     * Cha x l: vn m v c to trong khong [tuNgay, denNgay)
+     */
     private int getAllTicketUnSolvedFromTo(Date from, Date to) {
-        String sql = "SELECT COUNT(*) FROM Tickets " +
-                "WHERE Status IN ('New','Open','In Progress','Reopened') " +
-                "AND CreatedAt >= ? AND CreatedAt < ?";
+        String sql = "SELECT COUNT(*) FROM Tickets "
+                + "WHERE Status IN ('New','Open','In Progress','Reopened') "
+                + "AND CreatedAt >= ? AND CreatedAt < ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
@@ -1273,18 +1318,17 @@ public int getTotalTicketsCount(int userId, String search, String status, String
 
         return 0;
     }
-    
+
     public List<Tickets> get10UnassignedTickets() {
         List<Tickets> list = new ArrayList<>();
 
-        String sql = "SELECT TOP 10 Id, TicketNumber, Title, Status, CreatedAt " +
-                     "FROM [dbo].[Tickets] " +
-                     "WHERE AssignedTo IS NULL " +
-                     "AND Status NOT IN ('Closed','Resolved') " +
-                     "ORDER BY CreatedAt DESC";
+        String sql = "SELECT TOP 10 Id, TicketNumber, Title, Status, CreatedAt "
+                + "FROM [dbo].[Tickets] "
+                + "WHERE AssignedTo IS NULL "
+                + "AND Status NOT IN ('Closed','Resolved') "
+                + "ORDER BY CreatedAt DESC";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Tickets t = new Tickets();
@@ -1303,5 +1347,233 @@ public int getTotalTicketsCount(int userId, String search, String status, String
 
         return list;
     }
+
+    public List<Tickets> getAgentQueues(int agentId, int currentLevel, String queueType, int offset, int limit, String search, String status, String type) {
+        List<Tickets> list = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT t.*, p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName, st.ResolutionDeadline "
+                + "FROM [dbo].[Tickets] t "
+                + "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id "
+                + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
+                + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
+                + "LEFT JOIN [dbo].[SLATracking] st ON t.Id = st.TicketId WHERE 1=1 "
+        );
+        if ("unassigned".equals(queueType)) {
+            sql.append("AND t.AssignedTo IS NULL AND t.Status NOT IN ('Closed', 'Resolved') ");
+        } else if ("mine".equals(queueType)) {
+            sql.append("AND t.AssignedTo = ? AND t.Status NOT IN ('Closed', 'Resolved') ");
+        } else if ("resolved".equals(queueType)) {
+            sql.append("AND t.Status = 'Resolved' ");
+        } else {
+            sql.append("AND t.Status NOT IN ('Closed', 'Resolved') ");
+        }
+
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
+        }
+        if (status != null && !status.equals("all")) {
+            sql.append("AND t.Status = ? ");
+        }
+        if (type != null && !type.equals("all")) {
+            sql.append("AND t.TicketType = ? ");
+        }
+
+        sql.append("ORDER BY t.CreatedAt ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int paramIdx = 1;
+            if ("mine".equals(queueType)) {
+                ps.setInt(paramIdx++, agentId);
+            }
+
+            if (search != null && !search.trim().isEmpty()) {
+                ps.setString(paramIdx++, "%" + search + "%");
+                ps.setString(paramIdx++, "%" + search + "%");
+            }
+            if (status != null && !status.equals("all")) {
+                ps.setString(paramIdx++, status);
+            }
+            if (type != null && !type.equals("all")) {
+                ps.setString(paramIdx++, type);
+            }
+
+            ps.setInt(paramIdx++, offset);
+            ps.setInt(paramIdx++, limit);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Tickets t = new Tickets();
+                t.setId(rs.getInt("Id"));
+                t.setTicketNumber(rs.getString("TicketNumber"));
+                t.setTicketType(rs.getString("TicketType"));
+                t.setTitle(rs.getString("Title"));
+                t.setStatus(rs.getString("Status"));
+                t.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                t.setPriorityLevel(rs.getString("PriorityLevel"));
+                t.setAssigneeName(rs.getString("AssigneeName"));
+
+                // Lấy SLA Deadline từ DB
+                t.setResolutionDeadline(rs.getTimestamp("ResolutionDeadline"));
+                list.add(t);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public boolean processApproval(int ticketId, int managerId, boolean isApproved) {
+        String sql;
+        if (isApproved) {
+            // DUYỆT: Lưu người duyệt, đổi trạng thái thành New, trả về Level 1 cho IT Support xử lý
+            sql = "UPDATE [dbo].[Tickets] SET "
+                    + "ApprovedBy = ?, ApprovedAt = GETDATE(), "
+                    + "Status = 'New', CurrentLevel = 1, UpdatedAt = GETDATE() "
+                    + "WHERE Id = ?";
+        } else {
+            // TỪ CHỐI: Đóng vé luôn, giữ nguyên Level
+            sql = "UPDATE [dbo].[Tickets] SET "
+                    + "ApprovedBy = ?, ApprovedAt = GETDATE(), "
+                    + "Status = 'Closed', UpdatedAt = GETDATE() "
+                    + "WHERE Id = ?";
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, managerId);
+            ps.setInt(2, ticketId);
+            int rows = ps.executeUpdate();
+
+            if (rows > 0 && isApproved) {
+                // Query ngược lại để lấy thông tin PriorityId và Type của vé
+                Tickets t = getTicketById(ticketId);
+                if (t != null && t.getPriorityId() != null && t.getPriorityId() > 0) {
+                    SLATrackingDao slaDao = new SLATrackingDao();
+                    // Tính thời gian SLA bắt đầu từ giây phút này!
+                    slaDao.applySLAForTicket(ticketId, t.getTicketType(), t.getPriorityId());
+                }
+            }
+
+            return rows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateTicketTriage(int ticketId, int categoryId, Integer impact, Integer urgency, Integer priorityId) {
+        String sql = "UPDATE [dbo].[Tickets] SET CategoryId = ?, Impact = ?, Urgency = ?, PriorityId = ?, UpdatedAt = GETDATE() WHERE Id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, categoryId);
+
+            // Xử lý an toàn cho Integer có thể Null (trường hợp Service Request)
+            if (impact != null) {
+                ps.setInt(2, impact);
+            } else {
+                ps.setNull(2, Types.INTEGER);
+            }
+            if (urgency != null) {
+                ps.setInt(3, urgency);
+            } else {
+                ps.setNull(3, Types.INTEGER);
+            }
+            if (priorityId != null) {
+                ps.setInt(4, priorityId);
+            } else {
+                ps.setNull(4, Types.INTEGER);
+            }
+
+            ps.setInt(5, ticketId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public List<model.Users> getActiveAgents() {
+        List<model.Users> list = new ArrayList<>();
+        // Lấy tất cả trừ End User, sắp xếp theo Role để dễ nhìn
+        String sql = "SELECT Id, FullName, Role FROM [dbo].[Users] "
+                + "WHERE Role IN ('IT Support', 'Manager') AND IsActive = 1 "
+                + "ORDER BY Role, FullName";
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                model.Users u = new model.Users();
+                u.setId(rs.getInt("Id"));
+                // Format tên hiển thị: Nguyễn Văn A (IT Support)
+                u.setFullName(rs.getString("FullName") + " (" + rs.getString("Role") + ")");
+                list.add(u);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public int getTotalAgentQueuesCount(int agentId, int currentLevel, String queueType, String search, String status, String type) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM [dbo].[Tickets] t WHERE 1=1 ");
+
+        // ĐÃ SỬA: Bỏ lọc theo CurrentLevel
+        if ("unassigned".equals(queueType)) {
+            sql.append("AND t.AssignedTo IS NULL AND t.Status NOT IN ('Closed', 'Resolved') ");
+        } else if ("mine".equals(queueType)) {
+            sql.append("AND t.AssignedTo = ? AND t.Status NOT IN ('Closed', 'Resolved') ");
+        } else if ("resolved".equals(queueType)) {
+            sql.append("AND t.Status = 'Resolved' ");
+        } else {
+            sql.append("AND t.Status NOT IN ('Closed', 'Resolved') ");
+        }
+
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
+        }
+        if (status != null && !status.equals("all")) {
+            sql.append("AND t.Status = ? ");
+        }
+        if (type != null && !type.equals("all")) {
+            sql.append("AND t.TicketType = ? ");
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int paramIdx = 1;
+            if ("mine".equals(queueType)) {
+                ps.setInt(paramIdx++, agentId);
+            }
+            if (search != null && !search.trim().isEmpty()) {
+                ps.setString(paramIdx++, "%" + search + "%");
+                ps.setString(paramIdx++, "%" + search + "%");
+            }
+            if (status != null && !status.equals("all")) {
+                ps.setString(paramIdx++, status);
+            }
+            if (type != null && !type.equals("all")) {
+                ps.setString(paramIdx++, type);
+            }
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     
+    public List<String> getDistinctStatuses() {
+        List<String> list = new ArrayList<>();
+        String sql = "SELECT DISTINCT Status FROM [dbo].[Tickets] WHERE Status IS NOT NULL ORDER BY Status";
+        try {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                list.add(rs.getString("Status"));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return list;
+    }
 }

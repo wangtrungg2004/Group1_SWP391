@@ -10,7 +10,7 @@ package controller.ticket.agent;
  */
 
 
-import dao.TicketDAO;
+import dao.TicketDao;
 import model.Users;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -47,7 +47,7 @@ public class UpdateStatusController extends HttpServlet {
         
         if (idParam != null && !idParam.isEmpty() && status != null && !status.isEmpty()) {
             int ticketId = Integer.parseInt(idParam);
-            TicketDAO ticketDao = new TicketDAO();
+            TicketDao ticketDao = new TicketDao();
             Tickets ticket = ticketDao.searchTicketById(ticketId);
             // Đổi trạng thái vé
             ticketDao.updateTicketStatus(ticketId, status);

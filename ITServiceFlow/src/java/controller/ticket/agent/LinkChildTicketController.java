@@ -9,7 +9,7 @@ package controller.ticket.agent;
  * @author Dumb Trung
  */
 
-import dao.TicketDAO;
+import dao.TicketDao;
 import model.Users;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -40,7 +40,7 @@ public class LinkChildTicketController extends HttpServlet {
         String[] childIds = request.getParameterValues("childTicketIds"); 
 
         if (childIds != null && childIds.length > 0) {
-            TicketDAO ticketDao = new TicketDAO();
+            TicketDao ticketDao = new TicketDao();
             ticketDao.linkChildTickets(parentId, childIds);
         }
 

@@ -1,7 +1,7 @@
 package controller.ticket.user;
 
 
-import dao.TicketDAO;
+import dao.TicketDao;
 import model.Tickets;
 import model.Users;
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class UserDashboardController extends HttpServlet {
             return;
         }
 
-        TicketDAO ticketDao = new TicketDAO();
+        TicketDao ticketDao = new TicketDao();
         
         // 2. Lấy 5 vé gần nhất (Offset 0, Limit 5)
         // CẬP NHẬT: Truyền đầy đủ các tham số lọc rỗng ("", "all", "all") để lấy toàn bộ vé mới nhất

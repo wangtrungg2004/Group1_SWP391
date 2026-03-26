@@ -9,7 +9,7 @@ package controller.ticket.agent;
  * @author Dumb Trung
  */
 
-import dao.TicketDAO;
+import dao.TicketDao;
 import model.Users;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -40,7 +40,7 @@ public class ProcessApprovalController extends HttpServlet {
             int ticketId = Integer.parseInt(request.getParameter("id"));
             String action = request.getParameter("action"); // Nhận giá trị 'approve' hoặc 'reject'
             
-            TicketDAO dao = new TicketDAO();
+            TicketDao dao = new TicketDao();
             
             if ("approve".equals(action)) {
                 dao.processApproval(ticketId, currentUser.getId(), true);
