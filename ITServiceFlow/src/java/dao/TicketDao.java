@@ -678,56 +678,73 @@ public int getTotalTicketsCount(int userId, String search, String status, String
     // 7. Lấy danh sách Hàng đợi (Queue) cho Agent có Filter và SẮP XẾP NGÀY
     public List<Tickets> getAgentQueues(int agentId, int currentLevel, String queueType, int offset, int limit, String search, String status, String type, String sortOrder) {
         List<Tickets> list = new ArrayList<>();
-        
+
         StringBuilder sql = new StringBuilder(
-            "SELECT t.*, p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName, st.ResolutionDeadline " +
-            "FROM [dbo].[Tickets] t " +
-            "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id " +
-            "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id " +
-            "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id " +
-            "LEFT JOIN [dbo].[SLATracking] st ON t.Id = st.TicketId WHERE 1=1 "
+                "SELECT t.*, p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName "
+                + "FROM [dbo].[Tickets] t "
+                + "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id "
+                + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
+                + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id WHERE 1=1 "
         );
 
+        // Lọc theo Queue Type
         if ("unassigned".equals(queueType)) {
-            sql.append("AND t.AssignedTo IS NULL AND t.Status NOT IN ('Closed', 'Resolved') ");
+            sql.append("AND t.AssignedTo IS NULL AND t.Status != 'Closed' AND t.Status != 'Resolved' ");
         } else if ("mine".equals(queueType)) {
-            sql.append("AND t.AssignedTo = ? AND t.Status NOT IN ('Closed', 'Resolved') ");
+            sql.append("AND t.AssignedTo = ? AND t.Status != 'Closed' AND t.Status != 'Resolved' ");
         } else if ("resolved".equals(queueType)) {
             sql.append("AND t.Status = 'Resolved' ");
-        } else { 
-            sql.append("AND t.Status NOT IN ('Closed', 'Resolved') ");
+        } else { // all_active
+            sql.append("AND t.Status != 'Closed' AND t.Status != 'Resolved' ");
         }
 
+        // Lọc theo thanh Search & Filter
         if (search != null && !search.trim().isEmpty()) {
             sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
         }
-        if (status != null && !status.equals("all")) sql.append("AND t.Status = ? ");
-        if (type != null && !type.equals("all")) sql.append("AND t.TicketType = ? ");
-        
-        // THUẬT TOÁN SẮP XẾP (Mặc định là DESC - Mới nhất trước)
-        if ("asc".equalsIgnoreCase(sortOrder)) {
-            sql.append("ORDER BY t.CreatedAt ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
-        } else {
-            sql.append("ORDER BY t.CreatedAt DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        if (status != null && !status.equals("all")) {
+            sql.append("AND t.Status = ? ");
         }
+        if (type != null && !type.equals("all")) {
+            sql.append("AND t.TicketType = ? ");
+        }
+
+        // Xử lý tham số sortOrder (Sắp xếp theo thời gian)
+        if ("asc".equalsIgnoreCase(sortOrder)) {
+            sql.append("ORDER BY t.CreatedAt ASC ");
+        } else {
+            sql.append("ORDER BY t.CreatedAt DESC "); // Mặc định là mới nhất lên đầu
+        }
+
+        sql.append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIdx = 1;
-            if ("mine".equals(queueType)) ps.setInt(paramIdx++, agentId);
             
+            // Lưu ý: Mình đã nhận tham số currentLevel vào hàm cho khớp với Controller.
+            // Nếu DB của bạn có cột phân loại Ticket theo Level thì bổ sung logic ps.setInt ở đây. 
+
+            if ("mine".equals(queueType)) {
+                ps.setInt(paramIdx++, agentId);
+            }
+
             if (search != null && !search.trim().isEmpty()) {
                 ps.setString(paramIdx++, "%" + search + "%");
                 ps.setString(paramIdx++, "%" + search + "%");
             }
-            if (status != null && !status.equals("all")) ps.setString(paramIdx++, status);
-            if (type != null && !type.equals("all")) ps.setString(paramIdx++, type);
-            
+            if (status != null && !status.equals("all")) {
+                ps.setString(paramIdx++, status);
+            }
+            if (type != null && !type.equals("all")) {
+                ps.setString(paramIdx++, type);
+            }
+
             ps.setInt(paramIdx++, offset);
             ps.setInt(paramIdx++, limit);
-            
-            ResultSet rs = ps.executeQuery();
+ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Tickets t = new Tickets();
+                // Map dữ liệu
                 t.setId(rs.getInt("Id"));
                 t.setTicketNumber(rs.getString("TicketNumber"));
                 t.setTicketType(rs.getString("TicketType"));
@@ -736,10 +753,11 @@ public int getTotalTicketsCount(int userId, String search, String status, String
                 t.setCreatedAt(rs.getTimestamp("CreatedAt"));
                 t.setPriorityLevel(rs.getString("PriorityLevel"));
                 t.setAssigneeName(rs.getString("AssigneeName"));
-                t.setResolutionDeadline(rs.getTimestamp("ResolutionDeadline"));
                 list.add(t);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return list;
     }
 
