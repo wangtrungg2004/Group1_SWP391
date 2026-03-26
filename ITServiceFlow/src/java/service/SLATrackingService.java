@@ -1,12 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package service;
 
+import dao.NotificationDao;
 import dao.SLARuleDao;
 import dao.SLATrackingDao;
-import dao.NotificationDao;
 import dao.UserDao;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,15 +17,11 @@ import java.util.Set;
 import model.SLARule;
 import model.SLATracking;
 
-/**
- *
- * @author DELL
- */
 public class SLATrackingService {
-    private SLATrackingDao slaTrackingDao;
-    private SLARuleDao slaRuleDao;
-    private NotificationDao notificationDao;
-    private UserDao userDao;
+    private final SLATrackingDao slaTrackingDao;
+    private final SLARuleDao slaRuleDao;
+    private final NotificationDao notificationDao;
+    private final UserDao userDao;
 
     public SLATrackingService() {
         this.slaTrackingDao = new SLATrackingDao();
@@ -39,55 +31,67 @@ public class SLATrackingService {
     }
 
     public void applySLARuleToTicket(int ticketId, String ticketType, int priorityId) {
-        // 1. Find matching SLA Rule
         SLARule matchedRule = slaRuleDao.getActiveRuleByTypeAndPriority(ticketType, priorityId);
-
-        if (matchedRule != null) {
-            // 2. Calculate Deadlines
-            Date now = new Date();
-            Calendar calendar = Calendar.getInstance();
-
-            calendar.setTime(now);
-            calendar.add(Calendar.HOUR, matchedRule.getResponseTime());
-            Date responseDeadline = calendar.getTime();
-
-            calendar.setTime(now);
-            calendar.add(Calendar.HOUR, matchedRule.getResolutionTime());
-            Date resolutionDeadline = calendar.getTime();
-
-            // 3. Create SLATracking entry
-            SLATracking tracking = new SLATracking();
-            tracking.setTicketId(ticketId);
-            tracking.setResponseDeadline(responseDeadline);
-            tracking.setResolutionDeadline(resolutionDeadline);
-
-            slaTrackingDao.addSLATracking(tracking);
+        if (matchedRule == null) {
+            return;
         }
+
+        Date now = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(now);
+        calendar.add(Calendar.HOUR, matchedRule.getResponseTime());
+        Date responseDeadline = calendar.getTime();
+
+        calendar.setTime(now);
+        calendar.add(Calendar.HOUR, matchedRule.getResolutionTime());
+        Date resolutionDeadline = calendar.getTime();
+
+        SLATracking tracking = new SLATracking();
+        tracking.setTicketId(ticketId);
+        tracking.setResponseDeadline(responseDeadline);
+        tracking.setResolutionDeadline(resolutionDeadline);
+        slaTrackingDao.addSLATracking(tracking);
     }
 
-    public java.util.Map<String, Integer> getSLAStatistics() {
+    public Map<String, Integer> getSLAStatistics() {
         return slaTrackingDao.getSLAStatistics();
     }
 
-    public java.util.List<java.util.Map<String, Object>> getBreachedTickets(int limit) {
+    public Map<String, Integer> getSLAStatistics(java.sql.Date from, java.sql.Date to, Integer categoryId, Integer locationId) {
+        return slaTrackingDao.getSLAStatistics(from, to, categoryId, locationId);
+    }
+
+    public List<Map<String, Object>> getBreachedTickets(int limit) {
         return slaTrackingDao.getBreachedTickets(limit);
     }
 
-    public java.util.List<java.util.Map<String, Object>> getNearBreachTickets(int limit) {
+    public List<Map<String, Object>> getBreachedTickets(int limit, java.sql.Date from, java.sql.Date to, Integer categoryId, Integer locationId) {
+        return slaTrackingDao.getBreachedTickets(limit, from, to, categoryId, locationId);
+    }
+
+    public List<Map<String, Object>> getNearBreachTickets(int limit) {
         return slaTrackingDao.getNearBreachTickets(limit);
     }
 
-    public java.util.List<java.util.Map<String, Object>> getBreachList(String team, String priority, String agent,
+    public List<Map<String, Object>> getNearBreachTickets(int limit, java.sql.Date from, java.sql.Date to, Integer categoryId, Integer locationId) {
+        return slaTrackingDao.getNearBreachTickets(limit, from, to, categoryId, locationId);
+    }
+
+    public List<Map<String, Object>> getBreachList(String team, String priority, String agent,
             String status, String sortBy, int offset, int limit) {
         return slaTrackingDao.getBreachList(team, priority, agent, status, sortBy, offset, limit);
     }
 
-    public void runEscalationSweep() {
-        // Always keep IsBreached in sync for unresolved tickets.
-        slaTrackingDao.markBreachedTickets();
+    public int countBreachList(String team, String priority, String agent, String status) {
+        return slaTrackingDao.countBreachList(team, priority, agent, status);
+    }
 
-        // Escalation event/history relies on this table. If migration is not applied yet,
-        // skip to avoid duplicate notifications every request.
+    public Map<String, Integer> getTicketTypeDistribution(java.sql.Date from, java.sql.Date to, Integer categoryId, Integer locationId) {
+        return slaTrackingDao.getTicketTypeDistribution(from, to, categoryId, locationId);
+    }
+
+    public void runEscalationSweep() {
+        slaTrackingDao.markBreachedTickets();
         if (!slaTrackingDao.isEscalationHistoryEnabled()) {
             return;
         }
@@ -141,26 +145,21 @@ public class SLATrackingService {
     }
 
     private void triggerEscalation(Map<String, Object> item,
-                                   String stageCode,
-                                   String stageLabel,
-                                   Date deadline,
-                                   Integer remainingMinutes,
-                                   List<Integer> recipientUserIds,
-                                   String notificationTitle,
-                                   String notificationMessage,
-                                   String autoAction,
-                                   String escalatedToRole,
-                                   Integer escalatedToUserId) {
+            String stageCode,
+            String stageLabel,
+            Date deadline,
+            Integer remainingMinutes,
+            List<Integer> recipientUserIds,
+            String notificationTitle,
+            String notificationMessage,
+            String autoAction,
+            String escalatedToRole,
+            Integer escalatedToUserId) {
         Integer ticketId = toInteger(item.get("TicketId"));
-        if (ticketId == null) {
+        if (ticketId == null || recipientUserIds == null || recipientUserIds.isEmpty()) {
             return;
         }
-
         if (slaTrackingDao.hasEscalationHistory(ticketId, stageCode, deadline)) {
-            return;
-        }
-
-        if (recipientUserIds == null || recipientUserIds.isEmpty()) {
             return;
         }
 
@@ -180,7 +179,6 @@ public class SLATrackingService {
                 sentCount++;
             }
         }
-
         if (sentCount <= 0) {
             return;
         }
@@ -189,23 +187,13 @@ public class SLATrackingService {
         Integer notificationTargetId = recipientUserIds.size() == 1 ? recipientUserIds.get(0) : null;
 
         slaTrackingDao.addEscalationHistory(
-                ticketId,
-                stageCode,
-                stageLabel,
-                deadline,
-                remainingMinutes,
-                notificationTargetType,
-                notificationTargetId,
-                notificationTitle,
-                notificationMessage,
-                autoAction,
-                escalatedToRole,
-                escalatedToUserId);
+                ticketId, stageCode, stageLabel, deadline, remainingMinutes,
+                notificationTargetType, notificationTargetId, notificationTitle, notificationMessage,
+                autoAction, escalatedToRole, escalatedToUserId);
     }
 
     private List<Integer> collectRecipientUserIds(Integer createdBy, Integer assignedTo, List<Integer> managerIds) {
         Set<Integer> recipients = new LinkedHashSet<>();
-
         if (createdBy != null && createdBy > 0) {
             recipients.add(createdBy);
         }
@@ -219,7 +207,6 @@ public class SLATrackingService {
                 }
             }
         }
-
         return new ArrayList<>(recipients);
     }
 
@@ -238,10 +225,7 @@ public class SLATrackingService {
     }
 
     private Date toDate(Object value) {
-        if (value instanceof Date) {
-            return (Date) value;
-        }
-        return null;
+        return (value instanceof Date) ? (Date) value : null;
     }
 
     private String getTicketDisplay(Map<String, Object> item, int ticketId) {

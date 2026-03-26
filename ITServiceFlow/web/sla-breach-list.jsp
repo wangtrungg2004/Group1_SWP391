@@ -85,6 +85,7 @@
                                                                     </select>
                                                                 </div>
                                                                 <div class="col-md-3">
+<<<<<<< HEAD
                                                                     <select name="status" class="form-control">
                                                                         <option value="">-- All Statuses --</option>
                                                                         <option value="Open" ${param.status=='Open'
@@ -109,6 +110,19 @@
                                                                         <!-- Add more sort options if needed -->
                                                                     </select>
                                                                 </div>
+=======
+                                                                     <select name="status" class="form-control">
+                                                                         <option value="">-- All Statuses --</option>
+                                                                         <c:forEach items="${availableStatuses}" var="s">
+                                                                             <option value="${s}" ${param.status==s ? 'selected' : ''}>${s}</option>
+                                                                         </c:forEach>
+                                                                     </select>
+                                                                 </div>
+                                                                <div class="col-md-5">
+                                                                    <input type="text" name="agent" class="form-control"
+                                                                        placeholder="Agent Name" value="${param.agent}">
+                                                                </div>
+>>>>>>> HoangNV4
                                                                 <div class="col-md-1">
                                                                     <button type="submit"
                                                                         class="btn btn-primary btn-block"><i
@@ -198,6 +212,7 @@
                                                                 </table>
                                                             </div>
 
+<<<<<<< HEAD
                                                             <!-- Pagination (Simplified for now) -->
                                                             <nav aria-label="Page navigation" class="mt-4">
                                                                 <ul class="pagination justify-content-center">
@@ -217,6 +232,39 @@
                                                                     </li>
                                                                 </ul>
                                                             </nav>
+=======
+                                                            <!-- Pagination -->
+                                                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                                                <div>
+                                                                    <c:if test="${totalRecords > 0}">
+                                                                        Showing ${(currentPage - 1) * 10 + 1} to 
+                                                                        ${currentPage * 10 > totalRecords ? totalRecords : currentPage * 10} 
+                                                                        of ${totalRecords} entries
+                                                                    </c:if>
+                                                                </div>
+                                                                <c:if test="${totalPages > 1}">
+                                                                    <nav aria-label="Page navigation">
+                                                                        <ul class="pagination mb-0">
+                                                                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                                                                <a class="page-link"
+                                                                                    href="SLABreachList?page=${currentPage - 1}&priority=${paramPriority}&status=${paramStatus}&agent=${paramAgent}">Previous</a>
+                                                                            </li>
+                                                                            <c:forEach begin="1" end="${totalPages}" var="i">
+                                                                                <li
+                                                                                    class="page-item ${currentPage == i ? 'active' : ''}">
+                                                                                    <a class="page-link"
+                                                                                        href="SLABreachList?page=${i}&priority=${paramPriority}&status=${paramStatus}&agent=${paramAgent}">${i}</a>
+                                                                                </li>
+                                                                            </c:forEach>
+                                                                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                                                                <a class="page-link"
+                                                                                    href="SLABreachList?page=${currentPage + 1}&priority=${paramPriority}&status=${paramStatus}&agent=${paramAgent}">Next</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </nav>
+                                                                </c:if>
+                                                            </div>
+>>>>>>> HoangNV4
 
                                                         </div>
                                                     </div>

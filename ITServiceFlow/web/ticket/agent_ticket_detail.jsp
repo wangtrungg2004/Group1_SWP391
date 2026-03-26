@@ -97,6 +97,7 @@
                                         <span style="font-size: 0.9rem;"><strong>Resolution SLA:</strong> Deadline is <fmt:formatDate value="${slaTracking.resolutionDeadline}" pattern="dd/MM/yyyy HH:mm" /></span>
                                         <c:if test="${isSlaBreached}"><span class="badge badge-danger px-2 py-1" style="font-size: 0.8rem; letter-spacing: 0.5px;">BREACHED</span></c:if>
                                     </div>
+                                </div>
                             </c:if>
 
                             <div class="row">
@@ -263,9 +264,7 @@
 
                                             <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-bottom pb-2 mb-3">
                                                 <h6 class="sidebar-section-title border-0 pb-0 mb-0 m-0">Configuration Items</h6>
-                                                <a href="${pageContext.request.contextPath}/TicketLinkCIListServlet" class="btn btn-sm btn-light text-primary border" title="Go to Asset Management page">
-                                                    <i class="feather icon-external-link"></i> Manage
-                                                </a>
+                                                <a href="${pageContext.request.contextPath}/Long_TicketListServlet" class="btn btn-sm btn-light text-primary border" title="Go to Asset Management page"><i class="feather icon-settings"></i> Manage CIs</a>
                                             </div>
                                             
                                             <div class="meta-group mb-0">

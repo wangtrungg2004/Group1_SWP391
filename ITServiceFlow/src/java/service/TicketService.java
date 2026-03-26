@@ -1,20 +1,14 @@
 package service;
 
-import dao.ProblemDao;
 import dao.TicketDAO;
-import java.sql.Date;
 import java.util.List;
 import java.util.Map;
-import model.Problems;
 import model.Tickets;
 
-/**
- * @author DELL
- */
 public class TicketService {
-    
-    private TicketDAO ticketDao;
-    private SLATrackingService slaTrackingService;
+
+    private final TicketDAO ticketDao;
+    private final SLATrackingService slaTrackingService;
 
     public TicketService() {
         this.ticketDao = new TicketDAO();
@@ -26,16 +20,12 @@ public class TicketService {
     }
 
     public boolean createTicket(Tickets ticket) {
-        // 1. Generate Ticket Number if missing
         if (ticket.getTicketNumber() == null || ticket.getTicketNumber().isEmpty()) {
             ticket.setTicketNumber(ticketDao.getNextTicketNumber(ticket.getTicketType()));
         }
 
-        // 2. Create Ticket
-        int ticketId = ticketDao.createTicket2(ticket);
-
+        int ticketId = ticketDao.createTicket(ticket);
         if (ticketId > 0) {
-            // 3. Apply SLA
             if (ticket.getPriorityId() != null && ticket.getPriorityId() > 0) {
                 slaTrackingService.applySLARuleToTicket(ticketId, ticket.getTicketType(), ticket.getPriorityId());
             }
@@ -43,37 +33,32 @@ public class TicketService {
         }
         return false;
     }
-    
+
     public Tickets getTicketById(int id) {
         return ticketDao.getTicketById(id);
     }
-    
-    public List<Tickets> getIncidentsNotInProblem()
-    {
+
+    public List<Tickets> getIncidentsNotInProblem() {
         return ticketDao.getIncidentsNotInProblem();
     }
-    
-    public List<Tickets> searchIncidentsNotProblem(String keyword)
-    {
+
+    public List<Tickets> searchIncidentsNotProblem(String keyword) {
         return ticketDao.searchIncidentsNotInProblem(keyword);
     }
-    
-    public int getTotalTicket()
-    {
+
+    public int getTotalTicket() {
         return ticketDao.getTotalTicket();
     }
-    
-    public int getTotalTicketThisMonth()
-    {
+
+    public int getTotalTicketThisMonth() {
         return ticketDao.getTotalTicketThisMonth();
     }
-    
+
     public Map<String, Object> getTicketChartLast6Months() {
         return ticketDao.getTicketStatsLast6Months();
     }
-    
-    public List<Tickets> get10UnAssignedTicket()
-    {
+
+    public List<Tickets> get10UnAssignedTicket() {
         return ticketDao.get10UnassignedTickets();
     }
 }

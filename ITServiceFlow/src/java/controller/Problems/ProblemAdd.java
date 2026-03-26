@@ -213,7 +213,6 @@ public class ProblemAdd extends HttpServlet {
                 if (assignedTo > 0) {
                     notificationDao.addNotification(assignedTo, message, null, false, notificationTitle, type);
                 }
-
                 auditLogService.createAuditLog(createdBy, "CREATE", "Problem", newProblemId);
             }
             response.sendRedirect("ProblemList?success=Problem added successfully!");
