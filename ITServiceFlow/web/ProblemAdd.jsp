@@ -151,7 +151,7 @@
                                                         <select name="AssignedTo" class="form-control">
                                                             <option value="">-- Select assignee --</option>
                                                             <c:forEach items="${assignees}" var="u">
-                                                                 <c:if test="${u.role == 'IT Support' or u.role == 'Manager'}">
+                                                                 <c:if test="${u.role == 'IT Support'}">
                                                                     <option value="${u.id}" ${u.id == savedAssignedTo ? 'selected' : ''}>
                                                                         ${u.fullName} (${u.username})
                                                                     </option>

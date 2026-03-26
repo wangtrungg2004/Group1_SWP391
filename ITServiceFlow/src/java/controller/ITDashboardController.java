@@ -56,7 +56,7 @@ public class ITDashboardController extends HttpServlet {
         // 2. 5 ticket gần nhất assign cho agent (đang mở)
         int currentLevel = ("Manager".equals(role) || "Admin".equals(role)) ? 2 : 1;
         List<Tickets> recentTickets = ticketDAO.getAgentQueues(
-                agentId, currentLevel, "mine", 0, 5, "", "all", "all", "desc");
+                agentId, currentLevel, "mine", 0, 5, "", "all", "all");
 
         // 3. Số problem đang assign cho agent
         int myProblems = problemDao.getTotalAssignProblems(agentId);

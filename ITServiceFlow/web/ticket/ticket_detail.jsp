@@ -1,7 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
-<%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
 <%
     if (session.getAttribute("user") == null) {
         response.sendRedirect(request.getContextPath() + "/Login.jsp");
@@ -179,47 +178,6 @@
                 color: #00875a;
             }
 
-            /* ── Status Timeline ── */
-            .timeline-wrap {
-                position: relative;
-                padding: 8px 0 4px 0;
-                margin-bottom: 8px;
-            }
-            .timeline-wrap::before {
-                content: '';
-                position: absolute;
-                left: 15px;
-                top: 0; bottom: 0;
-                width: 2px;
-                background: #dfe1e6;
-            }
-            .tl-item {
-                display: flex;
-                align-items: flex-start;
-                gap: 12px;
-                margin-bottom: 18px;
-                position: relative;
-            }
-            .tl-dot {
-                width: 30px; height: 30px;
-                border-radius: 50%;
-                display: flex; align-items: center; justify-content: center;
-                font-size: 0.75rem;
-                flex-shrink: 0;
-                z-index: 1;
-                border: 2px solid #fff;
-            }
-            .tl-dot.dot-created  { background: #e3fcef; color: #00875a; box-shadow: 0 0 0 2px #00875a; }
-            .tl-dot.dot-status   { background: #deebff; color: #0052cc; box-shadow: 0 0 0 2px #0052cc; }
-            .tl-dot.dot-assign   { background: #fff0b3; color: #ff8b00; box-shadow: 0 0 0 2px #ff8b00; }
-            .tl-dot.dot-comment  { background: #f4f5f7; color: #5e6c84; box-shadow: 0 0 0 2px #b3bac5; }
-            .tl-dot.dot-closed   { background: #ffebe6; color: #bf2600; box-shadow: 0 0 0 2px #bf2600; }
-            .tl-dot.dot-resolved { background: #e3fcef; color: #006644; box-shadow: 0 0 0 2px #006644; }
-            .tl-body { flex: 1; padding-top: 4px; }
-            .tl-action { font-size: 0.88rem; font-weight: 600; color: #172b4d; margin-bottom: 2px; }
-            .tl-meta   { font-size: 0.78rem; color: #6b778c; }
-            .tl-meta strong { color: #42526e; }
-
             /* Activity Log Styling */
             .empty-activity {
                 background: #fafbfc;
@@ -320,58 +278,6 @@
                                                         </c:when>
                                                         <c:otherwise>
                                                             <span class="text-muted" style="font-size: 0.85rem; font-style: italic;">No files attached to this request.</span>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </div>
-
-
-                                                <%-- ── Ticket Status Timeline ── --%>
-                                                <div class="mb-4">
-                                                    <h6 class="section-title"><i class="feather icon-activity"></i> Ticket Timeline</h6>
-                                                    <c:choose>
-                                                        <c:when test="${empty timeline}">
-                                                            <div class="empty-activity">
-                                                                <i class="feather icon-clock"></i>
-                                                                <p>No history yet.</p>
-                                                            </div>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <div class="timeline-wrap">
-                                                                <c:forEach items="${timeline}" var="log">
-                                                                    <div class="tl-item">
-                                                                        <%-- Chọn icon và màu theo action --%>
-                                                                        <c:choose>
-                                                                            <c:when test="${fn:containsIgnoreCase(log.action, 'created') || fn:containsIgnoreCase(log.action, 'tao')}">
-                                                                                <div class="tl-dot dot-created"><i class="feather icon-plus"></i></div>
-                                                                            </c:when>
-                                                                            <c:when test="${fn:containsIgnoreCase(log.action, 'assign')}">
-                                                                                <div class="tl-dot dot-assign"><i class="feather icon-user-check"></i></div>
-                                                                            </c:when>
-                                                                            <c:when test="${fn:containsIgnoreCase(log.action, 'resolved') || fn:containsIgnoreCase(log.action, 'resolve')}">
-                                                                                <div class="tl-dot dot-resolved"><i class="feather icon-check-circle"></i></div>
-                                                                            </c:when>
-                                                                            <c:when test="${fn:containsIgnoreCase(log.action, 'closed') || fn:containsIgnoreCase(log.action, 'close')}">
-                                                                                <div class="tl-dot dot-closed"><i class="feather icon-lock"></i></div>
-                                                                            </c:when>
-                                                                            <c:when test="${fn:containsIgnoreCase(log.action, 'comment')}">
-                                                                                <div class="tl-dot dot-comment"><i class="feather icon-message-circle"></i></div>
-                                                                            </c:when>
-                                                                            <c:otherwise>
-                                                                                <div class="tl-dot dot-status"><i class="feather icon-refresh-cw"></i></div>
-                                                                            </c:otherwise>
-                                                                        </c:choose>
-                                                                        <div class="tl-body">
-                                                                            <div class="tl-action"><c:out value="${log.action}"/></div>
-                                                                            <div class="tl-meta">
-                                                                                <c:if test="${not empty log.userName}">
-                                                                                    by <strong><c:out value="${log.userName}"/></strong> &nbsp;·&nbsp;
-                                                                                </c:if>
-                                                                                <fmt:formatDate value="${log.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </c:forEach>
-                                                            </div>
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </div>

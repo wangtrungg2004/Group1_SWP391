@@ -676,26 +676,27 @@ public int getTotalTicketsCount(int userId, String search, String status, String
   
     
     // 7. Lấy danh sách Hàng đợi (Queue) cho Agent có Filter và SẮP XẾP NGÀY
-    public List<Tickets> getAgentQueues(int agentId, int currentLevel, String queueType, int offset, int limit, String search, String status, String type, String sortOrder) {
+    public List<Tickets> getAgentQueues(int agentId, int currentLevel, String queueType, int offset, int limit, String search, String status, String type) {
         List<Tickets> list = new ArrayList<>();
 
         StringBuilder sql = new StringBuilder(
-                "SELECT t.*, p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName "
+                "SELECT t.*, p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName, st.ResolutionDeadline "
                 + "FROM [dbo].[Tickets] t "
                 + "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id "
                 + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
-                + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id WHERE 1=1 "
+                + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
+                + "LEFT JOIN [dbo].[SLATracking] st ON t.Id = st.TicketId WHERE 1=1 "
         );
 
-        // Lọc theo Queue Type
+        // Lọc theo Queue Type (Bỏ Status != 'Closed', 'Resolved' thành NOT IN cho gọn)
         if ("unassigned".equals(queueType)) {
-            sql.append("AND t.AssignedTo IS NULL AND t.Status != 'Closed' AND t.Status != 'Resolved' ");
+            sql.append("AND t.AssignedTo IS NULL AND t.Status NOT IN ('Closed', 'Resolved') ");
         } else if ("mine".equals(queueType)) {
-            sql.append("AND t.AssignedTo = ? AND t.Status != 'Closed' AND t.Status != 'Resolved' ");
+            sql.append("AND t.AssignedTo = ? AND t.Status NOT IN ('Closed', 'Resolved') ");
         } else if ("resolved".equals(queueType)) {
             sql.append("AND t.Status = 'Resolved' ");
         } else { // all_active
-            sql.append("AND t.Status != 'Closed' AND t.Status != 'Resolved' ");
+            sql.append("AND t.Status NOT IN ('Closed', 'Resolved') ");
         }
 
         // Lọc theo thanh Search & Filter
@@ -709,21 +710,12 @@ public int getTotalTicketsCount(int userId, String search, String status, String
             sql.append("AND t.TicketType = ? ");
         }
 
-        // Xử lý tham số sortOrder (Sắp xếp theo thời gian)
-        if ("asc".equalsIgnoreCase(sortOrder)) {
-            sql.append("ORDER BY t.CreatedAt ASC ");
-        } else {
-            sql.append("ORDER BY t.CreatedAt DESC "); // Mặc định là mới nhất lên đầu
-        }
-
-        sql.append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        // Bỏ sortOrder truyền vào, mặc định sắp xếp mới nhất (DESC) lên đầu để dễ theo dõi
+        sql.append("ORDER BY t.CreatedAt DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIdx = 1;
             
-            // Lưu ý: Mình đã nhận tham số currentLevel vào hàm cho khớp với Controller.
-            // Nếu DB của bạn có cột phân loại Ticket theo Level thì bổ sung logic ps.setInt ở đây. 
-
             if ("mine".equals(queueType)) {
                 ps.setInt(paramIdx++, agentId);
             }
@@ -741,10 +733,10 @@ public int getTotalTicketsCount(int userId, String search, String status, String
 
             ps.setInt(paramIdx++, offset);
             ps.setInt(paramIdx++, limit);
-ResultSet rs = ps.executeQuery();
+
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Tickets t = new Tickets();
-                // Map dữ liệu
                 t.setId(rs.getInt("Id"));
                 t.setTicketNumber(rs.getString("TicketNumber"));
                 t.setTicketType(rs.getString("TicketType"));
@@ -753,6 +745,14 @@ ResultSet rs = ps.executeQuery();
                 t.setCreatedAt(rs.getTimestamp("CreatedAt"));
                 t.setPriorityLevel(rs.getString("PriorityLevel"));
                 t.setAssigneeName(rs.getString("AssigneeName"));
+                
+                // Lấy SLA Deadline từ DB (nếu có)
+                try {
+                    t.setResolutionDeadline(rs.getTimestamp("ResolutionDeadline"));
+                } catch (Exception e) {
+                    // Cột có thể không tồn tại trong một số view, bỏ qua
+                }
+                
                 list.add(t);
             }
         } catch (Exception e) {

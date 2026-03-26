@@ -1,12 +1,10 @@
 package controller.ticket.user;
 
-import dao.AuditLogsDAO;
 import dao.CategoryDao;
 import dao.CsatSurveyDAO;
 import dao.ServiceCatalogDao;
 import dao.TicketCommentsDAO;
 import dao.TicketDAO;
-import model.AuditLog;
 import model.CsatSurvey;
 import model.Tickets;
 import model.Users;
@@ -97,11 +95,6 @@ public class TicketDetailUserController extends HttpServlet {
             // Nu null  JSP s hin th nt "Give Feedback"
         }
         // 
-
-        // Load Timeline (Audit Log) cho ticket này
-        AuditLogsDAO auditDao = new AuditLogsDAO();
-        List<AuditLog> timeline = auditDao.getByEntity("Ticket", ticketId);
-        request.setAttribute("timeline", timeline);
 
         CategoryDao catDao = new CategoryDao();
         ServiceCatalogDao svcDao = new ServiceCatalogDao();

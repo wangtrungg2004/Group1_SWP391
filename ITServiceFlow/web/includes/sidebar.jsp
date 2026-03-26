@@ -99,12 +99,7 @@
                             <span class="pcoded-mtext">Ticket - Assets</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="CreateTicket" class="nav-link">
-                            <span class="pcoded-micon"><i class="feather icon-plus-circle"></i></span>
-                            <span class="pcoded-mtext">Create Ticket</span>
-                        </a>
-                    </li>
+                   
 
                     <li class="nav-item pcoded-menu-caption"><label>Problem & Knowledge</label></li>
                     <li class="nav-item">
