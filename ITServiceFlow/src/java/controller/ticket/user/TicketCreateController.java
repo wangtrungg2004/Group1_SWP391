@@ -74,6 +74,7 @@ public class TicketCreateController extends HttpServlet {
         t.setDescription(request.getParameter("description"));
         t.setCreatedBy(currentUser.getId());
         t.setLocationId(currentUser.getLocationId() > 0 ? currentUser.getLocationId() : 1);
+        t.setCurrentLevel(1);
 
         if ("Incident".equals(ticketType)) {
 
@@ -141,34 +142,37 @@ public class TicketCreateController extends HttpServlet {
         }
 
         String assetTag = request.getParameter("assetTag");
-        if (assetTag == null || assetTag.trim().isEmpty()) {
-            request.setAttribute("errorMessage", "Vui lòng nhập Asset tag.");
-            doGet(request, response);
-            return;
-        }
+        String normalizedAssetTag = assetTag == null ? "" : assetTag.trim();
+//        if (assetTag == null || assetTag.trim().isEmpty()) {
+//            request.setAttribute("errorMessage", "Vui lòng nhập Asset tag.");
+//            doGet(request, response);
+//            return;
+//        }
 
         AssetsDAO assetsDAO = new AssetsDAO();
-        Assets asset = assetsDAO.getAssetByTag(assetTag.trim());
-        if (asset == null) {
-            request.setAttribute("errorMessage", "Asset tag is wrong.");
-            preserveFormForError(request, ticketType);
-            doGet(request, response);
-            return;
-        }
+        Assets asset = normalizedAssetTag.isEmpty() ? null : assetsDAO.getAssetByTag(normalizedAssetTag);
+//        if (asset == null) {
+//            request.setAttribute("errorMessage", "Asset tag is wrong.");
+//            preserveFormForError(request, ticketType);
+//            doGet(request, response);
+//            return;
+//        }
 
         TicketDAO dao = new TicketDAO();
         int isCreated = dao.createTicket(t);
 
-        if ("ok".equals(isCreated)) {
+        if (isCreated > 0) {
             Tickets created = dao.getTicketByNumber(t.getTicketNumber());
             if (created != null) {
-                TicketAssetsDAO ticketAssetsDAO = new TicketAssetsDAO();
-                boolean linked = ticketAssetsDAO.addLink(created.getId(), asset.getId());
-                if (!linked) {
-                    request.setAttribute("errorMessage", "Could not link asset to ticket. Please try again from ticket detail.");
-                    preserveFormForError(request, ticketType);
-                    doGet(request, response);
-                    return;
+                if (asset != null) {
+                    TicketAssetsDAO ticketAssetsDAO = new TicketAssetsDAO();
+                    boolean linked = ticketAssetsDAO.addLink(created.getId(), asset.getId());
+                    if (!linked) {
+                        request.setAttribute("errorMessage", "Could not link asset to ticket. Please try again from ticket detail.");
+                        preserveFormForError(request, ticketType);
+                        doGet(request, response);
+                        return;
+                    }
                 }
                 response.sendRedirect(request.getContextPath() + "/Tickets?created=1");
                 return;
@@ -179,7 +183,7 @@ public class TicketCreateController extends HttpServlet {
             return;
         } else {
             preserveFormForError(request, ticketType);
-            request.setAttribute("errorMessage", "Lỗi hệ thống: " + isCreated);
+            request.setAttribute("errorMessage", "Lỗi hệ thống: không thể tạo ticket.");
             doGet(request, response);
         }
 

@@ -187,6 +187,12 @@
                             <span class="pcoded-mtext">SLA Breach List</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="${pageContext.request.contextPath}/AuditLogs" class="nav-link">
+                            <span class="pcoded-micon"><i class="feather icon-alert-circle"></i></span>
+                            <span class="pcoded-mtext">System Audit Logs</span>
+                        </a>
+                    </li>
 
                     <li class="nav-item pcoded-menu-caption"><label>Problem Management</label></li>
                     <li class="nav-item pcoded-hasmenu">
@@ -247,6 +253,13 @@
                             <span class="pcoded-mtext">CSAT Report</span>
                         </a>
                     </li>
+                    
+                    <li class="nav-item">
+                        <a href="${pageContext.request.contextPath}/AgentPerformanceReport" class="nav-link">
+                            <span class="pcoded-micon"><i class="feather icon-alert-circle"></i></span>
+                            <span class="pcoded-mtext">Agent Performance Report</span>
+                        </a>
+                    </li>
 
                 </c:if>
 
@@ -265,12 +278,12 @@
                             <span class="pcoded-mtext">User Management</span>
                         </a>
                     </li>
-                    <li class="nav-item">
+<!--                    <li class="nav-item">
                         <a href="${pageContext.request.contextPath}/CIListServlet" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-server"></i></span>
                             <span class="pcoded-mtext">Configuration Items</span>
                         </a>
-                    </li>
+                    </li>-->
                     <li class="nav-item">
                         <a href="${pageContext.request.contextPath}/TemporaryAccessApproval" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-shield"></i></span>

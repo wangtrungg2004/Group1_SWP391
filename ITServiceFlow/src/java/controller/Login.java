@@ -137,7 +137,7 @@ public class Login extends HttpServlet {
         if (role != null) {
             switch (role) {
                 case "Admin":
-                    response.sendRedirect("AdminDashboard.jsp");
+                    response.sendRedirect("AdminDashboard");
                     break;
                 case "Manager":
                     response.sendRedirect("ManagerDashboard");
