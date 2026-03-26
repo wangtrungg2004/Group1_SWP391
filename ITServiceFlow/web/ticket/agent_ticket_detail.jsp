@@ -371,7 +371,7 @@
 
                                             <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-bottom pb-2 mb-3">
                                                 <h6 class="sidebar-section-title border-0 pb-0 mb-0 m-0">Configuration Items</h6>
-                                                <a href="${pageContext.request.contextPath}/TicketLinkCIListServlet" class="btn btn-sm btn-light text-primary border" title="Go to Asset Management page"><i class="feather icon-settings"></i> Manage CIs</a>
+                                                <a href="${pageContext.request.contextPath}/Long_TicketListServlet" class="btn btn-sm btn-light text-primary border" title="Go to Asset Management page"><i class="feather icon-settings"></i> Manage CIs</a>
                                             </div>
                                             <div class="meta-group mb-0">
                                                 <c:choose>

@@ -77,32 +77,40 @@
                                     <form action="${pageContext.request.contextPath}/Queues" method="GET" class="filter-toolbar">
     <input type="hidden" name="queue" value="${currentQueue}">
     
-    <div class="input-group" style="max-width: 350px; flex: 1;">
+    <div class="input-group" style="max-width: 300px; flex: 1;">
         <div class="input-group-prepend"><span class="input-group-text bg-white border-right-0"><i class="feather icon-search"></i></span></div>
         <input type="text" name="search" value="${search}" class="form-control border-left-0" placeholder="Search key, summary...">
-        <div class="input-group-append">
-            <button type="submit" class="btn btn-primary px-3" title="Click to search"><i class="feather icon-search mr-1"></i> Search</button>
-        </div>
     </div>
 
     <div class="d-flex align-items-center gap-2">
+        <%-- BỘ SẮP XẾP NGÀY TẠO --%>
+        <select name="sortOrder" class="form-control" style="width: 140px;" title="Sort by Date">
+            <option value="desc" ${sortOrder == 'desc' ? 'selected' : ''}>Sort by Newest ↑ </option>
+            <option value="asc" ${sortOrder == 'asc' ? 'selected' : ''}>Sort by Oldest ↓ </option>
+        </select>
+
+        <%-- BỘ LỌC TRẠNG THÁI --%>
         <select name="status" class="form-control" style="width: 160px;">
             <option value="all" ${selectedStatus == 'all' ? 'selected' : ''}>All Statuses</option>
-            <option value="New" ${selectedStatus == 'New' ? 'selected' : ''}>Pending / New</option>
+            <option value="New" ${selectedStatus == 'New' ? 'selected' : ''}>New / Unassigned</option>
+            <option value="Awaiting Approval" ${selectedStatus == 'Awaiting Approval' ? 'selected' : ''}>Awaiting Approval</option>
             <option value="In Progress" ${selectedStatus == 'In Progress' ? 'selected' : ''}>In Progress</option>
+            <option value="Resolved" ${selectedStatus == 'Resolved' ? 'selected' : ''}>Resolved</option>
+            <option value="Closed" ${selectedStatus == 'Closed' ? 'selected' : ''}>Closed</option>
             <option value="Reopened" ${selectedStatus == 'Reopened' ? 'selected' : ''}>Reopened</option>
         </select>
 
-        <select name="ticketType" class="form-control" style="width: 160px;">
+        <%-- BỘ LỌC LOẠI TICKET --%>
+        <select name="ticketType" class="form-control" style="width: 140px;">
             <option value="all" ${selectedTicketType == 'all' ? 'selected' : ''}>All Types</option>
             <option value="Incident" ${selectedTicketType == 'Incident' ? 'selected' : ''}>Incidents</option>
             <option value="ServiceRequest" ${selectedTicketType == 'ServiceRequest' ? 'selected' : ''}>Requests</option>
         </select>
 
-        <button type="submit" class="btn btn-secondary shadow-sm"><i class="feather icon-filter mr-1"></i> Apply Filter</button>
+        <button type="submit" class="btn btn-secondary shadow-sm"><i class="feather icon-filter mr-1"></i> Apply</button>
     </div>
 
-    <c:if test="${not empty search or selectedStatus != 'all' or selectedTicketType != 'all'}">
+    <c:if test="${not empty search or selectedStatus != 'all' or selectedTicketType != 'all' or sortOrder != 'desc'}">
         <a href="${pageContext.request.contextPath}/Queues?queue=${currentQueue}" class="btn btn-link text-muted font-weight-bold" style="text-decoration: none;"><i class="feather icon-rotate-ccw mr-1"></i> Reset</a>
     </c:if>
 </form>
@@ -188,15 +196,15 @@
                                     <nav aria-label="Page navigation" class="mt-4">
     <ul class="pagination justify-content-center">
         <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-            <a class="page-link" href="?queue=${currentQueue}&page=${currentPage - 1}&search=${search}&status=${selectedStatus}&ticketType=${selectedTicketType}">Previous</a>
+            <a class="page-link" href="?queue=${currentQueue}&page=${currentPage - 1}&search=${search}&status=${selectedStatus}&ticketType=${selectedTicketType}&sortOrder=${sortOrder}">Previous</a>
         </li>
         <c:forEach begin="1" end="${totalPages > 0 ? totalPages : 1}" var="i">
             <li class="page-item ${currentPage == i ? 'active' : ''}">
-                <a class="page-link" href="?queue=${currentQueue}&page=${i}&search=${search}&status=${selectedStatus}&ticketType=${selectedTicketType}">${i}</a>
+                <a class="page-link" href="?queue=${currentQueue}&page=${i}&search=${search}&status=${selectedStatus}&ticketType=${selectedTicketType}&sortOrder=${sortOrder}">${i}</a>
             </li>
         </c:forEach>
         <li class="page-item ${currentPage == totalPages || totalPages == 0 ? 'disabled' : ''}">
-            <a class="page-link" href="?queue=${currentQueue}&page=${currentPage + 1}&search=${search}&status=${selectedStatus}&ticketType=${selectedTicketType}">Next</a>
+            <a class="page-link" href="?queue=${currentQueue}&page=${currentPage + 1}&search=${search}&status=${selectedStatus}&ticketType=${selectedTicketType}&sortOrder=${sortOrder}">Next</a>
         </li>
     </ul>
 </nav>

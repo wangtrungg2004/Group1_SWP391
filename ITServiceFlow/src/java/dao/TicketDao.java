@@ -674,9 +674,9 @@ public int getTotalTicketsCount(int userId, String search, String status, String
     // CODE DÀNH CHO LUỒNG AGENT (DEV 2)
     // =========================================================================
   
-    // 7. Lấy danh sách Hàng đợi (Queue) cho Agent có Filter (TÍCH HỢP SLA)
-    // 7. Lấy danh sách Hàng đợi (Queue) cho Agent có Filter (TÍCH HỢP SLA)
-    public List<Tickets> getAgentQueues(int agentId, int currentLevel, String queueType, int offset, int limit, String search, String status, String type) {
+    
+    // 7. Lấy danh sách Hàng đợi (Queue) cho Agent có Filter và SẮP XẾP NGÀY
+    public List<Tickets> getAgentQueues(int agentId, int currentLevel, String queueType, int offset, int limit, String search, String status, String type, String sortOrder) {
         List<Tickets> list = new ArrayList<>();
         
         StringBuilder sql = new StringBuilder(
@@ -688,7 +688,6 @@ public int getTotalTicketsCount(int userId, String search, String status, String
             "LEFT JOIN [dbo].[SLATracking] st ON t.Id = st.TicketId WHERE 1=1 "
         );
 
-        // ĐÃ SỬA: Bỏ lọc theo CurrentLevel để hiển thị FULL ticket chưa gán
         if ("unassigned".equals(queueType)) {
             sql.append("AND t.AssignedTo IS NULL AND t.Status NOT IN ('Closed', 'Resolved') ");
         } else if ("mine".equals(queueType)) {
@@ -704,8 +703,13 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         }
         if (status != null && !status.equals("all")) sql.append("AND t.Status = ? ");
         if (type != null && !type.equals("all")) sql.append("AND t.TicketType = ? ");
-
-        sql.append("ORDER BY t.CreatedAt ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        
+        // THUẬT TOÁN SẮP XẾP (Mặc định là DESC - Mới nhất trước)
+        if ("asc".equalsIgnoreCase(sortOrder)) {
+            sql.append("ORDER BY t.CreatedAt ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        } else {
+            sql.append("ORDER BY t.CreatedAt DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        }
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIdx = 1;
@@ -732,8 +736,6 @@ public int getTotalTicketsCount(int userId, String search, String status, String
                 t.setCreatedAt(rs.getTimestamp("CreatedAt"));
                 t.setPriorityLevel(rs.getString("PriorityLevel"));
                 t.setAssigneeName(rs.getString("AssigneeName"));
-                
-                // Lấy SLA Deadline từ DB
                 t.setResolutionDeadline(rs.getTimestamp("ResolutionDeadline"));
                 list.add(t);
             }
@@ -741,12 +743,10 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         return list;
     }
 
-    // 8. Đếm tổng số vé của Queue (ĐÃ FIX LỖI ITIL)
-   // 8. Đếm tổng số vé của Queue (ĐÃ SỬA: Hiển thị full cho Unassigned)
+    // 8. Đếm tổng số vé của Queue (Hàm này không cần tham số sắp xếp)
     public int getTotalAgentQueuesCount(int agentId, int currentLevel, String queueType, String search, String status, String type) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM [dbo].[Tickets] t WHERE 1=1 ");
 
-        // ĐÃ SỬA: Bỏ lọc theo CurrentLevel
         if ("unassigned".equals(queueType)) {
             sql.append("AND t.AssignedTo IS NULL AND t.Status NOT IN ('Closed', 'Resolved') ");
         } else if ("mine".equals(queueType)) {
@@ -776,6 +776,9 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         } catch (Exception e) { e.printStackTrace(); }
         return 0;
     }
+
+   
+   
 
     
     

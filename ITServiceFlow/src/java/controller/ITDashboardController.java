@@ -56,7 +56,7 @@ public class ITDashboardController extends HttpServlet {
         // 2. 5 ticket gần nhất assign cho agent (đang mở)
         // 🚀 ĐÃ FIX: Thêm Level 1 (vì đây là IT Support Dashboard) và đổi "my" thành "mine"
         List<Tickets> recentTickets = ticketDAO.getAgentQueues(
-                agentId, 1, "mine", 0, 5, "", "all", "all");
+                agentId, 1, "mine", 0, 5, "", "all", "all","desc");
 
         // 3. Số problem đang assign cho agent
         int myProblems = problemDao.getTotalAssignProblems(agentId);
