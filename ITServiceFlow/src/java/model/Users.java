@@ -11,142 +11,130 @@ import java.util.Date;
  * @author DELL
  */
 public class Users {
-    private int id;
-    private String username;
-    private String email;
-    private String passwordHash;
-    private String fullName;
-    private String role;
-    private int departmentId;
-    private int locationId;
-    private String departmentName;
-    private String locationName;
-    private boolean isActive;
-    private Date createdAt;
-    private int ticketCount;
-    
+    private int Id;
+    private String Username;
+    private String Email;
+    private String PasswordHash;
+    private String FullName;
+    private String Role;
+    private int DepartmentId;
+    private int LocationId;
+    private boolean IsActive;
+    private Date CreatedAt;
+    private String ResetToken;
+    private Date ResetTokenExpiry;
+
     public Users() {
     }
 
-    public Users(int id, String username, String email, String passwordHash, String fullName, String role, int departmentId, int locationId, boolean isActive, Date createdAt, int ticketCount) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.passwordHash = passwordHash;
-        this.fullName = fullName;
-        this.role = role;
-        this.departmentId = departmentId;
-        this.locationId = locationId;
-        this.isActive = isActive;
-        this.createdAt = createdAt;
-        this.ticketCount = ticketCount;
+    public Users(int Id, String Username, String Email, String PasswordHash, String FullName, String Role, int DepartmentId, int LocationId, boolean IsActive, Date CreatedAt) {
+        this.Id = Id;
+        this.Username = Username;
+        this.Email = Email;
+        this.PasswordHash = PasswordHash;
+        this.FullName = FullName;
+        this.Role = Role;
+        this.DepartmentId = DepartmentId;
+        this.LocationId = LocationId;
+        this.IsActive = IsActive;
+        this.CreatedAt = CreatedAt;
     }
-
-    
 
     
 
     public String getPasswordHash() {
-        return passwordHash;
+        return PasswordHash;
     }
 
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
+    public void setPasswordHash(String PasswordHash) {
+        this.PasswordHash = PasswordHash;
     }
     
     public int getId() {
-        return id;
+        return Id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(int Id) {
+        this.Id = Id;
     }
 
     public String getUsername() {
-        return username;
+        return Username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUsername(String Username) {
+        this.Username = Username;
     }
 
     public String getEmail() {
-        return email;
+        return Email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setEmail(String Email) {
+        this.Email = Email;
     }
 
     public String getFullName() {
-        return fullName;
+        return FullName;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setFullName(String FullName) {
+        this.FullName = FullName;
     }
 
     public String getRole() {
-        return role;
+        return Role;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRole(String Role) {
+        this.Role = Role;
     }
 
     public int getDepartmentId() {
-        return departmentId;
+        return DepartmentId;
     }
 
-    public void setDepartmentId(int departmentId) {
-        this.departmentId = departmentId;
+    public void setDepartmentId(int DepartmentId) {
+        this.DepartmentId = DepartmentId;
     }
 
-    public boolean isActive() {
-        return isActive;
+    public boolean IsActive() {
+        return IsActive;
     }
 
-    public void setIsActive(boolean isActive) {
-        this.isActive = isActive;
+    public void IsActive(boolean IsActive) {
+        this.IsActive = IsActive;
     }
 
     public Date getCreatedAt() {
-        return createdAt;
+        return CreatedAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+    public void setCreatedAt(Date CreatedAt) {
+        this.CreatedAt = CreatedAt;
     }
 
     public int getLocationId() {
-        return locationId;
+        return LocationId;
     }
 
-    public void setLocationId(int locationId) {
-        this.locationId = locationId;
+    public void setLocationId(int LocationId) {
+        this.LocationId = LocationId;
     }
 
-    public String getDepartmentName() {
-        return departmentName;
+    public String getResetToken() {
+        return ResetToken;
     }
 
-    public void setDepartmentName(String departmentName) {
-        this.departmentName = departmentName;
+    public void setResetToken(String ResetToken) {
+        this.ResetToken = ResetToken;
     }
 
-    public String getLocationName() {
-        return locationName;
+    public Date getResetTokenExpiry() {
+        return ResetTokenExpiry;
     }
 
-    public void setLocationName(String locationName) {
-        this.locationName = locationName;
+    public void setResetTokenExpiry(Date ResetTokenExpiry) {
+        this.ResetTokenExpiry = ResetTokenExpiry;
     }
-    
-    public int getTicketCount() {
-        return ticketCount;
-    }
-    public void setTicketCount(int ticketCount) {
-        this.ticketCount = ticketCount;
-    }
-    
 }

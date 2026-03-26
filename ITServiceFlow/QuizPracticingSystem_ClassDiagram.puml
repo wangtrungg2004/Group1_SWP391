@@ -1,0 +1,97 @@
+@startuml Quiz Practicing System - Class Diagram (Simplified)
+
+class Customer {
+    - customerId: String
+    - name: String
+    + viewRegistrations()
+    + viewPracticesList()
+    + createPractice()
+    + takePracticeQuiz()
+    + takeSimulationExam()
+}
+
+class Registration {
+    - registrationId: String
+    - customerId: String
+    - registrationDate: Date
+}
+
+class Practice {
+    - practiceId: String
+    - customerId: String
+    - title: String
+    + peekAnswer()
+}
+
+class PracticeQuiz {
+    - quizId: String
+    - practiceId: String
+    + peekAnswer()
+    + answerQuestion()
+    + markQuestion()
+    + reviewProgress()
+}
+
+class SimulationExam {
+    - examId: String
+    - customerId: String
+    - title: String
+    + answerQuestion()
+    + markQuestion()
+    + reviewProgress()
+    + submitQuiz()
+    + scoreExam()
+}
+
+class Question {
+    - questionId: String
+    - content: String
+}
+
+class Answer {
+    - answerId: String
+    - questionId: String
+    - customerId: String
+    - isCorrect: boolean
+}
+
+class QuizResult {
+    - resultId: String
+    - quizId: String
+    - score: double
+    + calculateScore()
+}
+
+class Explanation {
+    - explanationId: String
+    - questionId: String
+    - content: String
+}
+
+' Relationships
+Customer "1" --> "*" Registration
+Customer "1" --> "*" Practice
+Customer "1" --> "*" SimulationExam
+Customer "1" --> "*" Answer
+
+Practice "1" --> "*" PracticeQuiz
+PracticeQuiz "1" --> "*" Question
+SimulationExam "1" --> "*" Question
+
+Question "1" --> "*" Answer
+Question "1" --> "1" Explanation
+
+SimulationExam "1" --> "1" QuizResult
+QuizResult "1" --> "*" Answer
+
+note right of PracticeQuiz
+  Practice Only:
+  - Peek Answer
+end note
+
+note right of SimulationExam
+  Extension Point:
+  - Submit Quiz / Score Exam
+end note
+
+@enduml
