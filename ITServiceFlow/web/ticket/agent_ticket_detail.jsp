@@ -83,7 +83,7 @@
                     <div class="main-body">
                         <div class="page-wrapper p-0">
 
-                            <c:if test="${not empty slaTracking}">
+                            <c:if test="${not empty slaTracking and ticket.status != 'Resolved' and ticket.status != 'Closed'}">
                                 <div class="alert ${isSlaBreached ? 'alert-danger' : 'alert-warning'} p-3 mb-4 border-0 d-flex justify-content-between align-items-center" style="border-radius: 6px;">
                                     <div>
                                         <i class="feather icon-clock font-weight-bold mr-2" style="font-size: 1.1rem;"></i> 

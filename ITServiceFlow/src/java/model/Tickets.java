@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 public class Tickets {
+
     private int id;
     private String ticketNumber;
     private String ticketType;
@@ -32,16 +33,13 @@ public class Tickets {
     private String priorityLevel;
     private String assigneeName;
     private String serviceName;
-
     private String assetTag;
     private String assetName;
     private String assetType;
     private List<Assets> linkedAssets;
 
-    
     // Thêm thuộc tính này vào model
     private java.util.Date resolutionDeadline;
-
 
     public Tickets() {
     }
@@ -304,8 +302,6 @@ public class Tickets {
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }
-    
-    
 
     // Thêm Getter / Setter
     public java.util.Date getResolutionDeadline() {

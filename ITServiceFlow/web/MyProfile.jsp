@@ -8,8 +8,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
     <title>My Profile - ITServiceFlow</title>
-    <link rel="stylesheet" href="assets/fonts/fontawesome/css/fontawesome-all.min.css">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/fonts/fontawesome/css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
     <style>
         /* ── Layout ────────────────────────────────── */
         .profile-wrapper {
@@ -473,7 +473,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="mt-3 pt-3 border-top text-right">
-                                                    <a href="${pageContext.request.contextPath}/MyTickets"
+                                                    <a href="${pageContext.request.contextPath}/Tickets"
                                                        style="font-size:0.82rem; color:#1a73e8; font-weight:600; text-decoration:none;">
                                                         View all my tickets <i class="feather icon-arrow-right"></i>
                                                     </a>

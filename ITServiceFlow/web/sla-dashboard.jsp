@@ -19,6 +19,10 @@
                     <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
                     <!-- vendor css -->
                     <link rel="stylesheet" href="assets/css/style.css">
+<<<<<<< HEAD
+=======
+                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+>>>>>>> HoangNV4
 
                 </head>
 
@@ -63,6 +67,49 @@
                                                 </div>
                                             </div>
                                             <!-- [ breadcrumb ] end -->
+<<<<<<< HEAD
+=======
+                                            
+                                            <!-- [ Main Content ] start -->
+                                            <div class="row">
+                                                <!-- Filter -->
+                                                <div class="col-sm-12">
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <form action="SLADashboard" method="get" class="form-inline">
+                                                                <div class="form-group mb-2">
+                                                                    <label for="from" class="mr-2">From:</label>
+                                                                    <input type="date" class="form-control mr-3" name="from" value="${fromDate}">
+                                                                </div>
+                                                                <div class="form-group mb-2">
+                                                                    <label for="to" class="mr-2">To:</label>
+                                                                    <input type="date" class="form-control mr-3" name="to" value="${toDate}">
+                                                                </div>
+                                                                <div class="form-group mb-2">
+                                                                    <label for="categoryId" class="mr-2">Category:</label>
+                                                                    <select name="categoryId" class="form-control mr-3">
+                                                                        <option value="">All Categories</option>
+                                                                        <c:forEach items="${categories}" var="cat">
+                                                                            <option value="${cat.Id}" ${categoryId == cat.Id ? 'selected' : ''}>${cat.Name}</option>
+                                                                        </c:forEach>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group mb-2">
+                                                                    <label for="locationId" class="mr-2">Location:</label>
+                                                                    <select name="locationId" class="form-control mr-3">
+                                                                        <option value="">All Locations</option>
+                                                                        <c:forEach items="${locations}" var="loc">
+                                                                            <option value="${loc.Id}" ${locationId == loc.Id ? 'selected' : ''}>${loc.Name}</option>
+                                                                        </c:forEach>
+                                                                    </select>
+                                                                </div>
+                                                                <button type="submit" class="btn btn-primary mb-2">Filter</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+>>>>>>> HoangNV4
 
                                             <!-- [ Main Content ] start -->
                                             <!-- KPI Cards -->
@@ -108,6 +155,11 @@
                                                 </div>
                                             </div>
 
+<<<<<<< HEAD
+=======
+                                  
+
+>>>>>>> HoangNV4
                                             <!-- Alert Tables -->
                                             <div class="row">
                                                 <!-- Near Breach Tickets -->
@@ -136,7 +188,13 @@
                                                                         </c:if>
                                                                         <c:forEach items="${nearBreachTickets}" var="t">
                                                                             <tr>
+<<<<<<< HEAD
                                                                                 <td><a href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a></td>
+=======
+                                                                                <td><a
+                                                                                        href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a>
+                                                                                </td>
+>>>>>>> HoangNV4
                                                                                 <td>${t['Title']}</td>
                                                                                 <td class="text-warning">
                                                                                     <fmt:formatDate
@@ -179,7 +237,13 @@
                                                                         </c:if>
                                                                         <c:forEach items="${breachedTickets}" var="t">
                                                                             <tr>
+<<<<<<< HEAD
                                                                                 <td><a href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a></td>
+=======
+                                                                                <td><a
+                                                                                        href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a>
+                                                                                </td>
+>>>>>>> HoangNV4
                                                                                 <td>${t['Title']}</td>
                                                                                 <td>${t['Priority']}</td>
                                                                                 <td class="text-danger">
@@ -212,6 +276,14 @@
                     <script src="assets/js/vendor-all.min.js"></script>
                     <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
                     <script src="assets/js/pcoded.min.js"></script>
+<<<<<<< HEAD
                 </body>
 
                 </html>
+=======
+                    
+
+                </body>
+
+                </html>
+>>>>>>> HoangNV4

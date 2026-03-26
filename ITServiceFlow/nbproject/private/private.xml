@@ -3,45 +3,28 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/includes/sidebar.jsp</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/dao/TimeLogDAO.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/ticket/user/MyTicketsController.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/KnowledgeArticleEdit.jsp</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/TicketResolutionReview.jsp</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/UserCreate.jsp</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/ticket/agent_ticket_detail.jsp</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/MyProfileController.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/MyProfile.jsp</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/SubmitChangeRequest.jsp</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/dao/CsatSurveyDAO.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/ticket/agent/TicketTimeLogController.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/dao/UserDao.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/includes/header.jsp</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/ticket/user/TicketCreateController.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/dao/AuditLogsDAO.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/ServiceCatalog.jsp</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/ticket/agent/AgentTicketDetailController.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/model/TimeLog.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/ITDashboardController.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/AdminDashboardController.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/MyChangeRequests.jsp</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/ITDashboard.jsp</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/CsatReportController.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/WEB-INF/web.xml</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/TemporaryAccessRequest.jsp</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/CsatReport.jsp</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/Login.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/service/AuditLogService.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/service/TimeLogService.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/dao/TicketDao.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/Utils/DbContext.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/TemporaryAccessApproval.jsp</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/controller/GoogleLogin.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/KnowledgeArticleManage.jsp</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/UserManagement.jsp</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/ticket/my_tickets.jsp</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/src/java/dao/UsersDAO.java</file>
-            <file>file:/E:/Group1_SWP391/ITServiceFlow/web/AdminDashboard.jsp</file>
+
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/nbproject/build-impl.xml</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/Home/HomeController.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/Auth/ForgotPassword.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/Auth/GoogleLogin.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/Auth/Logout.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/filter/AuthorizationFilter.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/GoogleAuthCallback.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/KnowledgeArticleManageServlet.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/KnowErrors/KnowErrorList.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/KnowErrors/KnowErrorDetail.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/Problems/ProblemUpdate.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/ticket/agent/AddCommentController.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/dao/SLATrackingDao.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/dao/ServiceCatalogDao.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/filter/TemporaryRoleSyncFilter.java</file>
+            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/Utils/DbContext.java</file>
+
+            <file>file:/C:/Users/FPTshop/Pictures/Update/new/System%20Audit%20Logs/Group1_SWP391/ITServiceFlow/src/java/controller/SLA/SLADashboard.java</file>
+            <file>file:/C:/Users/FPTshop/Pictures/Update/new/System%20Audit%20Logs/Group1_SWP391/ITServiceFlow/src/java/controller/PerformanceDashboard.java</file>
+            <file>file:/C:/Users/FPTshop/Pictures/Update/new/System%20Audit%20Logs/Group1_SWP391/ITServiceFlow/web/sla-dashboard.jsp</file>
+
         </group>
     </open-files>
 </project-private>

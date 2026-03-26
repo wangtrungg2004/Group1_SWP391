@@ -642,6 +642,50 @@ public class UserDao extends DbContext{
         }
         return false;
     }
+
+    public List<Integer> getActiveUserIdsByRoles(List<String> roles) {
+        List<Integer> ids = new ArrayList<>();
+        if (connection == null || roles == null || roles.isEmpty()) {
+            return ids;
+        }
+
+        List<String> normalizedRoles = new ArrayList<>();
+        for (String role : roles) {
+            if (role != null) {
+                String trimmed = role.trim();
+                if (!trimmed.isEmpty()) {
+                    normalizedRoles.add(trimmed);
+                }
+            }
+        }
+        if (normalizedRoles.isEmpty()) {
+            return ids;
+        }
+
+        StringBuilder sql = new StringBuilder("SELECT Id FROM Users WHERE IsActive = 1 AND Role IN (");
+        for (int i = 0; i < normalizedRoles.size(); i++) {
+            if (i > 0) {
+                sql.append(", ");
+            }
+            sql.append("?");
+        }
+        sql.append(")");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int idx = 1;
+            for (String role : normalizedRoles) {
+                ps.setString(idx++, role);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ids.add(rs.getInt("Id"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ids;
+    }
     
     public int getTotalUser()
     {
