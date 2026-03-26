@@ -16,6 +16,8 @@ import java.util.List;
 import service.ProblemService;
 import model.Users;
 import service.UserService;
+import dao.AuditLogDao;
+import model.AuditLog;
 /**
  *
  * @author DELL
@@ -60,6 +62,7 @@ public class ProblemAdd extends HttpServlet {
     ProblemService problemService = new ProblemService();
     NotificationDao notificationDao = new NotificationDao();
     UserService userService = new UserService();
+    AuditLogDao auditLogDao = new AuditLogDao();
     
     private String trimOrNull(String value) {
         return (value == null || value.trim().isEmpty()) ? null : value.trim();
@@ -139,6 +142,17 @@ public class ProblemAdd extends HttpServlet {
                 if (assignedTo > 0) {
                     notificationDao.addNotification(assignedTo, message, null, false);
                 }
+                
+                // Add Audit Log
+                AuditLog log = new AuditLog();
+                log.setUserId(createdBy);
+                log.setAction("CREATE_PROBLEM");
+                log.setScreen("Problem Add");
+                log.setDataBefore("N/A");
+                log.setDataAfter("Problem created: " + Title + " (ID: " + newProblemId + ")");
+                log.setEntity("Problems");
+                log.setEntityId(newProblemId);
+                auditLogDao.insertLog(log);
             }
             response.sendRedirect("ProblemList?success=Problem added successfully!");
         } else {
