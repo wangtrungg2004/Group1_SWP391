@@ -16,11 +16,10 @@ import java.util.List;
 import model.Priority;
 import model.SLARule;
 import service.SLARuleService;
-<<<<<<< HEAD
-=======
+
 import dao.AuditLogDao;
 import model.AuditLog;
->>>>>>> HoangNV4
+
 
 /**
  *
@@ -30,10 +29,10 @@ import model.AuditLog;
 public class SLAConfig extends HttpServlet {
 
     SLARuleService slaRuleService = new SLARuleService();
-<<<<<<< HEAD
-=======
+
+
     AuditLogDao auditLogDao = new AuditLogDao();
->>>>>>> HoangNV4
+
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -89,11 +88,11 @@ public class SLAConfig extends HttpServlet {
             type = type.trim();
 
         int page = 1;
-<<<<<<< HEAD
+
         int pageSize = 15;
-=======
+
         int pageSize = 10;
->>>>>>> HoangNV4
+
         Integer priorityId = null;
 
         if (pageRaw != null && !pageRaw.isEmpty()) {
@@ -113,7 +112,7 @@ public class SLAConfig extends HttpServlet {
         }
 
         List<SLARule> rules = slaRuleService.searchSLARules(name, type, priorityId, status, page, pageSize);
-<<<<<<< HEAD
+
         int totalRecords = slaRuleService.countSLARules(name, type, priorityId, status);
         int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
         if (totalPages < 1)
@@ -122,7 +121,7 @@ public class SLAConfig extends HttpServlet {
         request.setAttribute("slaRules", rules);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
-=======
+
         int totalLogs = slaRuleService.countSLARules(name, type, priorityId, status);
         int totalPages = (int) Math.ceil((double) totalLogs / pageSize);
         if (totalPages < 1)
@@ -139,18 +138,16 @@ public class SLAConfig extends HttpServlet {
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalRecords", totalLogs);
->>>>>>> HoangNV4
         request.setAttribute("paramName", name);
         request.setAttribute("paramType", type);
         request.setAttribute("paramPriority", priorityId);
         request.setAttribute("paramStatus", status);
 
-<<<<<<< HEAD
+
         List<Priority> priorities = slaRuleService.getAllPriorities();
         request.setAttribute("priorities", priorities);
 
-=======
->>>>>>> HoangNV4
+
         request.getRequestDispatcher("sla-config.jsp").forward(request, response);
     }
 
@@ -175,8 +172,7 @@ public class SLAConfig extends HttpServlet {
                 try {
                     int id = Integer.parseInt(idRaw);
                     slaRuleService.deleteSLARule(id);
-<<<<<<< HEAD
-=======
+
                     
                     // Add Audit Log
                     AuditLog log = new AuditLog();
@@ -189,7 +185,7 @@ public class SLAConfig extends HttpServlet {
                     log.setEntityId(id);
                     auditLogDao.insertLog(log);
 
->>>>>>> HoangNV4
+
                     session.setAttribute("successMessage", "SLA Rule deleted successfully.");
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
@@ -205,13 +201,13 @@ public class SLAConfig extends HttpServlet {
                     if (rule != null) {
                         String newStatus = "Active".equals(currentStatus) ? "Inactive" : "Active";
                         rule.setStatus(newStatus);
-<<<<<<< HEAD
+
                         slaRuleService.updateSLARule(rule);
                         
                         if ("Active".equals(newStatus)) {
                             // Additional logic could be added here if needed
                         }
-=======
+
                         // If activating, we might want to check for conflicts, but
                         // SLARuleDao.addSLARule handles it.
                         // For updateSLARule, we need to ensure Dao handles deactivation of other rules
@@ -243,7 +239,7 @@ public class SLAConfig extends HttpServlet {
                         log.setEntityId(id);
                         auditLogDao.insertLog(log);
 
->>>>>>> HoangNV4
+
                         session.setAttribute("successMessage", "SLA Rule status updated.");
                         response.sendRedirect("SLAConfig?action=detail&id=" + id);
                         return;
@@ -295,14 +291,14 @@ public class SLAConfig extends HttpServlet {
                 rule.setStatus(status);
                 rule.setCreatedBy(userId);
 
-<<<<<<< HEAD
+
                 boolean success;
                 if (idRaw != null && !idRaw.isEmpty()) {
                     int id = Integer.parseInt(idRaw);
                     rule.setId(id);
                     success = slaRuleService.updateSLARule(rule);
                     if (success) {
-=======
+
                 boolean isEdit = idRaw != null && !idRaw.isEmpty();
                 Integer currentId = isEdit ? Integer.parseInt(idRaw) : null;
 
@@ -328,14 +324,13 @@ public class SLAConfig extends HttpServlet {
                         log.setEntityId(currentId);
                         auditLogDao.insertLog(log);
                         
->>>>>>> HoangNV4
+
                         session.setAttribute("successMessage", "SLA Rule updated successfully!");
                     }
                 } else {
                     success = slaRuleService.addSLARule(rule);
                     if (success) {
-<<<<<<< HEAD
-=======
+
                         // Add Audit Log
                         AuditLog log = new AuditLog();
                         log.setUserId(userId != null ? userId : 1);
@@ -347,7 +342,7 @@ public class SLAConfig extends HttpServlet {
                         // We could fetch latest ID if needed
                         auditLogDao.insertLog(log);
                         
->>>>>>> HoangNV4
+
                         session.setAttribute("successMessage", "SLA Rule added successfully!");
                     }
                 }

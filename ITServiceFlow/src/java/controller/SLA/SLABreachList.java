@@ -5,10 +5,9 @@
 package controller.SLA;
 
 import dao.SLARuleDao;
-<<<<<<< HEAD
-=======
+
 import dao.TicketDao;
->>>>>>> HoangNV4
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -43,15 +42,14 @@ public class SLABreachList extends HttpServlet {
             return;
         }
 
-<<<<<<< HEAD
+
         // Only Admin and Manager can access this screen
         if (role == null || (!"Admin".equals(role) && !"Manager".equals(role))) {
             response.sendRedirect("Login.jsp");
             return;
         }
 
-=======
->>>>>>> HoangNV4
+
         // Get Parameters
         String searchAgent = request.getParameter("agent");
         String priority = request.getParameter("priority");
@@ -60,11 +58,11 @@ public class SLABreachList extends HttpServlet {
         String pageStr = request.getParameter("page");
 
         int page = 1;
-<<<<<<< HEAD
+
         int limit = 20;
-=======
+
         int limit = 10;
->>>>>>> HoangNV4
+
         if (pageStr != null && !pageStr.isEmpty()) {
             try {
                 page = Integer.parseInt(pageStr);
@@ -77,11 +75,11 @@ public class SLABreachList extends HttpServlet {
         // Get Data
         List<Map<String, Object>> tickets = slaTrackingService.getBreachList(null, priority, searchAgent, status,
                 sortBy, offset, limit);
-<<<<<<< HEAD
+
 
         // Get Priorities for Filter
         List<Priority> priorities = slaRuleDao.getAllPriorities();
-=======
+
         int totalRecords = slaTrackingService.countBreachList(null, priority, searchAgent, status);
         int totalPages = (int) Math.ceil((double) totalRecords / limit);
         if (totalPages < 1)
@@ -91,18 +89,18 @@ public class SLABreachList extends HttpServlet {
         List<Priority> priorities = slaRuleDao.getAllPriorities();
         TicketDao ticketDao = new TicketDao();
         List<String> availableStatuses = ticketDao.getDistinctStatuses();
->>>>>>> HoangNV4
+
 
         // Set Attributes
         request.setAttribute("tickets", tickets);
         request.setAttribute("priorities", priorities);
-<<<<<<< HEAD
+
         request.setAttribute("currentPage", page);
         // Note: Total pages calculation would require a count query, skipping for now
         // as per simplified requirement or adding later if needed.
         // For now, simple Previous/Next logic if list size == limit could be used, or
         // just simple list.
-=======
+
         request.setAttribute("availableStatuses", availableStatuses);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
@@ -110,7 +108,7 @@ public class SLABreachList extends HttpServlet {
         request.setAttribute("paramPriority", priority);
         request.setAttribute("paramStatus", status);
         request.setAttribute("paramAgent", searchAgent);
->>>>>>> HoangNV4
+
 
         request.getRequestDispatcher("sla-breach-list.jsp").forward(request, response);
     }
