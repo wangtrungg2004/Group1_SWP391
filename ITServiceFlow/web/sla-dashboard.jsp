@@ -19,10 +19,7 @@
                     <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
                     <!-- vendor css -->
                     <link rel="stylesheet" href="assets/css/style.css">
-<<<<<<< HEAD
-=======
                     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
->>>>>>> HoangNV4
 
                 </head>
 
@@ -67,8 +64,6 @@
                                                 </div>
                                             </div>
                                             <!-- [ breadcrumb ] end -->
-<<<<<<< HEAD
-=======
                                             
                                             <!-- [ Main Content ] start -->
                                             <div class="row">
@@ -109,7 +104,6 @@
                                                     </div>
                                                 </div>
                                             </div>
->>>>>>> HoangNV4
 
                                             <!-- [ Main Content ] start -->
                                             <!-- KPI Cards -->
@@ -155,11 +149,7 @@
                                                 </div>
                                             </div>
 
-<<<<<<< HEAD
-=======
                                   
-
->>>>>>> HoangNV4
                                             <!-- Alert Tables -->
                                             <div class="row">
                                                 <!-- Near Breach Tickets -->
@@ -188,13 +178,9 @@
                                                                         </c:if>
                                                                         <c:forEach items="${nearBreachTickets}" var="t">
                                                                             <tr>
-<<<<<<< HEAD
-                                                                                <td><a href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a></td>
-=======
                                                                                 <td><a
                                                                                         href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a>
                                                                                 </td>
->>>>>>> HoangNV4
                                                                                 <td>${t['Title']}</td>
                                                                                 <td class="text-warning">
                                                                                     <fmt:formatDate
@@ -237,13 +223,9 @@
                                                                         </c:if>
                                                                         <c:forEach items="${breachedTickets}" var="t">
                                                                             <tr>
-<<<<<<< HEAD
-                                                                                <td><a href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a></td>
-=======
                                                                                 <td><a
                                                                                         href="tickets?action=view&id=${t['Id']}">${t['TicketNumber']}</a>
                                                                                 </td>
->>>>>>> HoangNV4
                                                                                 <td>${t['Title']}</td>
                                                                                 <td>${t['Priority']}</td>
                                                                                 <td class="text-danger">
@@ -276,14 +258,8 @@
                     <script src="assets/js/vendor-all.min.js"></script>
                     <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
                     <script src="assets/js/pcoded.min.js"></script>
-<<<<<<< HEAD
-                </body>
-
-                </html>
-=======
                     
 
                 </body>
 
                 </html>
->>>>>>> HoangNV4

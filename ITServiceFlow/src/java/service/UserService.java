@@ -4,8 +4,11 @@
  */
 package service;
 
+import Utils.PasswordUtil;
 import dao.UserDao;
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.UUID;
 import model.Users;
 
 /**
@@ -19,127 +22,101 @@ public class UserService {
     {
         return dao.getAllUsers();
     }
-    public Users login(String Username, String PasswordHash)
+    public Users login(String Username, String RawPassword)
     {
-        if (Username == null || PasswordHash == null) return null;
-        return dao.login(Username, PasswordHash);
+        if (Username == null || RawPassword == null) return null;
+        // [PASSWORD_HASH] hash trước khi so sánh với DB; khi bỏ hash: gọi dao.login(Username, RawPassword.trim()) và đổi UserDao.login so sánh cột Password (plain)
+        String passwordHash = PasswordUtil.sha256(RawPassword.trim());
+        return dao.login(Username, passwordHash);
     }
     
-    public boolean createUser(Users user)
-    {
-        if (user == null) {
-            System.err.println("User object is null");
+    public boolean resetPassword(String username, String email, String rawNewPassword) {
+        if (username == null || email == null || rawNewPassword == null) {
             return false;
         }
-        if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
-            System.err.println("Username is null or empty");
-            return false;
-        }
-        if (user.getPasswordHash() == null || user.getPasswordHash().trim().isEmpty()) {
-            System.err.println("PasswordHash is null or empty");
-            return false;
-        }
-        if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
-            System.err.println("Email is null or empty");
-            return false;
-        }
-        if (user.getFullName() == null || user.getFullName().trim().isEmpty()) {
-            System.err.println("FullName is null or empty");
-            return false;
-        }
-        if (user.getRole() == null || user.getRole().trim().isEmpty()) {
-            System.err.println("Role is null or empty");
-            return false;
-        }
-        
-        // Kiểm tra username đã tồn tại chưa
-        if (dao.usernameExists(user.getUsername())) {
-            System.err.println("Username đã tồn tại: " + user.getUsername());
-            return false;
-        }
-
-        // Kiểm tra email đã tồn tại chưa
-        if (dao.emailExists(user.getEmail())) {
-            System.err.println("Email đã tồn tại: " + user.getEmail());
-            return false;
-        }
-        
-        return dao.createUser(user);
+        // [PASSWORD_HASH] hash trước khi lưu; khi bỏ hash: truyền rawNewPassword.trim() và đổi UserDao dùng cột Password
+        String newPasswordHash = PasswordUtil.sha256(rawNewPassword.trim());
+        return dao.resetPassword(username, email, newPasswordHash);
     }
     
-    // Method để kiểm tra username (có thể dùng ở controller)
-    public boolean usernameExists(String username) {
-        if (username == null || username.trim().isEmpty()) {
+    public boolean createUser(String username, String email, String rawPassword, String fullName, String role, Integer departmentId) {
+        int locationId = dao.getDefaultLocationId();
+        if (locationId <= 0) {
             return false;
         }
-        return dao.usernameExists(username.trim());
+        return createUser(username, email, rawPassword, fullName, role, departmentId, locationId);
     }
 
-    // Method để kiểm tra email (có thể dùng ở controller)
-    public boolean emailExists(String email) {
-        if (email == null || email.trim().isEmpty()) {
+    public boolean createUser(String username, String email, String rawPassword, String fullName, String role, Integer departmentId, Integer locationId) {
+        if (username == null || email == null || rawPassword == null || role == null || locationId == null || locationId <= 0) {
             return false;
         }
-        return dao.emailExists(email.trim());
+        // [PASSWORD_HASH] hash trước khi insert; khi bỏ hash: truyền rawPassword.trim() và đổi UserDao/DB dùng cột Password
+        String passwordHash = PasswordUtil.sha256(rawPassword.trim());
+        return dao.createUser(
+                username.trim(),
+                email.trim(),
+                passwordHash,
+                fullName == null ? null : fullName.trim(),
+                role.trim(),
+                departmentId,
+                locationId
+        );
     }
     
-    /**
-     * Find or create user from Google OAuth data
-     * If user exists with the email, return existing user
-     * If not, create new user and return it
-     */
-    public Users findOrCreateGoogleUser(String googleId, String email, String fullName) {
+    public Users getUserByEmail(String email) {
+        return dao.getUserByEmail(email);
+    }
+
+    public Users getUserByUsername(String username) {
+        return dao.getUserByUsername(username);
+    }
+
+    public Users loginWithGoogleEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
-            System.err.println("Email is null or empty");
             return null;
         }
-        
-        // Try to find existing user by email
-        Users existingUser = dao.findByEmail(email.trim());
-        if (existingUser != null) {
-            System.out.println("Found existing Google user: " + email);
-            return existingUser;
+        return dao.getUserByEmail(email.trim());
+    }
+    
+    public String createPasswordResetToken(String email) {
+        Users user = dao.getUserByEmail(email);
+        if (user == null) {
+            return null;
         }
-        
-        // Create new user
-        System.out.println("Creating new Google user: " + email);
-        Users newUser = dao.createGoogleUser(email.trim(), fullName, googleId);
-        return newUser;
+        String token = UUID.randomUUID().toString();
+        Timestamp expiresAt = new Timestamp(System.currentTimeMillis() + 15 * 60 * 1000L);
+        boolean saved = dao.savePasswordResetToken(user.getId(), token, expiresAt);
+        return saved ? token : null;
     }
-
-    /**
-     * Request password reset: find user by email, generate token, save and return reset link.
-     * Token valid 1 hour. Caller can send link by email or show on page.
-     */
-    public String requestPasswordReset(String email) {
-        if (email == null || email.trim().isEmpty()) return null;
-        Users user = dao.findByEmail(email.trim());
-        if (user == null) return null;
-        String token = java.util.UUID.randomUUID().toString().replace("-", "");
-        java.util.Calendar cal = java.util.Calendar.getInstance();
-        cal.add(java.util.Calendar.HOUR_OF_DAY, 1);
-        if (!dao.setResetToken(user.getId(), token, cal.getTime())) return null;
-        return token;
+    
+    public boolean isValidResetToken(String token) {
+        return dao.getValidUserIdByToken(token) != null;
     }
-
-    /**
-     * Kiểm tra email có tồn tại và đang active hay không.
-     * Dùng để phân biệt lỗi "không tìm thấy email" với lỗi kỹ thuật khi tạo reset token.
-     */
-    public boolean activeEmailExists(String email) {
-        if (email == null || email.trim().isEmpty()) return false;
-        return dao.findByEmail(email.trim()) != null;
+    
+    public boolean resetPasswordByToken(String token, String rawNewPassword) {
+        if (token == null || rawNewPassword == null || rawNewPassword.trim().isEmpty()) {
+            return false;
+        }
+        Integer userId = dao.getValidUserIdByToken(token);
+        if (userId == null) {
+            return false;
+        }
+        // [PASSWORD_HASH] hash trước khi update; khi bỏ hash: truyền rawNewPassword.trim() và đổi UserDao/DB dùng cột Password
+        String newPasswordHash = PasswordUtil.sha256(rawNewPassword.trim());
+        boolean updated = dao.updatePasswordByUserId(userId, newPasswordHash);
+        if (!updated) {
+            return false;
+        }
+        return dao.markTokenUsed(token);
     }
-
-    /**
-     * Reset password using token; returns true if success.
-     */
-    public boolean resetPassword(String token, String newPassword) {
-        if (token == null || token.isEmpty() || newPassword == null || newPassword.trim().isEmpty()) return false;
-        Users user = dao.findByResetToken(token);
-        if (user == null) return false;
-        boolean ok = dao.updatePassword(user.getId(), newPassword.trim());
-        if (ok) dao.clearResetToken(user.getId());
-        return ok;
+    
+    public int getTotalUser()
+    {
+        return dao.getTotalUser();
+    }
+    
+    public List<Users> getTopAgentsThisMonth() {
+        return dao.getTopAgentsThisMonth();
     }
 }

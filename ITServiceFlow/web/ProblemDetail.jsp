@@ -139,6 +139,14 @@
                                     </button>
                                 </div>
                             </c:if>
+                            <c:if test="${param.error == 'rejected_reason_required'}">
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <strong>Thông báo:</strong> Rejected reason cannot be null.
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            </c:if>
                             <c:if test="${not empty success}">
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                                     <strong>Thành công:</strong> ${success}
@@ -246,7 +254,7 @@
                                                                     <div class="modal-body">
                                                                         <input type="hidden" name="problemId" value="${problem.id}">
                                                                         <input type="hidden" name="status" value="REJECTED">
-                                                                        <label>Lý do từ chối (tùy chọn)</label>
+                                                                        <label>Lý do từ chối <span class="text-danger">*</span></label>
                                                                         <textarea name="rejectedReason" class="form-control" rows="3" 
                                                                                   placeholder="Nhập lý do từ chối..." maxlength="2000"></textarea>
                                                                     </div>

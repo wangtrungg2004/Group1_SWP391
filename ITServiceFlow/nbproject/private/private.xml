@@ -3,28 +3,27 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-
-            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/nbproject/build-impl.xml</file>
-            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/Home/HomeController.java</file>
-            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/Auth/ForgotPassword.java</file>
-            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/Auth/GoogleLogin.java</file>
-            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/Auth/Logout.java</file>
-            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/filter/AuthorizationFilter.java</file>
-            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/GoogleAuthCallback.java</file>
-            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/KnowledgeArticleManageServlet.java</file>
-            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/KnowErrors/KnowErrorList.java</file>
-            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/KnowErrors/KnowErrorDetail.java</file>
-            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/Problems/ProblemUpdate.java</file>
-            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/controller/ticket/agent/AddCommentController.java</file>
-            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/dao/SLATrackingDao.java</file>
-            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/dao/ServiceCatalogDao.java</file>
-            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/filter/TemporaryRoleSyncFilter.java</file>
-            <file>file:/D:/OneDrive/Desktop/swp/VietAnh/Group1_SWP391/ITServiceFlow/src/java/Utils/DbContext.java</file>
-
-            <file>file:/C:/Users/FPTshop/Pictures/Update/new/System%20Audit%20Logs/Group1_SWP391/ITServiceFlow/src/java/controller/SLA/SLADashboard.java</file>
-            <file>file:/C:/Users/FPTshop/Pictures/Update/new/System%20Audit%20Logs/Group1_SWP391/ITServiceFlow/src/java/controller/PerformanceDashboard.java</file>
-            <file>file:/C:/Users/FPTshop/Pictures/Update/new/System%20Audit%20Logs/Group1_SWP391/ITServiceFlow/web/sla-dashboard.jsp</file>
-
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/Utils/DbContext.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/dao/SLATrackingDao.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/model/AuditLog.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/controller/Logout.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/dao/TicketDAO.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/dao/SLARuleDao.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/dao/ChangeRequestDao.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/service/TimeLogService.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/dao/TemporaryRoleRequestDao.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/controller/KnowledgeArticleManageServlet.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/service/AuditLogService.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/controller/Problems/ProblemUpdate.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/model/Problems.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/controller/PerformanceDashboard.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/controller/ticket/user/TicketCreateController.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/controller/SLA/SLABreachList.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/controller/SLA/SLADashboard.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/dao/KnowledgeArticleDAO.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/model/SharedFile.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/model/KnowledgeArticles.java</file>
+            <file>file:/D:/Java%20SWP/Group1_SWP391/ITServiceFlow/src/java/dao/TicketCommentsDAO.java</file>
         </group>
     </open-files>
 </project-private>

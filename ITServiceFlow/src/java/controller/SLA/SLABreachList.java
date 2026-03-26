@@ -6,10 +6,7 @@ package controller.SLA;
 
 import dao.SLARuleDao;
 
-import dao.TicketDao;
-
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -58,9 +55,6 @@ public class SLABreachList extends HttpServlet {
         String pageStr = request.getParameter("page");
 
         int page = 1;
-
-        int limit = 20;
-
         int limit = 10;
 
         if (pageStr != null && !pageStr.isEmpty()) {
@@ -77,9 +71,6 @@ public class SLABreachList extends HttpServlet {
                 sortBy, offset, limit);
 
 
-        // Get Priorities for Filter
-        List<Priority> priorities = slaRuleDao.getAllPriorities();
-
         int totalRecords = slaTrackingService.countBreachList(null, priority, searchAgent, status);
         int totalPages = (int) Math.ceil((double) totalRecords / limit);
         if (totalPages < 1)
@@ -87,8 +78,7 @@ public class SLABreachList extends HttpServlet {
 
         // Get Available Filters
         List<Priority> priorities = slaRuleDao.getAllPriorities();
-        TicketDao ticketDao = new TicketDao();
-        List<String> availableStatuses = ticketDao.getDistinctStatuses();
+        List<String> availableStatuses = slaRuleDao.getDistinctStatuses();
 
 
         // Set Attributes

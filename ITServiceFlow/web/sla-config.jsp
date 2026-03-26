@@ -102,26 +102,13 @@
                                                                         placeholder="SLA Name" value="${param.name}">
                                                                 </div>
                                                                 <div class="col">
-<<<<<<< HEAD
                                                                     <select class="form-control" name="type">
                                                                         <option value="">-- All Types --</option>
-                                                                        <option value="Incident"
-                                                                            ${param.type=='Incident' ? 'selected' : ''
-                                                                            }>Incident</option>
-                                                                        <option value="ServiceRequest"
-                                                                            ${param.type=='ServiceRequest' ? 'selected'
-                                                                            : '' }>Service Request</option>
-                                                                    </select>
-                                                                </div>
-=======
-                                                                     <select class="form-control" name="type">
-                                                                         <option value="">-- All Types --</option>
                                                                          <c:forEach items="${availableTypes}" var="t">
                                                                              <option value="${t}" ${param.type==t ? 'selected' : ''}>${t}</option>
                                                                          </c:forEach>
                                                                      </select>
                                                                  </div>
->>>>>>> HoangNV4
                                                                 <div class="col">
                                                                     <select class="form-control" name="priority">
                                                                         <option value="">-- All Priorities --</option>
@@ -133,25 +120,13 @@
                                                                     </select>
                                                                 </div>
                                                                 <div class="col">
-<<<<<<< HEAD
                                                                     <select class="form-control" name="status">
                                                                         <option value="">-- All Status --</option>
-                                                                        <option value="Active" ${param.status=='Active'
-                                                                            ? 'selected' : '' }>Active</option>
-                                                                        <option value="Inactive"
-                                                                            ${param.status=='Inactive' ? 'selected' : ''
-                                                                            }>Inactive</option>
-                                                                    </select>
-                                                                </div>
-=======
-                                                                     <select class="form-control" name="status">
-                                                                         <option value="">-- All Status --</option>
                                                                          <c:forEach items="${availableStatuses}" var="s">
                                                                              <option value="${s}" ${param.status==s ? 'selected' : ''}>${s}</option>
                                                                          </c:forEach>
                                                                      </select>
                                                                  </div>
->>>>>>> HoangNV4
                                                                 <div class="col">
                                                                     <button type="submit"
                                                                         class="btn btn-primary">Search</button>
@@ -225,33 +200,6 @@
                                                         </div>
 
                                                         <!-- Pagination -->
-<<<<<<< HEAD
-                                                        <c:if test="${totalPages > 1}">
-                                                            <nav aria-label="Page navigation" class="mt-3">
-                                                                <ul class="pagination justify-content-center">
-                                                                    <c:if test="${currentPage > 1}">
-                                                                        <li class="page-item">
-                                                                            <a class="page-link"
-                                                                                href="SLAConfig?page=${currentPage - 1}&name=${paramName}&type=${paramType}&priority=${paramPriority}&status=${paramStatus}">Previous</a>
-                                                                        </li>
-                                                                    </c:if>
-                                                                    <c:forEach begin="1" end="${totalPages}" var="i">
-                                                                        <li
-                                                                            class="page-item ${currentPage == i ? 'active' : ''}">
-                                                                            <a class="page-link"
-                                                                                href="SLAConfig?page=${i}&name=${paramName}&type=${paramType}&priority=${paramPriority}&status=${paramStatus}">${i}</a>
-                                                                        </li>
-                                                                    </c:forEach>
-                                                                    <c:if test="${currentPage < totalPages}">
-                                                                        <li class="page-item">
-                                                                            <a class="page-link"
-                                                                                href="SLAConfig?page=${currentPage + 1}&name=${paramName}&type=${paramType}&priority=${paramPriority}&status=${paramStatus}">Next</a>
-                                                                        </li>
-                                                                    </c:if>
-                                                                </ul>
-                                                            </nav>
-                                                        </c:if>
-=======
                                                         <div class="d-flex justify-content-between align-items-center mt-3">
                                                             <div>
                                                                 <c:if test="${totalRecords > 0}">
@@ -282,7 +230,6 @@
                                                                 </nav>
                                                             </c:if>
                                                         </div>
->>>>>>> HoangNV4
                                                     </div>
                                                 </div>
                                             </div>

@@ -21,6 +21,8 @@
 <!-- [ navigation menu ] start -->
 <nav class="pcoded-navbar menupos-fixed menu-light brand-blue ">
     <div class="navbar-wrapper ">
+        <c:set var="role" value="${sessionScope.role}" />
+
         <div class="navbar-brand header-logo">
             <a href="${dashboardHref}" class="b-brand">
                 <img src="assets/images/logo.svg" alt="" class="logo images">
@@ -30,9 +32,7 @@
         </div>
         <div class="navbar-content scroll-div">
             <ul class="nav pcoded-inner-navbar">
-                <li class="nav-item pcoded-menu-caption">
-                    <label>Navigation</label>
-                </li>
+               
 
                 <!-- ??? USER MENU ??????????????????????????????????????? -->
                 <c:if test="${role == 'User'}">
@@ -99,8 +99,12 @@
                             <span class="pcoded-mtext">Ticket - Assets</span>
                         </a>
                     </li>
-                    
-                    
+                    <li class="nav-item">
+                        <a href="CreateTicket" class="nav-link">
+                            <span class="pcoded-micon"><i class="feather icon-plus-circle"></i></span>
+                            <span class="pcoded-mtext">Create Ticket</span>
+                        </a>
+                    </li>
 
                     <li class="nav-item pcoded-menu-caption"><label>Problem & Knowledge</label></li>
                     <li class="nav-item">

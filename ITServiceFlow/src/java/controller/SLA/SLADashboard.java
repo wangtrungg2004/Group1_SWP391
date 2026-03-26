@@ -5,29 +5,15 @@
 package controller.SLA;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-<<<<<<< HEAD
 import java.util.List;
 import java.util.Map;
 import service.SLATrackingService;
-=======
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Calendar;
-import java.sql.Date;
-import model.Users;
-import Utils.DbContext;
-import service.SLATrackingService;
-import dao.GeneralDao;
-import dao.SLATrackingDao;
->>>>>>> HoangNV4
 
 /**
  *
@@ -37,10 +23,7 @@ import dao.SLATrackingDao;
 public class SLADashboard extends HttpServlet {
 
     private SLATrackingService slaTrackingService = new SLATrackingService();
-<<<<<<< HEAD
-=======
     private dao.GeneralDao generalDao = new dao.GeneralDao();
->>>>>>> HoangNV4
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -54,10 +37,6 @@ public class SLADashboard extends HttpServlet {
             return;
         }
 
-<<<<<<< HEAD
-        // Get Statistics
-        Map<String, Integer> stats = slaTrackingService.getSLAStatistics();
-=======
         // Default Date Range: Last 30 Days
         java.sql.Date toDate = new java.sql.Date(System.currentTimeMillis());
         java.util.Calendar cal = java.util.Calendar.getInstance();
@@ -81,7 +60,6 @@ public class SLADashboard extends HttpServlet {
 
         // Get Statistics
         Map<String, Integer> stats = slaTrackingService.getSLAStatistics(fromDate, toDate, categoryId, locationId);
->>>>>>> HoangNV4
         request.setAttribute("stats", stats);
 
         // Calculate Compliance Rate
@@ -91,19 +69,12 @@ public class SLADashboard extends HttpServlet {
         request.setAttribute("complianceRate", String.format("%.1f", complianceRate));
 
         // Get Ticket Lists
-<<<<<<< HEAD
-        List<Map<String, Object>> nearBreachTickets = slaTrackingService.getNearBreachTickets(10);
-        List<Map<String, Object>> breachedTickets = slaTrackingService.getBreachedTickets(10);
-=======
         List<Map<String, Object>> nearBreachTickets = slaTrackingService.getNearBreachTickets(10, fromDate, toDate, categoryId, locationId);
         List<Map<String, Object>> breachedTickets = slaTrackingService.getBreachedTickets(10, fromDate, toDate, categoryId, locationId);
->>>>>>> HoangNV4
 
         request.setAttribute("nearBreachTickets", nearBreachTickets);
         request.setAttribute("breachedTickets", breachedTickets);
 
-<<<<<<< HEAD
-=======
         // Get Ticket Type Distribution for Pie Chart
         java.util.Map<String, Integer> ticketTypeStats = slaTrackingService.getTicketTypeDistribution(fromDate, toDate, categoryId, locationId);
         request.setAttribute("ticketTypeStats", ticketTypeStats);
@@ -118,7 +89,6 @@ public class SLADashboard extends HttpServlet {
         request.setAttribute("categoryId", categoryId);
         request.setAttribute("locationId", locationId);
 
->>>>>>> HoangNV4
         request.getRequestDispatcher("sla-dashboard.jsp").forward(request, response);
     }
 

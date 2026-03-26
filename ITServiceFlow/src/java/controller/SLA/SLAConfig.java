@@ -5,7 +5,6 @@
 package controller.SLA;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -29,10 +28,7 @@ import model.AuditLog;
 public class SLAConfig extends HttpServlet {
 
     SLARuleService slaRuleService = new SLARuleService();
-
-
     AuditLogDao auditLogDao = new AuditLogDao();
-
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -88,11 +84,7 @@ public class SLAConfig extends HttpServlet {
             type = type.trim();
 
         int page = 1;
-
-        int pageSize = 15;
-
         int pageSize = 10;
-
         Integer priorityId = null;
 
         if (pageRaw != null && !pageRaw.isEmpty()) {
@@ -112,16 +104,6 @@ public class SLAConfig extends HttpServlet {
         }
 
         List<SLARule> rules = slaRuleService.searchSLARules(name, type, priorityId, status, page, pageSize);
-
-        int totalRecords = slaRuleService.countSLARules(name, type, priorityId, status);
-        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
-        if (totalPages < 1)
-            totalPages = 1;
-
-        request.setAttribute("slaRules", rules);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
-
         int totalLogs = slaRuleService.countSLARules(name, type, priorityId, status);
         int totalPages = (int) Math.ceil((double) totalLogs / pageSize);
         if (totalPages < 1)
@@ -142,12 +124,6 @@ public class SLAConfig extends HttpServlet {
         request.setAttribute("paramType", type);
         request.setAttribute("paramPriority", priorityId);
         request.setAttribute("paramStatus", status);
-
-
-        List<Priority> priorities = slaRuleService.getAllPriorities();
-        request.setAttribute("priorities", priorities);
-
-
         request.getRequestDispatcher("sla-config.jsp").forward(request, response);
     }
 
@@ -201,33 +177,8 @@ public class SLAConfig extends HttpServlet {
                     if (rule != null) {
                         String newStatus = "Active".equals(currentStatus) ? "Inactive" : "Active";
                         rule.setStatus(newStatus);
-
                         slaRuleService.updateSLARule(rule);
-                        
-                        if ("Active".equals(newStatus)) {
-                            // Additional logic could be added here if needed
-                        }
 
-                        // If activating, we might want to check for conflicts, but
-                        // SLARuleDao.addSLARule handles it.
-                        // For updateSLARule, we need to ensure Dao handles deactivation of other rules
-                        // if this one becomes active.
-                        // Let's rely on updateSLARule to be improved or handle logic here.
-                        // Actually better to use existing service method or improve dao.
-                        // For now simply update. Ideally validation should be here.
-
-                        // We need to call addSLARule logic-alike or simply update.
-                        // Let's just update and let Service/DAO handle logic if implemented,
-                        // BUT wait, updateSLARule in DAO currently just updates. It does not
-                        // auto-deactivate others.
-                        // We should probably deactivate others if setting to Active.
-                        // Let's modify updateSLARule in DAO later or handled it manually here?
-                        // Better to keep logic in DAO.
-
-                        // Let's assume for now we just toggle. The user requirement said: "Allows
-                        // enabling/disabling"
-                        slaRuleService.updateSLARule(rule);
-                        
                         // Add Audit Log
                         AuditLog log = new AuditLog();
                         log.setUserId(userId != null ? userId : 1);
@@ -291,14 +242,6 @@ public class SLAConfig extends HttpServlet {
                 rule.setStatus(status);
                 rule.setCreatedBy(userId);
 
-
-                boolean success;
-                if (idRaw != null && !idRaw.isEmpty()) {
-                    int id = Integer.parseInt(idRaw);
-                    rule.setId(id);
-                    success = slaRuleService.updateSLARule(rule);
-                    if (success) {
-
                 boolean isEdit = idRaw != null && !idRaw.isEmpty();
                 Integer currentId = isEdit ? Integer.parseInt(idRaw) : null;
 
@@ -330,7 +273,6 @@ public class SLAConfig extends HttpServlet {
                 } else {
                     success = slaRuleService.addSLARule(rule);
                     if (success) {
-
                         // Add Audit Log
                         AuditLog log = new AuditLog();
                         log.setUserId(userId != null ? userId : 1);
@@ -339,9 +281,7 @@ public class SLAConfig extends HttpServlet {
                         log.setDataBefore("N/A");
                         log.setDataAfter("Rule created: " + slaName);
                         log.setEntity("SLARules");
-                        // We could fetch latest ID if needed
                         auditLogDao.insertLog(log);
-                        
 
                         session.setAttribute("successMessage", "SLA Rule added successfully!");
                     }

@@ -18,15 +18,6 @@ import model.SLARule;
  */
 public class SLARuleDao extends DbContext {
 
-<<<<<<< HEAD
-    private void deactivateRulesByTypeAndPriority(String ticketType, int priorityId) {
-        String sql = "UPDATE [dbo].[SLARules] SET Status = 'Inactive', UpdatedAt = GETDATE() "
-                + "WHERE TicketType = ? AND PriorityId = ? AND Status = 'Active'";
-        try {
-            PreparedStatement stm = connection.prepareStatement(sql);
-            stm.setString(1, ticketType);
-            stm.setInt(2, priorityId);
-=======
     private void deactivateRulesByTypeAndPriority(String ticketType, int priorityId, Integer excludeId) {
         StringBuilder sql = new StringBuilder("UPDATE [dbo].[SLARules] SET Status = 'Inactive', UpdatedAt = GETDATE() "
                 + "WHERE TicketType = ? AND PriorityId = ? AND Status = 'Active'");
@@ -40,7 +31,6 @@ public class SLARuleDao extends DbContext {
             if (excludeId != null) {
                 stm.setInt(3, excludeId);
             }
->>>>>>> HoangNV4
             stm.executeUpdate();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -105,11 +95,7 @@ public class SLARuleDao extends DbContext {
     public boolean addSLARule(SLARule sla) {
         try {
             if ("Active".equalsIgnoreCase(sla.getStatus())) {
-<<<<<<< HEAD
-                deactivateRulesByTypeAndPriority(sla.getTicketType(), sla.getPriorityId());
-=======
                 deactivateRulesByTypeAndPriority(sla.getTicketType(), sla.getPriorityId(), null);
->>>>>>> HoangNV4
             }
 
             String sql = "INSERT INTO [dbo].[SLARules] (SLAName, TicketType, PriorityId, ResponseTime, ResolutionTime, Status, CreatedBy, CreatedAt, UpdatedAt) "
@@ -131,12 +117,9 @@ public class SLARuleDao extends DbContext {
     }
 
     public boolean updateSLARule(SLARule sla) {
-<<<<<<< HEAD
-=======
         if ("Active".equalsIgnoreCase(sla.getStatus())) {
             deactivateRulesByTypeAndPriority(sla.getTicketType(), sla.getPriorityId(), sla.getId());
         }
->>>>>>> HoangNV4
         String sql = "UPDATE [dbo].[SLARules] SET SLAName=?, TicketType=?, PriorityId=?, ResponseTime=?, ResolutionTime=?, Status=?, UpdatedAt=GETDATE() WHERE Id=?";
         try {
             PreparedStatement stm = connection.prepareStatement(sql);
@@ -313,8 +296,6 @@ public class SLARuleDao extends DbContext {
         }
         return 0;
     }
-<<<<<<< HEAD
-=======
     public List<String> getDistinctTypes() {
         List<String> list = new ArrayList<>();
         String sql = "SELECT DISTINCT TicketType FROM [dbo].[SLARules] WHERE TicketType IS NOT NULL ORDER BY TicketType";
@@ -364,5 +345,4 @@ public class SLARuleDao extends DbContext {
         }
         return false;
     }
->>>>>>> HoangNV4
 }

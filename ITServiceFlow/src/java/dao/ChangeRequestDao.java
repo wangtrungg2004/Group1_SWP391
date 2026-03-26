@@ -11,6 +11,39 @@ import java.time.Year;
 
 public class ChangeRequestDao extends DbContext {
 
+     // Cache schema check để tránh query sys.columns lặp lại nhiều lần
+    private Boolean linkedTicketColumnExists = null;
+    private String requestNumberColumn = null;
+
+    private boolean hasChangeRequestColumn(String columnName) {
+        String sql = "SELECT 1 FROM sys.columns "
+                + "WHERE object_id = OBJECT_ID('dbo.ChangeRequests') "
+                + "AND name = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, columnName);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    private boolean hasLinkedTicketIdColumn() {
+        if (linkedTicketColumnExists == null) {
+            linkedTicketColumnExists = hasChangeRequestColumn("LinkedTicketId");
+        }
+        return linkedTicketColumnExists;
+    }
+
+    private String getRequestNumberColumn() {
+        if (requestNumberColumn == null) {
+            requestNumberColumn = hasChangeRequestColumn("RFCNumber")
+                    ? "RFCNumber"
+                    : "TicketNumber";
+        }
+        return requestNumberColumn;
+    }
     // ── Sinh RFCNumber tự động ────────────────────────────────────────────────
     private String getNextRFCNumber() {
         int year = Year.now().getValue();
