@@ -46,6 +46,13 @@ public class NotificationService {
         return dao.addNotification(userId, message, relatedTicketId, isRead, title, type);
     }
     
+    public List<Notifications> searchAllNotifications(String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return dao.getAllNotifications();
+        }
+        return dao.searchAllNotifications(keyword.trim());
+    }
+    
     /** Gui notification cho nhieu user (moi user 1 dong). Dung khi chon "One user" nhap 1 id. */
     public int addNotificationToUsers(List<Integer> userIds, String message,
                                   Integer relatedTicketId, String title, String type) {
@@ -61,5 +68,13 @@ public class NotificationService {
     /** Gui 1 notification cho tat ca (broadcast). Chi tao 1 dong trong DB. */
     public boolean addBroadcastNotification(String message, Integer relatedTicketId, String title, String type) {
         return dao.addBroadcastNotification(message, relatedTicketId, title, type);
+    }
+    
+        /** Giong ProblemService.searchProblem: null/blank -> full list trong pham vi user + broadcast. */
+    public List<Notifications> searchNotificationsForUser(int userId, String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return dao.getNotificationsByUserId(userId);
+        }
+        return dao.searchNotificationsForUser(userId, keyword.trim());
     }
 }

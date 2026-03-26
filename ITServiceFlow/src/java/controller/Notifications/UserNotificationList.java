@@ -75,8 +75,18 @@ public class UserNotificationList extends HttpServlet {
             response.sendRedirect("Login.jsp");
             return;
         }
-        List<Notifications> notifications = notificationService.getAllUserNotification(userId);
+                String keyword = request.getParameter("keyword");
+        if (keyword == null) {
+            keyword = "";
+        }
+        List<Notifications> notifications;  
+        if (!keyword.isEmpty()) {
+            notifications = notificationService.searchNotificationsForUser(userId, keyword);
+        } else {
+            notifications = notificationService.getAllUserNotification(userId);
+        }
         request.setAttribute("notifications", notifications);
+        request.setAttribute("filterKeyword", keyword);
         request.getRequestDispatcher("UserNotificationList.jsp").forward(request, response);
     }
 

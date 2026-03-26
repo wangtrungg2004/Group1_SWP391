@@ -35,7 +35,7 @@
                             <div class="row align-items-center">
                                 <div class="col-md-12">
                                     <div class="page-header-title">
-                                        <h5 class="m-b-10">Upload File public</h5>
+                                        <h5 class="m-b-10">Upload File Chung</h5>
                                     </div>
                                     <ul class="breadcrumb">
                                         <li class="breadcrumb-item"><a href="UserDashboard.jsp"><i class="feather icon-home"></i></a></li>
@@ -52,12 +52,12 @@
                                 <div class="col-sm-12 col-md-8 col-xl-7">
                                     <div class="card">
                                         <div class="card-header bg-light">
-                                            <h5>Upload File (max 15MB)</h5>
+                                            <h5>Upload File (tối đa 15MB)</h5>
                                         </div>
                                         <div class="card-body">
                                             <form id="uploadForm" enctype="multipart/form-data">
                                                 <div class="form-group mb-3">
-                                                    <label>Select file</label>
+                                                    <label>Chọn file</label>
                                                     <input type="file" id="fileInput" name="file" class="form-control-file" required>
                                                     <small class="form-text text-muted">PNG, JPG, PDF, DOC, DOCX, TXT (≤15MB)</small>
                                                 </div>
@@ -99,7 +99,7 @@
             e.preventDefault();
             const file = fileInput.files[0];
             if (!file) {
-                alert('Please select a file');
+                alert('Vui lòng chọn file');
                 return;
             }
 
@@ -129,12 +129,12 @@
                             msg = '<div class="alert alert-success">' +
                                   '<strong>Upload thành công!</strong><br>' +
                                   'File ID: ' + data.fileId + '<br>' +
-                                  'File name: ' + data.originalName + '<br>' +
-                                  'Path: <a href="' + fileUrl + '" target="_blank">' + fileUrl + '</a>' +
+                                  'Tên file: ' + data.originalName + '<br>' +
+                                  'Đường dẫn: <a href="' + fileUrl + '" target="_blank">' + fileUrl + '</a>' +
                                   '</div>';
                             fileInput.value = '';
                         } catch (err) {
-                            msg = '<div class="alert alert-danger">Unable to read server response.</div>';
+                            msg = '<div class="alert alert-danger">Không đọc được phản hồi máy chủ.</div>';
                         }
                     } else {
                         msg = '<div class="alert alert-danger">Lỗi: ' + (xhr.responseText || xhr.status) + '</div>';

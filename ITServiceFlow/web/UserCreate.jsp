@@ -54,7 +54,7 @@
             <span class="font-bold text-xl tracking-tight">IT ServiceFlow</span>
         </div>
         <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1">
-            <a class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-text-muted-light hover:bg-background-light hover:text-primary transition group" href="${pageContext.request.contextPath}/AdminDashboard">
+            <a class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-text-muted-light hover:bg-background-light hover:text-primary transition group" href="AdminDashboard.jsp">
                 <span class="material-icons mr-3 text-xl text-gray-400 group-hover:text-primary">dashboard</span>
                 Dashboard
             </a>
@@ -100,7 +100,7 @@
         <nav aria-label="Breadcrumb" class="flex mb-6">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a class="inline-flex items-center text-sm font-medium text-text-muted-light hover:text-primary" href="${pageContext.request.contextPath}/AdminDashboard">
+                    <a class="inline-flex items-center text-sm font-medium text-text-muted-light hover:text-primary" href="AdminDashboard.jsp">
                         <span class="material-icons text-base mr-1">home</span>
                         Home
                     </a>

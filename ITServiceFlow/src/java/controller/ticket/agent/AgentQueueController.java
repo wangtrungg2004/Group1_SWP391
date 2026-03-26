@@ -59,22 +59,15 @@ public class AgentQueueController extends HttpServlet {
         String pageStr = request.getParameter("page");
         if (pageStr != null && !pageStr.isEmpty()) { try { page = Integer.parseInt(pageStr); } catch (Exception e) { page = 1; } }
         
-     int offset = (page - 1) * pageSize;
+        int offset = (page - 1) * pageSize;
         TicketDAO ticketDao = new TicketDAO();
 
-        // XÁC ĐỊNH LEVEL CỦA AGENT ĐANG ĐĂNG NHẬP
-        int currentLevel = ("Manager".equals(role) || "Admin".equals(role)) ? 2 : 1;
-
-        // Truyền thêm currentLevel vào DAO
-        int totalTickets = ticketDao.getTotalAgentQueuesCount(currentUser.getId(), currentLevel, queueType, search, status, ticketType);
+        // 3. Truyền dữ liệu vào DAO (Đảm bảo biến ticketType được truyền vào cuối)
+        int totalTickets = ticketDao.getTotalAgentQueuesCount(currentUser.getId(), queueType, search, status, ticketType);
         int totalPages = (int) Math.ceil((double) totalTickets / pageSize);
-        List<Tickets> queueList = ticketDao.getAgentQueues(currentUser.getId(), currentLevel, queueType, offset, pageSize, search, status, ticketType);
-// Nếu là Manager, lấy danh sách IT Support để phục vụ Modal gán vé trên Queue
-        // Sửa trong cả 2 file Controller (AgentTicketDetail và AgentQueue)
-        if ("Manager".equals(session.getAttribute("role")) || "Admin".equals(session.getAttribute("role"))) {
-            request.setAttribute("itSupportList", ticketDao.getActiveAgents());
-        }       
-// 4. Đẩy ra View
+        List<Tickets> queueList = ticketDao.getAgentQueues(currentUser.getId(), queueType, offset, pageSize, search, status, ticketType);
+
+        // 4. Đẩy ra View
         request.setAttribute("queueList", queueList);
         request.setAttribute("currentQueue", queueType); // Tab đang mở
         request.setAttribute("currentPage", page);

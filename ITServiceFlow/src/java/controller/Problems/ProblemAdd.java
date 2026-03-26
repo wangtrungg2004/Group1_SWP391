@@ -113,37 +113,15 @@ public class ProblemAdd extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        
+
         String Title       = trimOrNull(request.getParameter("Title"));
         String Description = trimOrNull(request.getParameter("Description"));
         String RootCause   = trimOrNull(request.getParameter("RootCause"));
         String Workaround  = trimOrNull(request.getParameter("Workaround"));
-//        String Status      = trimOrNull(request.getParameter("Status"));
-        String assignedToStr = request.getParameter("AssignedTo");
-
+        String assignedToStr = trimOrNull(request.getParameter("AssignedTo"));
         final String defaultStatus = "NEW";
-        
-        int assignedTo = 0;
-        if (assignedToStr != null && !assignedToStr.trim().isEmpty()) {
-            try {
-                assignedTo = Integer.parseInt(assignedToStr.trim());
-            } catch (NumberFormatException e) {
-                request.setAttribute("error", "Invalid Assigned To ID.");
-                request.setAttribute("assignees", userService.getAllUser());
-                request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
-                return;
-            }
-        }
 
-        if (Title == null) {
-            request.setAttribute("error", "Title is required.");
-            request.setAttribute("assignees", userService.getAllUser());
-            request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
-            return;
-        }
-        
-                // Thu thập ticket đã chọn từ form
+        // Thu thập ticket đã chọn
         List<Integer> relatedTickets = new ArrayList<>();
         String[] ticketArray = request.getParameterValues("ticketIds");
         if (ticketArray != null) {
@@ -151,19 +129,60 @@ public class ProblemAdd extends HttpServlet {
                 if (RLTicket != null && !RLTicket.trim().isEmpty()) {
                     try {
                         relatedTickets.add(Integer.parseInt(RLTicket.trim()));
-                    } catch (NumberFormatException ex) { }
+                    } catch (NumberFormatException ex) {
+                        // ignore invalid id
+                    }
                 }
             }
         }
-        // Bắt buộc chọn ít nhất 1 ticket
-        if (relatedTickets.isEmpty()) {
-            request.setAttribute("error", "Please select at least one related ticket.");
-            request.setAttribute("assignees", userService.getAllUser());
-            request.setAttribute("Ticket", ticketService.getIncidentsNotInProblem());
+
+        // Giữ lại dữ liệu form khi có lỗi
+        request.setAttribute("savedTitle", Title);
+        request.setAttribute("savedDescription", Description);
+        request.setAttribute("savedAssignedTo", assignedToStr);
+        request.setAttribute("savedTicketIds", relatedTickets);
+
+        // Common data cho JSP (tránh list ticket bị rỗng)
+        request.setAttribute("assignees", userService.getAllUser());
+        request.setAttribute("Ticket", ticketService.getIncidentsNotInProblem());
+
+        // Validate title
+        if (Title == null) {
+            request.setAttribute("error", "Title is required.");
+            request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
+            return;
+        }
+
+        // Validate assignee
+        if (assignedToStr == null) {
+            request.setAttribute("error", "You Have to Assigned to an IT Support");
             request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
             return;
         }
         
+        if(Description == null || Description.isEmpty())
+        {
+            request.setAttribute("error", "Description cannot be null");
+            request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
+            return; 
+        }
+
+        int assignedTo;
+        try {
+            assignedTo = Integer.parseInt(assignedToStr);
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "Invalid assignee.");
+            request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
+            return;
+        }
+
+        // Bắt buộc chọn ít nhất 1 related ticket
+        if (relatedTickets.isEmpty()) {
+            request.setAttribute("error", "Please select at least one related ticket.");
+            request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
+            return;
+        }
+
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
         int createdBy = (userId != null) ? userId : 1;
@@ -171,56 +190,35 @@ public class ProblemAdd extends HttpServlet {
         java.sql.Date createdAt = new java.sql.Date(System.currentTimeMillis());
 
         boolean success = problemService.insertProblem(
-            null,
-            Title,
-            Description,
-            RootCause,
-            Workaround,
-            defaultStatus,
-            createdBy,
-            assignedTo,
-            createdAt
+                null,
+                Title,
+                Description,
+                RootCause,
+                Workaround,
+                defaultStatus,
+                createdBy,
+                assignedTo,
+                createdAt
         );
 
         if (success) {
-//            
-//            List<Integer> relatedTickets = new ArrayList<>();
-//            String[] ticketArray = request.getParameterValues("ticketIds");
-//            if(ticketArray != null)
-//            {
-//                for (String RLTicket : ticketArray) {
-//                    if(RLTicket != null && !RLTicket.trim().isEmpty())
-//                    {
-//                        try{
-//                            relatedTickets.add(Integer.parseInt(RLTicket.trim()));
-//                        }
-//                        catch(NumberFormatException ex)
-//                        {
-//                        }
-//                    }
-//                }
-//            }
-            
             int newProblemId = problemService.getLatestProblemId();
             if (newProblemId > 0) {
-                    // Link ticket đã chọn vào problem
-                if (!relatedTickets.isEmpty()) {
-                    problemService.linkProblemTicket(newProblemId, relatedTickets);
-                    // hoặc: problemService.addProblemTickets(newProblemId, relatedTickets);
-                }
+                problemService.linkProblemTicket(newProblemId, relatedTickets);
+
                 String message = "New problem: " + Title + " (Status: " + defaultStatus + ")";
                 String notificationTitle = "New problem: " + Title;
                 String type = "Problem";
-                // Gửi notification cho người được assign (nếu có)
+
                 if (assignedTo > 0) {
                     notificationDao.addNotification(assignedTo, message, null, false, notificationTitle, type);
                 }
+
                 auditLogService.createAuditLog(createdBy, "CREATE", "Problem", newProblemId);
             }
             response.sendRedirect("ProblemList?success=Problem added successfully!");
         } else {
             request.setAttribute("error", "Failed to add problem. Please try again.");
-            request.setAttribute("assignees", userService.getAllUser());
             request.getRequestDispatcher("ProblemAdd.jsp").forward(request, response);
         }
     }

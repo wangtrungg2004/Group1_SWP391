@@ -74,9 +74,19 @@ public class NotificationList extends HttpServlet {
             response.sendRedirect("Login.jsp"); 
             return;
         }
-        List<Notifications> notification;
-        notification = NotificationService.getAllNotification();
-        request.setAttribute("notifications", notification);
+        String keyword = request.getParameter("keyword");
+        if (keyword == null) keyword = "";
+        keyword = keyword.trim();
+
+        List<Notifications> notifications;
+        if (!keyword.isEmpty()) {
+            notifications = NotificationService.searchAllNotifications(keyword);
+        } else {
+            notifications = NotificationService.getAllNotification();
+        }
+
+        request.setAttribute("notifications", notifications);
+        request.setAttribute("searchKeyword", keyword);
         request.getRequestDispatcher("NotificationList.jsp").forward(request, response);
     }
 

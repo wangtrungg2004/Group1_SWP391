@@ -55,10 +55,6 @@
         <servlet-class>controller.ticket.agent.UpdateStatusController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ProcessApproval</servlet-name>
-        <servlet-class>controller.ticket.agent.ProcessApprovalController</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>CsatSurvey</servlet-name>
         <servlet-class>controller.ticket.user.CsatSurveyController</servlet-class>
     </servlet>
@@ -194,10 +190,6 @@
     <servlet-mapping>
         <servlet-name>UpdateTicketStatus</servlet-name>
         <url-pattern>/UpdateStatus</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ProcessApproval</servlet-name>
-        <url-pattern>/ProcessApproval</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>

@@ -89,13 +89,13 @@
                                                 <li class="breadcrumb-item">
                                                     <c:choose>
                                                         <c:when test="${role eq 'IT Support'}">
-                                                            <a href="${pageContext.request.contextPath}/ITDashboard"><i class="feather icon-home"></i></a>
+                                                            <a href="ITDashboard.jsp"><i class="feather icon-home"></i></a>
                                                         </c:when>
                                                         <c:when test="${role eq 'Manager'}">
                                                             <a href="ManagerDashboard"><i class="feather icon-home"></i></a>
                                                         </c:when>
                                                         <c:when test="${role eq 'Admin'}">
-                                                            <a href="${pageContext.request.contextPath}/AdminDashboard"><i class="feather icon-home"></i></a>
+                                                            <a href="AdminDashboard.jsp"><i class="feather icon-home"></i></a>
                                                         </c:when>
                                                         <c:otherwise>
                                                             <a href="UserDashboard"><i class="feather icon-home"></i></a>

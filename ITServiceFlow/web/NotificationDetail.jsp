@@ -87,6 +87,11 @@
     body {
         overflow-x: hidden;
     }
+    .noti-message-detail {
+        white-space: pre-wrap;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
     </style>
 </head>
 
@@ -185,7 +190,7 @@
                                                                             </tr>
                                                                             <tr>
                                                                                 <th>Message</th>
-                                                                                <td><strong>${notification.message}</strong></td>
+                                                                                <td><strong class="noti-message-detail"><c:out value="${notification.message}"/></strong></td>
                                                                             </tr>
                                                                             <tr>
                                                                                 <th>Created At</th>

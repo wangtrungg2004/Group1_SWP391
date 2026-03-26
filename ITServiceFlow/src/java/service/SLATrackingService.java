@@ -4,9 +4,9 @@
  */
 package service;
 
-import dao.NotificationDao;
 import dao.SLARuleDao;
 import dao.SLATrackingDao;
+import dao.NotificationDao;
 import dao.UserDao;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

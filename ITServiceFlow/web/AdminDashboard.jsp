@@ -1,32 +1,61 @@
+<%-- 
+    Document   : AdminDashboard
+    Created on : Jan 17, 2026, 12:58:54 AM
+    Author     : DELL
+--%>
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@ page import="java.util.List, java.util.Map" %>
-<%@ page import="model.Users, model.Tickets, model.AuditLog, model.ChangeRequests" %>
-<%@ taglib uri="jakarta.tags.core"   prefix="c" %>
-<%@ taglib uri="jakarta.tags.fmt"    prefix="fmt" %>
-<%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
+<%@ page import="dao.NotificationDao" %>
+<%@ page import="model.Notifications" %>
+<%@ page import="java.util.List" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 <%
     if (session.getAttribute("user") == null) {
         response.sendRedirect("Login.jsp");
         return;
     }
+    
     String role = (String) session.getAttribute("role");
-    if (!"Admin".equals(role)) {
-        response.sendRedirect("Login.jsp");
-        return;
-    }
-    model.Users currentUser = (model.Users) session.getAttribute("user");
+    model.Users user = (model.Users) session.getAttribute("user");
+    
+    List<Notifications> notifications = new java.util.ArrayList<>();
+    NotificationDao notificationDao = new NotificationDao();
+    notifications = notificationDao.getAllNotifications();
+    request.setAttribute("notifications", notifications);
 %>
 <!DOCTYPE html>
 <html lang="en">
+
     <head>
+
+        <!--<title>Flash Able - Most Trusted Admin Template</title>-->
+        <!-- HTML5 Shim and Respond.js IE11 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 11]>
+                <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+                <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+                <![endif]-->
+        <!-- Meta -->
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-        <title>Admin Dashboard — IT ServiceFlow</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="Flash Able Bootstrap admin template made using Bootstrap 4 and it has huge amount of ready made feature, UI components, pages which completely fulfills any dashboard needs." />
+        <meta name="keywords"
+              content="admin templates, bootstrap admin templates, bootstrap 4, dashboard, dashboard templets, sass admin templets, html admin templates, responsive, bootstrap admin templates free download,premium bootstrap admin templates, Flash Able, Flash Able bootstrap admin template">
+        <meta name="author" content="Codedthemes" />
 
+        <!-- Favicon icon -->
+        <!--<link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">-->
+        <!-- fontawesome icon -->
         <link rel="stylesheet" href="assets/fonts/fontawesome/css/fontawesome-all.min.css">
+        <!-- animation css -->
         <link rel="stylesheet" href="assets/plugins/animation/css/animate.min.css">
+
+        <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
+
+        <!-- vendor css -->
         <link rel="stylesheet" href="assets/css/style.css">
 
         <style>
@@ -354,7 +383,7 @@
 	<nav class="pcoded-navbar menupos-fixed menu-light brand-blue ">
 		<div class="navbar-wrapper ">
 			<div class="navbar-brand header-logo">
-				<a href="${pageContext.request.contextPath}/AdminDashboard" class="b-brand">
+				<a href="AdminDashboard.jsp" class="b-brand">
 <!--					<img src="assets/images/logo.svg" alt="" class="logo images">
 					<img src="assets/images/logo-icon.svg" alt="" class="logo-thumb images">-->
 				</a>
@@ -366,7 +395,7 @@
 						<label>Navigation</label>
 					</li>
 					<li class="nav-item">
-						<a href="${pageContext.request.contextPath}/AdminDashboard" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
+						<a href="AdminDashboard.jsp" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
 					</li>
 					<li class="nav-item pcoded-menu-caption">
 						<label>UI Element</label>
@@ -453,7 +482,7 @@
         <nav class="pcoded-navbar menupos-fixed menu-light brand-blue ">
             <div class="navbar-wrapper ">
                 <div class="navbar-brand header-logo">
-                    <a href="${pageContext.request.contextPath}/AdminDashboard" class="b-brand">
+                    <a href="AdminDashboard.jsp" class="b-brand">
                         <!--					<img src="assets/images/logo.svg" alt="" class="logo images">
                                                                 <img src="assets/images/logo-icon.svg" alt="" class="logo-thumb images">-->
                     </a>
@@ -465,7 +494,7 @@
                             <label>Navigation</label>
                         </li>
                         <li class="nav-item">
-                            <a href="${pageContext.request.contextPath}/AdminDashboard" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
+                            <a href="AdminDashboard.jsp" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
                         </li>
                         <li class="nav-item pcoded-menu-caption">
                             <label>UI Element</label>
@@ -550,720 +579,763 @@
         </nav>
         <!-- [ navigation menu ] end -->
 
-        <!-- ════════════════════════════════════════════════════════════════════
-             MAIN CONTENT
-        ════════════════════════════════════════════════════════════════════ -->
+        <!-- [ Header ] start -->
+        <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed">
+            <div class="m-header">
+                <a class="mobile-menu" id="mobile-collapse1" href="#!"><span></span></a>
+                <a href="index.html" class="b-brand">
+                    <img src="assets/images/logo.svg" alt="" class="logo images">
+                    <img src="assets/images/logo-icon.svg" alt="" class="logo-thumb images">
+                </a>
+            </div>
+            <a class="mobile-menu" id="mobile-header" href="#!">
+                <i class="feather icon-more-horizontal"></i>
+            </a>
+            <div class="collapse navbar-collapse">
+                <a href="#!" class="mob-toggler"></a>
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <div class="main-search open">
+                            <div class="input-group">
+                                <input type="text" id="m-search" class="form-control" placeholder="Search . . .">
+                                <a href="#!" class="input-group-append search-close">
+                                    <i class="feather icon-x input-group-text"></i>
+                                </a>
+                                <span class="input-group-append search-btn btn btn-primary">
+                                    <i class="feather icon-search input-group-text"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li>
+                        <div class="dropdown">
+                            <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i class="icon feather icon-bell"></i></a>
+                            <div class="dropdown-menu dropdown-menu-right notification">
+                                <div class="noti-head">
+                                    <h6 class="d-inline-block m-b-0">Notifications</h6>
+                                    <div class="float-right">
+                                        <a href="#!" class="m-r-10">mark as read</a>
+                                        <a href="#!">clear all</a>
+                                    </div>
+                                </div>
+                                <ul class="noti-body">
+                                    <c:choose>
+                                        <c:when test="${empty notifications}">
+                                            <li class="notification"><p class="text-muted m-2">No notifications</p></li>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <c:forEach items="${notifications}" var="notification">
+                                                <li class="notification">
+                                                    <div class="media">
+                                                        <img class="img-radius" src="assets/images/user/avatar-1.jpg" alt="">
+                                                        <div class="media-body">
+                                                            <p>
+                                                                <span class="n-time text-muted">
+                                                                    <i class="icon feather icon-clock m-r-10"></i>
+                                                                    <fmt:formatDate value="${notification.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
+                                                                </span>
+                                                            </p>
+                                                            <p><c:out value="${notification.message}"/></p>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </c:forEach>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </ul>
+                                <div class="noti-footer">
+                                    <a href="#!">show all</a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="dropdown drp-user">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="icon feather icon-settings"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right profile-notification">
+                                <div class="pro-head">
+                                    <img src="assets/images/user/avatar-1.jpg" class="img-radius" alt="User-Profile-Image">
+                                    <span><%= user != null ? user.getFullName() : "User" %></span>
+                                    <span style="display: block; font-size: 11px; color: #999;"><%= role != null ? role : "" %></span>
+                                    <a href="Logout" class="dud-logout" title="Logout">
+                                        <i class="feather icon-log-out"></i>
+                                    </a>
+                                </div>
+                                <ul class="pro-body">
+                                    <li><a href="#!" class="dropdown-item"><i class="feather icon-settings"></i> Settings</a></li>
+                                    <li><a href="#!" class="dropdown-item"><i class="feather icon-user"></i> Profile</a></li>
+                                    <li><a href="message.html" class="dropdown-item"><i class="feather icon-mail"></i> My Messages</a></li>
+                                    <li><a href="Logout" class="dropdown-item"><i class="feather icon-log-out"></i> Logout</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </header>
+        <!-- [ Header ] end -->
+
+        <!-- [ Main Content ] start -->
         <div class="pcoded-main-container">
             <div class="pcoded-wrapper">
                 <div class="pcoded-content">
                     <div class="pcoded-inner-content">
                         <div class="main-body">
                             <div class="page-wrapper">
-
-                                <!-- breadcrumb -->
+                                <!-- [ breadcrumb ] start -->
                                 <div class="page-header">
                                     <div class="page-block">
                                         <div class="row align-items-center">
                                             <div class="col-md-12">
                                                 <div class="page-header-title">
-                                                    <h5 class="m-b-10">Admin Dashboard</h5>
+                                                    <h5>Home</h5>
                                                 </div>
                                                 <ul class="breadcrumb">
-                                                    <li class="breadcrumb-item"><a href="AdminDashboard"><i class="feather icon-home"></i></a></li>
-                                                    <li class="breadcrumb-item">System Overview</li>
+                                                    <li class="breadcrumb-item"><a href="index.html"><i class="feather icon-home"></i></a></li>
+                                                    <li class="breadcrumb-item"><a href="#!">Analytics Dashboard</a></li>
                                                 </ul>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- ════════════════════════════════════════
-                                     ZONE 1 — SYSTEM HEALTH KPIs
-                                ════════════════════════════════════════ -->
-                                <div class="dash-section">
-                                    <h6><i class="feather icon-activity mr-1"></i> System Health</h6>
-                                    <small>Real-time overview of all ITSM processes</small>
-                                </div>
-                                <div class="row mb-0">
-                                    <!-- Total Tickets -->
-                                    <div class="col-xl-3 col-md-6 mb-3">
-                                        <div class="kpi-card">
-                                            <div class="kpi-icon blue"><i class="feather icon-file-text"></i></div>
-                                            <div>
-                                                <div class="kpi-lbl">Total Tickets</div>
-                                                <div class="kpi-val">${totalTickets}</div>
-                                                <div class="kpi-sub">This month: <strong>${ticketsThisMonth}</strong></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Active Users -->
-                                    <div class="col-xl-3 col-md-6 mb-3">
-                                        <div class="kpi-card">
-                                            <div class="kpi-icon green"><i class="feather icon-users"></i></div>
-                                            <div>
-                                                <div class="kpi-lbl">Active Users</div>
-                                                <div class="kpi-val">${totalActiveUsers}</div>
-                                                <div class="kpi-sub">IsActive = true</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Total Problems -->
-                                    <div class="col-xl-3 col-md-6 mb-3">
-                                        <div class="kpi-card">
-                                            <div class="kpi-icon purple"><i class="feather icon-alert-circle"></i></div>
-                                            <div>
-                                                <div class="kpi-lbl">Total Problems</div>
-                                                <div class="kpi-val">${totalProblems}</div>
-                                                <div class="kpi-sub">All statuses</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- RFC Pending -->
-                                    <div class="col-xl-3 col-md-6 mb-3">
-                                        <div class="kpi-card">
-                                            <div class="kpi-icon yellow"><i class="feather icon-git-pull-request"></i></div>
-                                            <div>
-                                                <div class="kpi-lbl">RFC Pending Approval</div>
-                                                <div class="kpi-val <c:if test="${rfcPendingCount > 0}">warning</c:if>">${rfcPendingCount}</div>
-                                                    <div class="kpi-sub">Awaiting Manager</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- SLA Breached -->
-                                        <div class="col-xl-3 col-md-6 mb-3">
-                                            <div class="kpi-card">
-                                                <div class="kpi-icon red"><i class="feather icon-alert-triangle"></i></div>
-                                                <div>
-                                                    <div class="kpi-lbl">SLA Breached</div>
-                                                    <div class="kpi-val <c:if test="${slaBreached > 0}">danger</c:if>">${slaBreached}</div>
-                                                <div class="kpi-sub">Near breach: ${slaNearBreach}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Unassigned -->
-                                    <div class="col-xl-3 col-md-6 mb-3">
-                                        <div class="kpi-card">
-                                            <div class="kpi-icon orange"><i class="feather icon-user-x"></i></div>
-                                            <div>
-                                                <div class="kpi-lbl">Unassigned Tickets</div>
-                                                <div class="kpi-val <c:if test="${unassignedCount > 0}">warning</c:if>">${unassignedCount}</div>
-                                                    <div class="kpi-sub">Needs assignment</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- Avg CSAT -->
-                                        <div class="col-xl-3 col-md-6 mb-3">
-                                            <div class="kpi-card">
-                                                <div class="kpi-icon teal"><i class="feather icon-star"></i></div>
-                                                <div>
-                                                    <div class="kpi-lbl">Avg CSAT Rating</div>
-                                                    <div class="kpi-val success">${csatAvg}</div>
-                                                <div class="kpi-sub">Out of 5.0</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Total Surveys -->
-                                    <div class="col-xl-3 col-md-6 mb-3">
-                                        <div class="kpi-card">
-                                            <div class="kpi-icon indigo"><i class="feather icon-message-square"></i></div>
-                                            <div>
-                                                <div class="kpi-lbl">CSAT Surveys</div>
-                                                <div class="kpi-val">${csatTotal}</div>
-                                                <div class="kpi-sub">Response rate: ${csatResponseRate}%</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- ════════════════════════════════════════
-                                     ZONE 2 — TICKET MANAGEMENT
-                                ════════════════════════════════════════ -->
-                                <div class="dash-section mt-4">
-                                    <h6><i class="feather icon-layers mr-1"></i> Ticket Management</h6>
-                                </div>
+                                <!-- [ breadcrumb ] end -->
+                                <!-- [ Main Content ] start -->
                                 <div class="row">
-                                    <!-- Volume chart -->
-                                    <div class="col-lg-7 mb-3">
-                                        <div class="panel">
-                                            <div class="panel-title">
-                                                Ticket volume — last 6 months
-                                                <a href="Long_TicketListServlet">View all</a>
-                                            </div>
-                                            <div style="height:230px">
-                                                <canvas id="ticketVolumeChart"></canvas>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Status breakdown -->
-                                    <div class="col-lg-5 mb-3">
-                                        <div class="panel">
-                                            <div class="panel-title">Status breakdown</div>
-                                            <c:forEach var="entry" items="${ticketsByStatus}">
-                                                <c:if test="${entry.value > 0}">
-                                                    <div class="prow">
-                                                        <span class="plabel">${entry.key}</span>
-                                                        <div class="pbar">
-                                                            <div class="pfill"
-                                                                 style="width:${entry.value * 100 / (totalTickets > 0 ? totalTickets : 1)}%;
-                                                                 background:
-                                                                 <c:choose>
-                                                                     <c:when test="${entry.key == 'New'}">           #1976d2</c:when>
-                                                                     <c:when test="${entry.key == 'Open'}">          #388e3c</c:when>
-                                                                     <c:when test="${entry.key == 'In Progress'}">   #7b1fa2</c:when>
-                                                                     <c:when test="${entry.key == 'Pending'}">       #f57f17</c:when>
-                                                                     <c:when test="${entry.key == 'Resolved'}">      #0097a7</c:when>
-                                                                     <c:otherwise>                                  #9e9e9e</c:otherwise>
-                                                                 </c:choose>">
-                                                            </div>
-                                                        </div>
-                                                        <span class="pnum">${entry.value}</span>
-                                                    </div>
-                                                </c:if>
-                                            </c:forEach>
-                                        </div>
-                                    </div>
-                                    <!-- Type breakdown -->
-                                    <div class="col-lg-5 mb-3">
-                                        <div class="panel">
-                                            <div class="panel-title">Type distribution</div>
-                                            <c:set var="typeTotal" value="${totalTickets > 0 ? totalTickets : 1}" />
-                                            <c:forEach var="entry" items="${ticketsByType}">
-                                                <div class="prow">
-                                                    <span class="plabel">${entry.key}</span>
-                                                    <div class="pbar">
-                                                        <div class="pfill"
-                                                             style="width:${entry.value * 100 / typeTotal}%;
-                                                             background:#5e35b1">
-                                                        </div>
-                                                    </div>
-                                                    <span class="pnum">${entry.value}</span>
-                                                </div>
-                                            </c:forEach>
-                                        </div>
-                                    </div>
-                                    <!-- Unassigned queue -->
-                                    <div class="col-lg-7 mb-3">
-                                        <div class="panel">
-                                            <div class="panel-title">
-                                                <span><i class="feather icon-alert-circle mr-1 text-danger"></i> Unassigned tickets</span>
-                                                <a href="Long_TicketListServlet">Assign all</a>
-                                            </div>
-                                            <c:choose>
-                                                <c:when test="${empty unassignedTickets}">
-                                                    <p class="text-muted" style="font-size:.85rem">No unassigned tickets. Great!</p>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <c:forEach var="t" items="${unassignedTickets}">
-                                                        <div class="list-row">
-                                                            <div class="r-label">
-                                                                <span class="font-weight-600">${t.ticketNumber}</span>
-                                                                <span class="text-muted ml-2" style="font-size:.8rem">${t.title}</span>
-                                                            </div>
-                                                            <div class="r-val">
-                                                                <span class="sbadge
-                                                                      <c:choose>
-                                                                          <c:when test="${t.status == 'New'}">sbadge-new</c:when>
-                                                                          <c:when test="${t.status == 'Open'}">sbadge-open</c:when>
-                                                                          <c:otherwise>sbadge-pending</c:otherwise>
-                                                                      </c:choose>">${t.status}</span>
-                                                                &nbsp;
-                                                                <fmt:formatDate value="${t.createdAt}" pattern="dd/MM/yyyy"/>
-                                                            </div>
-                                                        </div>
-                                                    </c:forEach>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <!-- ════════════════════════════════════════
-                                     ZONE 3 — SLA COMPLIANCE
-                                ════════════════════════════════════════ -->
-                                <div class="dash-section">
-                                    <h6><i class="feather icon-clock mr-1"></i> SLA Compliance</h6>
-                                </div>
-                                <div class="row">
-                                    <!-- Overall compliance ring -->
-                                    <div class="col-lg-4 mb-3">
-                                        <div class="panel">
-                                            <div class="panel-title">Overall compliance</div>
-                                            <div class="sla-ring-wrap">
-                                                <div class="sla-ring">
-                                                    <%-- SVG donut ring: circumference = 2π×28 ≈ 176 --%>
-                                                    <svg viewBox="0 0 80 80">
-                                                    <circle cx="40" cy="40" r="28" fill="none" stroke="#eee" stroke-width="10"/>
-                                                    <circle cx="40" cy="40" r="28" fill="none"
-                                                            stroke="#2e7d32" stroke-width="10"
-                                                            stroke-dasharray="${slaCompliancePct * 1.76} 176"
-                                                            stroke-dashoffset="44"
-                                                            stroke-linecap="round"
-                                                            transform="rotate(-90 40 40)"/>
-                                                    </svg>
-                                                    <div class="ring-pct">${slaCompliancePct}%</div>
-                                                </div>
-                                                <div>
-                                                    <div class="sla-legend-item mb-2">
-                                                        <div class="sla-dot" style="background:#2e7d32"></div>
-                                                        Within SLA: <strong>${slaWithin}</strong>
+                                    <!-- product profit start -->
+                                    <div class="col-xl-3 col-md-6">
+                                        <div class="card prod-p-card bg-c-red">
+                                            <div class="card-body">
+                                                <div class="row align-items-center m-b-25">
+                                                    <div class="col">
+                                                        <h6 class="m-b-5 text-white">Total Profit</h6>
+                                                        <h3 class="m-b-0 text-white">$1,783</h3>
                                                     </div>
-                                                    <div class="sla-legend-item mb-2">
-                                                        <div class="sla-dot" style="background:#c62828"></div>
-                                                        Breached: <strong class="text-danger">${slaBreached}</strong>
-                                                    </div>
-                                                    <div class="sla-legend-item">
-                                                        <div class="sla-dot" style="background:#e65100"></div>
-                                                        Near breach: <strong class="text-warning">${slaNearBreach}</strong>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-money-bill-alt text-c-red f-18"></i>
                                                     </div>
                                                 </div>
+                                                <p class="m-b-0 text-white"><span class="label label-danger m-r-10">+11%</span>From Previous Month</p>
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- Compliance by priority -->
-                                    <div class="col-lg-4 mb-3">
-                                        <div class="panel">
-                                            <div class="panel-title">Compliance by priority</div>
-                                            <c:forEach var="prio" items="${fn:split('P1,P2,P3,P4', ',')}">
-                                                <c:set var="pctKey"  value="${prio}_pct" />
-                                                <c:set var="totKey"  value="${prio}_total" />
-                                                <c:set var="pct"     value="${slaByPriority[pctKey]}" />
-                                                <c:set var="tot"     value="${slaByPriority[totKey]}" />
-                                                <c:if test="${tot != null && tot > 0}">
-                                                    <div class="prow">
-                                                        <span class="plabel">${prio}</span>
-                                                        <div class="pbar">
-                                                            <div class="pfill"
-                                                                 style="width:${pct}%;
-                                                                 background:
-                                                                 <c:choose>
-                                                                     <c:when test="${pct >= 90}">#2e7d32</c:when>
-                                                                     <c:when test="${pct >= 70}">#f57f17</c:when>
-                                                                     <c:otherwise>              #c62828</c:otherwise>
-                                                                 </c:choose>">
-                                                            </div>
-                                                        </div>
-                                                        <span class="pnum">${pct}%</span>
+                                    <div class="col-xl-3 col-md-6">
+                                        <div class="card prod-p-card bg-c-blue">
+                                            <div class="card-body">
+                                                <div class="row align-items-center m-b-25">
+                                                    <div class="col">
+                                                        <h6 class="m-b-5 text-white">Total Orders</h6>
+                                                        <h3 class="m-b-0 text-white">15,830</h3>
                                                     </div>
-                                                </c:if>
-                                            </c:forEach>
-                                        </div>
-                                    </div>
-                                    <!-- Near-breach ticket list -->
-                                    <div class="col-lg-4 mb-3">
-                                        <div class="panel">
-                                            <div class="panel-title">
-                                                <span><i class="feather icon-alert-triangle mr-1 text-warning"></i> Near breach (&lt;2h)</span>
-                                            </div>
-                                            <c:choose>
-                                                <c:when test="${empty nearBreachList}">
-                                                    <p class="text-muted" style="font-size:.85rem">No tickets near SLA breach.</p>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <c:forEach var="nb" items="${nearBreachList}">
-                                                        <div class="list-row">
-                                                            <div class="r-label">
-                                                                <span class="font-weight-600">${nb.TicketNumber}</span><br>
-                                                                <span class="text-muted" style="font-size:.78rem">${nb.Title}</span>
-                                                            </div>
-                                                            <div class="r-val text-right">
-                                                                <span class="sbadge sbadge-warning">${nb.Priority}</span><br>
-                                                                <span style="font-size:.75rem;color:#c62828">
-                                                                    <fmt:formatDate value="${nb.ResolutionDeadline}" pattern="HH:mm dd/MM"/>
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </c:forEach>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- ════════════════════════════════════════
-                                     ZONE 4 — PROBLEM & CHANGE MANAGEMENT
-                                ════════════════════════════════════════ -->
-                                <div class="dash-section">
-                                    <h6><i class="feather icon-tool mr-1"></i> Problem &amp; Change Management</h6>
-                                </div>
-                                <div class="row">
-                                    <!-- Problem status -->
-                                    <div class="col-lg-4 mb-3">
-                                        <div class="panel">
-                                            <div class="panel-title">
-                                                Problem status
-                                                <a href="ProblemList">View all</a>
-                                            </div>
-                                            <c:forEach var="entry" items="${problemsByStatus}">
-                                                <c:if test="${entry.value > 0}">
-                                                    <div class="list-row">
-                                                        <span class="r-label">${entry.key}</span>
-                                                        <span class="sbadge
-                                                              <c:choose>
-                                                                  <c:when test="${entry.key == 'Pending'}">          sbadge-warning</c:when>
-                                                                  <c:when test="${entry.key == 'Under Investigation'}">sbadge-progress</c:when>
-                                                                  <c:when test="${entry.key == 'Resolved'}">          sbadge-resolved</c:when>
-                                                                  <c:when test="${entry.key == 'Closed'}">            sbadge-closed</c:when>
-                                                                  <c:when test="${entry.key == 'Rejected'}">          sbadge-danger</c:when>
-                                                                  <c:otherwise>                                       sbadge-new</c:otherwise>
-                                                              </c:choose>">${entry.value}</span>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-database text-c-blue f-18"></i>
                                                     </div>
-                                                </c:if>
-                                            </c:forEach>
-                                        </div>
-                                    </div>
-                                    <!-- RFC status -->
-                                    <div class="col-lg-4 mb-3">
-                                        <div class="panel">
-                                            <div class="panel-title">
-                                                RFC (Change Request) status
-                                                <a href="ManagerChangeApprovals">View all</a>
-                                            </div>
-                                            <c:forEach var="entry" items="${rfcByStatus}">
-                                                <c:if test="${entry.value > 0}">
-                                                    <div class="list-row">
-                                                        <span class="r-label">${entry.key}</span>
-                                                        <span class="sbadge
-                                                              <c:choose>
-                                                                  <c:when test="${entry.key == 'Pending Approval'}">sbadge-warning</c:when>
-                                                                  <c:when test="${entry.key == 'Approved'}">        sbadge-success</c:when>
-                                                                  <c:when test="${entry.key == 'In Progress'}">     sbadge-progress</c:when>
-                                                                  <c:when test="${entry.key == 'Completed'}">       sbadge-resolved</c:when>
-                                                                  <c:when test="${entry.key == 'Rejected'}">        sbadge-danger</c:when>
-                                                                  <c:when test="${entry.key == 'RolledBack'}">      sbadge-danger</c:when>
-                                                                  <c:otherwise>                                     sbadge-closed</c:otherwise>
-                                                              </c:choose>">${entry.value}</span>
-                                                    </div>
-                                                </c:if>
-                                            </c:forEach>
-                                        </div>
-                                    </div>
-                                    <!-- RFC pending needs action -->
-                                    <div class="col-lg-4 mb-3">
-                                        <div class="panel">
-                                            <div class="panel-title">
-                                                <span><i class="feather icon-clock mr-1 text-warning"></i> RFC awaiting approval</span>
-                                                <a href="ManagerChangeApprovals">Approve</a>
-                                            </div>
-                                            <c:choose>
-                                                <c:when test="${empty top5PendingRFCs}">
-                                                    <p class="text-muted" style="font-size:.85rem">No pending RFCs.</p>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <c:forEach var="rfc" items="${top5PendingRFCs}">
-                                                        <div class="list-row">
-                                                            <div class="r-label">
-                                                                <span class="font-weight-600">${rfc.rfcNumber}</span><br>
-                                                                <span class="text-muted" style="font-size:.78rem">${rfc.title}</span>
-                                                            </div>
-                                                            <span class="sbadge
-                                                                  <c:choose>
-                                                                      <c:when test="${rfc.riskLevel == 'High'}">   sbadge-danger</c:when>
-                                                                      <c:when test="${rfc.riskLevel == 'Medium'}"> sbadge-warning</c:when>
-                                                                      <c:otherwise>                               sbadge-success</c:otherwise>
-                                                                  </c:choose>">${rfc.riskLevel}</span>
-                                                        </div>
-                                                    </c:forEach>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- ════════════════════════════════════════
-                                     ZONE 5 — USER & AGENT MANAGEMENT
-                                ════════════════════════════════════════ -->
-                                <div class="dash-section">
-                                    <h6><i class="feather icon-users mr-1"></i> User &amp; Agent Management</h6>
-                                </div>
-                                <div class="row">
-                                    <!-- User role breakdown -->
-                                    <div class="col-lg-4 mb-3">
-                                        <div class="panel">
-                                            <div class="panel-title">
-                                                Users by role
-                                                <a href="UserCreate">Manage</a>
-                                            </div>
-                                            <c:forEach var="entry" items="${usersByRole}">
-                                                <div class="prow">
-                                                    <span class="plabel">${entry.key}</span>
-                                                    <div class="pbar">
-                                                        <div class="pfill"
-                                                             style="width:${entry.value * 100 / (totalActiveUsers > 0 ? totalActiveUsers : 1)}%;
-                                                             background:#5e35b1"></div>
-                                                    </div>
-                                                    <span class="pnum">${entry.value}</span>
                                                 </div>
-                                            </c:forEach>
-                                        </div>
-                                    </div>
-                                    <!-- Top agents -->
-                                    <div class="col-lg-4 mb-3">
-                                        <div class="panel">
-                                            <div class="panel-title">Top agents this month</div>
-                                            <c:set var="agentRank" value="0"/>
-                                            <c:forEach var="agent" items="${topAgents}" varStatus="loop">
-                                                <div class="list-row">
-                                                    <div class="r-label" style="display:flex;align-items:center;gap:8px">
-                                                        <div class="agent-avatar"
-                                                             style="<c:if test="${loop.index == 0}">background:#e8f5e9;color:#2e7d32;</c:if>
-                                                             <c:if test="${loop.index == 1}">background:#e3f2fd;color:#1565c0;</c:if>">
-                                                            ${loop.index + 1}
-                                                        </div>
-                                                        ${agent.fullName}
-                                                    </div>
-                                                    <span class="r-val">${agent.ticketCount != null ? agent.ticketCount : '—'} resolved</span>
-                                                </div>
-                                            </c:forEach>
-                                        </div>
-                                    </div>
-                                    <!-- Agent CSAT leaderboard -->
-                                    <div class="col-lg-4 mb-3">
-                                        <div class="panel">
-                                            <div class="panel-title">Agent CSAT leaderboard</div>
-                                            <c:forEach var="row" items="${agentCsat}" varStatus="loop">
-                                                <c:if test="${loop.index < 5}">
-                                                    <div class="list-row">
-                                                        <div class="r-label" style="display:flex;align-items:center;gap:8px">
-                                                            <div class="agent-avatar">${loop.index + 1}</div>
-                                                            ${row[0]}
-                                                        </div>
-                                                        <div class="r-val">
-                                                            <span class="star-filled">&#9733;</span>
-                                                            <fmt:formatNumber value="${row[1]}" pattern="0.0"/>
-                                                            <span class="text-muted ml-1">(${row[2]})</span>
-                                                        </div>
-                                                    </div>
-                                                </c:if>
-                                            </c:forEach>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- ════════════════════════════════════════
-                                     ZONE 6 — CSAT & SERVICE QUALITY
-                                ════════════════════════════════════════ -->
-                                <div class="dash-section">
-                                    <h6><i class="feather icon-smile mr-1"></i> Customer Satisfaction (CSAT)</h6>
-                                </div>
-                                <div class="row">
-                                    <!-- CSAT summary + distribution -->
-                                    <div class="col-lg-6 mb-3">
-                                        <div class="panel">
-                                            <div class="panel-title">
-                                                CSAT overview
-                                                <a href="CsatReport">Full report</a>
+                                                <p class="m-b-0 text-white"><span class="label label-primary m-r-10">+12%</span>From Previous Month</p>
                                             </div>
-                                            <div class="d-flex gap-4 mb-3">
-                                                <div style="text-align:center;min-width:80px">
-                                                    <div style="font-size:2rem;font-weight:700;color:#2e7d32">${csatAvg}</div>
-                                                    <div style="font-size:.75rem;color:#888">Avg Rating</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-3 col-md-6">
+                                        <div class="card prod-p-card bg-c-green">
+                                            <div class="card-body">
+                                                <div class="row align-items-center m-b-25">
+                                                    <div class="col">
+                                                        <h6 class="m-b-5 text-white">Average Price</h6>
+                                                        <h3 class="m-b-0 text-white">$6,780</h3>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-dollar-sign text-c-green f-18"></i>
+                                                    </div>
                                                 </div>
-                                                <div style="text-align:center;min-width:80px">
-                                                    <div style="font-size:2rem;font-weight:700">${csatTotal}</div>
-                                                    <div style="font-size:.75rem;color:#888">Surveys</div>
+                                                <p class="m-b-0 text-white"><span class="label label-success m-r-10">+52%</span>From Previous Month</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-3 col-md-6">
+                                        <div class="card prod-p-card bg-c-yellow">
+                                            <div class="card-body">
+                                                <div class="row align-items-center m-b-25">
+                                                    <div class="col">
+                                                        <h6 class="m-b-5 text-white">Product Sold</h6>
+                                                        <h3 class="m-b-0 text-white">6,784</h3>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-tags text-c-yellow f-18"></i>
+                                                    </div>
                                                 </div>
-                                                <div style="text-align:center;min-width:80px">
-                                                    <div style="font-size:2rem;font-weight:700;color:#1565c0">${csatResponseRate}%</div>
-                                                    <div style="font-size:.75rem;color:#888">Response Rate</div>
+                                                <p class="m-b-0 text-white"><span class="label label-warning m-r-10">+52%</span>From Previous Month</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- product profit end -->
+                                    <div class="col-md-12 col-xl-4">
+                                        <div class="card card-social">
+                                            <div class="card-block border-bottom">
+                                                <div class="row align-items-center justify-content-center">
+                                                    <div class="col-auto">
+                                                        <i class="fab fa-facebook-f text-primary f-36"></i>
+                                                    </div>
+                                                    <div class="col text-right">
+                                                        <h3>12,281</h3>
+                                                        <h5 class="text-c-blue mb-0">+7.2% <span class="text-muted">Total Likes</span></h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-block">
+                                                <div class="row align-items-center justify-content-center card-active">
+                                                    <div class="col-6">
+                                                        <h6 class="text-center m-b-10"><span class="text-muted m-r-5">Target:</span>35,098</h6>
+                                                        <div class="progress">
+                                                            <div class="progress-bar progress-c-blue" role="progressbar" style="width:60%;height:6px;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <h6 class="text-center  m-b-10"><span class="text-muted m-r-5">Duration:</span>350</h6>
+                                                        <div class="progress">
+                                                            <div class="progress-bar progress-c-green" role="progressbar" style="width:45%;height:6px;" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-xl-4">
+                                        <div class="card card-social">
+                                            <div class="card-block border-bottom">
+                                                <div class="row align-items-center justify-content-center">
+                                                    <div class="col-auto">
+                                                        <i class="fab fa-twitter text-c-info f-36"></i>
+                                                    </div>
+                                                    <div class="col text-right">
+                                                        <h3>11,200</h3>
+                                                        <h5 class="text-c-info mb-0">+6.2% <span class="text-muted">Total Likes</span></h5>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <!-- Rating distribution bars -->
                                             <c:forEach begin="1" end="5" var="i">
                                                 <c:set var="star" value="${6 - i}" />
                                                 <c:set var="distIdx" value="${star - 1}" />
+                                                <c:choose>
+                                                    <c:when test="${star == 5}"><c:set var="starColor" value="#2e7d32"/></c:when>
+                                                    <c:when test="${star == 4}"><c:set var="starColor" value="#558b2f"/></c:when>
+                                                    <c:when test="${star == 3}"><c:set var="starColor" value="#f9a825"/></c:when>
+                                                    <c:when test="${star == 2}"><c:set var="starColor" value="#e65100"/></c:when>
+                                                    <c:otherwise><c:set var="starColor" value="#c62828"/></c:otherwise>
+                                                </c:choose>
 
                                                 <div class="prow">
                                                     <span class="plabel">★${star}</span>
                                                     <div class="pbar">
-                                                        <div class="pfill"
-                                                             style="width:${csatTotal > 0 ? csatDist[distIdx] * 100 / csatTotal : 0}%;
-                                                             background:
-                                                             <c:choose>
-                                                                 <c:when test="${star == 5}">#2e7d32</c:when>
-                                                                 <c:when test="${star == 4}">#558b2f</c:when>
-                                                                 <c:when test="${star == 3}">#f9a825</c:when>
-                                                                 <c:when test="${star == 2}">#e65100</c:when>
-                                                                 <c:otherwise>#c62828</c:otherwise>
-                                                             </c:choose>">
+                                                        <div class="pfill" style="width:${csatTotal > 0 ? csatDist[distIdx] * 100 / csatTotal : 0}%; background:${starColor};">
                                                         </div>
                                                     </div>
                                                     <span class="pnum">${csatDist[distIdx]}</span>
                                                 </div>
                                             </c:forEach>
-                                            <c:forEach begin="1" end="5" var="i">
-                                                <c:set var="star" value="${6 - i}" />
-                                                <c:set var="distIdx" value="${star - 1}" />
-                                                <div class="prow">
-                                                    <span class="plabel" style="width:30px">★${star}</span>
-                                                    <div class="pbar">
-                                                        <div class="pfill"
-                                                             style="width:${csatTotal > 0 ? csatDist[distIdx] * 100 / csatTotal : 0}%;
-                                                             background:${starColors[star]}">
                                                         </div>
                                                     </div>
-                                                    <span class="pnum">${csatDist[distIdx]}</span>
                                                 </div>
-                                            </c:forEach>
-                                        </div>
-                                    </div>
-                                    <!-- Donut chart for CSAT distribution -->
-                                    <div class="col-lg-6 mb-3">
-                                        <div class="panel">
-                                            <div class="panel-title">Rating distribution chart</div>
-                                            <div style="height:220px; position:relative">
-                                                <canvas id="csatDonutChart"></canvas>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-
-                                <!-- ════════════════════════════════════════
-                                     ZONE 7 — AUDIT LOG & SYSTEM ACTIVITY
-                                ════════════════════════════════════════ -->
-                                <div class="dash-section">
-                                    <h6><i class="feather icon-shield mr-1"></i> Audit Log &amp; System Activity</h6>
-                                    <small>Admin-only — last 10 system actions</small>
-                                </div>
-                                <div class="row">
-                                    <div class="col-12 mb-4">
-                                        <div class="panel">
-                                            <div class="panel-title">
-                                                Recent system activity
-                                                <a href="#">View full log</a>
+                                    <div class="col-md-6 col-xl-4">
+                                        <div class="card card-social">
+                                            <div class="card-block border-bottom">
+                                                <div class="row align-items-center justify-content-center">
+                                                    <div class="col-auto">
+                                                        <i class="fab fa-google-plus-g text-c-red f-36"></i>
+                                                    </div>
+                                                    <div class="col text-right">
+                                                        <h3>10,500</h3>
+                                                        <h5 class="text-c-red mb-0">+5.9% <span class="text-muted">Total Likes</span></h5>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <c:choose>
-                                                <c:when test="${empty recentAuditLogs}">
-                                                    <p class="text-muted" style="font-size:.85rem">No audit log entries found.</p>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <c:forEach var="log" items="${recentAuditLogs}">
-                                                        <div class="audit-row">
-                                                            <div class="flex-grow-1">
-                                                                <span class="audit-action">${log.action}</span>
-                                                                on
-                                                                <span class="audit-entity">${log.entity} #${log.entityId}</span>
-                                                                by
-                                                                <strong>${log.userName != null ? log.userName : 'User #'.concat(log.userId)}</strong>
-                                                            </div>
-                                                            <div class="audit-time">
-                                                                <fmt:formatDate value="${log.createdAt}" pattern="HH:mm dd/MM/yyyy"/>
-                                                            </div>
+                                            <div class="card-block">
+                                                <div class="row align-items-center justify-content-center card-active">
+                                                    <div class="col-6">
+                                                        <h6 class="text-center m-b-10"><span class="text-muted m-r-5">Target:</span>25,998</h6>
+                                                        <div class="progress">
+                                                            <div class="progress-bar progress-c-blue" role="progressbar" style="width:80%;height:6px;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
                                                         </div>
-                                                    </c:forEach>
-                                                </c:otherwise>
-                                            </c:choose>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <h6 class="text-center  m-b-10"><span class="text-muted m-r-5">Duration:</span>900</h6>
+                                                        <div class="progress">
+                                                            <div class="progress-bar progress-c-green" role="progressbar" style="width:50%;height:6px;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- sessions-section start -->
+                                    <div class="col-xl-8 col-md-6">
+                                        <div class="card table-card">
+                                            <div class="card-header">
+                                                <h5>Site visitors session log</h5>
+                                            </div>
+                                            <div class="card-body px-0 py-0">
+                                                <div class="table-responsive">
+                                                    <div class="session-scroll" style="height:478px;position:relative;">
+                                                        <table class="table table-hover m-b-0">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th><span>CAMPAIGN DATE</span></th>
+                                                                    <th><span>CLICK <a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
+                                                                                    class="feather icon-help-circle f-16"></i></a></span></th>
+                                                                    <th><span>COST <a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
+                                                                                    class="feather icon-help-circle f-16"></i></a></span></th>
+                                                                    <th><span>CTR <a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
+                                                                                    class="feather icon-help-circle f-16"></i></a></span></th>
+                                                                    <th><span>ARPU <a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
+                                                                                    class="feather icon-help-circle f-16"></i></a></span></th>
+                                                                    <th><span>ECPI <a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
+                                                                                    class="feather icon-help-circle f-16"></i></a></span></th>
+                                                                    <th><span>ROI <a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
+                                                                                    class="feather icon-help-circle f-16"></i></a></span></th>
+                                                                    <th><span>REVENUE <a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
+                                                                                    class="feather icon-help-circle f-16"></i></a></span></th>
+                                                                    <th><span>CONVERSIONS <a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
+                                                                                    class="feather icon-help-circle f-16"></i></a></span></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>Total and average</td>
+                                                                    <td>1300</td>
+                                                                    <td>1025</td>
+                                                                    <td>14005</td>
+                                                                    <td>95,3%</td>
+                                                                    <td>29,7%</td>
+                                                                    <td>3,25</td>
+                                                                    <td>2:30</td>
+                                                                    <td>45.5%</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>8-11-2016</td>
+                                                                    <td>786
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>485
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-primary rounded" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>769
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>45,3%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>6,7%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-info rounded" role="progressbar" style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>8,56
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>10:55
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>33.8%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>15-10-2016</td>
+                                                                    <td>786
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>523
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-primary rounded" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>736
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>78,3%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>6,6%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-info rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>7,56
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 44%;" aria-valuenow="44" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>4:30
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 68%;" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>76.8%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 90%;" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>8-8-2017</td>
+                                                                    <td>624
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 45%;" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>436
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-primary rounded" role="progressbar" style="width: 55%;" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>756
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 95%;" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>78,3%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 38%;" aria-valuenow="38" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>6,4%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-info rounded" role="progressbar" style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>9,45
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 41%;" aria-valuenow="41" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>9:05
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 67%;" aria-valuenow="67" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>8.63%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 41%;" aria-valuenow="41" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>11-12-2017</td>
+                                                                    <td>423
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 54%;" aria-valuenow="54" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>123
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-primary rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>756
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>78,6%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>45,6%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-info rounded" role="progressbar" style="width: 90%;" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>6,85
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>7:45
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>33.8%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>8-11-2016</td>
+                                                                    <td>786
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>485
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-primary rounded" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>769
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>45,3%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>6,7%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-info rounded" role="progressbar" style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>8,56
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>10:55
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>33.8%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>15-10-2016</td>
+                                                                    <td>786
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>523
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-primary rounded" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>736
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>78,3%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>6,6%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-info rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>7,56
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 44%;" aria-valuenow="44" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>4:30
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 68%;" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>76.8%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 90%;" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>8-8-2017</td>
+                                                                    <td>624
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 45%;" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>436
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-primary rounded" role="progressbar" style="width: 55%;" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>756
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 95%;" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>78,3%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 38%;" aria-valuenow="38" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>6,4%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-info rounded" role="progressbar" style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>9,45
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 41%;" aria-valuenow="41" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>9:05
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 67%;" aria-valuenow="67" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>8.63%
+                                                                        <div class="progress mt-1" style="height:4px;">
+                                                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 41%;" aria-valuenow="41" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- sessions-section end -->
+                                    <div class="col-md-6 col-xl-4">
+                                        <div class="card user-card">
+                                            <div class="card-header">
+                                                <h5>Profile</h5>
+                                            </div>
+                                            <div class="card-body  text-center">
+                                                <div class="usre-image">
+                                                    <img src="assets/images/widget/img-round1.jpg" class="img-radius wid-100 m-auto" alt="User-Profile-Image">
+                                                </div>
+                                                <h6 class="f-w-600 m-t-25 m-b-10">Alessa Robert</h6>
+                                                <p>Active | Male | Born 23.05.1992</p>
+                                                <hr>
+                                                <p class="m-t-15">Activity Level: 87%</p>
+                                                <div class="bg-c-blue counter-block m-t-10 p-20">
+                                                    <div class="row">
+                                                        <div class="col-4">
+                                                            <i class="fas fa-calendar-check text-white f-20"></i>
+                                                            <h6 class="text-white mt-2 mb-0">1256</h6>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <i class="fas fa-user text-white f-20"></i>
+                                                            <h6 class="text-white mt-2 mb-0">8562</h6>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <i class="fas fa-folder-open text-white f-20"></i>
+                                                            <h6 class="text-white mt-2 mb-0">189</h6>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p class="m-t-15">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                                                <hr>
+                                                <div class="row justify-content-center user-social-link">
+                                                    <div class="col-auto"><a href="#!"><i class="fab fa-facebook-f text-primary f-22"></i></a></div>
+                                                    <div class="col-auto"><a href="#!"><i class="fab fa-twitter text-c-info f-22"></i></a></div>
+                                                    <div class="col-auto"><a href="#!"><i class="fab fa-dribbble text-c-red f-22"></i></a></div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                            </div><!-- page-wrapper -->
-                        </div><!-- main-body -->
+                                <!-- [ Main Content ] end -->
+                            </div>
+                        </div>
                     </div>
-                </div><!-- pcoded-content -->
+                </div>
             </div>
-        </div><!-- pcoded-main-container -->
+        </div>
+        <!-- [ Main Content ] end -->
 
-        <!-- ════════════════════════════════════════════════════════════════════
-             SCRIPTS
-        ════════════════════════════════════════════════════════════════════ -->
+        <!-- Warning Section start -->
+        <!-- Older IE warning message -->
+        <!--[if lt IE 11]>
+        <div class="ie-warning">
+            <h1>Warning!!</h1>
+            <p>You are using an outdated version of Internet Explorer, please upgrade
+               <br/>to any of the following web browsers to access this website.
+            </p>
+            <div class="iew-container">
+                <ul class="iew-download">
+                    <li>
+                        <a href="http://www.google.com/chrome/">
+                            <img src="assets/images/browser/chrome.png" alt="Chrome">
+                            <div>Chrome</div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.mozilla.org/en-US/firefox/new/">
+                            <img src="assets/images/browser/firefox.png" alt="Firefox">
+                            <div>Firefox</div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://www.opera.com">
+                            <img src="assets/images/browser/opera.png" alt="Opera">
+                            <div>Opera</div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.apple.com/safari/">
+                            <img src="assets/images/browser/safari.png" alt="Safari">
+                            <div>Safari</div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://windows.microsoft.com/en-us/internet-explorer/download-ie">
+                            <img src="assets/images/browser/ie.png" alt="">
+                            <div>IE (11 & above)</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <p>Sorry for the inconvenience!</p>
+        </div>
+    <![endif]-->
+        <!-- Warning Section Ends -->
+
+        <!-- Required Js -->
         <script src="assets/plugins/jquery/js/jquery.min.js"></script>
         <script src="assets/js/vendor-all.min.js"></script>
         <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
         <script src="assets/js/pcoded.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        <%-- Pass server-side data into JS --%>
-        <c:set var="lbs"      value="${empty chartLabels   ? '' : chartLabels}" />
-        <c:set var="resolved" value="${empty chartResolved ? '' : chartResolved}" />
-        <c:set var="open"     value="${empty chartOpen     ? '' : chartOpen}" />
-
-        <script>
-            /* ── Ticket Volume Chart ───────────────────────────────────── */
-            var chartLabels = [
-            <c:forEach var="lb" items="${lbs}" varStatus="st">'${lb}'<c:if test="${!st.last}">,</c:if></c:forEach>
-            ];
-            var chartResolved = [
-            <c:forEach var="n" items="${resolved}" varStatus="st">${n}<c:if test="${!st.last}">,</c:if></c:forEach>
-            ];
-            var chartOpen = [
-            <c:forEach var="n" items="${open}" varStatus="st">${n}<c:if test="${!st.last}">,</c:if></c:forEach>
-            ];
-
-            (function () {
-                var ctx = document.getElementById('ticketVolumeChart');
-                if (!ctx)
-                    return;
-                if (!chartLabels.length) {
-                    chartLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-                    chartResolved = [0, 0, 0, 0, 0, 0];
-                    chartOpen = [0, 0, 0, 0, 0, 0];
-                }
-                new Chart(ctx.getContext('2d'), {
-                    type: 'bar',
-                    data: {
-                        labels: chartLabels,
-                        datasets: [
-                            {
-                                label: 'Resolved',
-                                data: chartResolved,
-                                backgroundColor: 'rgba(46,125,50,.7)',
-                                borderRadius: 4
-                            },
-                            {
-                                label: 'Open / Pending',
-                                data: chartOpen,
-                                backgroundColor: 'rgba(94,53,177,.6)',
-                                borderRadius: 4
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {legend: {position: 'top'}},
-                        scales: {y: {beginAtZero: true, ticks: {stepSize: 1}}}
-                    }
-                });
-            })();
-
-            /* ── CSAT Donut Chart ──────────────────────────────────────── */
-            (function () {
-                var ctx2 = document.getElementById('csatDonutChart');
-                if (!ctx2)
-                    return;
-                var dist = [
-            ${csatDist[0]},
-            ${csatDist[1]},
-            ${csatDist[2]},
-            ${csatDist[3]},
-            ${csatDist[4]}
-                ];
-                new Chart(ctx2.getContext('2d'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['★1', '★2', '★3', '★4', '★5'],
-                        datasets: [{
-                                data: dist,
-                                backgroundColor: ['#c62828', '#e65100', '#f9a825', '#558b2f', '#2e7d32'],
-                                borderWidth: 2
-                            }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {position: 'right', labels: {font: {size: 12}}}
-                        },
-                        cutout: '60%'
-                    }
-                });
-            })();
-        </script>
-
-        <script>
-            $(document).ready(function () {
-                $('.fixed-button').remove();
-            });
-        </script>
     </body>
+
 </html>
+
+<script>
+    $(document).ready(function () {
+        $('.fixed-button').remove();
+    });
+</script>
+

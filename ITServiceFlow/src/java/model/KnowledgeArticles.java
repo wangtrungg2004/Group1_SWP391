@@ -1,19 +1,8 @@
 package model;
 
 import java.util.Date;
-import java.util.List;
 
 public class KnowledgeArticles {
-    private List<SharedFile> attachments;
-
-    public List<SharedFile> getAttachments() {
-        return attachments;
-    }
-
-    public void setAttachments(List<SharedFile> attachments) {
-        this.attachments = attachments;
-    }
-
     private int id;
     private String articleNumber;
     private String title;
@@ -28,8 +17,8 @@ public class KnowledgeArticles {
     }
 
     public KnowledgeArticles(int id, String articleNumber, String title, String content,
-            Integer categoryId, String status, Integer viewCount,
-            int createdBy, Date createdAt) {
+                             Integer categoryId, String status, Integer viewCount,
+                             int createdBy, Date createdAt) {
         this.id = id;
         this.articleNumber = articleNumber;
         this.title = title;

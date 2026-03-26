@@ -93,7 +93,7 @@
                         <div class="page-block">
                             <ul class="breadcrumb bg-transparent p-0 m-0">
                                 <li class="breadcrumb-item">
-                                    <a href="${pageContext.request.contextPath}/ITDashboard" class="text-primary">
+                                    <a href="${pageContext.request.contextPath}/ITDashboard.jsp" class="text-primary">
                                         <i class="feather icon-home"></i>
                                     </a>
                                 </li>

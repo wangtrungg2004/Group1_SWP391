@@ -7,6 +7,9 @@ package dao;
 import Utils.DbContext;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Calendar;
+import java.util.Date;
+import model.SLARule;
 import model.SLATracking;
 
 /**
@@ -14,6 +17,35 @@ import model.SLATracking;
  * @author DELL
  */
 public class SLATrackingDao extends DbContext {
+
+    public boolean applySLAForTicket(int ticketId, String ticketType, Integer priorityId) {
+        if (ticketId <= 0 || ticketType == null || ticketType.trim().isEmpty() || priorityId == null || priorityId <= 0) {
+            return false;
+        }
+
+        SLARuleDao slaRuleDao = new SLARuleDao();
+        SLARule matchedRule = slaRuleDao.getActiveRuleByTypeAndPriority(ticketType, priorityId);
+        if (matchedRule == null) {
+            return false;
+        }
+
+        Date now = new Date();
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.setTime(now);
+        calendar.add(Calendar.HOUR, matchedRule.getResponseTime());
+        Date responseDeadline = calendar.getTime();
+
+        calendar.setTime(now);
+        calendar.add(Calendar.HOUR, matchedRule.getResolutionTime());
+        Date resolutionDeadline = calendar.getTime();
+
+        SLATracking tracking = new SLATracking();
+        tracking.setTicketId(ticketId);
+        tracking.setResponseDeadline(responseDeadline);
+        tracking.setResolutionDeadline(resolutionDeadline);
+        return addSLATracking(tracking);
+    }
 
     public boolean addSLATracking(SLATracking tracking) {
         String sql = "INSERT INTO [dbo].[SLATracking] (TicketId, ResponseDeadline, ResolutionDeadline, IsBreached, CreatedAt) "
@@ -410,57 +442,5 @@ public class SLATrackingDao extends DbContext {
             ex.printStackTrace();
         }
         return null;
-    }
-    
-    // =========================================================================
-    // CODE TÍCH HỢP SLA (TỰ ĐỘNG TÍNH TOÁN DEADLINE CHO CREATE & EDIT)
-    // =========================================================================
-
-    public void applySLAForTicket(int ticketId, String ticketType, Integer priorityId) {
-        // Nếu là Service Request không có Priority (hoặc chưa phân loại) -> Bỏ qua
-        if (priorityId == null || priorityId <= 0) return; 
-
-        SLARuleDao ruleDao = new SLARuleDao();
-        // Lấy Rule SLA đang Active tương ứng với Type và Priority
-        model.SLARule rule = ruleDao.getActiveRuleByTypeAndPriority(ticketType, priorityId);
-        
-        if (rule != null) {
-            java.util.Date now = new java.util.Date();
-            
-            // Đổi số giờ (Hours) quy định thành Milliseconds (1h = 3,600,000 ms)
-            long responseMillis = rule.getResponseTime() * 3600000L;
-            long resolutionMillis = rule.getResolutionTime() * 3600000L;
-            
-            // Tính toán Deadline
-            java.util.Date responseDeadline = new java.util.Date(now.getTime() + responseMillis);
-            java.util.Date resolutionDeadline = new java.util.Date(now.getTime() + resolutionMillis);
-            
-            // Kiểm tra xem vé này đã có Track SLA chưa (Phục vụ cho luồng Edit)
-            SLATracking existing = getSLATrackingByTicketId(ticketId);
-            if (existing != null) {
-                // Đã có -> Cập nhật lại Deadline mới
-                updateSLATrackingDeadlines(ticketId, responseDeadline, resolutionDeadline);
-            } else {
-                // Chưa có -> Tạo mới Track SLA
-                SLATracking tracking = new SLATracking();
-                tracking.setTicketId(ticketId);
-                tracking.setResponseDeadline(responseDeadline);
-                tracking.setResolutionDeadline(resolutionDeadline);
-                addSLATracking(tracking);
-            }
-        }
-    }
-
-    public boolean updateSLATrackingDeadlines(int ticketId, java.util.Date resp, java.util.Date res) {
-        String sql = "UPDATE [dbo].[SLATracking] SET ResponseDeadline = ?, ResolutionDeadline = ? WHERE TicketId = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-             ps.setTimestamp(1, new java.sql.Timestamp(resp.getTime()));
-             ps.setTimestamp(2, new java.sql.Timestamp(res.getTime()));
-             ps.setInt(3, ticketId);
-             return ps.executeUpdate() > 0;
-        } catch (Exception e) { 
-             e.printStackTrace(); 
-             return false; 
-        }
     }
 }
