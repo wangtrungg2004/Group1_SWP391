@@ -366,31 +366,38 @@ public class SLATrackingDao extends DbContext {
         return getPerformanceStats(from, to, null, null);
     }
 
-    public Map<String, Object> getPerformanceStats(java.sql.Date from, java.sql.Date to, Integer categoryId, Integer locationId) {
-        Map<String, Object> stats = new HashMap<>();
-        StringBuilder sql = new StringBuilder("SELECT COUNT(*) as Total, "
-                + "SUM(CASE WHEN Status IN ('Open', 'In Progress', 'On Hold') THEN 1 ELSE 0 END) as OpenTickets, "
-                + "SUM(CASE WHEN Status = 'Resolved' THEN 1 ELSE 0 END) as ResolvedTickets, "
-                + "AVG(CASE WHEN Status IN ('Resolved', 'Closed') AND ResolvedAt IS NOT NULL THEN CAST(DATEDIFF(HOUR, CreatedAt, ResolvedAt) AS FLOAT) ELSE NULL END) as AvgResolutionTime "
-                + "FROM Tickets WHERE CreatedAt >= ? AND CreatedAt < ?");
+    public java.util.Map<String, Object> getPerformanceStats(java.sql.Date from, java.sql.Date to, Integer categoryId, Integer locationId) {
+        java.util.Map<String, Object> stats = new java.util.HashMap<>();
+        StringBuilder sql = new StringBuilder("SELECT " +
+                "COUNT(*) as Total, " +
+                "SUM(CASE WHEN Status IN ('Open', 'In Progress', 'On Hold') THEN 1 ELSE 0 END) as OpenTickets, " +
+                "SUM(CASE WHEN Status = 'Resolved' THEN 1 ELSE 0 END) as ResolvedTickets, " +
+                "AVG(CASE WHEN Status = 'Resolved' AND ResolvedAt IS NOT NULL THEN CAST(DATEDIFF(HOUR, CreatedAt, ResolvedAt) AS FLOAT) ELSE NULL END) as AvgResolutionTime "
+                +
+                "FROM Tickets WHERE CreatedAt >= ? AND CreatedAt < ?");
+        
         if (categoryId != null && categoryId > 0) sql.append(" AND CategoryId = ? ");
         if (locationId != null && locationId > 0) sql.append(" AND LocationId = ? ");
 
-        try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
+        try {
+            PreparedStatement stm = connection.prepareStatement(sql.toString());
             int idx = 1;
             stm.setDate(idx++, from);
             stm.setDate(idx++, to);
             if (categoryId != null && categoryId > 0) stm.setInt(idx++, categoryId);
             if (locationId != null && locationId > 0) stm.setInt(idx++, locationId);
+            
             java.sql.ResultSet rs = stm.executeQuery();
             if (rs.next()) {
                 stats.put("Total", rs.getInt("Total"));
                 stats.put("OpenTickets", rs.getInt("OpenTickets"));
                 stats.put("ResolvedTickets", rs.getInt("ResolvedTickets"));
                 stats.put("AvgResolutionTime", rs.getDouble("AvgResolutionTime"));
+
                 double total = rs.getInt("Total");
                 double resolved = rs.getInt("ResolvedTickets");
-                stats.put("ResolutionRate", (int) ((total > 0) ? (resolved / total) * 100 : 0));
+                double rate = (total > 0) ? (resolved / total) * 100 : 0;
+                stats.put("ResolutionRate", (int) rate);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
