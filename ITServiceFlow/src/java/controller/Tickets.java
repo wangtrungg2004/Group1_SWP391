@@ -5,7 +5,6 @@
 package controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,7 +17,7 @@ import service.TicketService;
  *
  * @author DELL
  */
-@WebServlet(name = "Tickets", urlPatterns = { "/tickets" }) // URL pattern lowercase to match link
+@WebServlet(name = "Tickets", urlPatterns = { "/tickets-legacy" })
 public class Tickets extends HttpServlet {
 
     private TicketService ticketService = new TicketService();

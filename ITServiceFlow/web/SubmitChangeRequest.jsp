@@ -93,7 +93,7 @@
                         <div class="page-block">
                             <ul class="breadcrumb bg-transparent p-0 m-0">
                                 <li class="breadcrumb-item">
-                                    <a href="${pageContext.request.contextPath}/ITDashboard" class="text-primary">
+                                    <a href="${pageContext.request.contextPath}/ITDashboard.jsp" class="text-primary">
                                         <i class="feather icon-home"></i>
                                     </a>
                                 </li>
@@ -273,9 +273,9 @@
     </div>
 
     <script src="${pageContext.request.contextPath}/assets/plugins/jquery/js/jquery.min.js"></script>
-    <script src="${pageContext.request.contextPath}/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-    <script src="${pageContext.request.contextPath}/assets/js/vendor-all.min.js"></script>
-    <script src="${pageContext.request.contextPath}/assets/js/pcoded.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/vendor-all.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/pcoded.min.js"></script>
     <script>
     (function(){
         // ── Linked ticket preview ──────────────────────────────────────

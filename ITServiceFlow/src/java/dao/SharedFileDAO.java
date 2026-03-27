@@ -12,27 +12,6 @@ import java.util.List;
 
 public class SharedFileDAO extends DbContext {
 
-    public int addFile(String originalName, String storedName, String mimeType, long sizeBytes, String storagePath, int uploadedBy) throws SQLException {
-        String sql = "INSERT INTO SharedFiles (OriginalName, StoredName, MimeType, SizeBytes, StoragePath, UploadedBy, UploadedAt) "
-                + "VALUES (?, ?, ?, ?, ?, ?, GETDATE());";
-        try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, originalName);
-            ps.setString(2, storedName);
-            ps.setString(3, mimeType);
-            ps.setLong(4, sizeBytes);
-            ps.setString(5, storagePath);
-            ps.setInt(6, uploadedBy);
-            ps.executeUpdate();
-
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        }
-        return -1;
-    }
-
     public SharedFile save(SharedFile file) throws SQLException {
         String sql = "INSERT INTO SharedFiles (OriginalName, StoredName, MimeType, SizeBytes, StoragePath, UploadedBy, UploadedAt) "
                 +

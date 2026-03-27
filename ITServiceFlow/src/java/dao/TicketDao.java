@@ -93,32 +93,34 @@ public class TicketDAO extends DbContext {
         return list;
     }
 
-    public List<Tickets> getAllTickets() {
+        public List<Tickets> getAllTickets() {
         List<Tickets> list = new ArrayList<>();
-        String sql = "SELECT [Id]\n" +
-                "      ,[TicketNumber]\n" +
-                "      ,[TicketType]\n" +
-                "      ,[Title]\n" +
-                "      ,[Description]\n" +
-                "      ,[CategoryId]\n" +
-                "      ,[LocationId]\n" +
-                "      ,[Impact]\n" +
-                "      ,[Urgency]\n" +
-                "      ,[PriorityId]\n" +
-                "      ,[ServiceCatalogId]\n" +
-                "      ,[RequiresApproval]\n" +
-                "      ,[ApprovedBy]\n" +
-                "      ,[ApprovedAt]\n" +
-                "      ,[Status]\n" +
-                "      ,[CreatedBy]\n" +
-                "      ,[AssignedTo]\n" +
-                "      ,[ParentTicketId]\n" +
-                "      ,[ResolvedAt]\n" +
-                "      ,[ClosedAt]\n" +
-                "      ,[CreatedAt]\n" +
-                "      ,[UpdatedAt]\n" +
-                "      ,[CurrentLevel]\n" +
-                "  FROM [dbo].[Tickets]";
+        String sql = "SELECT t.[Id]\n"
+                + "      ,t.[TicketNumber]\n"
+                + "      ,t.[TicketType]\n"
+                + "      ,t.[Title]\n"
+                + "      ,t.[Description]\n"
+                + "      ,t.[CategoryId]\n"
+                + "      ,t.[LocationId]\n"
+                + "      ,t.[Impact]\n"
+                + "      ,t.[Urgency]\n"
+                + "      ,t.[PriorityId]\n"
+                + "      ,t.[ServiceCatalogId]\n"
+                + "      ,t.[RequiresApproval]\n"
+                + "      ,t.[ApprovedBy]\n"
+                + "      ,t.[ApprovedAt]\n"
+                + "      ,t.[Status]\n"
+                + "      ,t.[CreatedBy]\n"
+                + "      ,t.[AssignedTo]\n"
+                + "      ,t.[ParentTicketId]\n"
+                + "      ,t.[ResolvedAt]\n"
+                + "      ,t.[ClosedAt]\n"
+                + "      ,t.[CreatedAt]\n"
+                + "      ,t.[UpdatedAt]\n"
+                + "      ,t.[CurrentLevel]\n"
+                + "      ,p.[Level] AS PriorityLevel\n"
+                + "  FROM [dbo].[Tickets] t\n"
+                + "  LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id";
         try {
             PreparedStatement stm = connection.prepareStatement(sql);
             ResultSet rs = stm.executeQuery();
@@ -153,6 +155,8 @@ public class TicketDAO extends DbContext {
                 t.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
 
                 t.setCurrentLevel((Integer) rs.getObject("CurrentLevel"));
+
+                t.setPriorityLevel(rs.getString("PriorityLevel"));
 
                 list.add(t);
             }
@@ -440,17 +444,18 @@ public class TicketDAO extends DbContext {
     }
 
     // 5. Lấy danh sách ticket đã Resolved (có thể lọc theo keyword TicketNumber)
-    public List<Tickets> getResolvedTickets(String keyword) {
+    public List<Tickets> getResolvedTickets(String keyword, int assignedToId) {
         List<Tickets> list = new ArrayList<>();
         String baseSql = "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.ResolvedAt "
-                + "FROM [dbo].[Tickets] t WHERE t.Status = 'Resolved'";
+                + "FROM [dbo].[Tickets] t WHERE t.Status = 'Resolved' AND t.AssignedTo = ?";
         boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
         String sql = hasKeyword ? baseSql + " AND t.TicketNumber LIKE ?" : baseSql;
         sql += " ORDER BY t.ResolvedAt DESC";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, assignedToId);
             if (hasKeyword) {
-                ps.setString(1, "%" + keyword.trim() + "%");
+                ps.setString(2, "%" + keyword.trim() + "%");
             }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -674,53 +679,66 @@ public int getTotalTicketsCount(int userId, String search, String status, String
     // CODE DÀNH CHO LUỒNG AGENT (DEV 2)
     // =========================================================================
   
-    // 7. Lấy danh sách Hàng đợi (Queue) cho Agent có Filter (TÍCH HỢP SLA)
-    // 7. Lấy danh sách Hàng đợi (Queue) cho Agent có Filter (TÍCH HỢP SLA)
+    
+    // 7. Lấy danh sách Hàng đợi (Queue) cho Agent có Filter và SẮP XẾP NGÀY
     public List<Tickets> getAgentQueues(int agentId, int currentLevel, String queueType, int offset, int limit, String search, String status, String type) {
         List<Tickets> list = new ArrayList<>();
-        
+
         StringBuilder sql = new StringBuilder(
-            "SELECT t.*, p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName, st.ResolutionDeadline " +
-            "FROM [dbo].[Tickets] t " +
-            "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id " +
-            "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id " +
-            "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id " +
-            "LEFT JOIN [dbo].[SLATracking] st ON t.Id = st.TicketId WHERE 1=1 "
+                "SELECT t.*, p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName, st.ResolutionDeadline "
+                + "FROM [dbo].[Tickets] t "
+                + "LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id "
+                + "LEFT JOIN [dbo].[Users] u ON t.AssignedTo = u.Id "
+                + "LEFT JOIN [dbo].[Categories] c ON t.CategoryId = c.Id "
+                + "LEFT JOIN [dbo].[SLATracking] st ON t.Id = st.TicketId WHERE 1=1 "
         );
 
-        // ĐÃ SỬA: Bỏ lọc theo CurrentLevel để hiển thị FULL ticket chưa gán
+        // Lọc theo Queue Type (Bỏ Status != 'Closed', 'Resolved' thành NOT IN cho gọn)
         if ("unassigned".equals(queueType)) {
             sql.append("AND t.AssignedTo IS NULL AND t.Status NOT IN ('Closed', 'Resolved') ");
         } else if ("mine".equals(queueType)) {
             sql.append("AND t.AssignedTo = ? AND t.Status NOT IN ('Closed', 'Resolved') ");
         } else if ("resolved".equals(queueType)) {
             sql.append("AND t.Status = 'Resolved' ");
-        } else { 
+        } else { // all_active
             sql.append("AND t.Status NOT IN ('Closed', 'Resolved') ");
         }
 
+        // Lọc theo thanh Search & Filter
         if (search != null && !search.trim().isEmpty()) {
             sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
         }
-        if (status != null && !status.equals("all")) sql.append("AND t.Status = ? ");
-        if (type != null && !type.equals("all")) sql.append("AND t.TicketType = ? ");
+        if (status != null && !status.equals("all")) {
+            sql.append("AND t.Status = ? ");
+        }
+        if (type != null && !type.equals("all")) {
+            sql.append("AND t.TicketType = ? ");
+        }
 
-        sql.append("ORDER BY t.CreatedAt ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        // Bỏ sortOrder truyền vào, mặc định sắp xếp mới nhất (DESC) lên đầu để dễ theo dõi
+        sql.append("ORDER BY t.CreatedAt DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIdx = 1;
-            if ("mine".equals(queueType)) ps.setInt(paramIdx++, agentId);
             
+            if ("mine".equals(queueType)) {
+                ps.setInt(paramIdx++, agentId);
+            }
+
             if (search != null && !search.trim().isEmpty()) {
                 ps.setString(paramIdx++, "%" + search + "%");
                 ps.setString(paramIdx++, "%" + search + "%");
             }
-            if (status != null && !status.equals("all")) ps.setString(paramIdx++, status);
-            if (type != null && !type.equals("all")) ps.setString(paramIdx++, type);
-            
+            if (status != null && !status.equals("all")) {
+                ps.setString(paramIdx++, status);
+            }
+            if (type != null && !type.equals("all")) {
+                ps.setString(paramIdx++, type);
+            }
+
             ps.setInt(paramIdx++, offset);
             ps.setInt(paramIdx++, limit);
-            
+
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Tickets t = new Tickets();
@@ -733,20 +751,25 @@ public int getTotalTicketsCount(int userId, String search, String status, String
                 t.setPriorityLevel(rs.getString("PriorityLevel"));
                 t.setAssigneeName(rs.getString("AssigneeName"));
                 
-                // Lấy SLA Deadline từ DB
-                t.setResolutionDeadline(rs.getTimestamp("ResolutionDeadline"));
+                // Lấy SLA Deadline từ DB (nếu có)
+                try {
+                    t.setResolutionDeadline(rs.getTimestamp("ResolutionDeadline"));
+                } catch (Exception e) {
+                    // Cột có thể không tồn tại trong một số view, bỏ qua
+                }
+                
                 list.add(t);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return list;
     }
 
-    // 8. Đếm tổng số vé của Queue (ĐÃ FIX LỖI ITIL)
-   // 8. Đếm tổng số vé của Queue (ĐÃ SỬA: Hiển thị full cho Unassigned)
+    // 8. Đếm tổng số vé của Queue (Hàm này không cần tham số sắp xếp)
     public int getTotalAgentQueuesCount(int agentId, int currentLevel, String queueType, String search, String status, String type) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM [dbo].[Tickets] t WHERE 1=1 ");
 
-        // ĐÃ SỬA: Bỏ lọc theo CurrentLevel
         if ("unassigned".equals(queueType)) {
             sql.append("AND t.AssignedTo IS NULL AND t.Status NOT IN ('Closed', 'Resolved') ");
         } else if ("mine".equals(queueType)) {
@@ -776,6 +799,9 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         } catch (Exception e) { e.printStackTrace(); }
         return 0;
     }
+
+   
+   
 
     
     

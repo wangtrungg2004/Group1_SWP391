@@ -87,27 +87,14 @@
                                                                 <div class="col-md-3">
                                                                     <select name="status" class="form-control">
                                                                         <option value="">-- All Statuses --</option>
-                                                                        <option value="Open" ${param.status=='Open'
-                                                                            ? 'selected' : '' }>Open</option>
-                                                                        <option value="In Progress"
-                                                                            ${param.status=='In Progress' ? 'selected'
-                                                                            : '' }>In Progress</option>
-                                                                        <option value="On Hold"
-                                                                            ${param.status=='On Hold' ? 'selected' : ''
-                                                                            }>On Hold</option>
-                                                                    </select>
-                                                                </div>
-                                                                <div class="col-md-3">
+                                                                         <c:forEach items="${availableStatuses}" var="s">
+                                                                             <option value="${s}" ${param.status==s ? 'selected' : ''}>${s}</option>
+                                                                         </c:forEach>
+                                                                     </select>
+                                                                 </div>
+                                                                <div class="col-md-5">
                                                                     <input type="text" name="agent" class="form-control"
                                                                         placeholder="Agent Name" value="${param.agent}">
-                                                                </div>
-                                                                <div class="col-md-2">
-                                                                    <select name="sortBy" class="form-control">
-                                                                        <option value="remaining"
-                                                                            ${param.sortBy=='remaining' ? 'selected'
-                                                                            : '' }>Sort by Remaining Time</option>
-                                                                        <!-- Add more sort options if needed -->
-                                                                    </select>
                                                                 </div>
                                                                 <div class="col-md-1">
                                                                     <button type="submit"
@@ -198,25 +185,37 @@
                                                                 </table>
                                                             </div>
 
-                                                            <!-- Pagination (Simplified for now) -->
-                                                            <nav aria-label="Page navigation" class="mt-4">
-                                                                <ul class="pagination justify-content-center">
-                                                                    <li
-                                                                        class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                                                        <a class="page-link"
-                                                                            href="SLABreachList?page=${currentPage - 1}&priority=${param.priority}&status=${param.status}&agent=${param.agent}">Previous</a>
-                                                                    </li>
-                                                                    <li class="page-item active">
-                                                                        <a class="page-link" href="#">${currentPage}</a>
-                                                                    </li>
-                                                                    <!-- Simple Next Check: If list size == limit, assume next page exists -->
-                                                                    <li
-                                                                        class="page-item ${tickets.size() < 20 ? 'disabled' : ''}">
-                                                                        <a class="page-link"
-                                                                            href="SLABreachList?page=${currentPage + 1}&priority=${param.priority}&status=${param.status}&agent=${param.agent}">Next</a>
-                                                                    </li>
-                                                                </ul>
-                                                            </nav>
+                                                            <!-- Pagination -->
+                                                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                                                <div>
+                                                                    <c:if test="${totalRecords > 0}">
+                                                                        Showing ${(currentPage - 1) * 10 + 1} to 
+                                                                        ${currentPage * 10 > totalRecords ? totalRecords : currentPage * 10} 
+                                                                        of ${totalRecords} entries
+                                                                    </c:if>
+                                                                </div>
+                                                                <c:if test="${totalPages > 1}">
+                                                                    <nav aria-label="Page navigation">
+                                                                        <ul class="pagination mb-0">
+                                                                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                                                                <a class="page-link"
+                                                                                    href="SLABreachList?page=${currentPage - 1}&priority=${paramPriority}&status=${paramStatus}&agent=${paramAgent}">Previous</a>
+                                                                            </li>
+                                                                            <c:forEach begin="1" end="${totalPages}" var="i">
+                                                                                <li
+                                                                                    class="page-item ${currentPage == i ? 'active' : ''}">
+                                                                                    <a class="page-link"
+                                                                                        href="SLABreachList?page=${i}&priority=${paramPriority}&status=${paramStatus}&agent=${paramAgent}">${i}</a>
+                                                                                </li>
+                                                                            </c:forEach>
+                                                                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                                                                <a class="page-link"
+                                                                                    href="SLABreachList?page=${currentPage + 1}&priority=${paramPriority}&status=${paramStatus}&agent=${paramAgent}">Next</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </nav>
+                                                                </c:if>
+                                                            </div>
 
                                                         </div>
                                                     </div>

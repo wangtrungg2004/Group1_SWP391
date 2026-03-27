@@ -3,7 +3,7 @@
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 <%@ page import="java.util.List" %>
 <%@ page import="model.Notifications" %>
-
+<%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,6 +23,12 @@
         .pcoded-navbar.navbar-collapsed ~ .pcoded-main-container { margin-left: 80px !important; }
         .pcoded-content, .pcoded-inner-content, .main-body, .page-wrapper { max-width: 100% !important; width: 100% !important; }
         body { overflow-x: hidden; }
+        .msg-cell {
+            max-width: 320px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     </style>
 </head>
 <body class="">
@@ -58,6 +64,15 @@
                                             <h5 class="m-0">Notification List</h5>
                                         </div>
                                         <div class="card-body table-border-style">
+                                            <form action="UserNotificationList" method="get" class="mb-3 d-flex flex-wrap align-items-center gap-2">
+                                                <input type="search" name="keyword" class="form-control" style="max-width: 360px;"
+                                                    placeholder="Search title, message, type..."
+                                                    value="${filterKeyword != null ? filterKeyword : ''}">
+                                                <button type="submit" class="btn btn-primary">Search</button>
+                                                <c:if test="${not empty searchKeyword}">
+                                                    <a href="UserNotificationList" class="btn btn-outline-secondary">Clear</a>
+                                                </c:if>
+                                            </form>
                                             <c:if test="${empty notifications}">
                                                 <div class="alert alert-warning">Notification list is empty</div>
                                             </c:if>
@@ -71,7 +86,7 @@
                                                             <th>Send to</th>
                                                             <th>Message</th>
                                                             <th>Created At</th>
-                                                            <th>Status</th>
+                                                            <!--<th>Status</th>-->
                                                             <th>Action</th>
                                                         </tr>
                                                     </thead>
@@ -98,9 +113,18 @@
                                                                                 </c:otherwise>
                                                                             </c:choose>
                                                                         </td>
-                                                                        <td>${n.message}</td>
+                                                                        <td class="msg-cell" title="${n.message}">
+                                                                            <c:choose>
+                                                                                <c:when test="${fn:length(n.message) > 80}">
+                                                                                    <c:out value="${fn:substring(n.message, 0, 80)}"/>...
+                                                                                </c:when>
+                                                                                <c:otherwise>
+                                                                                    <c:out value="${n.message}"/>
+                                                                                </c:otherwise>
+                                                                            </c:choose>
+                                                                        </td>
                                                                         <td><fmt:formatDate value="${n.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
-                                                                        <td>${n.isRead ? 'Read' : 'Unread'}</td>
+                                                                        <!--<td>${n.isRead ? 'Read' : 'Unread'}</td>-->
                                                                         <td>
                                                                             <a class="btn btn-sm btn-primary" href="NotificationDetail?Id=${n.id}">Detail</a>
                                                                         </td>

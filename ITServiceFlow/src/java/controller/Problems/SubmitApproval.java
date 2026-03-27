@@ -119,6 +119,10 @@ public class SubmitApproval extends HttpServlet {
             if(rejectedReason != null){
                 rejectedReason = rejectedReason.trim();
             }
+            if (rejectedReason == null || rejectedReason.isEmpty()) {
+                response.sendRedirect("ProblemDetail?Id=" + id + "&error=rejected_reason_required");
+                return;
+            }
 
             problem.setStatus("REJECTED");
             problem.setRejectedReason(rejectedReason);

@@ -5,7 +5,6 @@
 package controller.SLA;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -24,6 +23,7 @@ import service.SLATrackingService;
 public class SLADashboard extends HttpServlet {
 
     private SLATrackingService slaTrackingService = new SLATrackingService();
+    private dao.GeneralDao generalDao = new dao.GeneralDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -37,8 +37,29 @@ public class SLADashboard extends HttpServlet {
             return;
         }
 
+        // Default Date Range: Last 30 Days
+        java.sql.Date toDate = new java.sql.Date(System.currentTimeMillis());
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.add(java.util.Calendar.DAY_OF_MONTH, -1);
+        java.sql.Date fromDate = new java.sql.Date(cal.getTimeInMillis());
+
+        String fromParam = request.getParameter("from");
+        String toParam = request.getParameter("to");
+        String catParam = request.getParameter("categoryId");
+        String locParam = request.getParameter("locationId");
+
+        Integer categoryId = (catParam != null && !catParam.isEmpty()) ? Integer.parseInt(catParam) : null;
+        Integer locationId = (locParam != null && !locParam.isEmpty()) ? Integer.parseInt(locParam) : null;
+
+        if (fromParam != null && !fromParam.isEmpty()) {
+            try { fromDate = java.sql.Date.valueOf(fromParam); } catch (Exception e) {}
+        }
+        if (toParam != null && !toParam.isEmpty()) {
+            try { toDate = java.sql.Date.valueOf(toParam); } catch (Exception e) {}
+        }
+
         // Get Statistics
-        Map<String, Integer> stats = slaTrackingService.getSLAStatistics();
+        Map<String, Integer> stats = slaTrackingService.getSLAStatistics(fromDate, toDate, categoryId, locationId);
         request.setAttribute("stats", stats);
 
         // Calculate Compliance Rate
@@ -48,11 +69,25 @@ public class SLADashboard extends HttpServlet {
         request.setAttribute("complianceRate", String.format("%.1f", complianceRate));
 
         // Get Ticket Lists
-        List<Map<String, Object>> nearBreachTickets = slaTrackingService.getNearBreachTickets(10);
-        List<Map<String, Object>> breachedTickets = slaTrackingService.getBreachedTickets(10);
+        List<Map<String, Object>> nearBreachTickets = slaTrackingService.getNearBreachTickets(10, fromDate, toDate, categoryId, locationId);
+        List<Map<String, Object>> breachedTickets = slaTrackingService.getBreachedTickets(10, fromDate, toDate, categoryId, locationId);
 
         request.setAttribute("nearBreachTickets", nearBreachTickets);
         request.setAttribute("breachedTickets", breachedTickets);
+
+        // Get Ticket Type Distribution for Pie Chart
+        java.util.Map<String, Integer> ticketTypeStats = slaTrackingService.getTicketTypeDistribution(fromDate, toDate, categoryId, locationId);
+        request.setAttribute("ticketTypeStats", ticketTypeStats);
+        
+        // Metadata for filters
+        request.setAttribute("categories", generalDao.getCategories());
+        request.setAttribute("locations", generalDao.getLocations());
+        
+        // Keep parameters
+        request.setAttribute("fromDate", fromDate);
+        request.setAttribute("toDate", toDate);
+        request.setAttribute("categoryId", categoryId);
+        request.setAttribute("locationId", locationId);
 
         request.getRequestDispatcher("sla-dashboard.jsp").forward(request, response);
     }

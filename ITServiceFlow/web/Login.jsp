@@ -67,13 +67,7 @@
                 </div>
 
                 <div class="form-options">
-                    <div class="remember-wrapper">
-                        <input type="checkbox" id="remember" name="remember">
-                        <label for="remember" class="checkbox-label">
-                            <span class="checkbox-custom"></span>
-                            Keep me signed in
-                        </label>
-                    </div>
+                    
                     <a href="ForgotPassword" class="forgot-password">Forgot password</a>
                 </div>
 

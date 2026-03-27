@@ -75,6 +75,27 @@
         /* Empty state */
         .empty-state { text-align: center; padding: 50px 20px; color: #6b778c; }
         .empty-state i { font-size: 3rem; color: #b3bac5; display: block; margin-bottom: 12px; }
+
+        /* ── Search bar ── */
+        .search-bar { display:flex; gap:10px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
+        .search-bar input[type=text] {
+            flex:1; min-width:200px; height:36px; border:1px solid #dfe1e6;
+            border-radius:5px; padding:0 12px; font-size:.875rem; color:#172b4d; outline:none;
+        }
+        .search-bar input[type=text]:focus { border-color:#4c9aff; box-shadow:0 0 0 2px rgba(76,154,255,.2); }
+        .btn-search {
+            height:36px; padding:0 16px; border:none; border-radius:5px;
+            background:#0052cc; color:#fff; font-size:.875rem; font-weight:600;
+            cursor:pointer; display:inline-flex; align-items:center; gap:5px;
+        }
+        .btn-search:hover { background:#003d99; }
+        .btn-reset {
+            height:36px; padding:0 12px; border:1px solid #dfe1e6; border-radius:5px;
+            background:#fff; color:#42526e; font-size:.875rem; font-weight:600;
+            cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:5px;
+        }
+        .btn-reset:hover { background:#f4f5f7; text-decoration:none; }
+        .search-result-info { font-size:.78rem; color:#6b778c; align-self:center; }
     </style>
 </head>
 <body>
@@ -93,7 +114,7 @@
                                 <div class="col">
                                     <ul class="breadcrumb bg-transparent p-0 m-0">
                                         <li class="breadcrumb-item">
-                                            <a href="${pageContext.request.contextPath}/ITDashboard" class="text-primary">
+                                            <a href="${pageContext.request.contextPath}/ITDashboard.jsp" class="text-primary">
                                                 <i class="feather icon-home"></i>
                                             </a>
                                         </li>
@@ -152,14 +173,30 @@
                         </div>
                     </div>
 
+                    <!-- Search bar -->
+                    <form method="GET" action="${pageContext.request.contextPath}/MyChangeRequests" class="search-bar mb-3">
+                        <input type="hidden" name="tab" value="${tab}"/>
+                        <input type="text" name="keyword" value="${keyword}"
+                               placeholder="Tìm theo tiêu đề, số RFC…"/>
+                        <button type="submit" class="btn-search">
+                            <i class="feather icon-search"></i> Tìm
+                        </button>
+                        <c:if test="${not empty keyword}">
+                            <a href="${pageContext.request.contextPath}/MyChangeRequests?tab=${tab}" class="btn-reset">
+                                <i class="feather icon-x"></i> Xóa
+                            </a>
+                            <span class="search-result-info">${requests.size()} kết quả cho "<strong>${keyword}</strong>"</span>
+                        </c:if>
+                    </form>
+
                     <!-- Tabs -->
                     <div class="rfc-tabs">
-                        <a href="?tab=all"              class="rfc-tab ${tab=='all'              ? 'active':''}">Tất cả</a>
-                        <a href="?tab=Draft"            class="rfc-tab ${tab=='Draft'            ? 'active':''}">Nháp</a>
-                        <a href="?tab=Pending Approval" class="rfc-tab ${tab=='Pending Approval' ? 'active':''}">Chờ duyệt</a>
-                        <a href="?tab=Approved"         class="rfc-tab ${tab=='Approved'         ? 'active':''}">Đã duyệt</a>
-                        <a href="?tab=Rejected"         class="rfc-tab ${tab=='Rejected'         ? 'active':''}">Từ chối</a>
-                        <a href="?tab=In Progress"      class="rfc-tab ${tab=='In Progress'      ? 'active':''}">Đang thực hiện</a>
+                        <a href="${pageContext.request.contextPath}/MyChangeRequests?tab=all&keyword=${keyword}"              class="rfc-tab ${tab=='all'              ? 'active':''}">Tất cả</a>
+                        <a href="${pageContext.request.contextPath}/MyChangeRequests?tab=Draft&keyword=${keyword}"            class="rfc-tab ${tab=='Draft'            ? 'active':''}">Nháp</a>
+                        <a href="${pageContext.request.contextPath}/MyChangeRequests?tab=Pending Approval&keyword=${keyword}" class="rfc-tab ${tab=='Pending Approval' ? 'active':''}">Chờ duyệt</a>
+                        <a href="${pageContext.request.contextPath}/MyChangeRequests?tab=Approved&keyword=${keyword}"         class="rfc-tab ${tab=='Approved'         ? 'active':''}">Đã duyệt</a>
+                        <a href="${pageContext.request.contextPath}/MyChangeRequests?tab=Rejected&keyword=${keyword}"         class="rfc-tab ${tab=='Rejected'         ? 'active':''}">Từ chối</a>
+                        <a href="${pageContext.request.contextPath}/MyChangeRequests?tab=In Progress&keyword=${keyword}"      class="rfc-tab ${tab=='In Progress'      ? 'active':''}">Đang thực hiện</a>
                     </div>
 
                     <!-- Table card -->
@@ -198,7 +235,7 @@
                                                             <a href="#" class="rfc-num"
                                                                data-toggle="modal"
                                                                data-target="#modal${req.id}">
-                                                                ${req.ticketNumber}
+                                                                ${req.rfcNumber}
                                                             </a>
                                                         </td>
                                                         <td style="max-width:240px;">
@@ -280,7 +317,7 @@
                                     <div class="modal-header" style="background:#f4f5f7;border-bottom:1px solid #dfe1e6;">
                                         <div>
                                             <h5 class="modal-title mb-0" style="color:#172b4d;font-weight:700;">
-                                                ${req.ticketNumber}
+                                                ${req.rfcNumber}
                                             </h5>
                                             <small class="text-muted"><c:out value="${req.title}"/></small>
                                         </div>
@@ -370,8 +407,8 @@
     </div>
 
     <script src="${pageContext.request.contextPath}/assets/plugins/jquery/js/jquery.min.js"></script>
-    <script src="${pageContext.request.contextPath}/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/vendor-all.min.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/pcoded.min.js"></script>
 </body>
 </html>

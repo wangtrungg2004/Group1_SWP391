@@ -48,7 +48,7 @@ public class SharedFileService {
 
         Path uploadDir = Paths.get(context.getRealPath("/uploads"));
         Files.createDirectories(uploadDir);
-        Path target = uploadDir.resolve(storedName); 
+        Path target = uploadDir.resolve(storedName);
         part.write(target.toString());
 
         SharedFile file = new SharedFile();

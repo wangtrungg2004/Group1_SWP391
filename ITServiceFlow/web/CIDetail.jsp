@@ -34,7 +34,7 @@
                                             <div class="page-header-title">
                                                 <div class="d-inline">
                                                     <h4>Configuration Item Detail</h4>
-                                                    <span>Asset Tag: <strong>${ci.assetTag}</strong> | ${ci.name}</span>
+                                                    <span>CI Tag: <strong>${ci.assetTag}</strong> | ${ci.name}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -63,9 +63,9 @@
                                         </div>
                                     </c:if>
 
-                                    <div class="row mb-4">
-                                        <div class="col-lg-6">
-                                            <div class="card h-100">
+                                    <div class="row mb-4 align-items-stretch">
+                                        <div class="col-lg-7">
+                                            <div class="card h-100 mb-4">
                                                 <div class="card-header d-flex justify-content-between align-items-center">
                                                     <h5 class="mb-0">Basic Information</h5>
                                                     <div class="card-header-right d-flex align-items-center">
@@ -87,7 +87,7 @@
                                                         <div class="col-md-6">
                                                             <table class="table table-borderless table-striped mb-0">
                                                                 <tr>
-                                                                    <th width="160">Asset Tag</th>
+                                                                    <th width="160">CI Tag</th>
                                                                     <td><strong>${ci.assetTag}</strong></td>
                                                                 </tr>
                                                                 <tr>
@@ -144,8 +144,8 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-lg-6">
-                                            <div class="card h-100">
+                                        <div class="col-lg-5">
+                                            <div class="card h-100 mb-4">
                                                 <div class="card-header d-flex justify-content-between align-items-center">
                                                     <h5 class="mb-0">Related Configuration Items</h5>
                                                     <button type="button" class="btn btn-primary btn-sm"
@@ -162,7 +162,7 @@
                                                                         <tr>
                                                                             <th>Relationship Type</th>
                                                                             <th>Related CI</th>
-                                                                            <th>Asset Tag</th>
+                                                                            <th>CI Tag</th>
                                                                             <th>Description</th>
                                                                         </tr>
                                                                     </thead>
@@ -216,7 +216,29 @@
                                         <div class="card-header d-flex justify-content-between align-items-center">
                                             <h5 class="mb-0">CI Map</h5>
                                         </div>
-                                        <div class="card-block">
+                                        <div class="card-block p-0 position-relative">
+                                            <div class="p-2 d-flex justify-content-between align-items-center" style="position: absolute; top: 0; left: 0; right: 0; z-index: 10;">
+                                                <button type="button" id="btnAutoLayout" class="btn btn-sm btn-outline-primary bg-white shadow-sm">
+                                                    <i class="feather icon-refresh-cw"></i> Auto layout
+                                                </button>
+                                                <div class="ci-legend d-flex flex-wrap bg-white p-2 rounded shadow-sm border" style="font-size: 0.75rem;">
+                                                    <div class="d-flex align-items-center mr-3">
+                                                        <span class="d-inline-block rounded-circle mr-1" style="width: 10px; height: 10px; background-color: #28a745;"></span> Laptop
+                                                    </div>
+                                                    <div class="d-flex align-items-center mr-3">
+                                                        <span class="d-inline-block rounded-circle mr-1" style="width: 10px; height: 10px; background-color: #dc3545;"></span> Network
+                                                    </div>
+                                                    <div class="d-flex align-items-center mr-3">
+                                                        <span class="d-inline-block rounded-circle mr-1" style="width: 10px; height: 10px; background-color: #17a2b8;"></span> Monitor
+                                                    </div>
+                                                    <div class="d-flex align-items-center mr-3">
+                                                        <span class="d-inline-block rounded-circle mr-1" style="width: 10px; height: 10px; background-color: #007bff;"></span> Server
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="d-inline-block rounded-circle mr-1" style="width: 10px; height: 10px; background-color: #ffc107;"></span> Printer
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <div id="ciGraph" style="width:100%; height: 520px; background:#f8f9fa; border:1px solid #dee2e6; border-radius:4px;"></div>
                                         </div>
                                     </div>
@@ -363,7 +385,7 @@
                                     <thead class="thead-light">
                                         <tr>
                                             <th style="width: 60px;">Select</th>
-                                            <th>Asset Tag</th>
+                                            <th>CI Tag</th>
                                             <th>Name</th>
                                             <th>Type</th>
                                             <th>Owner</th>
@@ -491,6 +513,9 @@
                                                 return '#007bff';
                                             case 'laptop':
                                                 return '#28a745';
+                                            case 'monitor':
+                                            case 'moniter':
+                                                return '#17a2b8';
                                             case 'printer':
                                                 return '#ffc107';
                                             case 'network':
@@ -555,7 +580,7 @@
                             .then(function (data) {
                                 cy.elements().remove();
                                 cy.add(data);
-                                cy.layout({name: 'breadthfirst', directed: true, padding: 30, animate: true}).run();
+                                runAutoLayout();
                             })
                             .catch(function (e) {
                                 console.error('Load CI graph failed:', e);
@@ -566,10 +591,30 @@
                             });
                 }
 
+                function runAutoLayout() {
+                    if (cy) {
+                        cy.layout({
+                            name: 'breadthfirst',
+                            directed: true,
+                            padding: 30,
+                            animate: true,
+                            spacingFactor: 1.25
+                        }).run();
+                    }
+                }
+
                 document.addEventListener('DOMContentLoaded', function () {
                     initGraph();
-                    if (cy)
+                    if (cy) {
                         loadGraph();
+                        
+                        var btnAutoLayout = document.getElementById('btnAutoLayout');
+                        if (btnAutoLayout) {
+                            btnAutoLayout.addEventListener('click', function() {
+                                runAutoLayout();
+                            });
+                        }
+                    }
                 });
             })();
         </script>

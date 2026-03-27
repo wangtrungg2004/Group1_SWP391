@@ -22,12 +22,12 @@ import java.io.IOException;
 @WebServlet(name = "TicketTimeLog", urlPatterns = {"/TicketTimeLog"})
 public class TicketTimeLogController extends HttpServlet {
 
-    private final TimeLogService timeLogService = new TimeLogService();
-    private final AuditLogService auditLogService = new AuditLogService();
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        TimeLogService timeLogService = new TimeLogService();
+        AuditLogService auditLogService = new AuditLogService();
 
         HttpSession session = request.getSession(false);
         if (session == null) {
@@ -80,7 +80,7 @@ public class TicketTimeLogController extends HttpServlet {
 
         // ── STOP TIMER ──────────────────────────────────────────
         } else if ("stopTimer".equals(action)) {
-            int timeLogId = resolveActiveTimeLogId(request, session, ticketId, userId);
+            int timeLogId = resolveActiveTimeLogId(request, session, ticketId, userId, timeLogService);
 
             if (timeLogId < 0) {
                 setFlash(session, "error", "Không tìm thấy phiên làm việc đang chạy.");
@@ -107,7 +107,7 @@ public class TicketTimeLogController extends HttpServlet {
                 response.sendRedirect(redirectUrl); return;
             }
             String ticketStatus = ticket.getStatus();
-            if (!"Resolved".equals(ticketStatus) && !"Closed".equals(ticketStatus)) {
+            if (!"Resolved".equals(ticketStatus)) {
                 setFlash(session, "error", "Chỉ được log time sau khi ticket đã Resolved hoặc Closed.");
                 response.sendRedirect(redirectUrl); return;
             }
@@ -160,7 +160,7 @@ public class TicketTimeLogController extends HttpServlet {
      * @return ID > 0 hoặc -1 nếu không tìm thấy.
      */
     private int resolveActiveTimeLogId(HttpServletRequest request, HttpSession session,
-                                        int ticketId, int userId) {
+                                        int ticketId, int userId, TimeLogService timeLogService) {
         // 1. Từ form
         String fromForm = request.getParameter("timeLogId");
         if (fromForm != null && !fromForm.isBlank()) {

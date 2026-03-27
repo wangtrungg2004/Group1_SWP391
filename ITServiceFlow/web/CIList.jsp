@@ -139,6 +139,7 @@
                                                                     <option value="Server"  ${assetType eq 'Server' ? 'selected' : ''}>Server</option>
                                                                     <option value="Network" ${assetType eq 'Network' ? 'selected' : ''}>Network</option>
                                                                     <option value="Printer" ${assetType eq 'Printer' ? 'selected' : ''}>Printer</option>
+                                                                    <option value="Moniter" ${assetType eq 'Moniter' ? 'selected' : ''}>Moniter</option>
                                                                 </select>
                                                             </div>
 
@@ -177,7 +178,9 @@
                                                     <h5 class="mb-0">
                                                         Configuration Items List
                                                     </h5>
-
+                                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addCIModal">
+                                                        <i class="feather icon-plus-circle mr-1"></i>Add Configuration Item
+                                                    </button>
                                                 </div>
                                                 <div class="card-block table-border-style">
                                                     <div class="table-responsive">
@@ -185,7 +188,7 @@
                                                             <thead class="thead-light">
                                                                 <tr>
                                                                     <th style="width:50px">No</th>
-                                                                    <th>Asset Tag</th>
+                                                                    <th>CI Tag</th>
                                                                     <th>Name</th>
                                                                     <th>Type</th>
                                                                     <th>Status</th>
@@ -322,7 +325,7 @@
                                                                 <li class="page-item ${currentPage eq i ? 'active' : ''}">
                                                                     <a class="page-link"
                                                                        href="CIListServlet?page=${i}&keyword=${keyword}&status=${status}&assetType=${assetType}&location=${location}${not empty ticketId ? '&ticketId='.concat(ticketId) : ''}"
-                                                                       style="${(currentPage eq i and i eq 1) ? 'background-color:#ffc107 !important; border-color:#ffc107 !important; color:#212529 !important; font-weight:600;' : ''}">
+                                                                       >
                                                                         ${i}
                                                                     </a>
                                                                 </li>
@@ -354,12 +357,132 @@
         </div>
         <%-- MAIN CONTENT END --%>
 
+        <%-- ADD CI MODAL --%>
+        <div class="modal fade" id="addCIModal" tabindex="-1" role="dialog" aria-labelledby="addCIModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <form action="CIAddServlet" method="POST">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addCIModalLabel">Add New Configuration Item</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">CI Tag <span class="text-danger">*</span></label>
+                                        <input type="text" name="assetTag" class="form-control" placeholder="Enter CI Tag (e.g. LAP-001)" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">Name <span class="text-danger">*</span></label>
+                                        <input type="text" name="name" class="form-control" placeholder="Enter CI Name" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">Asset Type</label>
+                                        <select name="assetType" class="form-control">
+                                            <option value="Laptop">Laptop</option>
+                                            <option value="Server">Server</option>
+                                            <option value="Network">Network</option>
+                                            <option value="Printer">Printer</option>
+                                            <option value="Moniter">Moniter</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">Location</label>
+                                        <select name="locationId" id="addCI-location" class="form-control">
+                                            <c:forEach var="loc" items="${locationList}">
+                                                <option value="${loc.id}">${loc.name}</option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">Owner</label>
+                                        <select name="ownerId" id="addCI-owner" class="form-control">
+                                            <c:forEach var="u" items="${userList}">
+                                                <option value="${u.id}" 
+                                                        data-location-id="${u.locationId}"
+                                                        ${u.username eq 'admin' or u.fullName eq 'admin' ? 'selected' : ''}>
+                                                    ${u.fullName} (${u.username})
+                                                </option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Configuration Item</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <script src="assets/js/vendor-all.min.js"></script>
         <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
         <script src="assets/js/pcoded.min.js"></script>
 
         <script>
-                                                                                              setTimeout(function () {
+            document.addEventListener('DOMContentLoaded', function() {
+                const locationSelect = document.getElementById('addCI-location');
+                const ownerSelect = document.getElementById('addCI-owner');
+                const allOwnerOptions = Array.from(ownerSelect.options);
+                
+                function filterOwners() {
+                    const selectedLocationId = locationSelect.value;
+                    
+                    // Clear current options
+                    ownerSelect.innerHTML = '';
+                    
+                    // Add filtered options
+                    let foundAdmin = false;
+                    allOwnerOptions.forEach(option => {
+                        const optionLocId = option.getAttribute('data-location-id');
+                        const isGlobalAdmin = option.text.toLowerCase().includes('(admin)'); // fallback check
+                        
+                        // Show if location matches OR if it's the admin user (optional based on your requirement)
+                        // User said: filtered by location equal to location in field location
+                        // If we must strictly filter by location, we do:
+                        if (optionLocId == selectedLocationId || option.text.toLowerCase().includes('admin')) {
+                            ownerSelect.appendChild(option.cloneNode(true));
+                            if (option.text.toLowerCase().includes('admin')) foundAdmin = true;
+                        }
+                    });
+
+                    // Set default to Admin if found
+                    if (foundAdmin) {
+                        for (let i = 0; i < ownerSelect.options.length; i++) {
+                            if (ownerSelect.options[i].text.toLowerCase().includes('admin')) {
+                                ownerSelect.selectedIndex = i;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (locationSelect && ownerSelect) {
+                    locationSelect.addEventListener('change', filterOwners);
+                    // Initial filter on load/modal open
+                    $('#addCIModal').on('shown.bs.modal', filterOwners);
+                }
+            });
+
+            setTimeout(function () {
                                                                                                   var alertBox = document.getElementById('linkSuccessAlert');
                                                                                                   if (alertBox) {
                                                                                                       alertBox.remove();

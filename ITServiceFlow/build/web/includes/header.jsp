@@ -1,13 +1,14 @@
 <%-- 
-    Top bar (header) - thanh trên cùng.
-    S? d?ng request attribute "notifications" n?u có (tùy ch?n).
-    Tên user có th? l?y t? session "user" (model.Users) ho?c "userName".
+    Top bar (header) - thanh trï¿½n cï¿½ng.
+    S? d?ng request attribute "notifications" n?u cï¿½ (tï¿½y ch?n).
+    Tï¿½n user cï¿½ th? l?y t? session "user" (model.Users) ho?c "userName".
 --%>
 <%@page import="dao.NotificationDao"%>
 <%@page import="model.Notifications"%>
 <%@page import="java.util.List"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
+<%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
 <%
     if (session != null && session.getAttribute("userId") != null 
         && request.getAttribute("headerNotifications") == null) 
@@ -24,16 +25,45 @@
         request.setAttribute("headerNotifications", list);
     }
 %>
+<c:set var="role" value="${sessionScope.role}" />
+<c:choose>
+    <c:when test="${role == 'Admin'}">
+        <c:set var="dashboardHref" value="${pageContext.request.contextPath}/AdminDashboard" />
+    </c:when>
+    <c:when test="${role == 'Manager'}">
+        <c:set var="dashboardHref" value="${pageContext.request.contextPath}/ManagerDashboard" />
+    </c:when>
+    <c:when test="${role == 'IT Support'}">
+        <c:set var="dashboardHref" value="${pageContext.request.contextPath}/ITDashboard" />
+    </c:when>
+    <c:when test="${role == 'User'}">
+        <c:set var="dashboardHref" value="${pageContext.request.contextPath}/UserDashboard" />
+    </c:when>
+    <c:otherwise>
+        <c:set var="dashboardHref" value="${pageContext.request.contextPath}/Login" />
+    </c:otherwise>
+</c:choose>
 <!-- [ Header ] start -->
 <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed">
     <style>
         .noti-body {
             overflow-y: auto;
         }
+        .noti-text-ellipsis {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+            word-break: break-word;
+        }
     </style>
+    <c:set var="role" value="${sessionScope.role}" />
+
     <div class="m-header">
         <a class="mobile-menu" id="mobile-collapse1" href="#!"><span></span></a>
-        <a href="AdminDashboard.jsp" class="b-brand">
+        <a href="${dashboardHref}" class="b-brand">
             <img src="assets/images/logo.svg" alt="" class="logo images">
             <img src="assets/images/logo-icon.svg" alt="" class="logo-thumb images">
         </a>
@@ -46,7 +76,7 @@
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
                 <div class="main-search open">
-                    <div class="input-group">
+<!--                    <div class="input-group">
                         <input type="text" id="m-search" class="form-control" placeholder="Search . . .">
                         <a href="#!" class="input-group-append search-close">
                             <i class="feather icon-x input-group-text"></i>
@@ -54,7 +84,7 @@
                         <span class="input-group-append search-btn btn btn-primary">
                             <i class="feather icon-search input-group-text"></i>
                         </span>
-                    </div>
+                    </div>-->
                 </div>
             </li>
         </ul>
@@ -88,7 +118,16 @@
                                                                 <fmt:formatDate value="${notification.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
                                                             </span>
                                                         </p>
-                                                        <p><c:out value="${notification.message}"/></p>
+                                                        <p class="noti-text-ellipsis" title="${notification.message}">
+                                                            <c:choose>
+                                                                <c:when test="${fn:length(notification.message) > 120}">
+                                                                    <c:out value="${fn:substring(notification.message, 0, 120)}"/>...
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <c:out value="${notification.message}"/>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </a>

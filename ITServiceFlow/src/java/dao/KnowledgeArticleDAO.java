@@ -2,20 +2,20 @@ package dao;
 
 import Utils.DbContext;
 import model.KnowledgeArticles;
-import model.SharedFile;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import model.SharedFile;
 
 /**
  * DAO for KnowledgeArticles table.
  */
 public class KnowledgeArticleDAO extends DbContext {
 
-    // ── Get filtered articles with attachments ───────────────────────────
+        // ── Get filtered articles with attachments ───────────────────────────
     public List<KnowledgeArticles> getFilteredArticles(String keyword, String status) {
         List<KnowledgeArticles> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT * FROM KnowledgeArticles WHERE 1=1 ");
@@ -85,6 +85,7 @@ public class KnowledgeArticleDAO extends DbContext {
         return list;
     }
 
+    
     // ── Search articles by keyword (title or content), only Published ──────
     public List<KnowledgeArticles> searchArticles(String keyword) {
         List<KnowledgeArticles> list = new ArrayList<>();
@@ -93,7 +94,7 @@ public class KnowledgeArticleDAO extends DbContext {
 
         if (hasKeyword) {
             sql = "SELECT * FROM KnowledgeArticles WHERE Status = 'Published' " +
-                    "AND (Title LIKE ? OR Content LIKE ?) ORDER BY CreatedAt DESC";
+                  "AND (Title LIKE ? OR Content LIKE ?) ORDER BY CreatedAt DESC";
         } else {
             sql = "SELECT * FROM KnowledgeArticles WHERE Status = 'Published' ORDER BY CreatedAt DESC";
         }
@@ -143,48 +144,56 @@ public class KnowledgeArticleDAO extends DbContext {
             e.printStackTrace();
         }
     }
-    // ── Update article content and status ─────────────────────────────────
-    public boolean updateArticle(int id, String title, String content, String status) {
-        String sql = "UPDATE KnowledgeArticles SET Title = ?, Content = ?, Status = ? WHERE Id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, title);
-            ps.setString(2, content);
-            ps.setString(3, status);
-            ps.setInt(4, id);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
 
-    // ── Update ticket resolution fields (Title, Description, ResolutionNotes) ──
+    // ── Update ticket resolution fields and create a Knowledge Article ──
     public boolean updateTicketResolution(int ticketId, String title,
-            String description, String resolutionNotes) {
-
-        String sql = "UPDATE Tickets SET Title = ?, Description = ?, " +
-                "ResolutionNotes = ?, UpdatedAt = GETDATE() WHERE Id = ? AND Status = 'Resolved'";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                                          String description, String resolutionNotes, int userId) {
+        // Step 1: Update the Ticket table
+        boolean ticketUpdated = false;
+        String sqlTicket = "UPDATE Tickets SET Title = ?, Description = ?, " +
+                           "ResolutionNotes = ?, UpdatedAt = GETDATE() WHERE Id = ? AND Status = 'Resolved'";
+        try (PreparedStatement ps = connection.prepareStatement(sqlTicket)) {
             ps.setString(1, title);
             ps.setString(2, description);
             ps.setString(3, resolutionNotes);
             ps.setInt(4, ticketId);
+            ticketUpdated = ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            // Fallback if ResolutionNotes column doesn't exist
+            if (e.getMessage() != null && e.getMessage().contains("ResolutionNotes")) {
+                ticketUpdated = updateTicketResolutionFallback(ticketId, title, description, resolutionNotes);
+            } else {
+                e.printStackTrace();
+            }
+        }
+
+        if (!ticketUpdated) return false;
+
+        // Step 2: Create a Knowledge Article from the resolution
+        String sqlKA = "INSERT INTO KnowledgeArticles (ArticleNumber, Title, Content, CategoryId, Status, ViewCount, CreatedBy, CreatedAt) " +
+                       "VALUES (?, ?, ?, (SELECT CategoryId FROM Tickets WHERE Id = ?), 'Published', 0, ?, GETDATE())";
+        try (PreparedStatement ps = connection.prepareStatement(sqlKA)) {
+            String articleNumber = "KA-" + System.currentTimeMillis();
+            String combinedContent = "Ticket Resolution:\n" + description + "\n\nResolution Steps:\n" + resolutionNotes;
+            
+            ps.setString(1, articleNumber);
+            ps.setString(2, title);
+            ps.setString(3, combinedContent);
+            ps.setInt(4, ticketId);
+            ps.setInt(5, userId);
+            
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            // If ResolutionNotes column doesn't exist, fall back
-            if (e.getMessage() != null && e.getMessage().contains("ResolutionNotes")) {
-                return updateTicketResolutionFallback(ticketId, title, description, resolutionNotes);
-            }
             e.printStackTrace();
             return false;
         }
     }
 
     private boolean updateTicketResolutionFallback(int ticketId, String title,
-            String description, String resolutionNotes) {
+                                                    String description, String resolutionNotes) {
         String combined = description + "\n\n[Resolution Steps]\n" + resolutionNotes;
         String sql = "UPDATE Tickets SET Title = ?, Description = ?, UpdatedAt = GETDATE() " +
-                "WHERE Id = ? AND Status = 'Resolved'";
+                     "WHERE Id = ? AND Status = 'Resolved'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, title);
             ps.setString(2, combined);
@@ -196,6 +205,7 @@ public class KnowledgeArticleDAO extends DbContext {
         }
     }
 
+   
     private KnowledgeArticles mapRow(ResultSet rs) throws SQLException {
         KnowledgeArticles a = new KnowledgeArticles();
         a.setId(rs.getInt("Id"));

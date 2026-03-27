@@ -106,7 +106,7 @@
                                                 <li class="breadcrumb-item">
                                                     <c:choose>
                                                         <c:when test="${role eq 'Admin'}">
-                                                            <a href="${pageContext.request.contextPath}/AdminDashboard"><i class="feather icon-home"></i></a>
+                                                            <a href="AdminDashboard.jsp"><i class="feather icon-home"></i></a>
                                                         </c:when>
                                                         <c:otherwise>
                                                             <a href="ManagerDashboard"><i class="feather icon-home"></i></a>

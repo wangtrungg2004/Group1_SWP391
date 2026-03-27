@@ -240,7 +240,7 @@
                                                                                       <td>${t.title}</td>
                                                                                       <td><span class="badge badge-light">${t.status}</span></td>
                                                                                       <td>${t.createdAt}</td>
-                                                                                      <td><a class="btn btn-sm btn-outline-primary" href="TicketDetail?id=${t.id}">View</a></td>
+                                                                                      <td><a class="btn btn-sm btn-outline-primary" href="${pageContext.request.contextPath}/TicketAgentDetail?id=${t.id}">View</a></td>
                                                                                     </tr>
                                                                                   </c:forEach>
 

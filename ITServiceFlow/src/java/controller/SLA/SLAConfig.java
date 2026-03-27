@@ -5,7 +5,6 @@
 package controller.SLA;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,6 +16,10 @@ import model.Priority;
 import model.SLARule;
 import service.SLARuleService;
 
+import dao.AuditLogDao;
+import model.AuditLog;
+
+
 /**
  *
  * @author DELL
@@ -25,6 +28,7 @@ import service.SLARuleService;
 public class SLAConfig extends HttpServlet {
 
     SLARuleService slaRuleService = new SLARuleService();
+    AuditLogDao auditLogDao = new AuditLogDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -80,7 +84,7 @@ public class SLAConfig extends HttpServlet {
             type = type.trim();
 
         int page = 1;
-        int pageSize = 15;
+        int pageSize = 10;
         Integer priorityId = null;
 
         if (pageRaw != null && !pageRaw.isEmpty()) {
@@ -100,22 +104,26 @@ public class SLAConfig extends HttpServlet {
         }
 
         List<SLARule> rules = slaRuleService.searchSLARules(name, type, priorityId, status, page, pageSize);
-        int totalRecords = slaRuleService.countSLARules(name, type, priorityId, status);
-        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+        int totalLogs = slaRuleService.countSLARules(name, type, priorityId, status);
+        int totalPages = (int) Math.ceil((double) totalLogs / pageSize);
         if (totalPages < 1)
             totalPages = 1;
 
+        List<Priority> priorities = slaRuleService.getAllPriorities();
+        List<String> availableTypes = slaRuleService.getDistinctTypes();
+        List<String> availableStatuses = slaRuleService.getDistinctStatuses();
+
         request.setAttribute("slaRules", rules);
+        request.setAttribute("priorities", priorities);
+        request.setAttribute("availableTypes", availableTypes);
+        request.setAttribute("availableStatuses", availableStatuses);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalRecords", totalLogs);
         request.setAttribute("paramName", name);
         request.setAttribute("paramType", type);
         request.setAttribute("paramPriority", priorityId);
         request.setAttribute("paramStatus", status);
-
-        List<Priority> priorities = slaRuleService.getAllPriorities();
-        request.setAttribute("priorities", priorities);
-
         request.getRequestDispatcher("sla-config.jsp").forward(request, response);
     }
 
@@ -140,6 +148,20 @@ public class SLAConfig extends HttpServlet {
                 try {
                     int id = Integer.parseInt(idRaw);
                     slaRuleService.deleteSLARule(id);
+
+                    
+                    // Add Audit Log
+                    AuditLog log = new AuditLog();
+                    log.setUserId(userId != null ? userId : 1);
+                    log.setAction("DELETE_SLA_RULE");
+                    log.setScreen("SLA Config");
+                    log.setDataBefore("ID: " + id);
+                    log.setDataAfter("SLA Rule deleted");
+                    log.setEntity("SLARules");
+                    log.setEntityId(id);
+                    auditLogDao.insertLog(log);
+
+
                     session.setAttribute("successMessage", "SLA Rule deleted successfully.");
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
@@ -156,10 +178,19 @@ public class SLAConfig extends HttpServlet {
                         String newStatus = "Active".equals(currentStatus) ? "Inactive" : "Active";
                         rule.setStatus(newStatus);
                         slaRuleService.updateSLARule(rule);
-                        
-                        if ("Active".equals(newStatus)) {
-                            // Additional logic could be added here if needed
-                        }
+
+                        // Add Audit Log
+                        AuditLog log = new AuditLog();
+                        log.setUserId(userId != null ? userId : 1);
+                        log.setAction("TOGGLE_SLA_STATUS");
+                        log.setScreen("SLA Config");
+                        log.setDataBefore("Status: " + currentStatus);
+                        log.setDataAfter("Status: " + newStatus);
+                        log.setEntity("SLARules");
+                        log.setEntityId(id);
+                        auditLogDao.insertLog(log);
+
+
                         session.setAttribute("successMessage", "SLA Rule status updated.");
                         response.sendRedirect("SLAConfig?action=detail&id=" + id);
                         return;
@@ -211,17 +242,47 @@ public class SLAConfig extends HttpServlet {
                 rule.setStatus(status);
                 rule.setCreatedBy(userId);
 
+                boolean isEdit = idRaw != null && !idRaw.isEmpty();
+                Integer currentId = isEdit ? Integer.parseInt(idRaw) : null;
+
+                if (slaRuleService.isSlaNameExists(rule.getSlaName(), currentId)) {
+                    session.setAttribute("errorMessage", "SLA Name '" + rule.getSlaName() + "' already exists. Please use a unique name.");
+                    response.sendRedirect("SLAConfig" + (isEdit ? "?action=edit&id=" + idRaw : ""));
+                    return;
+                }
+
                 boolean success;
-                if (idRaw != null && !idRaw.isEmpty()) {
-                    int id = Integer.parseInt(idRaw);
-                    rule.setId(id);
+                if (isEdit) {
+                    rule.setId(currentId);
                     success = slaRuleService.updateSLARule(rule);
                     if (success) {
+                        // Add Audit Log
+                        AuditLog log = new AuditLog();
+                        log.setUserId(userId != null ? userId : 1);
+                        log.setAction("UPDATE_SLA_RULE");
+                        log.setScreen("SLA Config");
+                        log.setDataBefore("N/A"); // For simplicity, detailed dataBefore could be fetched if needed
+                        log.setDataAfter("Rule updated: " + slaName);
+                        log.setEntity("SLARules");
+                        log.setEntityId(currentId);
+                        auditLogDao.insertLog(log);
+                        
+
                         session.setAttribute("successMessage", "SLA Rule updated successfully!");
                     }
                 } else {
                     success = slaRuleService.addSLARule(rule);
                     if (success) {
+                        // Add Audit Log
+                        AuditLog log = new AuditLog();
+                        log.setUserId(userId != null ? userId : 1);
+                        log.setAction("CREATE_SLA_RULE");
+                        log.setScreen("SLA Config");
+                        log.setDataBefore("N/A");
+                        log.setDataAfter("Rule created: " + slaName);
+                        log.setEntity("SLARules");
+                        auditLogDao.insertLog(log);
+
                         session.setAttribute("successMessage", "SLA Rule added successfully!");
                     }
                 }

@@ -1,12 +1,16 @@
 package controller;
 
 import dao.AssetsDAO;
+import dao.LocationsDAO;
+import dao.UserDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.Assets;
+import model.Locations;
+import model.Users;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -18,11 +22,15 @@ public class CIListServlet extends HttpServlet {
     private static final int PAGE_SIZE = 10;
 
     private AssetsDAO assetsDAO;
+    private UserDao userDao;
+    private LocationsDAO locationsDAO;
 
     @Override
     public void init() throws ServletException {
         super.init();
         assetsDAO = new AssetsDAO();
+        userDao = new UserDao();
+        locationsDAO = new LocationsDAO();
     }
 
     @Override
@@ -114,7 +122,12 @@ public class CIListServlet extends HttpServlet {
                 : fullList.subList(fromIndex, toIndex);
 
         
+        List<Users> userList = userDao.getAllUsers();
+        List<Locations> locationList = locationsDAO.getAllLocations();
+        
         request.setAttribute("ciList",      pageList);
+        request.setAttribute("userList",    userList);
+        request.setAttribute("locationList", locationList);
         request.setAttribute("keyword",     keyword);
         request.setAttribute("status",      statusForJSP);
         request.setAttribute("assetType",   assetTypeForJSP);

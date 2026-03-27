@@ -16,6 +16,8 @@ import jakarta.servlet.http.HttpSession;
 import model.Users;
 import service.TemporaryRoleAccessService;
 import service.UserService;
+import dao.AuditLogDao;
+import model.AuditLog;
 
 /**
  *
@@ -75,6 +77,8 @@ public class Login extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    private AuditLogDao auditLogDao = new AuditLogDao();
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -115,21 +119,34 @@ public class Login extends HttpServlet {
         session.setAttribute(TemporaryRoleAccessService.SESSION_TEMP_ROLE_ACTIVATED, false);
         temporaryRoleAccessService.synchronizeSessionRole(session);
         
+
         // Redirect theo role goc, temporary role chi active khi user bam nut trong trang TemporaryAccessRequest
+
+        // Add audit log
+        AuditLog log = new AuditLog();
+        log.setUserId(user.getId());
+        log.setAction("LOGIN");
+        log.setScreen("Login");
+        log.setDataBefore("N/A");
+        log.setDataAfter("User logged in: " + user.getUsername());
+        auditLogDao.insertLog(log);
+        
+        // Redirect theo role
+
         String role = user.getRole();
         if (role != null) {
             switch (role) {
                 case "Admin":
-                    response.sendRedirect(request.getContextPath() + "/AdminDashboard");
+                    response.sendRedirect("AdminDashboard");
                     break;
                 case "Manager":
-                    response.sendRedirect(request.getContextPath() + "/ManagerDashboard");
+                    response.sendRedirect("ManagerDashboard");
                     break;
                 case "User":
-                    response.sendRedirect(request.getContextPath() + "/UserDashboard");
+                    response.sendRedirect("UserDashboard");
                     break;
                 case "IT Support":
-                    response.sendRedirect(request.getContextPath() + "/ITDashboard");
+                    response.sendRedirect("ITDashboard.jsp");
                     break;
                 default:
                     request.setAttribute("error", "Role không hợp lệ. Vui lòng liên hệ quản trị viên.");

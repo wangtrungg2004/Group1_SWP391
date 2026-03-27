@@ -3,6 +3,7 @@ package controller.ticket.user;
 import dao.NotificationDao;
 import dao.TicketCommentsDAO;
 import dao.TicketDAO;
+import dao.UserDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -10,6 +11,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import model.TicketComments;
 import model.Tickets;
 import model.Users;
@@ -92,24 +97,72 @@ public class TicketReopenController extends HttpServlet {
 
     private void sendReopenNotifications(Tickets ticket, int ticketId, String reason) {
         NotificationDao notificationDao = new NotificationDao();
+        UserDao userDao = new UserDao();
         String ticketNumber = ticket.getTicketNumber() == null ? ("#" + ticketId) : ticket.getTicketNumber();
         String compactReason = reason.length() > 200 ? reason.substring(0, 200) + "..." : reason;
 
-        String title = "Ticket Reopened";
-        String message = "Requester reopened ticket " + ticketNumber + ". Reason: " + compactReason;
-
+        int requesterId = ticket.getCreatedBy();
         Integer assignedTo = ticket.getAssignedTo();
-        if (assignedTo != null && assignedTo > 0) {
-            notificationDao.addNotification(assignedTo, message, ticketId, false, title, "Ticket");
-            return;
+
+        if (requesterId > 0) {
+            String userTitle = "Reopen Request Submitted";
+            String userMessage = "Your reopen request for ticket " + ticketNumber
+                    + " has been sent to IT Support. Reason: " + compactReason;
+            notificationDao.addNotification(
+                    requesterId,
+                    userMessage,
+                    ticketId,
+                    false,
+                    userTitle,
+                    "Ticket-Reopen-User"
+            );
         }
 
-        notificationDao.addBroadcastNotification(
-                "Ticket " + ticketNumber + " has been reopened and is waiting for assignment. Reason: " + compactReason,
-                ticketId,
-                title,
-                "Ticket"
-        );
+        Set<Integer> itRecipientIds = new LinkedHashSet<>();
+        if (assignedTo != null && assignedTo > 0) {
+            itRecipientIds.add(assignedTo);
+        }
+        if (itRecipientIds.isEmpty()) {
+            List<Integer> activeItIds = userDao.getActiveUserIdsByRoles(Arrays.asList("IT Support"));
+            itRecipientIds.addAll(activeItIds);
+        }
+
+        String itTitle = "Ticket Reopened - Action Required";
+        String itMessage = "Requester reopened ticket " + ticketNumber
+                + ". Reason: " + compactReason
+                + ". Please review and continue handling.";
+        for (Integer itId : itRecipientIds) {
+            if (itId == null || itId <= 0 || itId == requesterId) {
+                continue;
+            }
+            notificationDao.addNotification(
+                    itId,
+                    itMessage,
+                    ticketId,
+                    false,
+                    itTitle,
+                    "Ticket-Reopen-IT"
+            );
+        }
+
+        List<Integer> managerIds = userDao.getActiveUserIdsByRoles(Arrays.asList("Manager"));
+        String managerTitle = "Ticket Reopened - For Monitoring";
+        String managerMessage = "Ticket " + ticketNumber
+                + " has been reopened by requester. Reason: " + compactReason
+                + ". IT Support has been notified.";
+        for (Integer managerId : managerIds) {
+            if (managerId == null || managerId <= 0 || managerId == requesterId) {
+                continue;
+            }
+            notificationDao.addNotification(
+                    managerId,
+                    managerMessage,
+                    ticketId,
+                    false,
+                    managerTitle,
+                    "Ticket-Reopen-Manager"
+            );
+        }
     }
 
     private int parseInt(String value) {

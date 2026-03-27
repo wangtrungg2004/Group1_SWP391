@@ -11,7 +11,7 @@ import java.time.Year;
 
 public class ChangeRequestDao extends DbContext {
 
-    // Cache schema check để tránh query sys.columns lặp lại nhiều lần
+     // Cache schema check để tránh query sys.columns lặp lại nhiều lần
     private Boolean linkedTicketColumnExists = null;
     private String requestNumberColumn = null;
 
@@ -44,28 +44,18 @@ public class ChangeRequestDao extends DbContext {
         }
         return requestNumberColumn;
     }
-
     // ── Sinh RFCNumber tự động ────────────────────────────────────────────────
     private String getNextRFCNumber() {
         int year = Year.now().getValue();
         String prefix = "CHG-" + year + "-";
-        String numberColumn = getRequestNumberColumn();
-        String sql = "SELECT TOP 1 " + numberColumn + " "
-                + "FROM ChangeRequests "
-                + "WHERE " + numberColumn + " LIKE ? "
-                + "ORDER BY TRY_CAST(RIGHT(" + numberColumn + ", 3) AS INT) DESC, " + numberColumn + " DESC";
+        String sql = "SELECT MAX(RFCNumber) FROM ChangeRequests WHERE RFCNumber LIKE ?";
         int next = 1;
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setString(1, prefix + "%");
             ResultSet rs = stm.executeQuery();
             if (rs.next() && rs.getString(1) != null) {
                 String last = rs.getString(1);
-                int idx = last.lastIndexOf('-');
-                if (idx >= 0 && idx < last.length() - 1) {
-                    try {
-                        next = Integer.parseInt(last.substring(idx + 1)) + 1;
-                    } catch (NumberFormatException ignored) {}
-                }
+                next = Integer.parseInt(last.substring(last.lastIndexOf('-') + 1)) + 1;
             }
         } catch (SQLException ex) { ex.printStackTrace(); }
         return prefix + String.format("%03d", next);
@@ -88,17 +78,10 @@ public class ChangeRequestDao extends DbContext {
                 || rollbackPlan == null || rollbackPlan.trim().isEmpty()) return -1;
 
         String status = savedAsDraft ? "Draft" : "Pending Approval";
-        boolean hasLinked = hasLinkedTicketIdColumn();
-        String numberColumn = getRequestNumberColumn();
-        String sql = hasLinked
-                ? "INSERT INTO ChangeRequests "
-                    + "(" + numberColumn + ", Title, Description, ChangeType, RiskLevel, RollbackPlan, "
-                    + " PlannedStart, PlannedEnd, Status, CreatedBy, LinkedTicketId, CreatedAt) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE())"
-                : "INSERT INTO ChangeRequests "
-                    + "(" + numberColumn + ", Title, Description, ChangeType, RiskLevel, RollbackPlan, "
-                    + " PlannedStart, PlannedEnd, Status, CreatedBy, CreatedAt) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE())";
+        String sql = "INSERT INTO ChangeRequests "
+                + "(RFCNumber, Title, Description, ChangeType, RiskLevel, RollbackPlan, "
+                + " PlannedStart, PlannedEnd, Status, CreatedBy, LinkedTicketId, CreatedAt) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE())";
         try (PreparedStatement stm = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, getNextRFCNumber());
             stm.setString(2, title.trim());
@@ -110,10 +93,8 @@ public class ChangeRequestDao extends DbContext {
             stm.setDate(8, plannedEnd   != null ? new java.sql.Date(plannedEnd.getTime())   : null);
             stm.setString(9, status);
             stm.setInt(10, createdBy);
-            if (hasLinked) {
-                if (linkedTicketId != null) stm.setInt(11, linkedTicketId);
-                else stm.setNull(11, Types.INTEGER);
-            }
+            if (linkedTicketId != null) stm.setInt(11, linkedTicketId);
+            else stm.setNull(11, Types.INTEGER);
             stm.executeUpdate();
             ResultSet keys = stm.getGeneratedKeys();
             return keys.next() ? keys.getInt(1) : -1;
@@ -132,23 +113,15 @@ public class ChangeRequestDao extends DbContext {
 
     // ── Lấy 1 RFC theo Id (THÊM MỚI — dùng cho trang detail) ────────────────
     public ChangeRequests getById(int id) {
-        boolean hasLinked = hasLinkedTicketIdColumn();
-        String numberColumn = getRequestNumberColumn();
-        String linkedSelect = hasLinked
-                ? " t.TicketNumber AS LinkedTicketNumber, t.Title AS LinkedTicketTitle, "
-                : " NULL AS LinkedTicketNumber, NULL AS LinkedTicketTitle, ";
-        String linkedJoin = hasLinked
-                ? "LEFT JOIN Tickets t ON cr.LinkedTicketId = t.Id "
-                : "";
-        String sql = "SELECT cr." + numberColumn + " AS RFCNumber, cr.*, u.FullName AS CreatedByName, "
-                + linkedSelect
+        String sql = "SELECT cr.*, u.FullName AS CreatedByName, "
+                + " t.TicketNumber AS LinkedTicketNumber, t.Title AS LinkedTicketTitle, "
                 + " (SELECT TOP 1 ca.Comment    FROM ChangeApprovals ca "
                 + "  WHERE ca.ChangeId = cr.Id  ORDER BY ca.DecidedAt DESC) AS ApproverComment, "
                 + " (SELECT TOP 1 ca.DecidedAt  FROM ChangeApprovals ca "
                 + "  WHERE ca.ChangeId = cr.Id  ORDER BY ca.DecidedAt DESC) AS ApprovedAt "
                 + "FROM ChangeRequests cr "
                 + "LEFT JOIN Users u  ON cr.CreatedBy    = u.Id "
-                + linkedJoin
+                + "LEFT JOIN Tickets t ON cr.LinkedTicketId = t.Id "
                 + "WHERE cr.Id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -166,21 +139,13 @@ public class ChangeRequestDao extends DbContext {
     // ── Tất cả RFC ───────────────────────────────────────────────────────────
     public List<ChangeRequests> getAllRequests() {
         List<ChangeRequests> list = new ArrayList<>();
-        boolean hasLinked = hasLinkedTicketIdColumn();
-        String numberColumn = getRequestNumberColumn();
-        String linkedSelect = hasLinked
-                ? " t.TicketNumber AS LinkedTicketNumber, t.Title AS LinkedTicketTitle, "
-                : " NULL AS LinkedTicketNumber, NULL AS LinkedTicketTitle, ";
-        String linkedJoin = hasLinked
-                ? "LEFT JOIN Tickets t ON cr.LinkedTicketId = t.Id "
-                : "";
-        String sql = "SELECT cr." + numberColumn + " AS RFCNumber, cr.*, u.FullName AS CreatedByName, "
-                + linkedSelect
+        String sql = "SELECT cr.*, u.FullName AS CreatedByName, "
+                + " t.TicketNumber AS LinkedTicketNumber, t.Title AS LinkedTicketTitle, "
                 + " (SELECT TOP 1 ca.Comment   FROM ChangeApprovals ca WHERE ca.ChangeId = cr.Id ORDER BY ca.DecidedAt DESC) AS ApproverComment, "
                 + " (SELECT TOP 1 ca.DecidedAt FROM ChangeApprovals ca WHERE ca.ChangeId = cr.Id ORDER BY ca.DecidedAt DESC) AS ApprovedAt "
                 + "FROM ChangeRequests cr "
                 + "LEFT JOIN Users u  ON cr.CreatedBy     = u.Id "
-                + linkedJoin
+                + "LEFT JOIN Tickets t ON cr.LinkedTicketId = t.Id "
                 + "ORDER BY cr.CreatedAt DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
@@ -191,19 +156,11 @@ public class ChangeRequestDao extends DbContext {
 
     private List<ChangeRequests> getByStatusFull(String status) {
         List<ChangeRequests> list = new ArrayList<>();
-        boolean hasLinked = hasLinkedTicketIdColumn();
-        String numberColumn = getRequestNumberColumn();
-        String linkedSelect = hasLinked
-                ? " t.TicketNumber AS LinkedTicketNumber, t.Title AS LinkedTicketTitle "
-                : " NULL AS LinkedTicketNumber, NULL AS LinkedTicketTitle ";
-        String linkedJoin = hasLinked
-                ? "LEFT JOIN Tickets t ON cr.LinkedTicketId = t.Id "
-                : "";
-        String sql = "SELECT cr." + numberColumn + " AS RFCNumber, cr.*, u.FullName AS CreatedByName, "
-                + linkedSelect
+        String sql = "SELECT cr.*, u.FullName AS CreatedByName, "
+                + " t.TicketNumber AS LinkedTicketNumber, t.Title AS LinkedTicketTitle "
                 + "FROM ChangeRequests cr "
                 + "LEFT JOIN Users u  ON cr.CreatedBy     = u.Id "
-                + linkedJoin
+                + "LEFT JOIN Tickets t ON cr.LinkedTicketId = t.Id "
                 + "WHERE cr.Status = ? ORDER BY cr.CreatedAt DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, status);
@@ -216,20 +173,12 @@ public class ChangeRequestDao extends DbContext {
     // ── RFC của 1 IT Support ─────────────────────────────────────────────────
     public List<ChangeRequests> getMyChangeRequests(int createdBy, String status) {
         List<ChangeRequests> list = new ArrayList<>();
-        boolean hasLinked = hasLinkedTicketIdColumn();
-        String numberColumn = getRequestNumberColumn();
-        String linkedSelect = hasLinked
-                ? " t.TicketNumber AS LinkedTicketNumber, t.Title AS LinkedTicketTitle "
-                : " NULL AS LinkedTicketNumber, NULL AS LinkedTicketTitle ";
-        String linkedJoin = hasLinked
-                ? "LEFT JOIN Tickets t ON cr.LinkedTicketId = t.Id "
-                : "";
         StringBuilder sql = new StringBuilder(
-            "SELECT cr." + numberColumn + " AS RFCNumber, cr.*, u.FullName AS CreatedByName, "
-            + linkedSelect
+            "SELECT cr.*, u.FullName AS CreatedByName, "
+            + " t.TicketNumber AS LinkedTicketNumber, t.Title AS LinkedTicketTitle "
             + "FROM ChangeRequests cr "
             + "LEFT JOIN Users u  ON cr.CreatedBy     = u.Id "
-            + linkedJoin
+            + "LEFT JOIN Tickets t ON cr.LinkedTicketId = t.Id "
             + "WHERE cr.CreatedBy = ? "
         );
         if (status != null && !status.isEmpty() && !"all".equals(status))
@@ -240,6 +189,91 @@ public class ChangeRequestDao extends DbContext {
             if (status != null && !status.isEmpty() && !"all".equals(status))
                 stm.setString(2, status);
             ResultSet rs = stm.executeQuery();
+            while (rs.next()) list.add(mapCR(rs));
+        } catch (Exception ex) { ex.printStackTrace(); }
+        return list;
+    }
+
+
+    // ── Tìm kiếm RFC cho Manager (keyword + status tab) ──────────────────────
+    public List<ChangeRequests> searchRequests(String keyword, String tab) {
+        List<ChangeRequests> list = new ArrayList<>();
+        boolean hasLinked = hasLinkedTicketIdColumn();
+        String numberColumn = getRequestNumberColumn();
+        String linkedSelect = hasLinked
+                ? " t.TicketNumber AS LinkedTicketNumber, t.Title AS LinkedTicketTitle, "
+                : " NULL AS LinkedTicketNumber, NULL AS LinkedTicketTitle, ";
+        String linkedJoin = hasLinked ? "LEFT JOIN Tickets t ON cr.LinkedTicketId = t.Id " : "";
+
+        StringBuilder sql = new StringBuilder(
+            "SELECT cr." + numberColumn + " AS RFCNumber, cr.*, u.FullName AS CreatedByName, "
+            + linkedSelect
+            + " (SELECT TOP 1 ca.Comment   FROM ChangeApprovals ca WHERE ca.ChangeId = cr.Id ORDER BY ca.DecidedAt DESC) AS ApproverComment, "
+            + " (SELECT TOP 1 ca.DecidedAt FROM ChangeApprovals ca WHERE ca.ChangeId = cr.Id ORDER BY ca.DecidedAt DESC) AS ApprovedAt "
+            + "FROM ChangeRequests cr "
+            + "LEFT JOIN Users u ON cr.CreatedBy = u.Id "
+            + linkedJoin
+            + "WHERE 1=1 "
+        );
+
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        boolean hasStatus  = tab != null && !tab.isEmpty() && !"all".equals(tab);
+
+        if (hasKeyword) sql.append("AND (cr.Title LIKE ? OR u.FullName LIKE ? OR cr." + numberColumn + " LIKE ?) ");
+        if (hasStatus)  sql.append("AND cr.Status = ? ");
+        sql.append("ORDER BY cr.CreatedAt DESC");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int idx = 1;
+            if (hasKeyword) {
+                String like = "%" + keyword.trim() + "%";
+                ps.setString(idx++, like);
+                ps.setString(idx++, like);
+                ps.setString(idx++, like);
+            }
+            if (hasStatus) ps.setString(idx, "Pending Approval".equals(tab) ? "Pending Approval" : tab);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) list.add(mapCR(rs));
+        } catch (Exception ex) { ex.printStackTrace(); }
+        return list;
+    }
+
+    // ── Tìm kiếm RFC của IT Support (keyword + status) ───────────────────────
+    public List<ChangeRequests> searchMyRequests(int createdBy, String keyword, String status) {
+        List<ChangeRequests> list = new ArrayList<>();
+        boolean hasLinked = hasLinkedTicketIdColumn();
+        String numberColumn = getRequestNumberColumn();
+        String linkedSelect = hasLinked
+                ? " t.TicketNumber AS LinkedTicketNumber, t.Title AS LinkedTicketTitle "
+                : " NULL AS LinkedTicketNumber, NULL AS LinkedTicketTitle ";
+        String linkedJoin = hasLinked ? "LEFT JOIN Tickets t ON cr.LinkedTicketId = t.Id " : "";
+
+        StringBuilder sql = new StringBuilder(
+            "SELECT cr." + numberColumn + " AS RFCNumber, cr.*, u.FullName AS CreatedByName, "
+            + linkedSelect
+            + "FROM ChangeRequests cr "
+            + "LEFT JOIN Users u ON cr.CreatedBy = u.Id "
+            + linkedJoin
+            + "WHERE cr.CreatedBy = ? "
+        );
+
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        boolean hasStatus  = status != null && !status.isEmpty() && !"all".equals(status);
+
+        if (hasKeyword) sql.append("AND (cr.Title LIKE ? OR cr." + numberColumn + " LIKE ?) ");
+        if (hasStatus)  sql.append("AND cr.Status = ? ");
+        sql.append("ORDER BY cr.CreatedAt DESC");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int idx = 1;
+            ps.setInt(idx++, createdBy);
+            if (hasKeyword) {
+                String like = "%" + keyword.trim() + "%";
+                ps.setString(idx++, like);
+                ps.setString(idx++, like);
+            }
+            if (hasStatus) ps.setString(idx, status);
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) list.add(mapCR(rs));
         } catch (Exception ex) { ex.printStackTrace(); }
         return list;
@@ -333,12 +367,9 @@ public class ChangeRequestDao extends DbContext {
     private ChangeRequests mapCR(ResultSet rs) throws SQLException {
         ChangeRequests cr = new ChangeRequests();
         cr.setId(rs.getInt("Id"));
-        String number = null;
-        try { number = rs.getString("RFCNumber"); } catch (Exception ignored) {}
-        if (number == null) {
-            try { number = rs.getString("TicketNumber"); } catch (Exception ignored) {}
-        }
-        cr.setRfcNumber(number);
+        // Hỗ trợ cả model cũ (setTicketNumber) và mới (setRfcNumber)
+        try { cr.setRfcNumber(rs.getString("RFCNumber")); }
+        catch (Exception e) { try { cr.setTicketNumber(rs.getString("RFCNumber")); } catch (Exception ignored) {} }
         cr.setTitle(rs.getString("Title"));
         cr.setDescription(rs.getString("Description"));
         cr.setChangeType(rs.getString("ChangeType"));

@@ -62,16 +62,25 @@ public class ManagerChangeApprovals extends HttpServlet {
             return;
         }
 
-        // ── Mặc định: danh sách ───────────────────────────────────────────
-        String tab = request.getParameter("tab");
+        // ── Mặc định: danh sách (có filter/search) ───────────────────────
+        String tab     = request.getParameter("tab");
+        String keyword = request.getParameter("keyword");
         if (tab == null || tab.isEmpty()) tab = "pending";
+        if (keyword == null) keyword = "";
 
-        List<ChangeRequests> requests = "all".equals(tab)
-                ? service.getAllRequests()
-                : service.getPendingRequests();
+        List<ChangeRequests> requests;
+        if (!keyword.trim().isEmpty()) {
+            // Có keyword → search
+            requests = service.searchRequests(keyword.trim(), tab);
+        } else if ("all".equals(tab)) {
+            requests = service.getAllRequests();
+        } else {
+            requests = service.getPendingRequests();
+        }
 
         request.setAttribute("requests", requests);
         request.setAttribute("tab",      tab);
+        request.setAttribute("keyword",  keyword);
         request.getRequestDispatcher("/ManagerChangeApprovals.jsp").forward(request, response);
     }
 

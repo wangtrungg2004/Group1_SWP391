@@ -77,14 +77,24 @@ public class ITSupportNotificationList extends HttpServlet {
             }
 
             // 4. Load notifications (nếu chưa có)
-            if (request.getAttribute("notifications") == null && userId != null) {
-                List<Notifications> notifications;
-
-                notifications = notificationService.getAllNotificationsByUserId(userId);
-                
-                request.setAttribute("notifications", notifications);
-                request.getRequestDispatcher("ITSupportNotificationList.jsp").forward(request, response);
+            if (userId == null) {
+                response.sendRedirect("Login.jsp");
+                return;
             }
+            String keyword = request.getParameter("keyword");
+            if (keyword == null) {
+                keyword = "";
+            }
+            List<Notifications> notifications;
+            if (!keyword.isEmpty()) {
+                notifications = notificationService.searchNotificationsForUser(userId, keyword);
+            } else {
+                notifications = notificationService.getAllNotificationsByUserId(userId);
+            }
+            
+            request.setAttribute("notifications", notifications);
+            request.setAttribute("searchKeyword", keyword);
+            request.getRequestDispatcher("ITSupportNotificationList.jsp").forward(request, response);
     }
 
     /**

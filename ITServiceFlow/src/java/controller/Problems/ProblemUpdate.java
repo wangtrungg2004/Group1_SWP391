@@ -5,24 +5,26 @@
 package controller.Problems;
 
 import dao.NotificationDao;
-import dao.TicketDAO;
+
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.List;
+
 import model.Problems;
 import model.Tickets;
+
 import service.AuditLogService;
 import service.ProblemService;
 import service.TicketService;
 import service.UserService;
-
 /**
  *
  * @author DELL
@@ -162,15 +164,40 @@ public class ProblemUpdate extends HttpServlet {
                 pro.setRootCause(request.getParameter("RootCause"));
                 pro.setWorkaround(request.getParameter("Workaround"));
             } else {
-                pro.setTitle(request.getParameter("Title"));
-                pro.setDescription(request.getParameter("Description"));
+                String title = request.getParameter("Title");
+                String description = request.getParameter("Description");
+                String assignedToStr = request.getParameter("AssignedTo");
+                if (title == null || title.trim().isEmpty()
+                        || description == null || description.trim().isEmpty()
+                        || assignedToStr == null || assignedToStr.trim().isEmpty()
+                        || ticketIds.isEmpty()) {
+                    request.setAttribute("error", "Title, Description, Assigned To and at least one Related Ticket are required.");
+                    request.setAttribute("problem", pro);
+                    request.setAttribute("assignees", userService.getAllUser());
+                    request.setAttribute("tickets", ticketService.getAllTicket());
+                    request.setAttribute("relatedTickets", problemService.getRelatedTicket(id));
+                    request.setAttribute("role", role != null ? role : "");
+                    request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
+                    return;
+                }
+                try {
+                    pro.setAssignedTo(Integer.parseInt(assignedToStr.trim()));
+                } catch (NumberFormatException ex) {
+                    request.setAttribute("error", "Assigned To is invalid.");
+                    request.setAttribute("problem", pro);
+                    request.setAttribute("assignees", userService.getAllUser());
+                    request.setAttribute("tickets", ticketService.getAllTicket());
+                    request.setAttribute("relatedTickets", problemService.getRelatedTicket(id));
+                    request.setAttribute("role", role != null ? role : "");
+                    request.getRequestDispatcher("ProblemUpdate.jsp").forward(request, response);
+                    return;
+                }
+                pro.setTitle(title.trim());
+                pro.setDescription(description.trim());
                 pro.setRootCause(request.getParameter("RootCause"));
                 pro.setWorkaround(request.getParameter("Workaround"));
                 pro.setStatus(request.getParameter("Status"));
-                String assignedToStr = request.getParameter("AssignedTo");
-                if (assignedToStr != null && !assignedToStr.isEmpty()) {
-                    pro.setAssignedTo(Integer.parseInt(assignedToStr));
-                }
+
             }
             boolean success = problemService.updateProblem(pro);
             if (success) {

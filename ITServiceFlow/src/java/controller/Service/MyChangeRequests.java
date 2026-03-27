@@ -40,14 +40,23 @@ public class MyChangeRequests extends HttpServlet {
             session.removeAttribute("flashSuccess");
         }
 
-        String tab = request.getParameter("tab");
+        String tab     = request.getParameter("tab");
+        String keyword = request.getParameter("keyword");
         if (tab == null || tab.isEmpty()) tab = "all";
+        if (keyword == null) keyword = "";
 
-        String statusFilter = "all".equals(tab) ? null : tab;
-        List<ChangeRequests> requests = service.getMyRequests(user.getId(), statusFilter);
+        List<ChangeRequests> requests;
+        if (!keyword.trim().isEmpty()) {
+            String statusFilter = "all".equals(tab) ? null : tab;
+            requests = service.searchMyRequests(user.getId(), keyword.trim(), statusFilter);
+        } else {
+            String statusFilter = "all".equals(tab) ? null : tab;
+            requests = service.getMyRequests(user.getId(), statusFilter);
+        }
 
         request.setAttribute("requests", requests);
-        request.setAttribute("tab", tab);
+        request.setAttribute("tab",      tab);
+        request.setAttribute("keyword",  keyword);
         request.getRequestDispatcher("/MyChangeRequests.jsp").forward(request, response);
     }
 

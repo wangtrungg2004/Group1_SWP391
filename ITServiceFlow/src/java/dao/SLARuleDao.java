@@ -18,13 +18,19 @@ import model.SLARule;
  */
 public class SLARuleDao extends DbContext {
 
-    private void deactivateRulesByTypeAndPriority(String ticketType, int priorityId) {
-        String sql = "UPDATE [dbo].[SLARules] SET Status = 'Inactive', UpdatedAt = GETDATE() "
-                + "WHERE TicketType = ? AND PriorityId = ? AND Status = 'Active'";
+    private void deactivateRulesByTypeAndPriority(String ticketType, int priorityId, Integer excludeId) {
+        StringBuilder sql = new StringBuilder("UPDATE [dbo].[SLARules] SET Status = 'Inactive', UpdatedAt = GETDATE() "
+                + "WHERE TicketType = ? AND PriorityId = ? AND Status = 'Active'");
+        if (excludeId != null) {
+            sql.append(" AND Id <> ?");
+        }
         try {
-            PreparedStatement stm = connection.prepareStatement(sql);
+            PreparedStatement stm = connection.prepareStatement(sql.toString());
             stm.setString(1, ticketType);
             stm.setInt(2, priorityId);
+            if (excludeId != null) {
+                stm.setInt(3, excludeId);
+            }
             stm.executeUpdate();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -89,7 +95,7 @@ public class SLARuleDao extends DbContext {
     public boolean addSLARule(SLARule sla) {
         try {
             if ("Active".equalsIgnoreCase(sla.getStatus())) {
-                deactivateRulesByTypeAndPriority(sla.getTicketType(), sla.getPriorityId());
+                deactivateRulesByTypeAndPriority(sla.getTicketType(), sla.getPriorityId(), null);
             }
 
             String sql = "INSERT INTO [dbo].[SLARules] (SLAName, TicketType, PriorityId, ResponseTime, ResolutionTime, Status, CreatedBy, CreatedAt, UpdatedAt) "
@@ -111,6 +117,9 @@ public class SLARuleDao extends DbContext {
     }
 
     public boolean updateSLARule(SLARule sla) {
+        if ("Active".equalsIgnoreCase(sla.getStatus())) {
+            deactivateRulesByTypeAndPriority(sla.getTicketType(), sla.getPriorityId(), sla.getId());
+        }
         String sql = "UPDATE [dbo].[SLARules] SET SLAName=?, TicketType=?, PriorityId=?, ResponseTime=?, ResolutionTime=?, Status=?, UpdatedAt=GETDATE() WHERE Id=?";
         try {
             PreparedStatement stm = connection.prepareStatement(sql);
@@ -286,5 +295,54 @@ public class SLARuleDao extends DbContext {
             ex.printStackTrace();
         }
         return 0;
+    }
+    public List<String> getDistinctTypes() {
+        List<String> list = new ArrayList<>();
+        String sql = "SELECT DISTINCT TicketType FROM [dbo].[SLARules] WHERE TicketType IS NOT NULL ORDER BY TicketType";
+        try {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                list.add(rs.getString("TicketType"));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<String> getDistinctStatuses() {
+        List<String> list = new ArrayList<>();
+        String sql = "SELECT DISTINCT Status FROM [dbo].[SLARules] WHERE Status IS NOT NULL ORDER BY Status";
+        try {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                list.add(rs.getString("Status"));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+    public boolean isSlaNameExists(String name, Integer excludeId) {
+        String sql = "SELECT COUNT(*) FROM [dbo].[SLARules] WHERE SLAName = ?";
+        if (excludeId != null) {
+            sql += " AND Id <> ?";
+        }
+        try {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setString(1, name);
+            if (excludeId != null) {
+                stm.setInt(2, excludeId);
+            }
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
     }
 }

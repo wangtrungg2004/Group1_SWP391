@@ -61,13 +61,15 @@
                                             <form method="post" action="${pageContext.request.contextPath}/CreateNotification" id="createNotifForm">
                                                 <div class="form-group">
                                                     <label>Title <span class="text-danger">*</span></label>
-                                                    <input type="text" name="title" class="form-control" required
+                                                    <input type="text" name="title" class="form-control" required maxlength="120"
                                                            placeholder="Notification title" value="${param.title}">
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Message <span class="text-danger">*</span></label>
-                                                    <textarea name="message" class="form-control" rows="3" required
+                                                    <textarea name="message" class="form-control" rows="3" required maxlength="500"
                                                               placeholder="Content">${param.message}</textarea>
+                                                    <small class="text-muted">Maximum 500 characters.</small>
+                                                              <small class="text-muted">Maximum 500 characters.</small>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Type</label>

@@ -214,11 +214,20 @@
                                                                            href="ProblemDetail?Id=${p.id}">
                                                                             Detail
                                                                         </a>
-                                                                        <a class="btn btn-sm btn-primary"
+                                                                        <c:if test="${(role eq 'Manager' or role eq 'IT Support') and (p.status eq 'NEW')}">
+                                                                            <a class="btn btn-sm btn-primary"
                                                                            href="ProblemUpdate?Id=${p.id}">
                                                                             Update
-                                                                        </a>
-                                                                           <c:if test="${(role eq 'Manager' or role eq 'IT Support') and (p.status eq 'NEW' or p.status eq 'APPROVED')}">
+                                                                        </a>   
+                                                                        </c:if>
+                                                                            
+                                                                            <!--<c:if test="${(role eq 'Manager' or role eq 'IT Support') and (p.status eq 'NEW' or p.status eq 'APPROVED')}">
+                                                                            <a class="btn btn-sm btn-primary"
+                                                                           href="ProblemUpdate?Id=${p.id}">
+                                                                            Update
+                                                                        </a>   
+                                                                        </c:if>-->
+                                                                           <c:if test="${(role eq 'Manager' or role eq 'IT Support') and (p.status eq 'NEW')}">
                                                                                <form action="ProblemList" method="post"
                                                                                         onsubmit="return confirm('Delete this Problem?');"
                                                                                         style="display:inline;">

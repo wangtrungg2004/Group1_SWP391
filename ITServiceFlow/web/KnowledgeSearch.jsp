@@ -1,10 +1,8 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@ taglib uri="jakarta.tags.core" prefix="c" %>
-        <% if (session.getAttribute("user")==null) { response.sendRedirect("Login.jsp"); return; } 
-           String role=(String) session.getAttribute("role"); 
-           // Allow all roles to search the knowledge base
-           if (role==null) { response.sendRedirect("Login.jsp"); return; } 
-           model.Users currentUser=(model.Users) session.getAttribute("user"); %>
+        <% if (session.getAttribute("user")==null) { response.sendRedirect("Login.jsp"); return; } String role=(String)
+            session.getAttribute("role"); if (role==null || !role.equals("User")) { response.sendRedirect("Login.jsp");
+            return; } model.Users currentUser=(model.Users) session.getAttribute("user"); %>
             <!DOCTYPE html>
             <html lang="vi">
 
@@ -94,7 +92,7 @@
                                                     <li class="breadcrumb-item"><a href="UserDashboard.jsp"><i
                                                                 class="feather icon-home"></i></a></li>
                                                     <li class="breadcrumb-item"><a href="#">Knowledge</a></li>
-                                                    <li class="breadcrumb-item active">Tìm kiếm</li>
+                                                    <li class="breadcrumb-item active">Search</li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -118,10 +116,8 @@
                                             <div class="col-xl-12">
                                                 <div class="card">
                                                     <div class="card-header">
-                                                        <h5><i class="feather icon-book-open mr-2"></i>Tìm kiếm Kho Tri
-                                                            Thức</h5>
-                                                        <span class="text-muted" style="font-size:0.88rem;">Tìm hướng
-                                                            dẫn khắc phục sự cố trước khi tạo ticket</span>
+                                                        <h5><i class="feather icon-book-open mr-2"></i>Search the Knowledge Repository</h5>
+                                                        
                                                     </div>
                                                     <div class="card-body">
                                                         <form action="KnowledgeSearch" method="GET">
@@ -129,11 +125,11 @@
                                                                 style="max-width:600px;">
                                                                 <input type="text" class="form-control" name="keyword"
                                                                     value="<c:out value='${keyword}'/>"
-                                                                    placeholder="Nhập từ khóa (ví dụ: lỗi mạng, màn hình xanh...)">
+                                                                    placeholder="Enter a description of your problem....">
                                                                 <div class="input-group-append">
                                                                     <button class="btn btn-primary" type="submit"
                                                                         id="btn-search">
-                                                                        <i class="feather icon-search"></i> Tìm kiếm
+                                                                        <i class="feather icon-search"></i>Search
                                                                     </button>
                                                                 </div>
                                                             </div>
@@ -143,16 +139,12 @@
                                                         <c:choose>
                                                             <c:when test="${not empty keyword}">
                                                                 <p class="text-muted mb-3">
-                                                                    Kết quả cho: <strong>"
+                                                                    Result for: <strong>"
                                                                         <c:out value="${keyword}" />"
                                                                     </strong>
-                                                                    — tìm thấy <strong>${totalResults}</strong> bài viết
+                                                                    — find <strong>${totalResults}</strong> article
                                                                 </p>
                                                             </c:when>
-                                                            <c:otherwise>
-                                                                <p class="text-muted mb-3">Hiển thị tất cả bài viết đã
-                                                                    xuất bản (<strong>${totalResults}</strong> bài)</p>
-                                                            </c:otherwise>
                                                         </c:choose>
 
                                                         <c:choose>
@@ -160,13 +152,12 @@
                                                                 <div class="text-center py-5">
                                                                     <div class="no-result-icon mb-3"><i
                                                                             class="feather icon-search"></i></div>
-                                                                    <h6 class="text-muted">Không tìm thấy bài viết nào
+                                                                    <h6 class="text-muted">No articles found.
                                                                     </h6>
                                                                     <p class="text-muted" style="font-size:0.88rem;">
-                                                                        Thử từ khóa khác hoặc
-                                                                        <a href="CreateTicket" class="text-primary">tạo
-                                                                            ticket hỗ trợ</a> nếu vấn đề chưa có hướng
-                                                                        dẫn.
+                                                                        Try a different keyword or
+                                                                        <a href="CreateTicket" class="text-primary">create
+                                                                            ticket </a> if the problem has no solution yet.
                                                                     </p>
                                                                 </div>
                                                             </c:when>
@@ -197,13 +188,13 @@
                                                                                     <span class="ml-3"><i
                                                                                             class="feather icon-eye mr-1"></i>${art.viewCount
                                                                                         != null ? art.viewCount : 0}
-                                                                                        lượt xem</span>
+                                                                                        view</span>
                                                                                 </div>
                                                                             </div>
                                                                             <a href="KnowledgeArticleView?id=${art.id}"
                                                                                 class="btn btn-sm btn-outline-primary ml-3"
                                                                                 id="view-article-${art.id}">
-                                                                                Xem chi tiết <i
+                                                                                View <i
                                                                                     class="feather icon-chevron-right"></i>
                                                                             </a>
                                                                         </div>

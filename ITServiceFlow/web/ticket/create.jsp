@@ -262,7 +262,7 @@
         </style>
     </head>
 
-    <body class="">
+<body class="">
         <div class="loader-bg"><div class="loader-track"><div class="loader-fill"></div></div></div>
 
         <jsp:include page="../includes/header.jsp" />
@@ -278,14 +278,14 @@
 
                                 <c:if test="${not empty errorMessage}">
                                     <div class="alert alert-danger mb-4 shadow-sm"><i class="feather icon-alert-circle mr-2"></i>${errorMessage}</div>
-                                    </c:if>
+                                </c:if>
 
                                 <div id="step1-root" class="fade-in">
                                     <div class="invgate-hero">
                                         <h2>Hello, how can we help you today?</h2>
                                         <div class="search-bar-wrapper">
                                             <i class="feather icon-search"></i>
-                                            <input type="text" id="searchInput" placeholder="Search for services, report issues, or find guides..." onkeyup="filterCards()">
+                                            <input type="text" id="searchInput" placeholder="Search for services, report issues..." onkeyup="filterCards()">
                                         </div>
                                     </div>
 
@@ -317,7 +317,6 @@
                                                 <div class="selected-action-badge" id="selectedActionLabel"><i class="feather icon-check-circle"></i> Requesting: ...</div>
 
                                                 <form action="${pageContext.request.contextPath}/CreateTicket" method="POST" id="ticketForm" enctype="multipart/form-data">
-
                                                     <input type="hidden" name="ticketType" id="payload_ticketType">
                                                     <input type="hidden" name="categoryId" id="payload_categoryId">
                                                     <input type="hidden" name="serviceCatalogId" id="payload_serviceCatalogId">
@@ -329,25 +328,24 @@
 
                                                     <div class="form-group mb-4">
                                                         <label class="font-weight-bold">Detailed Description <span class="text-danger">*</span></label>
-                                                        <textarea name="description" class="form-control" rows="5" placeholder="Please provide as much detail as possible to help us resolve the issue faster..." required></textarea>
+                                                        <textarea name="description" class="form-control" rows="5" placeholder="Please provide as much detail as possible..." required></textarea>
                                                     </div>
 
                                                     <div class="form-group mb-4">
-                                                        <label class="font-weight-bold">Asset tag <span class="text-danger">*</span></label>
-                                                        <input type="text" name="assetTag" class="form-control" placeholder="E.g., CI-001" maxlength="120" autocomplete="off" required value="${assetTag_val}">
-
-                                                    </div>
+                                                        <label class="font-weight-bold">Asset tag</label>
+                                                        <input type="text" name="assetTag" class="form-control" placeholder="E.g., CI-001" maxlength="120" autocomplete="off" value="${assetTag_val}">
+                                                    </div><!--
 
                                                     <div class="form-group mb-4">
                                                         <label class="font-weight-bold">Attachments <span class="text-muted" style="font-weight:normal; font-size:0.85rem;">(Max 15MB/file)</span></label>
                                                         <div class="file-upload-wrapper">
                                                             <input type="file" name="attachments" class="form-control-file d-block w-100" multiple>
                                                         </div>
-                                                        <small class="form-text text-muted mt-2"><i class="feather icon-info mr-1"></i>Supported formats: png, jpg, pdf, doc, docx, txt</small>
                                                         <c:if test="${not empty uploadWarning}">
                                                             <div class="text-warning mt-2 font-weight-bold"><i class="feather icon-alert-triangle mr-1"></i>${uploadWarning}</div>
-                                                            </c:if>
-                                                    </div>
+                                                        </c:if>
+                                                    </div>-->
+
                                                     <div id="incidentQuestions" style="display: none;">
                                                         <hr class="my-5">
                                                         <h5 class="font-weight-bold mb-4 text-primary">Priority Assessment</h5>
@@ -393,176 +391,165 @@
         <script src="${pageContext.request.contextPath}/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
         <script src="${pageContext.request.contextPath}/assets/js/pcoded.min.js"></script>
 
-        <script>
-                                            // 1. Dữ liệu nạp từ Database
-                                            var categories = [
+       <script>
+            // 1. Dữ liệu nạp từ Database
+            var categories = [
             <c:forEach items="${categoryList}" var="cat" varStatus="loop">
-                                            { id: ${cat.id}, name: "${cat.name}", parentId: ${cat.parentId != null ? cat.parentId : 'null'}, level: ${cat.level} }${!loop.last ? ',' : ''}
+                { 
+                    id: ${cat.id}, 
+                    name: "${cat.name}", 
+                    parentId: <c:out value="${cat.parentId}" default="null" />, 
+                    level: ${cat.level} 
+                }${!loop.last ? ',' : ''}
             </c:forEach>
-                                            ];
-                                            var services = [
+            ];
+
+            var services = [
             <c:forEach items="${serviceList}" var="svc" varStatus="loop">
-                                            { id: ${svc.id}, name: "${svc.name}", categoryId: ${svc.categoryId}, isActive: ${svc.isActive} }${!loop.last ? ',' : ''}
+                { 
+                    id: ${svc.id}, 
+                    name: "${svc.name}", 
+                    categoryId: ${svc.categoryId}, 
+                    isActive: ${svc.isActive} 
+                }${!loop.last ? ',' : ''}
             </c:forEach>
-                                            ];
+            ];
 
-                                            // Biến lưu trạng thái back
-                                            var currentRootId = null;
-                                            var currentRootName = null;
+            var currentRootId = null;
+            var currentRootName = null;
 
-                                            // Map Icon & Mô tả cho các ID gốc (Theo script SQL đã đồng bộ)
-                                            const uiMap = {
-                                                1: {icon: 'icon-globe', desc: 'VPN, WiFi, Internet connection issues...'},
-                                                2: {icon: 'icon-monitor', desc: 'Windows, Office, Internal software errors...'},
-                                                3: {icon: 'icon-cpu', desc: 'Broken PC, Mouse, Keyboard issues...'},
-                                                50: {icon: 'icon-shopping-cart', desc: 'Request new work equipment or accessories...'},
-                                                51: {icon: 'icon-download-cloud', desc: 'Request software installation or licenses...'},
-                                                52: {icon: 'icon-shield', desc: 'Request system access, password resets...'}
-                                            };
+            // Map UI Icon & Text cho 6 Root Categories
+            const uiMap = {
+                1: {icon: 'icon-wifi', desc: 'Internet, Wi-Fi, VPN, Firewall...'},
+                2: {icon: 'icon-cpu', desc: 'OS, Office Apps, ERP, CRM...'},
+                3: {icon: 'icon-monitor', desc: 'Laptops, Peripherals, Servers...'},
+                50: {icon: 'icon-shopping-cart', desc: 'Request new devices and accessories'},
+                51: {icon: 'icon-download', desc: 'Request software installations and licenses'},
+                52: {icon: 'icon-user-plus', desc: 'Request account creation and permissions'}
+            };
 
-                                            window.onload = function () {
-                                                renderStep1();
-                                            };
+            window.onload = function () {
+                renderStep1();
+            };
 
-                                            // ==========================================
-                                            // STEP 1: RENDER LƯỚI THẺ (ROOT CARDS)
-                                            // ==========================================
-                                            function renderStep1() {
-                                                let container = document.getElementById("rootCardsContainer");
-                                                container.innerHTML = "";
+            // ==========================================
+            // STEP 1: RENDER LƯỚI THẺ (ROOT CARDS)
+            // ==========================================
+            function renderStep1() {
+                let container = document.getElementById("rootCardsContainer");
+                container.innerHTML = "";
 
-                                                // Lấy tất cả Level 1
-                                                let roots = categories.filter(c => c.level === 1);
-                                                roots.forEach(root => {
-                                                    let ui = uiMap[root.id] || {icon: 'icon-grid', desc: 'Other services'};
-                                                    let isService = services.some(s => s.categoryId === root.id);
-                                                    let tag = isService
-                                                            ? '<span class="badge badge-light-primary float-right">Services</span>'
-                                                            : '<span class="badge badge-light-danger float-right">Incidents</span>';
+                let roots = categories.filter(function(c) { return c.level === 1; });
 
-                                                    let html = `
-                        <div class="col-md-6 col-lg-4 mb-4 root-card-item">
-                            <div class="category-card" onclick="goToStep2(\${root.id}, '\${root.name}')">
-                                \${tag}
-                                <div class="category-icon"><i class="feather \${ui.icon}"></i></div>
-                                <h4 class="category-title">\${root.name}</h4>
-                                <p class="category-desc">\${ui.desc}</p>
-                            </div>
-                        </div>
-                    `;
-                                                    container.innerHTML += html;
-                                                });
-                                            }
+                roots.forEach(function(root) {
+                    let ui = uiMap[root.id] || {icon: 'icon-grid', desc: 'Other IT Services'};
 
-                                            // ==========================================
-                                            // STEP 2: RENDER HÀNH ĐỘNG CHI TIẾT
-                                            // ==========================================
-                                            function goToStep2(rootId, rootName) {
-                                                currentRootId = rootId;
-                                                currentRootName = rootName;
+                    // Fix lỗi JSP EL bằng cách dùng phép cộng chuỗi truyền thống
+                    let html = '<div class="col-md-6 col-lg-4 mb-4 root-card-item">' +
+                               '<div class="category-card" onclick="goToStep2(' + root.id + ', \'' + root.name + '\')">' +
+                               '<div class="category-icon"><i class="feather ' + ui.icon + '"></i></div>' +
+                               '<h4 class="category-title">' + root.name + '</h4>' +
+                               '<p class="category-desc">' + ui.desc + '</p>' +
+                               '</div></div>';
+                    
+                    container.innerHTML += html;
+                });
+            }
 
-                                                document.getElementById("step1-root").style.display = "none";
-                                                document.getElementById("step2-drilldown").style.display = "block";
-                                                document.getElementById("drilldownTitle").innerText = rootName;
+            // ==========================================
+            // STEP 2: RENDER HÀNH ĐỘNG CHI TIẾT
+            // ==========================================
+            function goToStep2(rootId, rootName) {
+                currentRootId = rootId;
+                currentRootName = rootName;
 
-                                                let container = document.getElementById("subItemsContainer");
-                                                container.innerHTML = "";
+                document.getElementById("step1-root").style.display = "none";
+                document.getElementById("step2-drilldown").style.display = "block";
+                document.getElementById("drilldownTitle").innerText = rootName;
 
-                                                // Kiểm tra xem Root này là Dịch Vụ hay Lỗi
-                                                let isService = services.some(s => s.categoryId === rootId);
+                let container = document.getElementById("subItemsContainer");
+                container.innerHTML = "";
 
-                                                if (isService) {
-                                                    // RENDER DỊCH VỤ
-                                                    let rootServices = services.filter(s => s.categoryId === rootId && s.isActive);
-                                                    rootServices.forEach(svc => {
-                                                        container.innerHTML += `
-                            <div class="action-item" onclick="goToStep3('ServiceRequest', \${svc.id}, '\${svc.name}')">
-                                <i class="feather icon-plus-circle"></i>
-                                <div class="action-item-text">\${svc.name}</div>
-                                <i class="feather icon-chevron-right action-item-arrow"></i>
-                            </div>
-                        `;
-                                                    });
-                                                } else {
-                                                    // RENDER LỖI (Gom Level 2 làm Header, Level 3 làm Item)
-                                                    let level2Cats = categories.filter(c => c.parentId === rootId);
-                                                    level2Cats.forEach(l2 => {
-                                                        container.innerHTML += `<div class="group-title">\${l2.name}</div>`;
+                let l2Cats = categories.filter(function(c) { return c.parentId === rootId; });
+                let rootServices = services.filter(function(s) { return s.categoryId === rootId && s.isActive; });
 
-                                                        let level3Cats = categories.filter(c => c.parentId === l2.id);
-                                                        level3Cats.forEach(l3 => {
-                                                            container.innerHTML += `
-                                <div class="action-item" onclick="goToStep3('Incident', \${l3.id}, '\${l3.name}')">
-                                    <i class="feather icon-alert-triangle text-danger"></i>
-                                    <div class="action-item-text">\${l3.name}</div>
-                                    <i class="feather icon-chevron-right action-item-arrow"></i>
-                                </div>
-                            `;
-                                                        });
-                                                    });
-                                                }
-                                            }
+                if (l2Cats.length > 0) {
+                    container.innerHTML += '<div class="group-title mt-4"><i class="feather icon-alert-triangle mr-1"></i> Report an Issue</div>';
+                    l2Cats.forEach(function(l2) {
+                        let html = '<div class="action-item" onclick="goToStep3(\'Incident\', ' + l2.id + ', \'' + l2.name + '\')">' +
+                                   '<i class="feather icon-alert-octagon text-danger"></i>' +
+                                   '<div class="action-item-text">' + l2.name + '</div>' +
+                                   '<i class="feather icon-chevron-right action-item-arrow"></i>' +
+                                   '</div>';
+                        container.innerHTML += html;
+                    });
+                } 
+                else if (rootServices.length > 0) {
+                    container.innerHTML += '<div class="group-title mt-4"><i class="feather icon-shopping-cart mr-1"></i> Request a Service</div>';
+                    rootServices.forEach(function(svc) {
+                        let html = '<div class="action-item" onclick="goToStep3(\'ServiceRequest\', ' + svc.id + ', \'' + svc.name + '\')">' +
+                                   '<i class="feather icon-monitor text-primary"></i>' +
+                                   '<div class="action-item-text">' + svc.name + '</div>' +
+                                   '<i class="feather icon-chevron-right action-item-arrow"></i>' +
+                                   '</div>';
+                        container.innerHTML += html;
+                    });
+                } 
+                else {
+                    container.innerHTML = '<div class="text-center text-muted my-4">No categories or services available here.</div>';
+                }
+            }
 
-                                            // ==========================================
-                                            // STEP 3: MỞ FORM NHẬP LIỆU
-                                            // ==========================================
-                                            function goToStep3(type, itemId, itemName) {
-                                                document.getElementById("step2-drilldown").style.display = "none";
-                                                document.getElementById("step3-form").style.display = "block";
+            // ==========================================
+            // STEP 3: MỞ FORM NHẬP LIỆU
+            // ==========================================
+            function goToStep3(type, itemId, itemName) {
+                document.getElementById("step2-drilldown").style.display = "none";
+                document.getElementById("step3-form").style.display = "block";
 
-                                                document.getElementById("selectedActionLabel").innerHTML = `<i class="feather icon-check-circle"></i> \${currentRootName} ➝ \${itemName}`;
+                document.getElementById("selectedActionLabel").innerHTML = '<i class="feather icon-check-circle"></i> ' + currentRootName + ' ➝ ' + itemName;
 
-                                                // Gắn Payload Ẩn
-                                                document.getElementById("payload_ticketType").value = type;
+                document.getElementById("payload_ticketType").value = type;
+                let incFields = document.querySelectorAll(".inc-req");
 
-                                                let incFields = document.querySelectorAll(".inc-req");
+                if (type === 'Incident') {
+                    document.getElementById("payload_categoryId").value = itemId;
+                    document.getElementById("payload_serviceCatalogId").value = "";
+                    document.getElementById("incidentQuestions").style.display = "block";
+                    incFields.forEach(function(f) { f.required = true; });
+                } else {
+                    document.getElementById("payload_serviceCatalogId").value = itemId;
+                    document.getElementById("payload_categoryId").value = "";
+                    document.getElementById("incidentQuestions").style.display = "none";
+                    incFields.forEach(function(f) { 
+                        f.required = false; 
+                        f.checked = false; 
+                    });
+                }
+            }
 
-                                                if (type === 'Incident') {
-                                                    document.getElementById("payload_categoryId").value = itemId;
-                                                    document.getElementById("payload_serviceCatalogId").value = "";
+            function goBackToStep1() {
+                document.getElementById("step2-drilldown").style.display = "none";
+                document.getElementById("step1-root").style.display = "block";
+            }
 
-                                                    document.getElementById("incidentQuestions").style.display = "block";
-                                                    incFields.forEach(f => f.required = true);
-                                                } else {
-                                                    document.getElementById("payload_serviceCatalogId").value = itemId;
-                                                    document.getElementById("payload_categoryId").value = "";
+            function goBackToStep2() {
+                document.getElementById("step3-form").style.display = "none";
+                goToStep2(currentRootId, currentRootName); 
+            }
 
-                                                    document.getElementById("incidentQuestions").style.display = "none";
-                                                    incFields.forEach(f => {
-                                                        f.required = false;
-                                                        f.checked = false;
-                                                    });
-                                                }
-                                            }
-
-                                            // ==========================================
-                                            // ĐIỀU HƯỚNG QUAY LẠI
-                                            // ==========================================
-                                            function goBackToStep1() {
-                                                document.getElementById("step2-drilldown").style.display = "none";
-                                                document.getElementById("step1-root").style.display = "block";
-                                            }
-
-                                            function goBackToStep2() {
-                                                document.getElementById("step3-form").style.display = "none";
-                                                goToStep2(currentRootId, currentRootName); // Mở lại Step 2
-                                            }
-
-                                            // ==========================================
-                                            // BỘ LỌC TÌM KIẾM NHANH Ở STEP 1
-                                            // ==========================================
-                                            function filterCards() {
-                                                let filter = document.getElementById("searchInput").value.toLowerCase();
-                                                let cards = document.getElementsByClassName("root-card-item");
-                                                for (let i = 0; i < cards.length; i++) {
-                                                    let title = cards[i].innerText.toLowerCase();
-                                                    if (title.indexOf(filter) > -1) {
-                                                        cards[i].style.display = "";
-                                                    } else {
-                                                        cards[i].style.display = "none";
-                                                    }
-                                                }
-                                            }
+            function filterCards() {
+                let filter = document.getElementById("searchInput").value.toLowerCase();
+                let cards = document.getElementsByClassName("root-card-item");
+                for (let i = 0; i < cards.length; i++) {
+                    let title = cards[i].innerText.toLowerCase();
+                    if (title.indexOf(filter) > -1) {
+                        cards[i].style.display = "";
+                    } else {
+                        cards[i].style.display = "none";
+                    }
+                }
+            }
         </script>
     </body>
 </html>
