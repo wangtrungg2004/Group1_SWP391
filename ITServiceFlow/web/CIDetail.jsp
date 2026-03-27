@@ -10,16 +10,16 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
-        <link rel="stylesheet" href="assets/fonts/fontawesome/css/fontawesome-all.min.css">
-        <link rel="stylesheet" href="assets/plugins/animation/css/animate.min.css">
-        <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
-        <link rel="stylesheet" href="assets/css/style.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/fonts/fontawesome/css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/plugins/animation/css/animate.min.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/plugins/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
     </head>
 
     <body>
 
-        <jsp:include page="includes/header.jsp" />
-        <jsp:include page="includes/sidebar.jsp" />
+        <jsp:include page="/includes/header.jsp" />
+        <jsp:include page="/includes/sidebar.jsp" />
 
         <div class="pcoded-main-container">
             <div class="pcoded-wrapper">
@@ -263,9 +263,9 @@
             </div>
         </div>
 
-        <script src="assets/js/vendor-all.min.js"></script>
-        <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-        <script src="assets/js/pcoded.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/vendor-all.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/pcoded.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
 
         <!-- Edit CI Modal -->
@@ -308,16 +308,11 @@
                                     <label for="ciLocation">Location</label>
                                     <select class="form-control" id="ciLocation" name="locationId" required>
                                         <option value="">-- Select Location --</option>
-                                        <option value="1" ${ci.locationId == 1 ? 'selected' : ''}>Tầng 1 - Hà Nội</option>
-                                        <option value="2" ${ci.locationId == 2 ? 'selected' : ''}>Tầng 2 - Hà Nội</option>
-                                        <option value="3" ${ci.locationId == 3 ? 'selected' : ''}>Tầng 3 - Hà Nội</option>
-                                        <option value="4" ${ci.locationId == 4 ? 'selected' : ''}>Tầng 4 - Hà Nội</option>
-                                        <option value="5" ${ci.locationId == 5 ? 'selected' : ''}>Tầng 1 - HCM</option>
-                                        <option value="6" ${ci.locationId == 6 ? 'selected' : ''}>Tầng 2 - HCM</option>
-                                        <option value="7" ${ci.locationId == 7 ? 'selected' : ''}>Tầng 1 - Đà Nẵng</option>
-                                        <option value="8" ${ci.locationId == 8 ? 'selected' : ''}>Tầng 2 - Đà Nẵng</option>
-                                        <option value="9" ${ci.locationId == 9 ? 'selected' : ''}>Tầng 1 - Cần Thơ</option>
-                                        <option value="10" ${ci.locationId == 10 ? 'selected' : ''}>Tầng 2 - Cần Thơ</option>
+                                        <c:forEach var="loc" items="${locations}">
+                                            <option value="${loc.id}" ${ci.locationId == loc.id ? 'selected' : ''}>
+                                                <c:out value="${loc.name}"/>
+                                            </option>
+                                        </c:forEach>
                                     </select>
                                 </div>
                             </div>
@@ -439,38 +434,42 @@
                     }
                     var selectedLocationId = locationSelect.value;
                     var options = ownerSelect.options;
-                    var firstVisibleIndex = 0;
+                    var firstVisibleIndex = -1;
 
                     for (var i = 0; i < options.length; i++) {
                         var opt = options[i];
-                        if (!opt.getAttribute('data-location-id')) {
+                        var optLocationId = opt.getAttribute('data-location-id');
+                        
+                        if (!optLocationId) {
+                            // "Select Owner" option
+                            opt.hidden = false;
+                            opt.disabled = false;
                             opt.style.display = '';
+                            if (firstVisibleIndex === -1) firstVisibleIndex = i;
                             continue;
                         }
+                        
                         if (!selectedLocationId) {
+                            opt.hidden = false;
+                            opt.disabled = false;
                             opt.style.display = '';
-                        } else if (opt.getAttribute('data-location-id') === selectedLocationId) {
+                            if (firstVisibleIndex === -1) firstVisibleIndex = i;
+                        } else if (optLocationId === selectedLocationId) {
+                            opt.hidden = false;
+                            opt.disabled = false;
                             opt.style.display = '';
-                            if (firstVisibleIndex === 0) {
-                                firstVisibleIndex = i;
-                            }
+                            if (firstVisibleIndex === -1) firstVisibleIndex = i;
                         } else {
+                            opt.hidden = true;
+                            opt.disabled = true;
                             opt.style.display = 'none';
                         }
                     }
 
-                    if (selectedLocationId) {
-                        var currentOwner = ownerSelect.value;
-                        var currentOptionVisible = false;
-                        for (var j = 0; j < options.length; j++) {
-                            if (options[j].value === currentOwner && options[j].style.display !== 'none') {
-                                currentOptionVisible = true;
-                                break;
-                            }
-                        }
-                        if (!currentOptionVisible) {
-                            ownerSelect.selectedIndex = firstVisibleIndex;
-                        }
+                    // Check if current selection is still valid
+                    var currentOption = ownerSelect.options[ownerSelect.selectedIndex];
+                    if (currentOption && (currentOption.hidden || currentOption.disabled || currentOption.style.display === 'none')) {
+                        ownerSelect.selectedIndex = (firstVisibleIndex !== -1) ? firstVisibleIndex : 0;
                     }
                 }
 

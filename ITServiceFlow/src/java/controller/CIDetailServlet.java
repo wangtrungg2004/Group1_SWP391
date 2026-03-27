@@ -2,6 +2,7 @@ package controller;
 
 import dao.AssetsDAO;
 import dao.CIRelationshipsDAO;
+import dao.LocationsDAO;
 import dao.TicketAssetsDAO;
 import dao.TicketDAO;
 import dao.UsersDAO;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.Assets;
 import model.CIRelationships;
+import model.Locations;
 import model.Tickets;
 import model.Users;
 
@@ -26,6 +28,7 @@ public class CIDetailServlet extends HttpServlet {
     private TicketAssetsDAO ticketAssetsDAO;
     private TicketDAO ticketDAO;
     private UsersDAO usersDAO;
+    private LocationsDAO locationsDAO;
 
     @Override
     public void init() throws ServletException {
@@ -35,6 +38,7 @@ public class CIDetailServlet extends HttpServlet {
         ticketAssetsDAO = new TicketAssetsDAO();
         ticketDAO = new TicketDAO();
         usersDAO = new UsersDAO();
+        locationsDAO = new LocationsDAO();
     }
 
     @Override
@@ -101,12 +105,14 @@ public class CIDetailServlet extends HttpServlet {
 
         int relatedTicketCount = ticketAssetsDAO.getTicketIdsByAssetId(ciId).size();
         List<Users> users = usersDAO.getAllUsers();
+        List<Locations> locations = locationsDAO.getAllLocations();
 
         request.setAttribute("ci", ci);
         request.setAttribute("targetCIs", targetCIs);
         request.setAttribute("relationships", relationships);
         request.setAttribute("relatedTicketCount", relatedTicketCount);
         request.setAttribute("users", users);
+        request.setAttribute("locations", locations);
         if (ticketId != null) {
             request.setAttribute("ticketId", ticketId);
             request.setAttribute("ticket", ticket);
