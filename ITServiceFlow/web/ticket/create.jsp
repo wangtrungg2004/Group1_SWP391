@@ -331,10 +331,10 @@
                                                         <textarea name="description" class="form-control" rows="5" placeholder="Please provide as much detail as possible..." required></textarea>
                                                     </div>
 
-<!--                                                    <div class="form-group mb-4">
+                                                    <div class="form-group mb-4">
                                                         <label class="font-weight-bold">Asset tag <span class="text-danger">*</span></label>
                                                         <input type="text" name="assetTag" class="form-control" placeholder="E.g., CI-001" maxlength="120" autocomplete="off" required value="${assetTag_val}">
-                                                    </div>
+                                                    </div><!--
 
                                                     <div class="form-group mb-4">
                                                         <label class="font-weight-bold">Attachments <span class="text-muted" style="font-weight:normal; font-size:0.85rem;">(Max 15MB/file)</span></label>
