@@ -58,7 +58,7 @@
                     <li class="nav-item">
                         <a href="${pageContext.request.contextPath}/KnowledgeSearch" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-inbox"></i></span>
-                            <span class="pcoded-mtext">Knowledge Base</span>
+                            <span class="pcoded-mtext">Knowledge Search</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -99,12 +99,7 @@
                             <span class="pcoded-mtext">Ticket - Assets</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="CreateTicket" class="nav-link">
-                            <span class="pcoded-micon"><i class="feather icon-plus-circle"></i></span>
-                            <span class="pcoded-mtext">Create Ticket</span>
-                        </a>
-                    </li>
+                   
 
                     <li class="nav-item pcoded-menu-caption"><label>Problem & Knowledge</label></li>
                     <li class="nav-item">
@@ -120,13 +115,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/files/upload" target="_self" class="nav-link"><span class="pcoded-micon"><i class="feather icon-upload"></i></span><span class="pcoded-mtext">Shared Upload</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/KnowledgeArticleManage" target="_self" class="nav-link"><span class="pcoded-micon"><i class="feather icon-book"></i></span><span class="pcoded-mtext">Knowledge Article Management</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/TicketResolutionReview" class="nav-link"><span class="pcoded-micon"><i class="feather icon-check-square"></i></span><span class="pcoded-mtext">Ticket Resolution Review</span></a>
+                        <a href="${pageContext.request.contextPath}/TicketResolutionReview" class="nav-link"><span class="pcoded-micon"><i class="feather icon-check-square"></i></span><span class="pcoded-mtext">Ticket Resolution</span></a>
                     </li>
 
                     <li class="nav-item pcoded-menu-caption"><label>Change Management</label></li>
