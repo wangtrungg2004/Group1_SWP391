@@ -141,23 +141,7 @@
                                             <h6 class="section-title"><i class="feather icon-align-left"></i> Request Details</h6>
                                             <div class="desc-box"><c:out value="${ticket.description}" default="No description provided."/></div>
 
-                                            <h6 class="section-title"><i class="feather icon-paperclip"></i> Attachments</h6>
-                                            <div class="mb-5">
-                                                <c:choose>
-                                                    <c:when test="${not empty attachments}">
-                                                        <div class="d-flex flex-wrap" style="gap: 10px;">
-                                                            <c:forEach items="${attachments}" var="file">
-                                                                <a href="${pageContext.request.contextPath}/DownloadFile?id=${file.fileId}" target="_blank" class="btn btn-sm btn-light border text-dark font-weight-bold">
-                                                                    <i class="feather icon-file text-primary mr-1"></i> ${file.fileName}
-                                                                </a>
-                                                            </c:forEach>
-                                                        </div>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <span class="text-muted" style="font-size: 0.85rem; font-style: italic;">No files attached.</span>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </div>
+                                            
 
                                             <div class="card-neat p-4 p-lg-5">
                                                 <div class="section-title mb-4"><i class="feather icon-message-square text-primary mr-3" style="font-size: 1.2rem;"></i> Communication</div>

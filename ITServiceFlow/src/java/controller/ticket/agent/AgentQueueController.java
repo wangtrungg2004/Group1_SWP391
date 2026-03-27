@@ -11,8 +11,10 @@ package controller.ticket.agent;
 
 
 import dao.TicketDAO;
+import dao.TicketAssetsDAO;
 import model.Tickets;
 import model.Users;
+import model.Assets;
 import java.io.IOException;
 import java.util.List;
 import jakarta.servlet.ServletException;
@@ -53,9 +55,12 @@ public class AgentQueueController extends HttpServlet {
         // ĐỔI TÊN BIẾN: 'type' thành 'ticketType' để không bị trùng
         String ticketType = request.getParameter("ticketType");
         if (ticketType == null) ticketType = "all";
+        
+        String priority = request.getParameter("priority");
+        if (priority == null) priority = "all";
 
         int page = 1;
-        int pageSize = 15; 
+        int pageSize = 10; 
         String pageStr = request.getParameter("page");
         if (pageStr != null && !pageStr.isEmpty()) { try { page = Integer.parseInt(pageStr); } catch (Exception e) { page = 1; } }
         
@@ -66,9 +71,17 @@ public class AgentQueueController extends HttpServlet {
         int currentLevel = ("Manager".equals(role) || "Admin".equals(role)) ? 2 : 1;
 
         // Truyền thêm currentLevel vào DAO
-        int totalTickets = ticketDao.getTotalAgentQueuesCount(currentUser.getId(), currentLevel, queueType, search, status, ticketType);
+        int totalTickets = ticketDao.getTotalAgentQueuesCount(currentUser.getId(), currentLevel, queueType, search, status, ticketType, priority);
         int totalPages = (int) Math.ceil((double) totalTickets / pageSize);
-        List<Tickets> queueList = ticketDao.getAgentQueues(currentUser.getId(), currentLevel, queueType, offset, pageSize, search, status, ticketType);
+        List<Tickets> queueList = ticketDao.getAgentQueues(currentUser.getId(), currentLevel, queueType, offset, pageSize, search, status, ticketType, priority);
+        
+        // Gắn thông tin Asset cho từng ticket trong hàng đợi
+        TicketAssetsDAO ticketAssetsDAO = new TicketAssetsDAO();
+        for (Tickets t : queueList) {
+            List<Assets> linkedAssets = ticketAssetsDAO.getLinkedCIsByTicketId(t.getId());
+            t.setLinkedAssets(linkedAssets);
+        }
+
 // Nếu là Manager, lấy danh sách IT Support để phục vụ Modal gán vé trên Queue
         // Sửa trong cả 2 file Controller (AgentTicketDetail và AgentQueue)
         if ("Manager".equals(session.getAttribute("role")) || "Admin".equals(session.getAttribute("role"))) {
@@ -82,6 +95,7 @@ public class AgentQueueController extends HttpServlet {
         request.setAttribute("search", search);
         request.setAttribute("selectedStatus", status);
         request.setAttribute("selectedTicketType", ticketType); // Đổi tên attribute
+        request.setAttribute("selectedPriority", priority);
         
         request.getRequestDispatcher("/ticket/agent_queue.jsp").forward(request, response);
     }
