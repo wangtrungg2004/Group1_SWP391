@@ -65,7 +65,7 @@ public class Long_TicketListServlet extends HttpServlet {
         request.setAttribute("keyword", keyword);
         request.setAttribute("type", type);
         request.setAttribute("status", status);
-        request.setAttribute("priority", priority);
+        request.setAttribute("priorityLevel", priority);
         request.getRequestDispatcher("/Long_TicketList.jsp").forward(request, response);
     }
 
