@@ -332,8 +332,8 @@
                                                     </div>
 
                                                     <div class="form-group mb-4">
-                                                        <label class="font-weight-bold">Asset tag <span class="text-danger">*</span></label>
-                                                        <input type="text" name="assetTag" class="form-control" placeholder="E.g., CI-001" maxlength="120" autocomplete="off" required value="${assetTag_val}">
+                                                        <label class="font-weight-bold">Asset tag</label>
+                                                        <input type="text" name="assetTag" class="form-control" placeholder="E.g., CI-001" maxlength="120" autocomplete="off" value="${assetTag_val}">
                                                     </div><!--
 
                                                     <div class="form-group mb-4">
