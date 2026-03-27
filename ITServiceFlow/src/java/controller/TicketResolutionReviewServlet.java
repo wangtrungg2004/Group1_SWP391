@@ -51,6 +51,13 @@ public class TicketResolutionReviewServlet extends HttpServlet {
         String successParam = request.getParameter("success");
         String errorParam = request.getParameter("error");
 
+        // Lấy userId từ session để lọc ticket của chính mình
+        Integer currentUserId = (Integer) request.getSession().getAttribute("userId");
+        if (currentUserId == null) {
+            response.sendRedirect("Login.jsp");
+            return;
+        }
+
         // Case 1: Có ticketId (numeric) – load chi tiết ticket
         if (ticketIdStr != null && !ticketIdStr.trim().isEmpty()) {
             try {
@@ -87,7 +94,7 @@ public class TicketResolutionReviewServlet extends HttpServlet {
             if (ticket == null) {
                 request.setAttribute("errorMessage", "Không tìm thấy ticket số: " + ticketNumber);
                 // Vẫn hiện danh sách
-                List<Tickets> list = ticketDAO.getResolvedTickets(null);
+                List<Tickets> list = ticketDAO.getResolvedTickets(null, currentUserId);
                 request.setAttribute("resolvedTickets", list);
             } else {
                 if (!"Resolved".equals(ticket.getStatus())) {
@@ -102,7 +109,7 @@ public class TicketResolutionReviewServlet extends HttpServlet {
         }
 
         // Case 3: Hiện danh sách (có thể lọc theo keyword TicketNumber)
-        List<Tickets> list = ticketDAO.getResolvedTickets(keyword);
+        List<Tickets> list = ticketDAO.getResolvedTickets(keyword, currentUserId);
         request.setAttribute("resolvedTickets", list);
         request.setAttribute("keyword", keyword != null ? keyword : "");
         request.getRequestDispatcher("/TicketResolutionReview.jsp").forward(request, response);
@@ -136,9 +143,11 @@ public class TicketResolutionReviewServlet extends HttpServlet {
         }
 
         int ticketId;
+        int userId;
         try {
             ticketId = Integer.parseInt(ticketIdStr.trim());
-        } catch (NumberFormatException e) {
+            userId = (Integer) request.getSession().getAttribute("userId");
+        } catch (Exception e) {
             response.sendRedirect("TicketResolutionReview");
             return;
         }
@@ -147,7 +156,8 @@ public class TicketResolutionReviewServlet extends HttpServlet {
                 ticketId,
                 title != null ? title.trim() : "",
                 description != null ? description.trim() : "",
-                resolutionSteps != null ? resolutionSteps.trim() : "");
+                resolutionSteps != null ? resolutionSteps.trim() : "",
+                userId);
 
         response.sendRedirect("TicketResolutionReview?ticketId=" + ticketId
                 + (success ? "&success=true" : "&error=true"));

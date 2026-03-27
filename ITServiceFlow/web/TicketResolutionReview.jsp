@@ -4,12 +4,14 @@
 <html lang="vi">
 
     <head>
-        <meta charset="UTF-8">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
         <title>Ticket Resolution Review</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="assets/css/style.css">
-        <link rel="stylesheet" href="assets/css/pcoded.min.css">
-        <link rel="stylesheet" href="assets/fonts/feather.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/fonts/fontawesome/css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/plugins/animation/css/animate.min.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/plugins/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/fonts/feather/css/feather.css">
         <style>
             .badge-resolved {
                 background: #28a745;
@@ -40,8 +42,9 @@
     </head>
 
     <body>
-        <jsp:include page="includes/header.jsp" />
+        <div class="loader-bg"><div class="loader-track"><div class="loader-fill"></div></div></div>
         <jsp:include page="includes/sidebar.jsp" />
+        <jsp:include page="includes/header.jsp" />
 
         <div class="pcoded-main-container">
             <div class="pcoded-content">
@@ -50,12 +53,12 @@
                         <div class="row align-items-center">
                             <div class="col-md-12">
                                 <div class="page-header-title">
-                                    <h5 class="m-b-10">Ticket Resolution Review</h5>
+                                    <h5 class="m-b-10">Ticket Resolution</h5>
                                 </div>
                                 <ul class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="ITDashboard.jsp"><i
                                                 class="feather icon-home"></i></a></li>
-                                    <li class="breadcrumb-item active">Resolution Review</li>
+                                    <li class="breadcrumb-item active">Resolution </li>
                                 </ul>
                             </div>
                         </div>
@@ -368,9 +371,10 @@
             </div>
         </div>
 
-        <script src="assets/js/vendor-all.min.js"></script>
-        <script src="assets/js/plugins/bootstrap.min.js"></script>
-        <script src="assets/js/pcoded.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/plugins/jquery/js/jquery.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/vendor-all.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/pcoded.min.js"></script>
     </body>
 
 </html>

@@ -444,17 +444,18 @@ public class TicketDAO extends DbContext {
     }
 
     // 5. Lấy danh sách ticket đã Resolved (có thể lọc theo keyword TicketNumber)
-    public List<Tickets> getResolvedTickets(String keyword) {
+    public List<Tickets> getResolvedTickets(String keyword, int assignedToId) {
         List<Tickets> list = new ArrayList<>();
         String baseSql = "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.ResolvedAt "
-                + "FROM [dbo].[Tickets] t WHERE t.Status = 'Resolved'";
+                + "FROM [dbo].[Tickets] t WHERE t.Status = 'Resolved' AND t.AssignedTo = ?";
         boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
         String sql = hasKeyword ? baseSql + " AND t.TicketNumber LIKE ?" : baseSql;
         sql += " ORDER BY t.ResolvedAt DESC";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, assignedToId);
             if (hasKeyword) {
-                ps.setString(1, "%" + keyword.trim() + "%");
+                ps.setString(2, "%" + keyword.trim() + "%");
             }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {

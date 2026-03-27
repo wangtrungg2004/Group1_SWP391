@@ -145,23 +145,45 @@ public class KnowledgeArticleDAO extends DbContext {
         }
     }
 
-    // ── Update ticket resolution fields (Title, Description, ResolutionNotes) ──
+    // ── Update ticket resolution fields and create a Knowledge Article ──
     public boolean updateTicketResolution(int ticketId, String title,
-                                          String description, String resolutionNotes) {
-       
-        String sql = "UPDATE Tickets SET Title = ?, Description = ?, " +
-                     "ResolutionNotes = ?, UpdatedAt = GETDATE() WHERE Id = ? AND Status = 'Resolved'";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                                          String description, String resolutionNotes, int userId) {
+        // Step 1: Update the Ticket table
+        boolean ticketUpdated = false;
+        String sqlTicket = "UPDATE Tickets SET Title = ?, Description = ?, " +
+                           "ResolutionNotes = ?, UpdatedAt = GETDATE() WHERE Id = ? AND Status = 'Resolved'";
+        try (PreparedStatement ps = connection.prepareStatement(sqlTicket)) {
             ps.setString(1, title);
             ps.setString(2, description);
             ps.setString(3, resolutionNotes);
             ps.setInt(4, ticketId);
+            ticketUpdated = ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            // Fallback if ResolutionNotes column doesn't exist
+            if (e.getMessage() != null && e.getMessage().contains("ResolutionNotes")) {
+                ticketUpdated = updateTicketResolutionFallback(ticketId, title, description, resolutionNotes);
+            } else {
+                e.printStackTrace();
+            }
+        }
+
+        if (!ticketUpdated) return false;
+
+        // Step 2: Create a Knowledge Article from the resolution
+        String sqlKA = "INSERT INTO KnowledgeArticles (ArticleNumber, Title, Content, CategoryId, Status, ViewCount, CreatedBy, CreatedAt) " +
+                       "VALUES (?, ?, ?, (SELECT CategoryId FROM Tickets WHERE Id = ?), 'Published', 0, ?, GETDATE())";
+        try (PreparedStatement ps = connection.prepareStatement(sqlKA)) {
+            String articleNumber = "KA-" + System.currentTimeMillis();
+            String combinedContent = "Ticket Resolution:\n" + description + "\n\nResolution Steps:\n" + resolutionNotes;
+            
+            ps.setString(1, articleNumber);
+            ps.setString(2, title);
+            ps.setString(3, combinedContent);
+            ps.setInt(4, ticketId);
+            ps.setInt(5, userId);
+            
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            // If ResolutionNotes column doesn't exist, fall back
-            if (e.getMessage() != null && e.getMessage().contains("ResolutionNotes")) {
-                return updateTicketResolutionFallback(ticketId, title, description, resolutionNotes);
-            }
             e.printStackTrace();
             return false;
         }
