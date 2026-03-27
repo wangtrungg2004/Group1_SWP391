@@ -39,7 +39,6 @@ public class PerformanceDashboard extends HttpServlet {
         Date toDate = new Date(System.currentTimeMillis());
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, -30);
-        cal.add(Calendar.DAY_OF_MONTH, -1);
         Date fromDate = new Date(cal.getTimeInMillis());
 
         String fromParam = request.getParameter("from");
@@ -64,9 +63,16 @@ public class PerformanceDashboard extends HttpServlet {
                 // Ignore, keep default
             }
         }
-        Map<String, Object> performanceStats = slaDao.getPerformanceStats(fromDate, toDate, categoryId, locationId);
-        Map<String, Object> complianceStats = slaDao.getSLAComplianceStats(fromDate, toDate, categoryId, locationId);
-        java.util.List<Map<String, Object>> trendData = slaDao.getTrendData(fromDate, toDate, categoryId, locationId);
+
+
+        Calendar endCal = Calendar.getInstance();
+        endCal.setTime(toDate);
+        endCal.add(Calendar.DAY_OF_MONTH, 1);
+        Date queryToDate = new Date(endCal.getTimeInMillis());
+
+        Map<String, Object> performanceStats = slaDao.getPerformanceStats(fromDate, queryToDate, categoryId, locationId);
+        Map<String, Object> complianceStats = slaDao.getSLAComplianceStats(fromDate, queryToDate, categoryId, locationId);
+        java.util.List<Map<String, Object>> trendData = slaDao.getTrendData(fromDate, queryToDate, categoryId, locationId);
 
         request.setAttribute("performanceStats", performanceStats);
         request.setAttribute("complianceStats", complianceStats);

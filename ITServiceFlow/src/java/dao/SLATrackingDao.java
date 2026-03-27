@@ -206,7 +206,7 @@ public class SLATrackingDao extends DbContext {
         if (status != null && !status.isEmpty()) sql.append("AND t.Status = ? ");
         if (agent != null && !agent.isEmpty()) sql.append("AND u.FullName LIKE ? ");
         sql.append("AND t.Status NOT IN ('Resolved', 'Closed', 'Cancelled') ");
-        sql.append("AND st.ResolutionDeadline < DATEADD(hour, 4, GETDATE()) ");
+        sql.append("AND st.ResolutionDeadline < DATEADD(hour, 2, GETDATE()) ");
         sql.append("ORDER BY st.ResolutionDeadline ASC ");
         sql.append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
 
@@ -247,7 +247,7 @@ public class SLATrackingDao extends DbContext {
         if (status != null && !status.isEmpty()) sql.append("AND t.Status = ? ");
         if (agent != null && !agent.isEmpty()) sql.append("AND u.FullName LIKE ? ");
         sql.append("AND t.Status NOT IN ('Resolved', 'Closed', 'Cancelled') ");
-        sql.append("AND st.ResolutionDeadline < DATEADD(hour, 4, GETDATE()) ");
+        sql.append("AND st.ResolutionDeadline < DATEADD(hour, 2, GETDATE()) ");
         try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
             int paramIndex = 1;
             if (priority != null && !priority.isEmpty()) stm.setInt(paramIndex++, Integer.parseInt(priority));

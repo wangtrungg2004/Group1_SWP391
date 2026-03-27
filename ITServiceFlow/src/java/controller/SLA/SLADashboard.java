@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller.SLA;
 
 import java.io.IOException;
@@ -15,10 +11,6 @@ import java.util.List;
 import java.util.Map;
 import service.SLATrackingService;
 
-/**
- *
- * @author DELL
- */
 @WebServlet(name = "SLADashboard", urlPatterns = { "/SLADashboard" })
 public class SLADashboard extends HttpServlet {
 
@@ -37,10 +29,10 @@ public class SLADashboard extends HttpServlet {
             return;
         }
 
-        // Default Date Range: Last 30 Days
+        // Default Date Range: Last 30 Days 
         java.sql.Date toDate = new java.sql.Date(System.currentTimeMillis());
         java.util.Calendar cal = java.util.Calendar.getInstance();
-        cal.add(java.util.Calendar.DAY_OF_MONTH, -1);
+        cal.add(java.util.Calendar.DAY_OF_MONTH, -30); 
         java.sql.Date fromDate = new java.sql.Date(cal.getTimeInMillis());
 
         String fromParam = request.getParameter("from");
@@ -58,8 +50,13 @@ public class SLADashboard extends HttpServlet {
             try { toDate = java.sql.Date.valueOf(toParam); } catch (Exception e) {}
         }
 
-        // Get Statistics
-        Map<String, Integer> stats = slaTrackingService.getSLAStatistics(fromDate, toDate, categoryId, locationId);
+        java.util.Calendar endCal = java.util.Calendar.getInstance();
+        endCal.setTime(toDate);
+        endCal.add(java.util.Calendar.DAY_OF_MONTH, 1);
+        java.sql.Date queryToDate = new java.sql.Date(endCal.getTimeInMillis());
+
+        // Get Statistics (Dùng queryToDate thay vì toDate)
+        Map<String, Integer> stats = slaTrackingService.getSLAStatistics(fromDate, queryToDate, categoryId, locationId);
         request.setAttribute("stats", stats);
 
         // Calculate Compliance Rate
@@ -68,15 +65,15 @@ public class SLADashboard extends HttpServlet {
         double complianceRate = total > 0 ? ((double) (total - breached) / total) * 100 : 100.0;
         request.setAttribute("complianceRate", String.format("%.1f", complianceRate));
 
-        // Get Ticket Lists
-        List<Map<String, Object>> nearBreachTickets = slaTrackingService.getNearBreachTickets(10, fromDate, toDate, categoryId, locationId);
-        List<Map<String, Object>> breachedTickets = slaTrackingService.getBreachedTickets(10, fromDate, toDate, categoryId, locationId);
+        // Get Ticket Lists 
+        List<Map<String, Object>> nearBreachTickets = slaTrackingService.getNearBreachTickets(10, fromDate, queryToDate, categoryId, locationId);
+        List<Map<String, Object>> breachedTickets = slaTrackingService.getBreachedTickets(10, fromDate, queryToDate, categoryId, locationId);
 
         request.setAttribute("nearBreachTickets", nearBreachTickets);
         request.setAttribute("breachedTickets", breachedTickets);
 
         // Get Ticket Type Distribution for Pie Chart
-        java.util.Map<String, Integer> ticketTypeStats = slaTrackingService.getTicketTypeDistribution(fromDate, toDate, categoryId, locationId);
+        java.util.Map<String, Integer> ticketTypeStats = slaTrackingService.getTicketTypeDistribution(fromDate, queryToDate, categoryId, locationId);
         request.setAttribute("ticketTypeStats", ticketTypeStats);
         
         // Metadata for filters
