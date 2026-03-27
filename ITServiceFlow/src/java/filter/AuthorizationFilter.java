@@ -13,12 +13,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import model.Users;
-import service.TemporaryRoleAccessService;
 
 @WebFilter(filterName = "AuthorizationFilter", urlPatterns = {"/AdminDashboard.jsp", "/UserDashboard.jsp", "/ITDashboard.jsp", "/ManagerDashboard", "/ManagerDashboard.jsp", "/admin/*", "/user/*", "/it/*"})
 public class AuthorizationFilter implements Filter {
-
-    private final TemporaryRoleAccessService temporaryRoleAccessService = new TemporaryRoleAccessService();
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -65,8 +62,20 @@ public class AuthorizationFilter implements Filter {
             }
         }
 
-        String role = temporaryRoleAccessService.synchronizeSessionRole(session);
-        if (role == null) {
+        String role = null;
+        Object roleObj = session.getAttribute("role");
+        if (roleObj != null) {
+            role = roleObj.toString();
+        } else {
+            Object userObj = session.getAttribute("user");
+            if (userObj instanceof Users) {
+                role = ((Users) userObj).getRole();
+                session.setAttribute("role", role);
+                session.setAttribute("effectiveRole", role);
+            }
+        }
+
+        if (role == null || role.trim().isEmpty()) {
             session.invalidate();
             httpResponse.sendRedirect(contextPath + "/Login.jsp");
             return;

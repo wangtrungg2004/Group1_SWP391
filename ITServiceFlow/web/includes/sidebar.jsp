@@ -32,7 +32,6 @@
         </div>
         <div class="navbar-content scroll-div">
             <ul class="nav pcoded-inner-navbar">
-               
 
                 <!-- ??? USER MENU ??????????????????????????????????????? -->
                 <c:if test="${role == 'User'}">
@@ -65,12 +64,6 @@
                         <a href="${pageContext.request.contextPath}/KnowErrorList" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-alert-triangle"></i></span>
                             <span class="pcoded-mtext">Known Errors</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/TemporaryAccessRequest" class="nav-link">
-                            <span class="pcoded-micon"><i class="feather icon-unlock"></i></span>
-                            <span class="pcoded-mtext">Temporary Access</span>
                         </a>
                     </li>
                 </c:if>
@@ -123,12 +116,6 @@
                         <a href="${pageContext.request.contextPath}/MyChangeRequests" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-file-text"></i></span>
                             <span class="pcoded-mtext">My Change Requests</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/TemporaryAccessRequest" class="nav-link">
-                            <span class="pcoded-micon"><i class="feather icon-unlock"></i></span>
-                            <span class="pcoded-mtext">Temporary Access</span>
                         </a>
                     </li>
 
@@ -216,12 +203,6 @@
                             <span class="pcoded-mtext">Approve RFC</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/TemporaryAccessApproval" class="nav-link">
-                            <span class="pcoded-micon"><i class="feather icon-shield"></i></span>
-                            <span class="pcoded-mtext">Approve Temp Access</span>
-                        </a>
-                    </li>
 
                     <li class="nav-item pcoded-menu-caption"><label>Reports</label></li>
                     <li class="nav-item">
@@ -267,12 +248,6 @@
                             <span class="pcoded-mtext">Configuration Items</span>
                         </a>
                     </li>-->
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/TemporaryAccessApproval" class="nav-link">
-                            <span class="pcoded-micon"><i class="feather icon-shield"></i></span>
-                            <span class="pcoded-mtext">Temp Access Approval</span>
-                        </a>
-                    </li>
                 </c:if>
 
             </ul>
@@ -280,3 +255,4 @@
     </div>
 </nav>
 <!-- [ navigation menu ] end -->
+

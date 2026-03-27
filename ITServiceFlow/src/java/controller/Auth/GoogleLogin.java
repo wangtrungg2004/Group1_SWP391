@@ -10,14 +10,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import model.Users;
-import service.TemporaryRoleAccessService;
 import service.UserService;
 
 @WebServlet(name = "AuthGoogleLogin", urlPatterns = {"/auth/GoogleLogin"})
 public class GoogleLogin extends HttpServlet {
 
     private final UserService userService = new UserService();
-    private final TemporaryRoleAccessService temporaryRoleAccessService = new TemporaryRoleAccessService();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -55,8 +53,6 @@ public class GoogleLogin extends HttpServlet {
             session.setAttribute("effectiveRole", user.getRole());
             session.setAttribute("role", user.getRole());
             session.setAttribute("userId", user.getId());
-            session.setAttribute(TemporaryRoleAccessService.SESSION_TEMP_ROLE_ACTIVATED, false);
-            temporaryRoleAccessService.synchronizeSessionRole(session);
             redirectByRole(user.getRole(), request, response);
         } catch (Exception ex) {
             ex.printStackTrace();

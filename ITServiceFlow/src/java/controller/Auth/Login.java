@@ -14,7 +14,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Users;
-import service.TemporaryRoleAccessService;
 import service.UserService;
 
 /**
@@ -60,7 +59,6 @@ public class Login extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     UserService userService = new UserService();
-    TemporaryRoleAccessService temporaryRoleAccessService = new TemporaryRoleAccessService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -111,8 +109,6 @@ public class Login extends HttpServlet {
             session.setAttribute("effectiveRole", user.getRole());
             session.setAttribute("role", user.getRole());
             session.setAttribute("userId", user.getId());
-            session.setAttribute(TemporaryRoleAccessService.SESSION_TEMP_ROLE_ACTIVATED, false);
-            temporaryRoleAccessService.synchronizeSessionRole(session);
 
             String role = user.getRole();
             if (role != null) {
