@@ -185,7 +185,7 @@
                                                             <thead class="thead-light">
                                                                 <tr>
                                                                     <th style="width:50px">No</th>
-                                                                    <th>Asset Tag</th>
+                                                                    <th>CI Tag</th>
                                                                     <th>Name</th>
                                                                     <th>Type</th>
                                                                     <th>Status</th>
@@ -322,7 +322,7 @@
                                                                 <li class="page-item ${currentPage eq i ? 'active' : ''}">
                                                                     <a class="page-link"
                                                                        href="CIListServlet?page=${i}&keyword=${keyword}&status=${status}&assetType=${assetType}&location=${location}${not empty ticketId ? '&ticketId='.concat(ticketId) : ''}"
-                                                                       style="${(currentPage eq i and i eq 1) ? 'background-color:#ffc107 !important; border-color:#ffc107 !important; color:#212529 !important; font-weight:600;' : ''}">
+                                                                       >
                                                                         ${i}
                                                                     </a>
                                                                 </li>

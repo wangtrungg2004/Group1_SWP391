@@ -34,7 +34,7 @@
                                             <div class="page-header-title">
                                                 <div class="d-inline">
                                                     <h4>Configuration Item Detail</h4>
-                                                    <span>Asset Tag: <strong>${ci.assetTag}</strong> | ${ci.name}</span>
+                                                    <span>CI Tag: <strong>${ci.assetTag}</strong> | ${ci.name}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -87,7 +87,7 @@
                                                         <div class="col-md-6">
                                                             <table class="table table-borderless table-striped mb-0">
                                                                 <tr>
-                                                                    <th width="160">Asset Tag</th>
+                                                                    <th width="160">CI Tag</th>
                                                                     <td><strong>${ci.assetTag}</strong></td>
                                                                 </tr>
                                                                 <tr>
@@ -162,7 +162,7 @@
                                                                         <tr>
                                                                             <th>Relationship Type</th>
                                                                             <th>Related CI</th>
-                                                                            <th>Asset Tag</th>
+                                                                            <th>CI Tag</th>
                                                                             <th>Description</th>
                                                                         </tr>
                                                                     </thead>
@@ -363,7 +363,7 @@
                                     <thead class="thead-light">
                                         <tr>
                                             <th style="width: 60px;">Select</th>
-                                            <th>Asset Tag</th>
+                                            <th>CI Tag</th>
                                             <th>Name</th>
                                             <th>Type</th>
                                             <th>Owner</th>

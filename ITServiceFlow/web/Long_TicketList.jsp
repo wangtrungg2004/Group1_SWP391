@@ -347,7 +347,7 @@
                                 </thead>
                                 <tbody id="apTableBody">
                                     <tr>
-                                        <td colspan="5" class="text-center text-muted py-4">Chọn ticket để tải danh sách assets...</td>
+                                        <td colspan="5" class="text-center text-muted py-4">Select ticket to load the configuration item list....</td>
                                     </tr>
                                 </tbody>
                             </table>
