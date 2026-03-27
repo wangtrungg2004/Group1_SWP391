@@ -178,23 +178,7 @@
                                                 <c:out value="${ticket.description}" default="No description provided."/>
                                             </div>
 
-                                            <h6 class="section-title"><i class="feather icon-paperclip"></i> Attachments</h6>
-                                            <div class="mb-5">
-                                                <c:choose>
-                                                    <c:when test="${not empty attachments}">
-                                                        <div class="d-flex flex-wrap" style="gap: 10px;">
-                                                            <c:forEach items="${attachments}" var="file">
-                                                                <a href="${pageContext.request.contextPath}/DownloadFile?id=${file.fileId}" target="_blank" class="btn btn-sm btn-light border text-dark font-weight-bold">
-                                                                    <i class="feather icon-file text-primary mr-1"></i> ${file.fileName}
-                                                                </a>
-                                                            </c:forEach>
-                                                        </div>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <span class="text-muted" style="font-size: 0.85rem; font-style: italic;">No files attached.</span>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </div>
+                                            
 
                                             <div class="card-neat p-4 p-lg-5">
                                                 <div class="section-title mb-4">
@@ -369,28 +353,7 @@
                                                 </div>
                                             </div>
 
-                                            <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-bottom pb-2 mb-3">
-                                                <h6 class="sidebar-section-title border-0 pb-0 mb-0 m-0">Configuration Items</h6>
-                                                <a href="${pageContext.request.contextPath}/TicketLinkCIListServlet" class="btn btn-sm btn-light text-primary border" title="Go to Asset Management page"><i class="feather icon-settings"></i> Manage CIs</a>
-                                            </div>
-                                            <div class="meta-group mb-0">
-                                                <c:choose>
-                                                    <c:when test="${not empty linkedAssets}">
-                                                        <c:forEach items="${linkedAssets}" var="asset">
-                                                            <div class="p-2 border rounded mb-2 bg-light d-flex align-items-center">
-                                                                <i class="feather icon-monitor text-primary mx-2"></i>
-                                                                <div>
-                                                                    <div class="font-weight-bold text-dark" style="font-size: 0.85rem;">${asset.name}</div>
-                                                                    <div class="text-muted" style="font-size: 0.75rem;">Tag: ${asset.assetTag}</div>
-                                                                </div>
-                                                            </div>
-                                                        </c:forEach>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <span class="text-muted font-italic" style="font-size: 0.85rem;">No linked assets</span>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </div>
+
 
                                             <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-bottom pb-2 mb-3">
                                                 <h6 class="sidebar-section-title border-0 pb-0 mb-0 m-0">Incident Hierarchy</h6>
