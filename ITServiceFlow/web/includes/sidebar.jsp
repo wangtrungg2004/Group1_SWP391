@@ -93,13 +93,7 @@
                             <span class="pcoded-mtext">Ticket Queues</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/Long_TicketListServlet" class="nav-link">
-                            <span class="pcoded-micon"><i class="feather icon-inbox"></i></span>
-                            <span class="pcoded-mtext">Ticket - Assets</span>
-                        </a>
-                    </li>
-                   
+
 
                     <li class="nav-item pcoded-menu-caption"><label>Problem & Knowledge</label></li>
                     <li class="nav-item">

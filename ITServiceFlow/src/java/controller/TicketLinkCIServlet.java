@@ -30,9 +30,13 @@ public class TicketLinkCIServlet extends HttpServlet {
         return r;
     }
 
-    private void sendErrorRedirect(HttpServletResponse response, String contextPath, String message) throws IOException {
+    private void sendErrorRedirect(HttpServletResponse response, String contextPath, String message, String redirectAfter) throws IOException {
         String msg = URLEncoder.encode(message, StandardCharsets.UTF_8);
-        response.sendRedirect(contextPath + "/Long_TicketListServlet?errorMessage=" + msg);
+        if (redirectAfter != null) {
+            response.sendRedirect(contextPath + redirectAfter + (redirectAfter.contains("?") ? "&" : "?") + "errorMessage=" + msg);
+        } else {
+            response.sendRedirect(contextPath + "/Long_TicketListServlet?errorMessage=" + msg);
+        }
     }
 
     @Override
@@ -58,18 +62,18 @@ public class TicketLinkCIServlet extends HttpServlet {
         try {
             ticketId = Integer.parseInt(ticketIdStr);
         } catch (Exception e) {
-            sendErrorRedirect(response, ctx, "Invalid ticketId");
+            sendErrorRedirect(response, ctx, "Invalid ticketId", redirectAfter);
             return;
         }
 
         if (assetTag == null || assetTag.trim().isEmpty()) {
-            sendErrorRedirect(response, ctx, "Asset tag is required");
+            sendErrorRedirect(response, ctx, "Asset tag is required", redirectAfter);
             return;
         }
 
         Assets asset = assetsDAO.getAssetByTag(assetTag.trim());
         if (asset == null) {
-            sendErrorRedirect(response, ctx, "Asset not found");
+            sendErrorRedirect(response, ctx, "Asset not found", redirectAfter);
             return;
         }
 
@@ -77,12 +81,12 @@ public class TicketLinkCIServlet extends HttpServlet {
         if (success) {
             String okMsg = URLEncoder.encode("Linked asset successfully", StandardCharsets.UTF_8);
             if (redirectAfter != null) {
-                response.sendRedirect(ctx + redirectAfter + "?successMessage=" + okMsg);
+                response.sendRedirect(ctx + redirectAfter + (redirectAfter.contains("?") ? "&" : "?") + "successMessage=" + okMsg);
             } else {
                 response.sendRedirect(ctx + "/Long_TicketListServlet?successMessage=" + okMsg);
             }
         } else {
-            sendErrorRedirect(response, ctx, "Asset already linked or failed");
+            sendErrorRedirect(response, ctx, "Asset already linked or failed", redirectAfter);
         }
     }
 

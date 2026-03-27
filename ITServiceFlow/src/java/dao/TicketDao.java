@@ -681,7 +681,7 @@ public int getTotalTicketsCount(int userId, String search, String status, String
   
     
     // 7. Lấy danh sách Hàng đợi (Queue) cho Agent có Filter và SẮP XẾP NGÀY
-    public List<Tickets> getAgentQueues(int agentId, int currentLevel, String queueType, int offset, int limit, String search, String status, String type) {
+    public List<Tickets> getAgentQueues(int agentId, int currentLevel, String queueType, int offset, int limit, String search, String status, String type, String priority) {
         List<Tickets> list = new ArrayList<>();
 
         StringBuilder sql = new StringBuilder(
@@ -714,6 +714,9 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         if (type != null && !type.equals("all")) {
             sql.append("AND t.TicketType = ? ");
         }
+        if (priority != null && !priority.equals("all")) {
+            sql.append("AND p.Level = ? ");
+        }
 
         // Bỏ sortOrder truyền vào, mặc định sắp xếp mới nhất (DESC) lên đầu để dễ theo dõi
         sql.append("ORDER BY t.CreatedAt DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
@@ -734,6 +737,9 @@ public int getTotalTicketsCount(int userId, String search, String status, String
             }
             if (type != null && !type.equals("all")) {
                 ps.setString(paramIdx++, type);
+            }
+            if (priority != null && !priority.equals("all")) {
+                ps.setString(paramIdx++, priority);
             }
 
             ps.setInt(paramIdx++, offset);
@@ -767,8 +773,8 @@ public int getTotalTicketsCount(int userId, String search, String status, String
     }
 
     // 8. Đếm tổng số vé của Queue (Hàm này không cần tham số sắp xếp)
-    public int getTotalAgentQueuesCount(int agentId, int currentLevel, String queueType, String search, String status, String type) {
-        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM [dbo].[Tickets] t WHERE 1=1 ");
+    public int getTotalAgentQueuesCount(int agentId, int currentLevel, String queueType, String search, String status, String type, String priority) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM [dbo].[Tickets] t LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id WHERE 1=1 ");
 
         if ("unassigned".equals(queueType)) {
             sql.append("AND t.AssignedTo IS NULL AND t.Status NOT IN ('Closed', 'Resolved') ");
@@ -783,6 +789,7 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         if (search != null && !search.trim().isEmpty()) sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
         if (status != null && !status.equals("all")) sql.append("AND t.Status = ? ");
         if (type != null && !type.equals("all")) sql.append("AND t.TicketType = ? ");
+        if (priority != null && !priority.equals("all")) sql.append("AND p.Level = ? ");
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIdx = 1;
@@ -793,6 +800,7 @@ public int getTotalTicketsCount(int userId, String search, String status, String
             }
             if (status != null && !status.equals("all")) ps.setString(paramIdx++, status);
             if (type != null && !type.equals("all")) ps.setString(paramIdx++, type);
+            if (priority != null && !priority.equals("all")) ps.setString(paramIdx++, priority);
             
             ResultSet rs = ps.executeQuery();
             if (rs.next()) return rs.getInt(1);
