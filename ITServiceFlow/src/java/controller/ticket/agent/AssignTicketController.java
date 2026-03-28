@@ -1,17 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller.ticket.agent;
 
-/**
- *
- * @author Dumb Trung
- */
-
-
-
 import dao.TicketDAO;
+import model.Tickets;
 import model.Users;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -24,14 +14,12 @@ import jakarta.servlet.http.HttpSession;
 @WebServlet(name = "AssignTicket", urlPatterns = {"/AssignTicket"})
 public class AssignTicketController extends HttpServlet {
 
-    // Xử lý luồng: IT Support (LV1) bấm "Assign to me" (Gọi qua thẻ <a>)
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processAssign(request, response, true);
     }
 
-    // Xử lý luồng: Manager (LV2) gán cho người khác (Gọi qua Form Submit Modal)
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -54,18 +42,29 @@ public class AssignTicketController extends HttpServlet {
             int ticketId = Integer.parseInt(request.getParameter(isAssignToMe ? "id" : "ticketId"));
             int agentId;
 
+            TicketDAO dao = new TicketDAO();
+            Tickets ticket = dao.getTicketById(ticketId);
+
+            if (ticket == null) {
+                response.sendRedirect(request.getContextPath() + "/Queues");
+                return;
+            }
+
+            boolean isManager = "Manager".equals(role);
+            if (!isManager && ticket.getAssignedTo() != null && ticket.getAssignedTo() > 0 && ticket.getAssignedTo() != currentUser.getId()) {
+                request.getSession().setAttribute("errorMessage", "Error: This ticket is already being handled by another agent. You cannot take over.");
+                response.sendRedirect(request.getContextPath() + "/TicketAgentDetail?id=" + ticket.getId());
+                return;
+            }
+
             if (isAssignToMe) {
-                // LV1 tự nhận việc
                 agentId = currentUser.getId();
             } else {
-                // LV2 gán cho người khác từ Dropdown
                 agentId = Integer.parseInt(request.getParameter("agentId"));
             }
 
-            TicketDAO dao = new TicketDAO();
             dao.assignTicket(ticketId, agentId);
 
-            // Nguồn request từ đâu thì trả về trang đó (Queue hoặc Detail)
             String referer = request.getHeader("Referer");
             if (referer != null && referer.contains("Queues")) {
                 response.sendRedirect(request.getContextPath() + "/Queues");

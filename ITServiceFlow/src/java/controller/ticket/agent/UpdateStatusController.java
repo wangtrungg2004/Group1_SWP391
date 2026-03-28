@@ -1,16 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller.ticket.agent;
 
-/**
- *
- * @author Dumb Trung
- */
-
-
 import dao.TicketDAO;
+import dao.TicketCommentsDAO;
 import model.Users;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -20,7 +11,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import dao.NotificationDao;
 import dao.UsersDAO;
 import model.Tickets;
 import service.NotificationService;
@@ -29,10 +19,20 @@ import service.NotificationService;
 public class UpdateStatusController extends HttpServlet {
 
     NotificationService notificationService = new NotificationService();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+        processStatusUpdate(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processStatusUpdate(request, response);
+    }
+
+    private void processStatusUpdate(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
         Users currentUser = (Users) session.getAttribute("user");
         String role = (String) session.getAttribute("role");
@@ -43,41 +43,62 @@ public class UpdateStatusController extends HttpServlet {
         }
 
         String idParam = request.getParameter("id");
-        String status = request.getParameter("status"); // VD: "In Progress", "Resolved"
-        
+        String status = request.getParameter("status");
+        String breachReason = request.getParameter("breachReason"); 
+
         if (idParam != null && !idParam.isEmpty() && status != null && !status.isEmpty()) {
-            int ticketId = Integer.parseInt(idParam);
+            int ticketId = Integer.parseInt(idParam); 
             TicketDAO ticketDao = new TicketDAO();
-            Tickets ticket = ticketDao.searchTicketById(ticketId);
-            // Đổi trạng thái vé
+            Tickets ticket = ticketDao.getTicketById(ticketId);
+
+            boolean isOwner = (ticket.getAssignedTo() != null && ticket.getAssignedTo() == currentUser.getId());
+
+            if (!isOwner) {
+                request.getSession().setAttribute("errorMessage", "Access Denied: You must assign this ticket to yourself to take any action.");
+                response.sendRedirect(request.getContextPath() + "/TicketAgentDetail?id=" + ticketId);
+                return; 
+            }
+
+            String currentStatus = ticket.getStatus();
+            boolean canUpdate = false;
+
+            if ("Closed".equals(currentStatus)) {
+                canUpdate = false; 
+            } else if ("Resolved".equals(currentStatus)) {
+                if ("Closed".equals(status)) canUpdate = true; 
+            } else if ("In Progress".equals(currentStatus)) {
+                if ("Resolved".equals(status) || "Closed".equals(status)) canUpdate = true; 
+            } else if ("New".equals(currentStatus) || "Reopened".equals(currentStatus)) {
+                if ("In Progress".equals(status) || "Resolved".equals(status) || "Closed".equals(status)) canUpdate = true; 
+            }
+
+            if (!canUpdate) {
+                request.getSession().setAttribute("errorMessage", "Business Logic Error: Cannot revert status from [" + currentStatus + "] to [" + status + "].");
+                response.sendRedirect(request.getContextPath() + "/TicketAgentDetail?id=" + ticketId);
+                return;
+            }
+
             ticketDao.updateTicketStatus(ticketId, status);
-            
+
+            if (breachReason != null && !breachReason.trim().isEmpty()) {
+                TicketCommentsDAO commentDao = new TicketCommentsDAO();
+                commentDao.addComment(ticketId, currentUser.getId(), "️SLA BREACH REASON (Root Cause):\n" + breachReason, true);
+            }
+
+
             if ("Resolved".equals(status) || "Closed".equals(status)) {
-            Tickets t = ticketDao.getTicketById(ticketId);
+                Tickets t = ticketDao.getTicketById(ticketId);
+                if (t != null && t.getCreatedBy() > 0) {
+                    UsersDAO usersDAO = new UsersDAO();
+                    Users creator = usersDAO.getUserById(t.getCreatedBy());
 
-            if (t != null && t.getCreatedBy() > 0) {
-                UsersDAO usersDAO = new UsersDAO();
-                Users creator = usersDAO.getUserById(t.getCreatedBy());
-
-                // Chỉ gửi cho role User
-                if (creator != null && "User".equalsIgnoreCase(creator.getRole())) {
-                    String title = "Ticket " + (t.getTicketNumber() != null ? t.getTicketNumber() : "#" + ticketId);
-                    String msg = "Your ticket " + (t.getTitle() != null ? t.getTitle() : "") + " has been " + status + ".";
-
-                    notificationService.createNotification(
-                            creator.getId(),
-                            msg,
-                            ticketId,
-                            false,
-                            title,
-                            "Ticket"
-                    );
+                    if (creator != null && "User".equalsIgnoreCase(creator.getRole())) {
+                        String title = "Ticket " + (t.getTicketNumber() != null ? t.getTicketNumber() : "#" + ticketId);
+                        String msg = "Your ticket " + (t.getTitle() != null ? t.getTitle() : "") + " has been " + status + ".";
+                        notificationService.createNotification(creator.getId(), msg, ticketId, false, title, "Ticket");
+                    }
                 }
             }
-        }
-            
-            
-            // CẬP NHẬT GIAO DIỆN: Tự động tải lại trang để hiển thị trạng thái mới
             response.sendRedirect(request.getContextPath() + "/TicketAgentDetail?id=" + ticketId);
         } else {
             response.sendRedirect(request.getContextPath() + "/Queues");

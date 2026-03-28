@@ -12,9 +12,6 @@ import java.util.Map;
 
 public class TicketDAO extends DbContext {
 
-    // 1. Unified Create Ticket (Cho cả Incident và Service Request)
-    // 1. Unified Create Ticket (Đã fix lỗi Hardcode Status và Unreachable code)
-    // 1. Unified Create Ticket (Đã nâng cấp: Trả về Generated ID để làm SLA)
     public int createTicket(Tickets t) {
         String sql = "INSERT INTO Tickets ("
                 + "TicketNumber, TicketType, Title, Description, CategoryId, LocationId, "
@@ -22,7 +19,6 @@ public class TicketDAO extends DbContext {
                 + "AssignedTo, Status, CreatedBy, CurrentLevel, CreatedAt, UpdatedAt"
                 + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
 
-        // Thêm Statement.RETURN_GENERATED_KEYS để lấy ID vừa sinh ra
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, t.getTicketNumber());
             ps.setString(2, t.getTicketType());
@@ -47,21 +43,18 @@ public class TicketDAO extends DbContext {
             if (rowsAffected > 0) {
                 try (ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs.next()) {
-                        return rs.getInt(1); // Thành công: Trả về ID vé
+                        return rs.getInt(1); 
                     }
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return -1; // Thất bại
+        return -1; 
     }
 
-    // 2. Load Tickets cho Dashboard (L1, L2, L3)
     public List<Tickets> getTicketsForAgent(int currentAgentId, int currentAgentLevel) {
         List<Tickets> list = new ArrayList<>();
-        // Logic: Lấy ticket assign cho mình, hoặc ticket đang ở Level của mình mà chưa
-        // ai nhận
         String sql = "SELECT * FROM Tickets "
                 + "WHERE AssignedTo = ? OR (CurrentLevel = ? AND Status = 'New' AND AssignedTo IS NULL) "
                 + "ORDER BY CreatedAt DESC";
@@ -80,7 +73,6 @@ public class TicketDAO extends DbContext {
                 t.setStatus(rs.getString("Status"));
                 t.setCurrentLevel(rs.getInt("CurrentLevel"));
 
-                // Tránh NullPointerException khi lấy Integer
                 t.setPriorityId((Integer) rs.getObject("PriorityId"));
                 t.setAssignedTo((Integer) rs.getObject("AssignedTo"));
 
@@ -166,10 +158,8 @@ public class TicketDAO extends DbContext {
         return list;
     }
     
-    // Lấy danh sách TOÀN BỘ nhân sự IT (Support, Manager, Admin) để gán vé
     public List<model.Users> getActiveAgents() {
         List<model.Users> list = new ArrayList<>();
-        // Lấy tất cả trừ End User, sắp xếp theo Role để dễ nhìn
         String sql = "SELECT Id, FullName, Role FROM [dbo].[Users] "
                    + "WHERE Role IN ('IT Support', 'Manager') AND IsActive = 1 "
                    + "ORDER BY Role, FullName";
@@ -178,7 +168,6 @@ public class TicketDAO extends DbContext {
             while (rs.next()) {
                 model.Users u = new model.Users();
                 u.setId(rs.getInt("Id"));
-                // Format tên hiển thị: Nguyễn Văn A (IT Support)
                 u.setFullName(rs.getString("FullName") + " (" + rs.getString("Role") + ")");
                 list.add(u);
             }
@@ -215,11 +204,9 @@ public class TicketDAO extends DbContext {
     // }
     // }
 
-    // 3. Lấy danh sách Ticket cho End-User (My Tickets)
    public List<Tickets> getTicketsByCreator(int userId, int offset, int limit, String search, String status, String type) {
         List<Tickets> list = new ArrayList<>();
         
-        // Sử dụng StringBuilder để linh hoạt nối chuỗi SQL
         StringBuilder sql = new StringBuilder(
             "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.CreatedAt, t.UpdatedAt, "
             + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, c.Name AS CategoryName "
@@ -230,17 +217,14 @@ public class TicketDAO extends DbContext {
             + "WHERE t.CreatedBy = ? "
         );
 
-        // Nối thêm điều kiện tìm kiếm nếu có
         if (search != null && !search.trim().isEmpty()) {
             sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
         }
-        
-        // Nối thêm điều kiện Status nếu không phải 'all'
+
         if (status != null && !status.equals("all")) {
             sql.append("AND t.Status = ? ");
         }
-        
-        // Nối thêm điều kiện Type nếu không phải 'all'
+
         if (type != null && !type.equals("all")) {
             sql.append("AND t.TicketType = ? ");
         }
@@ -251,7 +235,6 @@ public class TicketDAO extends DbContext {
             int paramIndex = 1;
             ps.setInt(paramIndex++, userId);
             
-            // Set params tương ứng với thứ tự nối chuỗi
             if (search != null && !search.trim().isEmpty()) {
                 ps.setString(paramIndex++, "%" + search + "%");
                 ps.setString(paramIndex++, "%" + search + "%");
@@ -288,7 +271,6 @@ public class TicketDAO extends DbContext {
         return list;
     }
 
-    // 3b. Lấy chi tiết ticket theo TicketNumber (dùng cho TicketResolutionReview)
     public Tickets getTicketByNumber(String ticketNumber) {
         String sql = "SELECT t.*, "
                 + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, "
@@ -340,8 +322,6 @@ public class TicketDAO extends DbContext {
         return null;
     }
 
-    // 4. Lấy chi tiết 1 Ticket theo ID - ĐÃ NÂNG CẤP JOIN
-   // 4. Lấy chi tiết 1 Ticket theo ID - ĐÃ NÂNG CẤP JOIN VÀ FIX LỖI OBJECT
     public Tickets getTicketById(int id) {
         String sql = "SELECT t.*, "
                 + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, "
@@ -374,14 +354,12 @@ public class TicketDAO extends DbContext {
                 t.setCreatedAt(rs.getTimestamp("CreatedAt"));
                 t.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
                 
-                // 🚀 ĐÃ FIX: Bổ sung các trường bị thiếu để Controller và JSP nhận diện quyền
                 t.setAssignedTo((Integer) rs.getObject("AssignedTo"));
                 t.setCurrentLevel((Integer) rs.getObject("CurrentLevel"));
                 t.setRequiresApproval((Boolean) rs.getObject("RequiresApproval"));
                 t.setApprovedBy((Integer) rs.getObject("ApprovedBy"));
                 t.setParentTicketId((Integer) rs.getObject("ParentTicketId"));
 
-                // Set các trường hiển thị
                 t.setPriorityLevel(rs.getString("PriorityLevel"));
                 t.setAssigneeName(rs.getString("AssigneeName"));
                 t.setCategoryName(rs.getString("CategoryName"));
@@ -395,7 +373,6 @@ public class TicketDAO extends DbContext {
         return null;
     }
 
-    // Search ticket by ID (support Long_TicketDetailServlet)
     public Tickets searchTicketById(int ticketId) {
         String sql = "SELECT t.*, "
                 + "p.Level AS PriorityLevel, u.FullName AS AssigneeName, "
@@ -443,7 +420,6 @@ public class TicketDAO extends DbContext {
         return null;
     }
 
-    // 5. Lấy danh sách ticket đã Resolved (có thể lọc theo keyword TicketNumber)
     public List<Tickets> getResolvedTickets(String keyword, int assignedToId) {
         List<Tickets> list = new ArrayList<>();
         String baseSql = "SELECT t.Id, t.TicketNumber, t.TicketType, t.Title, t.Status, t.ResolvedAt "
@@ -474,7 +450,7 @@ public class TicketDAO extends DbContext {
         return list;
     }
 
-    // 5. Tạo ticket và trả về ID sinh ra (cho SLA tracking)
+    // Create Ticket and return its Id for SLA tracking
     public int createTicket2(Tickets ticket) {
         String sql = "INSERT INTO [dbo].[Tickets] (TicketNumber, TicketType, Title, Description, CategoryId, LocationId, Impact, Urgency, PriorityId, ServiceCatalogId, RequiresApproval, Status, CreatedBy, CreatedAt) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE())";
@@ -525,7 +501,6 @@ public class TicketDAO extends DbContext {
         return -1;
     }
     
-    // 6. Lấy thống kê KPI cho Dashboard của người dùng
     public java.util.Map<String, Integer> getUserTicketKPIs(int userId) {
         java.util.Map<String, Integer> kpis = new java.util.HashMap<>();
         kpis.put("open", 0);
@@ -533,7 +508,6 @@ public class TicketDAO extends DbContext {
         kpis.put("awaiting", 0);
         kpis.put("resolved7d", 0);
 
-        // Gộp 4 phép tính vào 1 câu query duy nhất để tối ưu tốc độ
         String sql = "SELECT "
                    + "SUM(CASE WHEN Status = 'New' THEN 1 ELSE 0 END) AS OpenCount, "
                    + "SUM(CASE WHEN Status = 'In Progress' THEN 1 ELSE 0 END) AS InProgressCount, "
@@ -558,7 +532,6 @@ public class TicketDAO extends DbContext {
         return kpis;
     }
     
-    // 7. Đếm tổng số vé để tính tổng số trang
 public int getTotalTicketsCount(int userId, String search, String status, String type) {
         StringBuilder sql = new StringBuilder(
             "SELECT COUNT(*) FROM [dbo].[Tickets] WHERE CreatedBy = ? "
@@ -599,7 +572,6 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         return 0;
     }
 
-    // Helper to generate Ticket Number
     public String getNextTicketNumber(String type) {
         String prefix = type.equals("Incident") ? "INC-" : "SR-";
         return prefix + System.currentTimeMillis();
@@ -675,12 +647,7 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         
     }
     
-    // =========================================================================
-    // CODE DÀNH CHO LUỒNG AGENT (DEV 2)
-    // =========================================================================
   
-    
-    // 7. Lấy danh sách Hàng đợi (Queue) cho Agent có Filter và SẮP XẾP NGÀY
     public List<Tickets> getAgentQueues(int agentId, int currentLevel, String queueType, int offset, int limit, String search, String status, String type, String priority) {
         List<Tickets> list = new ArrayList<>();
 
@@ -693,18 +660,16 @@ public int getTotalTicketsCount(int userId, String search, String status, String
                 + "LEFT JOIN [dbo].[SLATracking] st ON t.Id = st.TicketId WHERE 1=1 "
         );
 
-        // Lọc theo Queue Type (Bỏ Status != 'Closed', 'Resolved' thành NOT IN cho gọn)
         if ("unassigned".equals(queueType)) {
             sql.append("AND t.AssignedTo IS NULL AND t.Status NOT IN ('Closed', 'Resolved') ");
         } else if ("mine".equals(queueType)) {
             sql.append("AND t.AssignedTo = ? AND t.Status NOT IN ('Closed', 'Resolved') ");
         } else if ("resolved".equals(queueType)) {
             sql.append("AND t.Status = 'Resolved' ");
-        } else { // all_active
+        } else { 
             sql.append("AND t.Status NOT IN ('Closed', 'Resolved') ");
         }
 
-        // Lọc theo thanh Search & Filter
         if (search != null && !search.trim().isEmpty()) {
             sql.append("AND (t.TicketNumber LIKE ? OR t.Title LIKE ?) ");
         }
@@ -718,7 +683,6 @@ public int getTotalTicketsCount(int userId, String search, String status, String
             sql.append("AND p.Level = ? ");
         }
 
-        // Bỏ sortOrder truyền vào, mặc định sắp xếp mới nhất (DESC) lên đầu để dễ theo dõi
         sql.append("ORDER BY t.CreatedAt DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
@@ -756,12 +720,10 @@ public int getTotalTicketsCount(int userId, String search, String status, String
                 t.setCreatedAt(rs.getTimestamp("CreatedAt"));
                 t.setPriorityLevel(rs.getString("PriorityLevel"));
                 t.setAssigneeName(rs.getString("AssigneeName"));
-                
-                // Lấy SLA Deadline từ DB (nếu có)
+
                 try {
                     t.setResolutionDeadline(rs.getTimestamp("ResolutionDeadline"));
                 } catch (Exception e) {
-                    // Cột có thể không tồn tại trong một số view, bỏ qua
                 }
                 
                 list.add(t);
@@ -772,7 +734,6 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         return list;
     }
 
-    // 8. Đếm tổng số vé của Queue (Hàm này không cần tham số sắp xếp)
     public int getTotalAgentQueuesCount(int agentId, int currentLevel, String queueType, String search, String status, String type, String priority) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM [dbo].[Tickets] t LEFT JOIN [dbo].[Priorities] p ON t.PriorityId = p.Id WHERE 1=1 ");
 
@@ -808,16 +769,7 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         return 0;
     }
 
-   
-   
 
-    
-    
-    // =========================================================================
-    // CODE ACTION CHO AGENT 
-    // =========================================================================
-
-    // 9. Phân công vé cho Agent (Assign to me)
     public boolean assignTicket(int ticketId, int agentId) {
         String sql = "UPDATE [dbo].[Tickets] SET AssignedTo = ?, UpdatedAt = GETDATE() WHERE Id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -830,8 +782,6 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         }
     }
 
-    // 10. Cập nhật trạng thái vé (Phiên bản Nâng cấp có Hiệu ứng Domino US03)
-  // 10. Cập nhật trạng thái vé (Hiệu ứng Domino & Dừng đồng hồ SLA)
     public boolean updateTicketStatus(int ticketId, String status) {
         String sql = "UPDATE [dbo].[Tickets] SET Status = ?, UpdatedAt = GETDATE() ";
         if ("Resolved".equals(status)) sql += ", ResolvedAt = GETDATE() ";
@@ -843,10 +793,8 @@ public int getTotalTicketsCount(int userId, String search, String status, String
             ps.setInt(2, ticketId);
             int rows = ps.executeUpdate();
             
-            // ===== HIỆU ỨNG DOMINO ĐỐI VỚI VÉ CON =====
             if (rows > 0 && ("Resolved".equals(status) || "Closed".equals(status))) {
-                // Update trạng thái và thời gian ResolvedAt cho vé con. 
-                // Cột ResolvedAt này sẽ tự động làm "điểm chốt" để báo cáo SLA biết là vé con đã hoàn thành, không bị Breach nữa!
+
                 String cascadeSql = "UPDATE [dbo].[Tickets] SET Status = ?, UpdatedAt = GETDATE() ";
                 if ("Resolved".equals(status)) cascadeSql += ", ResolvedAt = GETDATE() ";
                 if ("Closed".equals(status)) cascadeSql += ", ClosedAt = GETDATE() ";
@@ -903,7 +851,6 @@ public int getTotalTicketsCount(int userId, String search, String status, String
             }
         } catch (Exception e) { e.printStackTrace(); }
 
-        // SLA breaching: ticket của agent này có ResolutionDeadline trong 2 giờ tới
         String slaSql = "SELECT COUNT(*) FROM SLATracking st "
                       + "JOIN Tickets t ON st.TicketId = t.Id "
                       + "WHERE t.AssignedTo = ? "
@@ -918,10 +865,6 @@ public int getTotalTicketsCount(int userId, String search, String status, String
 
         return kpis;
     }
-
-    // =========================================================================
-    // MANAGER DASHBOARD STATS
-    // =========================================================================
 
     public int getTotalTicketThisMonth()
     {
@@ -951,19 +894,17 @@ public int getTotalTicketsCount(int userId, String search, String status, String
     }
     
 /**
- * 6 tháng gần nhất (từ cũ → mới), mỗi tháng: số đã xử lý + số chưa xử lý.
+ * 
  */
     public Map<String, Object> getTicketStatsLast6Months() {
         List<String> labels = new ArrayList<>();
         int[] daXuLy = new int[6];
         int[] chuaXuLy = new int[6];
 
-        // Tháng hiện tại
         YearMonth thangHienTai = YearMonth.from(LocalDate.now());
 
-        // Duyệt 6 tháng: từ (hiện tại - 5) đến hiện tại
         for (int i = 0; i < 6; i++) {
-            YearMonth thang = thangHienTai.minusMonths(5 - i); // i=0 → tháng cũ nhất
+            YearMonth thang = thangHienTai.minusMonths(5 - i);
 
             labels.add(thang.getMonthValue() + "/" + thang.getYear());
 
@@ -971,7 +912,6 @@ public int getTotalTicketsCount(int userId, String search, String status, String
                 continue;
             }
 
-            // Ngày đầu tháng và ngày đầu tháng sau (dùng < tháng sau = hết tháng này)
             Date tuNgay  = Date.valueOf(thang.atDay(1));
             Date denNgay = Date.valueOf(thang.plusMonths(1).atDay(1));
 
@@ -985,12 +925,7 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         ketQua.put("chuaXuLy", chuaXuLy);
         return ketQua;
     }
-    
-    // =========================================================================
-    // CODE US03: PARENT - CHILD INCIDENTS (GOM NHÓM VÉ)
-    // =========================================================================
 
-    // 1. Lấy danh sách các vé con (Child Tickets) của 1 vé cha
     public List<Tickets> getLinkedChildTickets(int parentId) {
         List<Tickets> list = new ArrayList<>();
         String sql = "SELECT t.*, u.FullName AS AssigneeName " +
@@ -1014,7 +949,6 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         return list;
     }
 
-    // 2. Lấy thông tin vé cha (Parent Ticket) của 1 vé con
     public Tickets getParentTicket(int parentTicketId) {
         if (parentTicketId <= 0) return null;
         String sql = "SELECT * FROM [dbo].[Tickets] WHERE Id = ?";
@@ -1033,12 +967,9 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         return null;
     }
 
-    // 3. Lấy danh sách các vé CÓ THỂ LIÊN KẾT (Để hiển thị trong Modal chọn vé con)
-    // 3. Lấy danh sách các vé CÓ THỂ LIÊN KẾT (Để hiển thị trong Modal chọn vé con)
-    // 3. Lấy danh sách các vé CÓ THỂ LIÊN KẾT (Chỉ lấy Incident, bỏ qua Service Request)
+
     public List<Tickets> getAvailableTicketsForLinking(int currentTicketId) {
         List<Tickets> list = new ArrayList<>();
-        // 🚀 ĐÃ BỔ SUNG: AND TicketType = 'Incident'
         String sql = "SELECT Id, TicketNumber, Title, Status FROM [dbo].[Tickets] " +
                      "WHERE Id != ? AND Status NOT IN ('Resolved', 'Closed') " +
                      "AND ParentTicketId IS NULL AND TicketType = 'Incident'";
@@ -1058,31 +989,24 @@ public int getTotalTicketsCount(int userId, String search, String status, String
     }
 
    
-   // 4. Hàm thực thi việc gán vé con vào vé cha (ĐÃ NÂNG CẤP KẾ THỪA ASSIGNEE)
     public boolean linkChildTickets(int parentId, String[] childIds) {
         if (childIds == null || childIds.length == 0) return false;
-        
-        // 1. Lấy thông tin vé cha để biết IT Support nào đang xử lý
+
         Tickets parent = getTicketById(parentId);
         Integer parentAssigneeId = null;
         if (parent != null && parent.getAssignedTo() != null && parent.getAssignedTo() > 0) {
             parentAssigneeId = parent.getAssignedTo();
         }
-        
-        // 2. Chuẩn bị tham số cho mệnh đề IN (...)
+
         StringBuilder placeholders = new StringBuilder();
         for (int i = 0; i < childIds.length; i++) {
             placeholders.append("?");
             if (i < childIds.length - 1) placeholders.append(",");
         }
         
-        // 3. Xây dựng câu lệnh SQL thông minh
         String sql = "UPDATE [dbo].[Tickets] SET ParentTicketId = ?, UpdatedAt = GETDATE() ";
         
-        // Nếu vé cha ĐÃ CÓ người xử lý -> Mang người đó đi gán cho vé con
         if (parentAssigneeId != null) {
-            // Dùng COALESCE: Nếu vé con IS NULL (chưa ai nhận) -> Gán cho Parent Assignee.
-            // Nếu vé con ĐÃ CÓ người nhận -> Giữ nguyên người cũ.
             sql += ", AssignedTo = COALESCE(AssignedTo, ?) ";
         }
         
@@ -1092,12 +1016,10 @@ public int getTotalTicketsCount(int userId, String search, String status, String
             int paramIndex = 1;
             ps.setInt(paramIndex++, parentId); // Set ParentId
             
-            // Set ID người xử lý (nếu có)
             if (parentAssigneeId != null) {
                 ps.setInt(paramIndex++, parentAssigneeId);
             }
             
-            // Set danh sách ID vé con
             for (int i = 0; i < childIds.length; i++) {
                 ps.setInt(paramIndex++, Integer.parseInt(childIds[i]));
             }
@@ -1109,17 +1031,15 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         }
     }
 
-    /** Đã xử lý: đóng/duyệt trong khoảng [tuNgay, denNgay) */
     private int getAllTicketSolvedFromTo(Date from, Date to) {
-        // ResolvedAt có thể NULL, dùng UpdatedAt fallback để chart có dữ liệu.
         String sql = "SELECT COUNT(*) FROM Tickets " +
                 "WHERE Status IN ('Resolved','Closed','Approved') " +
                 "AND COALESCE(ResolvedAt, UpdatedAt) >= ? AND COALESCE(ResolvedAt, UpdatedAt) < ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
-            ps.setDate(1, from); // từ ngày
-            ps.setDate(2, to);   // đến ngày
+            ps.setDate(1, from); 
+            ps.setDate(2, to);   
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -1142,8 +1062,8 @@ public int getTotalTicketsCount(int userId, String search, String status, String
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
-            ps.setDate(1, from); // từ ngày
-            ps.setDate(2, to);   // đến ngày
+            ps.setDate(1, from); 
+            ps.setDate(2, to);  
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -1188,82 +1108,101 @@ public int getTotalTicketsCount(int userId, String search, String status, String
         return list;
     }
     
-    // =========================================================================
-    // CODE US02: TICKET ROUTING THEO CHUẨN ITIL (QUEUE-BASED)
-    // =========================================================================
-    public void applyITILRouting(Tickets t) {
-        // Mặc định vé sinh ra không thuộc về cá nhân nào
+
+    public void applyRouting(Tickets t) {
+
         t.setAssignedTo(null); 
         
-        // Mặc định vé rớt vào hàng đợi Level 1 (IT Support)
         t.setCurrentLevel(1); 
 
-        // Rule 1: Vé Service Request yêu cầu phê duyệt -> Ném lên L2 (Manager Queue)
-                // Nâng cấp Rule 1 trong Auto-Routing
     if (t.getRequiresApproval() != null && t.getRequiresApproval()) {
-        t.setCurrentLevel(2); // Đẩy lên Manager
-        t.setStatus("Awaiting Approval"); // Đóng băng trạng thái
+        t.setCurrentLevel(2); 
+        t.setStatus("Awaiting Approval"); 
         t.setAssignedTo(null);
         return;
     }
 
-        // Rule 2: Sự cố nghiêm trọng (Major Incident - Priority 1) -> Ném lên L2 để giám sát khẩn
         if ("Incident".equals(t.getTicketType()) && t.getPriorityId() != null && t.getPriorityId() == 1) {
             t.setCurrentLevel(2);
             return;
         }
     }
     
-    // Hàm thực thi luồng Duyệt / Từ chối (Chuẩn ITIL Fulfillment)
-    // Hàm thực thi luồng Duyệt / Từ chối (Chuẩn ITIL Fulfillment)
+
     public boolean processApproval(int ticketId, int managerId, boolean isApproved) {
         String sql;
         if (isApproved) {
-            // DUYỆT: Lưu người duyệt, đổi trạng thái thành New, trả về Level 1 cho IT Support xử lý
             sql = "UPDATE [dbo].[Tickets] SET "
                 + "ApprovedBy = ?, ApprovedAt = GETDATE(), "
                 + "Status = 'New', CurrentLevel = 1, UpdatedAt = GETDATE() "
                 + "WHERE Id = ?";
         } else {
-            // TỪ CHỐI: Đóng vé luôn, giữ nguyên Level
             sql = "UPDATE [dbo].[Tickets] SET "
-                + "ApprovedBy = ?, ApprovedAt = GETDATE(), "
+                + "ApprovedBy = NULL, ApprovedAt = GETDATE(), "
                 + "Status = 'Closed', UpdatedAt = GETDATE() "
                 + "WHERE Id = ?";
         }
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, managerId);
-            ps.setInt(2, ticketId);
+            if (isApproved) {
+                ps.setInt(1, managerId);
+                ps.setInt(2, ticketId);
+            } else {
+                ps.setInt(1, ticketId);
+            }
             int rows = ps.executeUpdate();
             
-            // 🚀 ITIL TRIGGER: BẮT ĐẦU CHẠY SLA KHI MANAGER DUYỆT THÀNH CÔNG
+            // Trigger SLA Activation
             if (rows > 0 && isApproved) {
-                // Query ngược lại để lấy thông tin PriorityId và Type của vé
                 Tickets t = getTicketById(ticketId); 
-                if (t != null && t.getPriorityId() != null && t.getPriorityId() > 0) {
+                if (t != null) {
                     SLATrackingDao slaDao = new SLATrackingDao();
-                    // Tính thời gian SLA bắt đầu từ giây phút này!
-                    slaDao.applySLAForTicket(ticketId, t.getTicketType(), t.getPriorityId());
+                    
+                    if ("ServiceRequest".equals(t.getTicketType()) && t.getServiceCatalogId() != null && t.getServiceCatalogId() > 0) {
+                        
+                        int estimatedHours = 24; 
+                        String sqlCat = "SELECT EstimatedDeliveryDays FROM [dbo].[ServiceCatalog] WHERE Id = ?";
+                        try (PreparedStatement psCat = connection.prepareStatement(sqlCat)) {
+                            psCat.setInt(1, t.getServiceCatalogId());
+                            ResultSet rsCat = psCat.executeQuery();
+                            if (rsCat.next() && rsCat.getObject("EstimatedDeliveryDays") != null) {
+                                estimatedHours = rsCat.getInt("EstimatedDeliveryDays");
+                            }
+                        } catch (Exception e) { e.printStackTrace(); }
+
+                        int mappedPriorityId = 3;
+                        if (estimatedHours <= 8) mappedPriorityId = 1;       // Critical 
+                        else if (estimatedHours <= 16) mappedPriorityId = 2; // High 
+                        else if (estimatedHours <= 24) mappedPriorityId = 3; // Medium
+                        else mappedPriorityId = 4;                           // Low 
+
+                        try (PreparedStatement psPrio = connection.prepareStatement("UPDATE [dbo].[Tickets] SET PriorityId = ? WHERE Id = ?")) {
+                            psPrio.setInt(1, mappedPriorityId);
+                            psPrio.setInt(2, ticketId);
+                            psPrio.executeUpdate();
+                        } catch (Exception e) { e.printStackTrace(); }
+
+
+                        slaDao.applySLAForTicket(ticketId, t.getTicketType(), mappedPriorityId);
+                        
+                    } 
+                    else if ("Incident".equals(t.getTicketType()) && t.getPriorityId() != null && t.getPriorityId() > 0) {
+                        slaDao.applySLAForTicket(ticketId, t.getTicketType(), t.getPriorityId());
+                    }
                 }
             }
-            
             return rows > 0;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
-    
-    // =========================================================================
-    // CODE US05: TICKET TRIAGE (LV1 EDIT TICKET)
-    // =========================================================================
+
     public boolean updateTicketTriage(int ticketId, int categoryId, Integer impact, Integer urgency, Integer priorityId) {
         String sql = "UPDATE [dbo].[Tickets] SET CategoryId = ?, Impact = ?, Urgency = ?, PriorityId = ?, UpdatedAt = GETDATE() WHERE Id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, categoryId);
             
-            // Xử lý an toàn cho Integer có thể Null (trường hợp Service Request)
             if (impact != null) ps.setInt(2, impact); else ps.setNull(2, Types.INTEGER);
             if (urgency != null) ps.setInt(3, urgency); else ps.setNull(3, Types.INTEGER);
             if (priorityId != null) ps.setInt(4, priorityId); else ps.setNull(4, Types.INTEGER);
@@ -1376,7 +1315,6 @@ public boolean reopenTicketForUser(int ticketId, int userId) {
         return null;
     }
  public boolean updateTicketBasicFields(int ticketId, String ticketType, Integer categoryId, Integer priorityId, String status) {
-        // Nếu categoryId hoặc priorityId null -> giữ nguyên giá trị cũ trong DB
         Integer effectiveCategoryId = categoryId;
         Integer effectivePriorityId = priorityId;
 

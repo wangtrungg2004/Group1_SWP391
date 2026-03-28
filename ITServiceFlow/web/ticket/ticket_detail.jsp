@@ -412,7 +412,7 @@
                                                     <span class="meta-label">Status</span>
                                                     <div class="meta-value">
                                                         <c:choose>
-                                                            <c:when test="${ticket.status == 'New'}"><span class="jira-badge badge-new">Pending</span></c:when>
+                                                            
                                                             <c:when test="${ticket.status == 'In Progress'}"><span class="jira-badge badge-progress">In Progress</span></c:when>
                                                             <c:when test="${ticket.status == 'Reopened'}"><span class="jira-badge badge-reopened">Reopened</span></c:when>
                                                             <c:when test="${ticket.status == 'Resolved'}"><span class="jira-badge badge-resolved">Resolved</span></c:when>

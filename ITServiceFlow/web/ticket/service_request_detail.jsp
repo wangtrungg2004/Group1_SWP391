@@ -7,6 +7,12 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
+
+<%-- GLOBAL PERMISSION VARIABLES --%>
+<c:set var="isOwner" value="${not empty ticket.assignedTo && ticket.assignedTo == sessionScope.user.id}" />
+<c:set var="isManager" value="${sessionScope.role == 'Manager' || sessionScope.role == 'Admin'}" />
+<c:set var="canEdit" value="${isOwner}" />
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,7 +25,6 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
 
     <style>
-        /* Tái sử dụng CSS layout đẹp của bạn */
         body { background-color: #f4f5f7; }
         .card { border-radius: 8px; box-shadow: 0 1px 3px rgba(9,30,66,0.05); border: 1px solid #dfe1e6; }
         .ticket-header { border-bottom: 1px solid #dfe1e6; padding-bottom: 20px; margin-bottom: 25px; }
@@ -101,16 +106,15 @@
                                                 
                                                 <div class="d-flex align-items-center">
                                                     <c:choose>
-                                                        <%-- KỊCH BẢN 1: VÉ ĐANG CHỜ DUYỆT --%>
                                                         <c:when test="${ticket.status == 'Awaiting Approval'}">
                                                             <c:choose>
-                                                                <c:when test="${sessionScope.role == 'Manager' || sessionScope.role == 'Admin'}">
-                                                                    <a href="${pageContext.request.contextPath}/ProcessApproval?id=${ticket.id}&action=approve" class="btn btn-sm btn-success font-weight-bold shadow-sm mr-2 px-3">
+                                                                <c:when test="${isManager}">
+                                                                    <button type="button" class="btn btn-sm btn-success font-weight-bold shadow-sm mr-2 px-3" data-toggle="modal" data-target="#approveModal">
                                                                         <i class="feather icon-check-circle mr-1"></i> Approve
-                                                                    </a>
-                                                                    <a href="${pageContext.request.contextPath}/ProcessApproval?id=${ticket.id}&action=reject" class="btn btn-sm btn-danger font-weight-bold shadow-sm px-3">
+                                                                    </button>
+                                                                    <button type="button" class="btn btn-sm btn-danger font-weight-bold shadow-sm px-3" data-toggle="modal" data-target="#rejectModal">
                                                                         <i class="feather icon-x-circle mr-1"></i> Reject
-                                                                    </a>
+                                                                    </button>
                                                                 </c:when>
                                                                 <c:otherwise>
                                                                     <button class="btn btn-sm btn-light border text-muted font-weight-bold px-3" disabled>
@@ -120,19 +124,47 @@
                                                             </c:choose>
                                                         </c:when>
 
-                                                        <%-- KỊCH BẢN 2: VÉ BÌNH THƯỜNG / ĐÃ ĐƯỢC DUYỆT --%>
+                                                        <c:when test="${ticket.status == 'Closed'}">
+                                                            <span class="badge badge-secondary p-2 mr-2" style="font-size:0.85rem;">
+                                                                <i class="feather icon-archive mr-1"></i> Closed
+                                                            </span>
+                                                        </c:when>
+                                                        
                                                         <c:otherwise>
-                                                            <div class="dropdown mr-2">
-                                                                <button class="btn btn-sm btn-primary dropdown-toggle shadow-sm font-weight-bold px-3" type="button" data-toggle="dropdown">
-                                                                    ${ticket.status == 'New' ? 'Fulfill Request' : ticket.status}
-                                                                </button>
-                                                                <div class="dropdown-menu dropdown-menu-right mt-1 shadow-sm">
-                                                                    <a class="dropdown-item py-2" href="UpdateStatus?id=${ticket.id}&status=In Progress"><i class="feather icon-play mr-2 text-primary"></i> Start Fulfillment</a>
-                                                                    <div class="dropdown-divider"></div>
-                                                                    <a class="dropdown-item text-success font-weight-bold py-2" href="UpdateStatus?id=${ticket.id}&status=Resolved"><i class="feather icon-check-circle mr-2"></i> Mark as Completed</a>
-                                                                    <a class="dropdown-item text-secondary py-2" href="UpdateStatus?id=${ticket.id}&status=Closed"><i class="feather icon-archive mr-2"></i> Close Request</a>
-                                                                </div>
-                                                            </div>
+                                                            <c:choose>
+                                                                <c:when test="${canEdit}">
+                                                                    <div class="dropdown mr-2">
+                                                                        <button class="btn btn-sm btn-primary dropdown-toggle shadow-sm font-weight-bold px-3" type="button" data-toggle="dropdown">
+                                                                            ${ticket.status == 'New' ? 'Fulfill Request' : ticket.status}
+                                                                        </button>
+                                                                        <div class="dropdown-menu dropdown-menu-right mt-1 shadow-sm">
+                                                                            <c:if test="${ticket.status == 'New' || ticket.status == 'Reopened'}">
+                                                                                <a class="dropdown-item py-2" href="UpdateStatus?id=${ticket.id}&status=In Progress"><i class="feather icon-play mr-2 text-primary"></i> Start Fulfillment</a>
+                                                                                <div class="dropdown-divider"></div>
+                                                                            </c:if>
+                                                                            <c:if test="${ticket.status != 'Resolved'}">
+                                                                                <a class="dropdown-item text-success font-weight-bold py-2" href="UpdateStatus?id=${ticket.id}&status=Resolved"><i class="feather icon-check-circle mr-2"></i> Mark as Completed</a>
+                                                                            </c:if>
+                                                                            <a class="dropdown-item text-secondary py-2" href="UpdateStatus?id=${ticket.id}&status=Closed"><i class="feather icon-archive mr-2"></i> Close Request</a>
+                                                                        </div>
+                                                                    </div>
+                                                                </c:when>
+                                                                
+                                                                <%-- OTHERS ARE BLOCKED --%>
+                                                                <c:otherwise>
+                                                                    <div class="alert alert-secondary py-2 px-3 mb-0 mr-2 border d-flex align-items-center shadow-sm" style="font-size: 0.85rem; background: #fff;">
+                                                                        <i class="feather icon-lock mr-2 text-muted"></i> 
+                                                                        <c:choose>
+                                                                            <c:when test="${empty ticket.assigneeName}">
+                                                                                <span>Read Only. <a href="${pageContext.request.contextPath}/AssignTicket?id=${ticket.id}" class="font-weight-bold text-primary ml-1">Assign to me</a> to take action.</span>
+                                                                            </c:when>
+                                                                            <c:otherwise>
+                                                                                <span>Read Only. Handled by <strong>${ticket.assigneeName}</strong>.</span>
+                                                                            </c:otherwise>
+                                                                        </c:choose>
+                                                                    </div>
+                                                                </c:otherwise>
+                                                            </c:choose>
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </div>
@@ -140,8 +172,6 @@
 
                                             <h6 class="section-title"><i class="feather icon-align-left"></i> Request Details</h6>
                                             <div class="desc-box"><c:out value="${ticket.description}" default="No description provided."/></div>
-
-                                            
 
                                             <div class="card-neat p-4 p-lg-5">
                                                 <div class="section-title mb-4"><i class="feather icon-message-square text-primary mr-3" style="font-size: 1.2rem;"></i> Communication</div>
@@ -233,15 +263,33 @@
                                                 <span class="meta-label">Fulfiller (Assignee)</span>
                                                 <div class="meta-value">
                                                     <c:choose>
+                                                        <%-- TICKET IS ASSIGNED --%>
                                                         <c:when test="${not empty ticket.assigneeName}">
                                                             <div class="avatar-sm">${ticket.assigneeName.substring(0, 2).toUpperCase()}</div> 
-                                                            ${ticket.assigneeName}
+                                                            <span class="font-weight-bold text-dark">${ticket.assigneeName}</span>
+                                                            
+                                                            <c:if test="${isManager && ticket.status != 'Closed' && ticket.status != 'Resolved'}">
+                                                                <a href="javascript:void(0)" data-toggle="modal" data-target="#assignModal" class="text-danger font-weight-bold ml-2" style="font-size: 0.75rem;" title="Re-assign">(Re-assign)</a>
+                                                            </c:if>
                                                         </c:when>
+                                                        
+
                                                         <c:otherwise>
                                                             <div class="avatar-sm avatar-unassigned"><i class="feather icon-user-x"></i></div> 
                                                             <span class="text-muted mr-2">Unassigned</span>
+                                                            
                                                             <c:if test="${ticket.status != 'Awaiting Approval'}">
-                                                                <a href="AssignTicket?id=${ticket.id}" class="text-primary font-weight-bold" style="font-size: 0.8rem;">(Assign to me)</a>
+                                                                <c:choose>
+                                                                    <c:when test="${isManager}">
+                                                                        <div class="d-inline-block mt-1">
+                                                                            <a href="${pageContext.request.contextPath}/AssignTicket?id=${ticket.id}" class="text-primary font-weight-bold mr-2" style="font-size: 0.8rem;" title="Assign to me">(Assign to me)</a>
+                                                                            <a href="javascript:void(0)" data-toggle="modal" data-target="#assignModal" class="text-secondary font-weight-bold" style="font-size: 0.8rem;" title="Assign to another agent">(Assign to...)</a>
+                                                                        </div>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <a href="${pageContext.request.contextPath}/AssignTicket?id=${ticket.id}" class="text-primary font-weight-bold" style="font-size: 0.8rem;">(Assign to me)</a>
+                                                                    </c:otherwise>
+                                                                </c:choose>
                                                             </c:if>
                                                         </c:otherwise>
                                                     </c:choose>
@@ -259,11 +307,90 @@
                                         </div>
                                     </div>
                                 </div>
-                                
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="approveModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 8px;">
+                <div class="modal-header bg-light border-bottom-0 p-4">
+                    <h5 class="modal-title font-weight-bold text-success"><i class="feather icon-check-circle mr-2"></i>Approve Service Request</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <form action="${pageContext.request.contextPath}/ProcessApproval" method="POST">
+                    <div class="modal-body p-4 text-center">
+                        <input type="hidden" name="id" value="${ticket.id}">
+                        <input type="hidden" name="action" value="approve">
+                        <div class="mb-3"><i class="feather icon-check-circle text-success" style="font-size: 3.5rem;"></i></div>
+                        <h6 class="font-weight-bold text-dark">Confirm approval for this request?</h6>
+                        <p class="text-muted small mb-0">The system will automatically map the estimated delivery hours from the Service Catalog to establish the SLA and dispatch this ticket to IT Support.</p>
+                    </div>
+                    <div class="modal-footer border-top-0 p-4 pt-0 justify-content-center">
+                        <button type="button" class="btn btn-light font-weight-bold px-4" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success font-weight-bold px-4 shadow-sm">Confirm Approval</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <%-- ================= REJECT MODAL ================= --%>
+    <div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 8px;">
+                <div class="modal-header bg-light border-bottom-0 p-4">
+                    <h5 class="modal-title font-weight-bold text-danger"><i class="feather icon-x-circle mr-2"></i>Reject Service Request</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <form action="${pageContext.request.contextPath}/ProcessApproval" method="POST">
+                    <div class="modal-body p-4">
+                        <input type="hidden" name="id" value="${ticket.id}">
+                        <input type="hidden" name="action" value="reject">
+                        <div class="form-group mb-0">
+                            <label class="font-weight-bold text-dark mb-2">Reason for Rejection <span class="text-danger">*</span></label>
+                            <p class="text-muted small mb-3">This reason will be logged and visible to the requester.</p>
+                            <textarea name="rejectReason" class="form-control" rows="4" placeholder="e.g., Budget constraints, Invalid request..." required style="border-radius: 6px;"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top-0 p-4 pt-0">
+                        <button type="button" class="btn btn-light font-weight-bold px-4" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger font-weight-bold px-4 shadow-sm">Reject Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="assignModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 8px;">
+                <div class="modal-header bg-light border-bottom-0 p-4">
+                    <h5 class="modal-title font-weight-bold text-dark"><i class="feather icon-user-check text-primary mr-2"></i>Assign Request to Agent</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <form action="${pageContext.request.contextPath}/AssignTicket" method="POST">
+                    <div class="modal-body p-4">
+                        <input type="hidden" name="ticketId" value="${ticket.id}">
+                        <div class="form-group mb-0">
+                            <label class="font-weight-bold text-dark mb-2">Select Agent</label>
+                            <select name="agentId" class="form-control" required style="border: 1px solid #dfe1e6; border-radius: 6px; height: 42px;">
+                                <option value="" disabled selected>-- Choose an agent --</option>
+                                <c:forEach items="${itSupportList}" var="agent">
+                                    <option value="${agent.id}">${agent.fullName}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top-0 p-4 pt-0">
+                        <button type="button" class="btn btn-light font-weight-bold px-4" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary font-weight-bold px-4 shadow-sm">Assign Ticket</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -279,7 +406,6 @@
             var area = $('#commentArea');
             var btn = $('#btnSubmitComment');
             var input = $('#isInternalInput');
-            
             if(mode === 'reply') {
                 $(element).addClass('active-reply');
                 area.removeClass('note-mode').attr('placeholder', 'Type your response to the user here...');

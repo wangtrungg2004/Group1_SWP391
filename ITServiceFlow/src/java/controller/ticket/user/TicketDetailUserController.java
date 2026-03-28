@@ -20,12 +20,10 @@ import java.util.List;
 import model.TicketComments;
 
 /**
- * TicketDetailUserController  CP NHT cho US20
  *
- * Thm: Nu Tickets.Status = 'Closed', load CsatSurvey (nu c)
- *  ticket_detail.jsp hin th banner CSAT ph hp.
  *
- * Khng thay i logic c, ch thm ~7 dng sau khi set attribute "ticket".
+ *
+ * .
  */
 @WebServlet(name = "TicketDetailUser", urlPatterns = {"/TicketDetailUser"})
 public class TicketDetailUserController extends HttpServlet {
@@ -58,18 +56,14 @@ public class TicketDetailUserController extends HttpServlet {
 
         TicketDAO ticketDao = new TicketDAO();
 
-        // Ly ticket t bng Tickets (dng method c sn)
         Tickets ticket = ticketDao.getTicketById(ticketId);
 
-        // Kim tra: ticket tn ti v Tickets.CreatedBy = Users.Id hin ti
         if (ticket == null || ticket.getCreatedBy() != currentUser.getId()) {
             response.sendRedirect(request.getContextPath() + "/Tickets");
             return;
         }
         
-        // Ly danh sch Comment
         TicketCommentsDAO commentDao = new TicketCommentsDAO();
-        // Truyn 'true' v Agent c quyn xem Internal Note
         List<TicketComments> comments = commentDao.getCommentsByTicketId(ticketId, false);
         request.setAttribute("comments", comments);
 
@@ -84,17 +78,14 @@ public class TicketDetailUserController extends HttpServlet {
             session.removeAttribute("ticketDetailFlashMessage");
         }
 
-        //  US20: Load CSAT survey nu Tickets.Status = 'Closed' 
         if ("Closed".equalsIgnoreCase(ticket.getStatus())) {
             CsatSurveyDAO csatDao = new CsatSurveyDAO();
             CsatSurvey survey = csatDao.getSurveyByTicket(ticketId);
             if (survey != null) {
-                //  c survey  forward vo JSP  hin th kt qu
                 request.setAttribute("csatSurvey", survey);
             }
-            // Nu null  JSP s hin th nt "Give Feedback"
         }
-        // 
+
 
         CategoryDao catDao = new CategoryDao();
         ServiceCatalogDao svcDao = new ServiceCatalogDao();

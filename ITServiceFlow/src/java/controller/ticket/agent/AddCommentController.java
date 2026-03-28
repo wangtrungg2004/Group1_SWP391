@@ -46,8 +46,7 @@ public class AddCommentController extends HttpServlet {
             c.setTicketId(ticketId);
             c.setUserId(currentUser.getId());
             c.setContent(text.trim());
-            
-            // Ép buộc bảo mật: User thường không bao giờ được gửi Internal Note dù họ có hack html
+
             if ("User".equals(role)) {
                 c.setInternal(false);
             } else {
@@ -57,7 +56,6 @@ public class AddCommentController extends HttpServlet {
             new TicketCommentsDAO().addComment(c);
         }
 
-        // Tự động điều hướng về lại màn hình cũ
         if ("User".equals(role)) {
             response.sendRedirect(request.getContextPath() + "/TicketDetailUser?id=" + ticketId);
         } else {

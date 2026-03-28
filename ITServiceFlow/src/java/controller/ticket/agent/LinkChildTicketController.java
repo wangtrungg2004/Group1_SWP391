@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import model.Tickets;
 
 @WebServlet(name = "LinkChildTicket", urlPatterns = {"/LinkChildTicket"})
 public class LinkChildTicketController extends HttpServlet {
@@ -36,16 +37,27 @@ public class LinkChildTicketController extends HttpServlet {
         }
 
         try {
+            int ticketId = Integer.parseInt(request.getParameter("ticketId")); 
+
+            TicketDAO ticketDao = new TicketDAO();
+            Tickets ticket = ticketDao.getTicketById(ticketId);
+
+            boolean isOwner = (ticket.getAssignedTo() != null && ticket.getAssignedTo() == currentUser.getId());
+
+            if (!isOwner) {
+                request.getSession().setAttribute("errorMessage", "Access Denied: You must assign this ticket to yourself for taking any action.");
+                response.sendRedirect(request.getContextPath() + "/TicketAgentDetail?id=" + ticketId);
+                return; 
+            }
+            
             int parentTicketId = Integer.parseInt(request.getParameter("ticketId"));
             String[] childTicketIds = request.getParameterValues("childTicketIds");
 
             if (childTicketIds != null && childTicketIds.length > 0) {
                 TicketDAO dao = new TicketDAO();
-                // Thực thi link vào DB
                 dao.linkChildTickets(parentTicketId, childTicketIds);
             }
             
-            // Link xong tải lại trang chi tiết vé Cha
             response.sendRedirect(request.getContextPath() + "/TicketAgentDetail?id=" + parentTicketId);
 
         } catch (Exception e) {

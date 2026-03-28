@@ -37,7 +37,10 @@
         .jira-table tr:hover td { background-color: #fafbfc; }
         .ticket-key { font-weight: 600; color: #0052cc; font-size: 0.95rem;}
         
-        .sla-badge-placeholder { border: 1px dashed #ff8b00; color: #ff8b00; font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; font-weight: bold; display: inline-block;}
+        /* 🚀 SLA BREACHED ANIMATION & STYLES */
+        .sla-breached { background-color: #ffebe6; color: #bf2600; border: 1px solid #ff5630; animation: pulse-red 2s infinite; display: inline-block; text-align: center; }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255, 86, 48, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(255, 86, 48, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 86, 48, 0); } }
+        .row-breached td { background-color: #fffdfd !important; }
     </style>
 </head>
 <body class="">
@@ -55,10 +58,10 @@
                                 <div class="col-md-12">
                                     <div class="page-header-title"><h5 class="m-b-10">IT Service Desk</h5></div>
                                     <ul class="breadcrumb">
-                                        <li class="breadcrumb-item"><a href="#!"><i class="feather icon-briefcase"></i> Agent Workspace</a></li>
+                                         <li class="breadcrumb-item"><a href="#!"><i class="feather icon-briefcase"></i> Agent Workspace</a></li>
                                     </ul>
                                 </div>
-                            </div>
+                             </div>
                         </div>
                     </div>
 
@@ -78,7 +81,7 @@
                             <strong>Error!</strong> ${param.errorMessage}
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
-                            </button>
+                             </button>
                         </div>
                     </c:if>
 
@@ -88,66 +91,66 @@
                                 <div class="col-12">
                                     
                                    <div class="queue-nav">
-    <a href="${pageContext.request.contextPath}/Queues?queue=unassigned" class="queue-pill ${currentQueue == 'unassigned' ? 'active' : ''}"><i class="feather icon-inbox"></i> Unassigned (Triage)</a>
-    <a href="${pageContext.request.contextPath}/Queues?queue=mine" class="queue-pill ${currentQueue == 'mine' ? 'active' : ''}"><i class="feather icon-user"></i> Assigned to me</a>
-    <a href="${pageContext.request.contextPath}/Queues?queue=all_active" class="queue-pill ${currentQueue == 'all_active' ? 'active' : ''}"><i class="feather icon-list"></i> All Open</a>
-    <a href="${pageContext.request.contextPath}/Queues?queue=resolved" class="queue-pill ${currentQueue == 'resolved' ? 'active' : ''}"><i class="feather icon-check-circle"></i> Resolved</a>
-</div>
+                                        <a href="${pageContext.request.contextPath}/Queues?queue=unassigned" class="queue-pill ${currentQueue == 'unassigned' ? 'active' : ''}"><i class="feather icon-inbox"></i> Unassigned (Triage)</a>
+                                        <a href="${pageContext.request.contextPath}/Queues?queue=mine" class="queue-pill ${currentQueue == 'mine' ? 'active' : ''}"><i class="feather icon-user"></i> Assigned to me</a>
+                                        <a href="${pageContext.request.contextPath}/Queues?queue=all_active" class="queue-pill ${currentQueue == 'all_active' ? 'active' : ''}"><i class="feather icon-list"></i> All Open</a>
+                                        <a href="${pageContext.request.contextPath}/Queues?queue=resolved" class="queue-pill ${currentQueue == 'resolved' ? 'active' : ''}"><i class="feather icon-check-circle"></i> Resolved</a>
+                                    </div>
 
                                     <div class="card mb-4">
                                         <div class="card-block">
                                             <form id="searchForm" action="${pageContext.request.contextPath}/Queues" method="GET">
                                                 <input type="hidden" name="queue" value="${currentQueue}">
 
-                                                <div class="row">
+                                              <div class="row">
                                                     <%-- Keyword --%>
-                                                    <div class="col-md-6">
+                                                     <div class="col-md-6">
                                                         <label class="col-form-label font-weight-bold">
-                                                            <i class="feather icon-search mr-1"></i>Search Ticket
+                                                             <i class="feather icon-search mr-1"></i>Search Ticket
                                                         </label>
                                                         <div class="input-group">
-                                                            <input type="text"
+                                                             <input type="text"
                                                                    name="search"
                                                                    class="form-control"
                                                                    placeholder="Search by Ticket Number, Title..."
-                                                                   value="${search}">
+                                                                    value="${search}">
                                                             <div class="input-group-append">
-                                                                <button type="submit" class="btn btn-primary">
+                                                                 <button type="submit" class="btn btn-primary">
                                                                     <i class="feather icon-search"></i> Search
                                                                 </button>
-                                                                <c:if test="${not empty search 
-                                                                              or (selectedTicketType ne 'all' and not empty selectedTicketType)
-                                                                              or (selectedStatus ne 'all' and not empty selectedStatus)
-                                                                              or (selectedPriority ne 'all' and not empty selectedPriority)}">
-                                                                      <a href="${pageContext.request.contextPath}/Queues?queue=${currentQueue}"
-                                                                         class="btn btn-outline-secondary" title="Clear filters">
-                                                                          <i class="feather icon-x"></i>
+                                                                 <c:if test="${not empty search 
+                                                                               or (selectedTicketType ne 'all' and not empty selectedTicketType)
+                                                                               or (selectedStatus ne 'all' and not empty selectedStatus)
+                                                                               or (selectedPriority ne 'all' and not empty selectedPriority)}">
+                                                                       <a href="${pageContext.request.contextPath}/Queues?queue=${currentQueue}"
+                                                                          class="btn btn-outline-secondary" title="Clear filters">
+                                                                           <i class="feather icon-x"></i>
                                                                       </a>
-                                                                </c:if>
-                                                            </div>
+                                                                 </c:if>
+                                                             </div>
                                                         </div>
-                                                    </div>
+                                                   </div>
 
                                                     <div class="col-md-2">
                                                         <label class="col-form-label font-weight-bold">
                                                             <i class="feather icon-filter mr-1"></i>Filter by Type
-                                                        </label>
-                                                        <select name="ticketType"
+                                                         </label>
+                                                         <select name="ticketType"
                                                                 class="form-control"
-                                                                onchange="document.getElementById('searchForm').submit()">
+                                                                  onchange="document.getElementById('searchForm').submit()">
                                                             <option value="all"             ${selectedTicketType eq 'all' ? 'selected' : ''}>All</option>
                                                             <option value="Incident"        ${selectedTicketType eq 'Incident' ? 'selected' : ''}>Incident</option>
                                                             <option value="ServiceRequest"  ${selectedTicketType eq 'ServiceRequest' ? 'selected' : ''}>Service Request</option>
                                                         </select>
-                                                    </div>
+                                                     </div>
 
                                                     <div class="col-md-2">
-                                                        <label class="col-form-label font-weight-bold">
+                                                         <label class="col-form-label font-weight-bold">
                                                             <i class="feather icon-filter mr-1"></i>Filter by Status
-                                                        </label>
+                                                         </label>
                                                         <select name="status"
                                                                 class="form-control"
-                                                                onchange="document.getElementById('searchForm').submit()">
+                                                                 onchange="document.getElementById('searchForm').submit()">
                                                             <option value="all"         ${selectedStatus eq 'all' ? 'selected' : ''}>All Statuses</option>
                                                             <option value="New"         ${selectedStatus eq 'New' ? 'selected' : ''}>New</option>
                                                             <option value="In Progress" ${selectedStatus eq 'In Progress' ? 'selected' : ''}>In Progress</option>
@@ -156,13 +159,14 @@
                                                             <option value="Closed"      ${selectedStatus eq 'Closed' ? 'selected' : ''}>Closed</option>
                                                         </select>
                                                     </div>
+                                                    
                                                     <div class="col-md-2">
-                                                        <label class="col-form-label font-weight-bold">
+                                                         <label class="col-form-label font-weight-bold">
                                                             <i class="feather icon-filter mr-1"></i>Filter by Priority
-                                                        </label>
+                                                          </label>
                                                         <select name="priority"
                                                                 class="form-control"
-                                                                onchange="document.getElementById('searchForm').submit()">
+                                                                 onchange="document.getElementById('searchForm').submit()">
                                                             <option value="all"      ${selectedPriority eq 'all' ? 'selected' : ''}>All</option>
                                                             <option value="Critical" ${selectedPriority eq 'Critical' ? 'selected' : ''}>Critical</option>
                                                             <option value="High"     ${selectedPriority eq 'High' ? 'selected' : ''}>High</option>
@@ -173,45 +177,55 @@
                                                 </div>
                                                 <small class="text-muted mt-2 d-block">
                                                     Searches across: Ticket Number, Title
-                                                </small>
+                                                 </small>
                                             </form>
                                         </div>
-                                    </div>
+                                   </div>
 
                                     <div class="card border-0 shadow-sm">
-                                        <div class="table-responsive">
+                                         <div class="table-responsive">
                                             <table class="table jira-table mb-0">
                                                 <thead>
                                                     <tr>
-                                                        <th width="5%">No</th>
+                                                         <th width="5%">No</th>
                                                         <th width="10%">Key</th>
                                                         <th width="10%">Type</th>
                                                         <th width="10%">Priority</th>
-                                                        <th width="15%">Assets</th>
+                                                         <th width="15%">Assets</th>
                                                         <th width="13%">SLA Deadline</th>
                                                         <th width="12%">Assignee</th>
-                                                        <th width="10%">Status</th>
+                                                         <th width="10%">Status</th>
                                                         <th width="15%">Action</th>
-                                                    </tr>
+                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <c:if test="${empty queueList}">
                                                         <tr><td colspan="9" class="text-center py-5 text-muted"><i class="feather icon-check-circle d-block mb-2" style="font-size: 2rem;"></i> Queue is empty. Great job!</td></tr>
-                                                    </c:if>
-                                                    <c:forEach items="${queueList}" var="ticket" varStatus="status">
-                                                        <tr>
+                                                    </c:if>                                                  
+                                                    <jsp:useBean id="now" class="java.util.Date" />
+                                                    <c:forEach items="${queueList}" var="ticket" varStatus="status">                                                       
+                                                        <c:set var="isActiveBreached" value="${not empty ticket.resolutionDeadline and ticket.resolutionDeadline.time < now.time and ticket.status != 'Resolved' and ticket.status != 'Closed'}" />                                                        
+                                                        <tr class="${isActiveBreached ? 'row-breached' : ''}">
                                                             <td>${(currentPage - 1) * 10 + status.count}</td>
                                                             <td><a href="${pageContext.request.contextPath}/TicketAgentDetail?id=${ticket.id}" class="ticket-key">${ticket.ticketNumber}</a></td>
                                                             <td>${ticket.ticketType}</td>
+                                                            
+                                                            <%-- 🚀 PRIORITY COLOR CODING --%>
                                                             <td>
-                                                                <span class="badge ${ticket.priorityLevel == 'High' ? 'badge-danger' : 'badge-warning'}">${ticket.priorityLevel}</span>
+                                                                <c:choose>
+                                                                    <c:when test="${ticket.priorityLevel == 'Critical'}"><span class="badge badge-danger"><i class="feather icon-alert-circle mr-1"></i>Critical</span></c:when>
+                                                                    <c:when test="${ticket.priorityLevel == 'High'}"><span class="badge badge-warning text-dark"><i class="feather icon-arrow-up mr-1"></i>High</span></c:when>
+                                                                    <c:when test="${ticket.priorityLevel == 'Medium'}"><span class="badge badge-info"><i class="feather icon-minus mr-1"></i>Medium</span></c:when>
+                                                                    <c:when test="${ticket.priorityLevel == 'Low'}"><span class="badge badge-secondary"><i class="feather icon-arrow-down mr-1"></i>Low</span></c:when>
+                                                                    <c:otherwise><span class="badge badge-light border text-muted">${ticket.priorityLevel}</span></c:otherwise>
+                                                                </c:choose>
                                                             </td>
                                                             
                                                             <td>
                                                                 <c:choose>
                                                                     <c:when test="${not empty ticket.linkedAssets}">
                                                                         <c:forEach var="ci" items="${ticket.linkedAssets}">
-                                                                            <span class="badge badge-info mr-1">
+                                                                           <span class="badge badge-info mr-1">
                                                                                 <a href="${pageContext.request.contextPath}/CIDetailServlet?id=${ci.id}&ticketId=${ticket.id}"
                                                                                    class="text-white"
                                                                                    style="text-decoration: underline;">
@@ -234,23 +248,35 @@
                                                                         </c:forEach>
                                                                     </c:when>
                                                                     <c:otherwise>
-                                                                        <span class="text-muted">—</span>
+                                                                       <span class="text-muted">—</span>
                                                                     </c:otherwise>
                                                                 </c:choose>
                                                             </td>
 
-                                                            <%-- Khai báo biến thời gian hiện tại --%>
-                                                    <jsp:useBean id="now" class="java.util.Date" />
+                                                            <%-- 🚀 SLA DEADLINE COLOR CODING --%>
                                                             <td>
                                                                 <c:choose>
                                                                     <c:when test="${not empty ticket.resolutionDeadline}">
                                                                         <c:choose>
-                                                                            <c:when test="${ticket.resolutionDeadline.time < now.time}">
-                                                                                <span class="badge badge-danger p-2" title="SLA Breached!"><i class="feather icon-alert-octagon mr-1"></i> <fmt:formatDate value="${ticket.resolutionDeadline}" pattern="dd/MM HH:mm"/></span>
+                                                                            <%-- If ticket is Resolved/Closed, neutralize the SLA badge --%>
+                                                                            <c:when test="${ticket.status == 'Resolved' || ticket.status == 'Closed'}">
+                                                                                <span class="badge badge-light border text-muted p-2" title="SLA Stopped"><i class="feather icon-check-circle mr-1"></i> <fmt:formatDate value="${ticket.resolutionDeadline}" pattern="dd/MM HH:mm"/></span>
                                                                             </c:when>
+                                                                            
+                                                                            <%-- If actively Breached --%>
+                                                                            <c:when test="${ticket.resolutionDeadline.time < now.time}">
+                                                                                <div class="badge p-2 sla-breached" title="SLA Target Missed!">
+                                                                                    <i class="feather icon-alert-octagon mr-1"></i> <strong>BREACHED</strong><br>
+                                                                                    <span style="font-size: 0.75rem; opacity: 0.9;"><fmt:formatDate value="${ticket.resolutionDeadline}" pattern="dd/MM HH:mm"/></span>
+                                                                                </div>
+                                                                            </c:when>
+                                                                            
+                                                                            <%-- If Due within 2 Hours (Warning) --%>
                                                                             <c:when test="${(ticket.resolutionDeadline.time - now.time) < 7200000}">
                                                                                 <span class="badge badge-warning text-dark p-2" title="Due Soon!"><i class="feather icon-alert-triangle mr-1"></i> <fmt:formatDate value="${ticket.resolutionDeadline}" pattern="dd/MM HH:mm"/></span>
                                                                             </c:when>
+                                                                            
+                                                                            <%-- Safe (Green) --%>
                                                                             <c:otherwise>
                                                                                 <span class="badge badge-success p-2"><i class="feather icon-clock mr-1"></i> <fmt:formatDate value="${ticket.resolutionDeadline}" pattern="dd/MM HH:mm"/></span>
                                                                             </c:otherwise>
@@ -268,7 +294,9 @@
                                                                     <c:otherwise>${ticket.assigneeName}</c:otherwise>
                                                                 </c:choose>
                                                             </td>
+                                                            
                                                             <td><span class="badge badge-light border">${ticket.status}</span></td>
+                                                            
                                                             <td>
                                                                 <a href="${pageContext.request.contextPath}/TicketAgentDetail?id=${ticket.id}" class="btn btn-sm btn-info mb-1" title="View Ticket Detail">
                                                                     <i class="feather icon-eye"></i> View
@@ -278,7 +306,7 @@
                                                                         data-toggle="modal"
                                                                         data-target="#assetPickerModal"
                                                                         data-ticket-id="${ticket.id}">
-                                                                    <i class="feather icon-link"></i> Link to Asset
+                                                                    <i class="feather icon-link"></i> Link Asset
                                                                 </button>
                                                                 <c:if test="${empty ticket.assigneeName && ticket.status != 'Awaiting Approval'}">
                                                                     <c:choose>
@@ -322,7 +350,8 @@
             </div>
         </div>
     </div>
-        <c:if test="${sessionScope.role == 'Manager' || sessionScope.role == 'Admin'}">
+    
+    <c:if test="${sessionScope.role == 'Manager' || sessionScope.role == 'Admin'}">
         <div class="modal fade" id="assignModal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content border-0 shadow-lg" style="border-radius: 8px;">
@@ -358,7 +387,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="assetPickerModalLabel">Select the Asset to link.</h5>
+                    <h5 class="modal-title" id="assetPickerModalLabel">Select the Asset to link</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -419,7 +448,7 @@
                             </thead>
                             <tbody id="apTableBody">
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted py-4">Select ticket to load the configuration item list....</td>
+                                    <td colspan="5" class="text-center text-muted py-4">Select ticket to load the configuration item list...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -435,7 +464,7 @@
     <script src="${pageContext.request.contextPath}/assets/js/pcoded.min.js"></script>
 
     <script>
-        // Tự động ẩn thông báo sau 2 giây
+        // Auto-hide alerts after 2 seconds
         (function() {
             var successAlert = document.getElementById('successAlert');
             var errorAlert = document.getElementById('errorAlert');
@@ -497,7 +526,6 @@
             }
 
             var apAllAssets = [];
-
             function updateApAssetSearchClearVisibility() {
                 var searchVal = (document.getElementById('apAssetSearch').value || '').trim();
                 var assetTypeVal = document.getElementById('apAssetType').value || 'all';
@@ -513,7 +541,6 @@
 
                 var tbody = document.getElementById('apTableBody');
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Loading...</td></tr>';
-
                 try {
                     var url = '${pageContext.request.contextPath}/TicketAssetsPickerServlet?ticketId=' + encodeURIComponent(ticketId)
                             + '&keyword=' + encodeURIComponent('') 
@@ -538,11 +565,10 @@
                                 (a.assetTag || '').toLowerCase().includes(searchTerm) ||
                                 (a.name || '').toLowerCase().includes(searchTerm) ||
                                 (a.ownerName || '').toLowerCase().includes(searchTerm)
-                                );
+                        );
                     }
                     return ok;
                 });
-
                 renderRows(filtered, ticketId);
             }
 
@@ -556,11 +582,9 @@
                 loadAssetsBase();
                 updateApAssetSearchClearVisibility();
             });
-
             document.getElementById('apAssetSearch').addEventListener('input', function () {
                 updateApAssetSearchClearVisibility();
             });
-
             document.getElementById('apAssetSearch').addEventListener('keydown', function (e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
@@ -575,7 +599,6 @@
                 loadAssetsBase();
                 updateApAssetSearchClearVisibility();
             });
-
             document.getElementById('apAssetSearchClearBtn').addEventListener('click', function () {
                 document.getElementById('apAssetSearch').value = '';
                 document.getElementById('apAssetType').value = 'all';

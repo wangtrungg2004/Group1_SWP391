@@ -232,9 +232,11 @@
                                                                         <select id="AssignedTo" name="AssignedTo" class="form-control">
                                                                             <option value="">-- Select assignee --</option>
                                                                             <c:forEach items="${assignees}" var="u">
+                                                                                <c:if test="${u.role == 'IT Support'}">
                                                                                 <option value="${u.id}" ${u.id == problem.assignedTo ? 'selected' : ''}>
                                                                                     ${u.fullName} (${u.username})
                                                                                 </option>
+                                                                                </c:if>
                                                                             </c:forEach>
                                                                         </select>
                                                                         <small class="form-text text-muted">

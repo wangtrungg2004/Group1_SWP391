@@ -1,15 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller.ticket.agent;
 
-/**
- *
- * @author Dumb Trung
- */
-
 import dao.TicketDAO;
+import dao.TicketCommentsDAO;
 import model.Users;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -23,14 +15,13 @@ import jakarta.servlet.http.HttpSession;
 public class ProcessApprovalController extends HttpServlet {
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession();
         Users currentUser = (Users) session.getAttribute("user");
         String role = (String) session.getAttribute("role");
 
-        // Bảo mật cấp cao: Chỉ Manager (hoặc Admin) mới có quyền gọi API duyệt vé
         if (currentUser == null || (!"Manager".equals(role) && !"Admin".equals(role))) {
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
@@ -38,17 +29,20 @@ public class ProcessApprovalController extends HttpServlet {
 
         try {
             int ticketId = Integer.parseInt(request.getParameter("id"));
-            String action = request.getParameter("action"); // Nhận giá trị 'approve' hoặc 'reject'
-            
+            String action = request.getParameter("action");
             TicketDAO dao = new TicketDAO();
+            TicketCommentsDAO commentDao = new TicketCommentsDAO();
             
             if ("approve".equals(action)) {
                 dao.processApproval(ticketId, currentUser.getId(), true);
+                commentDao.addComment(ticketId, currentUser.getId(), "Service request approved. The system has automatically allocated the Priority and SLA based on the Service Catalog.", false);
+                
             } else if ("reject".equals(action)) {
+                String rejectReason = request.getParameter("rejectReason");
                 dao.processApproval(ticketId, currentUser.getId(), false);
+                commentDao.addComment(ticketId, currentUser.getId(), "REQUEST REJECTED.\nManager's Reason: " + rejectReason, false);
             }
-            
-            // Duyệt xong tải lại trang chi tiết đó
+
             response.sendRedirect(request.getContextPath() + "/TicketAgentDetail?id=" + ticketId);
             
         } catch (Exception e) {

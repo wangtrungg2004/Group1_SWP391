@@ -37,7 +37,6 @@ public class MyTicketsController extends HttpServlet {
             return;
         }
 
-    // 1. Lấy tham số tìm kiếm, bộ lọc và trang hiện tại
     String search = request.getParameter("search");
     if (search == null) search = "";
     
@@ -57,23 +56,19 @@ public class MyTicketsController extends HttpServlet {
     int offset = (page - 1) * pageSize;
     TicketDAO ticketDao = new TicketDAO();
 
-    // 2. Thực hiện truy vấn Server-side với các tham số bộ lọc
     int totalTickets = ticketDao.getTotalTicketsCount(currentUser.getId(), search, status, type);
     int totalPages = (int) Math.ceil((double) totalTickets / pageSize);
     List<Tickets> myTicketList = ticketDao.getTicketsByCreator(currentUser.getId(), offset, pageSize, search, status, type);
     
-    // 3. Lấy KPI và đẩy dữ liệu lên View
     request.setAttribute("kpis", ticketDao.getUserTicketKPIs(currentUser.getId()));
     request.setAttribute("myTicketList", myTicketList);
     request.setAttribute("currentPage", page);
     request.setAttribute("totalPages", totalPages);
 
-    // 4. Load set ticketId đã rated — dùng 1 query thay vì N query
     CsatSurveyDAO csatDao = new CsatSurveyDAO();
     Set<Integer> ratedTicketIds = csatDao.getSubmittedTicketIdsByUser(currentUser.getId());
     request.setAttribute("ratedTicketIds", ratedTicketIds);
     
-    // Giữ lại trạng thái bộ lọc trên giao diện
     request.setAttribute("search", search); 
     request.setAttribute("selectedStatus", status);
     request.setAttribute("selectedType", type);

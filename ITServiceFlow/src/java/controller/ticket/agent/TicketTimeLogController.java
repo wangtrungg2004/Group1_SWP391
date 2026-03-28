@@ -39,7 +39,7 @@ public class TicketTimeLogController extends HttpServlet {
         String role    = (String)  session.getAttribute("role");
 
         // Chỉ IT Support mới được log giờ
-        if (userId == null || !"IT Support".equals(role)) {
+        if (userId == null || !"IT Support".equals(role) && "IT Manager".equals(role)) {
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
         }
@@ -108,7 +108,7 @@ public class TicketTimeLogController extends HttpServlet {
             }
             String ticketStatus = ticket.getStatus();
             if (!"Resolved".equals(ticketStatus)) {
-                setFlash(session, "error", "Chỉ được log time sau khi ticket đã Resolved hoặc Closed.");
+                setFlash(session, "error", "Can.");
                 response.sendRedirect(redirectUrl); return;
             }
 
@@ -126,7 +126,7 @@ public class TicketTimeLogController extends HttpServlet {
                 hours = Double.parseDouble(hoursStr);
                 if (hours <= 0 || hours > 24) throw new NumberFormatException();
             } catch (NumberFormatException e) {
-                setFlash(session, "error", "Số giờ không hợp lệ (0.1 – 24).");
+                setFlash(session, "error", "Invalid input for hours (0.1 – 24).");
                 response.sendRedirect(redirectUrl);
                 return;
             }
@@ -135,7 +135,7 @@ public class TicketTimeLogController extends HttpServlet {
             if (logged) {
                 auditLogService.createAuditLog(userId, "LOG_TIME_MANUAL", "Ticket", ticketId);
                 setFlash(session, "success",
-                    String.format("Đã ghi nhận %.2f giờ: \"%s\"", hours, note));
+                    String.format("Log time %.2f hours: \"%s\"", hours, note));
             } else {
                 setFlash(session, "error", "Lỗi khi ghi nhận thời gian. Vui lòng thử lại.");
             }

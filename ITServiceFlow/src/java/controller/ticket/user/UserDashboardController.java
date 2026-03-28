@@ -25,7 +25,6 @@ public class UserDashboardController extends HttpServlet {
         Users currentUser = (Users) session.getAttribute("user");
         String role = (String) session.getAttribute("role");
 
-        // 1. Kiểm tra bảo mật (Authentication & Authorization)
         if (currentUser == null || role == null || (!role.equals("Manager") && !role.equals("User"))) {
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
@@ -33,16 +32,12 @@ public class UserDashboardController extends HttpServlet {
 
         TicketDAO ticketDao = new TicketDAO();
         
-        // 2. Lấy 5 vé gần nhất (Offset 0, Limit 5)
-        // CẬP NHẬT: Truyền đầy đủ các tham số lọc rỗng ("", "all", "all") để lấy toàn bộ vé mới nhất
         List<Tickets> recentTickets = ticketDao.getTicketsByCreator(
             currentUser.getId(), 0, 5, "", "all", "all"
         );
         
-        // 3. Lấy dữ liệu thống kê cho các thẻ KPI
         Map<String, Integer> kpis = ticketDao.getUserTicketKPIs(currentUser.getId());
 
-        // 4. Đẩy dữ liệu sang JSP thông qua Request Attribute
         request.setAttribute("recentTickets", recentTickets);
         request.setAttribute("kpis", kpis);
         

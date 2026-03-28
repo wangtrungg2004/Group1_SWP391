@@ -12,18 +12,12 @@ import model.Tickets;
 import model.Users;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@MultipartConfig(
-        fileSizeThreshold = 1024 * 1024 * 2,
-        maxFileSize       = 1024 * 1024 * 15,
-        maxRequestSize    = 1024 * 1024 * 50
-)
 @WebServlet(name = "CreateTicket", urlPatterns = {"/CreateTicket"})
 public class TicketCreateController extends HttpServlet {
 
@@ -127,7 +121,6 @@ public class TicketCreateController extends HttpServlet {
             }
         }
 
-        // ── Kiểm tra Asset tag (Optional) ──────────────────────────────────
         String assetTag = request.getParameter("assetTag");
         Assets asset = null;
         if (assetTag != null && !assetTag.trim().isEmpty()) {
@@ -141,40 +134,34 @@ public class TicketCreateController extends HttpServlet {
             }
         }
 
-        // ── Tạo Ticket ──────────────────────────────────────────────────────
         TicketDAO dao = new TicketDAO();
-        // GỌI BỘ ĐIỀU PHỐI ITIL ĐỂ XẾP HÀNG ĐỢI
-        dao.applyITILRouting(t);
-        // Lưu Database lấy ID
+
+        dao.applyRouting(t);
+
         int newTicketId = dao.createTicket(t);
 
         if (newTicketId > 0) {
-            // 1. Map Asset vào Ticket (nếu có)
+      
             if (asset != null) {
                 TicketAssetsDAO ticketAssetsDAO = new TicketAssetsDAO();
                 ticketAssetsDAO.addLink(newTicketId, asset.getId());
             }
 
-            // 2. TÍCH HỢP SLA MODULE TỰ ĐỘNG (CÓ ĐIỀU KIỆN ITIL)
             if (t.getPriorityId() != null && t.getPriorityId() > 0) {
-                // Kiểm tra xem vé này có phải là Service Request đang bị khóa chờ duyệt không
                 boolean isPendingApproval = "ServiceRequest".equals(t.getTicketType())
                         && t.getRequiresApproval() != null
                         && t.getRequiresApproval();
 
-                // Nếu KHÔNG PHẢI vé chờ duyệt -> Khởi động đồng hồ SLA ngay lập tức
                 if (!isPendingApproval) {
                     SLATrackingDao slaDao = new SLATrackingDao();
                     slaDao.applySLAForTicket(newTicketId, t.getTicketType(), t.getPriorityId());
                 }
             }
 
-            // 3. Chuyển hướng thành công
             response.sendRedirect(request.getContextPath() + "/Tickets?created=1");
             return;
 
         } else {
-            // Xử lý khi Insert thất bại (newTicketId <= 0)
             preserveFormForError(request, ticketType);
             request.setAttribute("errorMessage", "Lỗi hệ thống: Không thể tạo Ticket.");
             doGet(request, response);

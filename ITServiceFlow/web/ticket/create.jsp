@@ -316,7 +316,7 @@
                                             <div class="form-panel-wrapper">
                                                 <div class="selected-action-badge" id="selectedActionLabel"><i class="feather icon-check-circle"></i> Requesting: ...</div>
 
-                                                <form action="${pageContext.request.contextPath}/CreateTicket" method="POST" id="ticketForm" enctype="multipart/form-data">
+                                                <form action="${pageContext.request.contextPath}/CreateTicket" method="POST" id="ticketForm">
                                                     <input type="hidden" name="ticketType" id="payload_ticketType">
                                                     <input type="hidden" name="categoryId" id="payload_categoryId">
                                                     <input type="hidden" name="serviceCatalogId" id="payload_serviceCatalogId">
