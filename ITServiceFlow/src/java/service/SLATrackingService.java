@@ -1,5 +1,6 @@
 package service;
 
+import dao.AuditLogDao;
 import dao.NotificationDao;
 import dao.SLARuleDao;
 import dao.SLATrackingDao;
@@ -14,20 +15,27 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import model.AuditLog;
 import model.SLARule;
 import model.SLATracking;
 
 public class SLATrackingService {
+    private static final long SWEEP_INTERVAL_MS = 60000L;
+    private static final Object SWEEP_LOCK = new Object();
+    private static volatile long lastSweepStartedAt = 0L;
+
     private final SLATrackingDao slaTrackingDao;
     private final SLARuleDao slaRuleDao;
     private final NotificationDao notificationDao;
     private final UserDao userDao;
+    private final AuditLogDao auditLogDao;
 
     public SLATrackingService() {
         this.slaTrackingDao = new SLATrackingDao();
         this.slaRuleDao = new SLARuleDao();
         this.notificationDao = new NotificationDao();
         this.userDao = new UserDao();
+        this.auditLogDao = new AuditLogDao();
     }
 
     public void applySLARuleToTicket(int ticketId, String ticketType, int priorityId) {
@@ -91,7 +99,11 @@ public class SLATrackingService {
     }
 
     public void runEscalationSweep() {
-        slaTrackingDao.markBreachedTickets();
+        if (!acquireSweepWindow()) {
+            return;
+        }
+
+        slaTrackingDao.syncBreachFlags();
         if (!slaTrackingDao.isEscalationHistoryEnabled()) {
             return;
         }
@@ -112,34 +124,33 @@ public class SLATrackingService {
         }
 
         Integer assignedTo = toInteger(item.get("AssignedTo"));
-        Integer createdBy = toInteger(item.get("CreatedBy"));
-        List<Integer> recipients = collectRecipientUserIds(createdBy, assignedTo, managerIds);
+        List<Integer> recipients = collectRecipientUserIds(assignedTo, managerIds);
 
         if (remainingMinutes < 0) {
             String title = "SLA Breached: " + getTicketDisplay(item, ticketId);
             String message = "Ticket " + getTicketDisplay(item, ticketId)
-                    + " da breach SLA (deadline: " + formatDateTime(deadline) + ")."
-                    + " Vui long uu tien xu ly ngay.";
+                    + " has breached its SLA resolution deadline (deadline: " + formatDateTime(deadline)
+                    + ", overdue: " + Math.abs(remainingMinutes) + " minutes). Please take immediate action.";
             triggerEscalation(item, "BREACHED", "SLA breached", deadline, remainingMinutes,
                     recipients, title, message, "ESCALATE_TO_MANAGER", "Manager", null);
             return;
         }
 
         if (remainingMinutes <= 30) {
-            String title = "SLA Warning (30m): " + getTicketDisplay(item, ticketId);
+            String title = "SLA Critical (<=30m): " + getTicketDisplay(item, ticketId);
             String message = "Ticket " + getTicketDisplay(item, ticketId)
-                    + " con " + Math.max(0, remainingMinutes)
-                    + " phut truoc han SLA. Can hoan tat gap.";
-            triggerEscalation(item, "NEAR_BREACH_30M", "Near breach 30m", deadline, remainingMinutes,
+                    + " has only " + Math.max(0, remainingMinutes)
+                    + " minutes remaining before SLA breach. Please resolve urgently.";
+            triggerEscalation(item, "NEAR_BREACH_30M", "SLA critical 30m", deadline, remainingMinutes,
                     recipients, title, message, null, "Manager", null);
             return;
         }
 
         if (remainingMinutes <= 120) {
-            String title = "SLA Warning (2h): " + getTicketDisplay(item, ticketId);
+            String title = "SLA Near Breach (<=120m): " + getTicketDisplay(item, ticketId);
             String message = "Ticket " + getTicketDisplay(item, ticketId)
-                    + " dang sap breach SLA. Con " + remainingMinutes + " phut.";
-            triggerEscalation(item, "NEAR_BREACH_2H", "Near breach 2h", deadline, remainingMinutes,
+                    + " is approaching its SLA resolution deadline. " + remainingMinutes + " minutes remaining.";
+            triggerEscalation(item, "NEAR_BREACH_2H", "SLA near breach 120m", deadline, remainingMinutes,
                     recipients, title, message, null, "Manager", null);
         }
     }
@@ -186,17 +197,17 @@ public class SLATrackingService {
         String notificationTargetType = recipientUserIds.size() == 1 ? "USER" : "GROUP";
         Integer notificationTargetId = recipientUserIds.size() == 1 ? recipientUserIds.get(0) : null;
 
-        slaTrackingDao.addEscalationHistory(
+        boolean historySaved = slaTrackingDao.addEscalationHistory(
                 ticketId, stageCode, stageLabel, deadline, remainingMinutes,
                 notificationTargetType, notificationTargetId, notificationTitle, notificationMessage,
                 autoAction, escalatedToRole, escalatedToUserId);
+        if (historySaved) {
+            writeEscalationAudit(item, stageCode, stageLabel, deadline, remainingMinutes, recipientUserIds);
+        }
     }
 
-    private List<Integer> collectRecipientUserIds(Integer createdBy, Integer assignedTo, List<Integer> managerIds) {
+    private List<Integer> collectRecipientUserIds(Integer assignedTo, List<Integer> managerIds) {
         Set<Integer> recipients = new LinkedHashSet<>();
-        if (createdBy != null && createdBy > 0) {
-            recipients.add(createdBy);
-        }
         if (assignedTo != null && assignedTo > 0) {
             recipients.add(assignedTo);
         }
@@ -208,6 +219,57 @@ public class SLATrackingService {
             }
         }
         return new ArrayList<>(recipients);
+    }
+
+    private boolean acquireSweepWindow() {
+        long now = System.currentTimeMillis();
+        synchronized (SWEEP_LOCK) {
+            if ((now - lastSweepStartedAt) < SWEEP_INTERVAL_MS) {
+                return false;
+            }
+            lastSweepStartedAt = now;
+            return true;
+        }
+    }
+
+    private void writeEscalationAudit(Map<String, Object> item, String stageCode, String stageLabel,
+            Date deadline, Integer remainingMinutes, List<Integer> recipientUserIds) {
+        Integer ticketId = toInteger(item.get("TicketId"));
+        if (ticketId == null) {
+            return;
+        }
+
+        Integer auditUserId = resolveAuditUserId(toInteger(item.get("AssignedTo")), recipientUserIds);
+        if (auditUserId == null || auditUserId <= 0) {
+            return;
+        }
+
+        AuditLog log = new AuditLog();
+        log.setUserId(auditUserId);
+        log.setAction("SLA_ESCALATION_" + stageCode);
+        log.setScreen("SLA Dashboard");
+        log.setDataBefore("RemainingMinutes="
+                + (remainingMinutes == null ? "N/A" : remainingMinutes)
+                + ", Deadline=" + formatDateTime(deadline));
+        log.setDataAfter(stageLabel + " notification sent to "
+                + (recipientUserIds == null ? 0 : recipientUserIds.size()) + " recipient(s).");
+        log.setEntity("Ticket");
+        log.setEntityId(ticketId);
+        auditLogDao.insertLog(log);
+    }
+
+    private Integer resolveAuditUserId(Integer assignedTo, List<Integer> recipientUserIds) {
+        if (assignedTo != null && assignedTo > 0) {
+            return assignedTo;
+        }
+        if (recipientUserIds != null) {
+            for (Integer recipientId : recipientUserIds) {
+                if (recipientId != null && recipientId > 0) {
+                    return recipientId;
+                }
+            }
+        }
+        return 1;
     }
 
     private Integer toInteger(Object value) {

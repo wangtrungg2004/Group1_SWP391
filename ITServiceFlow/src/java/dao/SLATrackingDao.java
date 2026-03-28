@@ -3,24 +3,23 @@ package dao;
 import Utils.DbContext;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import model.SLARule;
 import model.SLATracking;
 
 public class SLATrackingDao extends DbContext {
 
     public boolean addSLATracking(SLATracking tracking) {
         String sql = "INSERT INTO [dbo].[SLATracking] (TicketId, ResponseDeadline, ResolutionDeadline, IsBreached, CreatedAt) "
-                + "VALUES (?, ?, ?, 0, GETDATE())";
+                + "VALUES (?, ?, ?, CASE WHEN ? < GETDATE() THEN 1 ELSE 0 END, GETDATE())";
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, tracking.getTicketId());
             stm.setTimestamp(2, new java.sql.Timestamp(tracking.getResponseDeadline().getTime()));
             stm.setTimestamp(3, new java.sql.Timestamp(tracking.getResolutionDeadline().getTime()));
+            stm.setTimestamp(4, new java.sql.Timestamp(tracking.getResolutionDeadline().getTime()));
             return stm.executeUpdate() > 0;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -68,16 +67,21 @@ public class SLATrackingDao extends DbContext {
     }
 
     public boolean updateSLATrackingDeadlines(int ticketId, java.util.Date resp, java.util.Date res) {
-        String sql = "UPDATE [dbo].[SLATracking] SET ResponseDeadline = ?, ResolutionDeadline = ? WHERE TicketId = ?";
+        String sql = "UPDATE [dbo].[SLATracking] "
+                + "SET ResponseDeadline = ?, "
+                + "    ResolutionDeadline = ?, "
+                + "    IsBreached = CASE WHEN ? < GETDATE() THEN 1 ELSE 0 END "
+                + "WHERE TicketId = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
              ps.setTimestamp(1, new java.sql.Timestamp(resp.getTime()));
              ps.setTimestamp(2, new java.sql.Timestamp(res.getTime()));
-             ps.setInt(3, ticketId);
+             ps.setTimestamp(3, new java.sql.Timestamp(res.getTime()));
+             ps.setInt(4, ticketId);
              return ps.executeUpdate() > 0;
-        } catch (Exception e) { 
+         } catch (Exception e) { 
              e.printStackTrace(); 
              return false; 
-        }
+         }
     }
 
     public SLATracking getSLATrackingByTicketId(int ticketId) {
@@ -272,14 +276,11 @@ public class SLATrackingDao extends DbContext {
         return false;
     }
 
-    public int markBreachedTickets() {
+    public int syncBreachFlags() {
         String sql = "UPDATE st "
-                + "SET st.IsBreached = 1 "
+                + "SET st.IsBreached = CASE WHEN st.ResolutionDeadline < GETDATE() THEN 1 ELSE 0 END "
                 + "FROM [dbo].[SLATracking] st "
-                + "INNER JOIN [dbo].[Tickets] t ON t.Id = st.TicketId "
-                + "WHERE t.Status NOT IN ('Resolved', 'Closed', 'Cancelled') "
-                + "AND st.ResolutionDeadline < GETDATE() "
-                + "AND ISNULL(st.IsBreached, 0) = 0";
+                + "WHERE ISNULL(st.IsBreached, -1) <> CASE WHEN st.ResolutionDeadline < GETDATE() THEN 1 ELSE 0 END";
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             return stm.executeUpdate();
         } catch (Exception ex) {
@@ -288,9 +289,13 @@ public class SLATrackingDao extends DbContext {
         return 0;
     }
 
+    public int markBreachedTickets() {
+        return syncBreachFlags();
+    }
+
     public List<Map<String, Object>> getEscalationCandidates() {
         List<Map<String, Object>> list = new ArrayList<>();
-        String sql = "SELECT st.TicketId, t.TicketNumber, t.Title, t.CreatedBy, t.AssignedTo, st.ResolutionDeadline, "
+        String sql = "SELECT st.TicketId, t.TicketNumber, t.Title, t.AssignedTo, st.ResolutionDeadline, "
                 + "DATEDIFF(MINUTE, GETDATE(), st.ResolutionDeadline) AS RemainingMinutes "
                 + "FROM [dbo].[SLATracking] st "
                 + "INNER JOIN [dbo].[Tickets] t ON t.Id = st.TicketId "
@@ -304,7 +309,6 @@ public class SLATrackingDao extends DbContext {
                 map.put("TicketId", rs.getInt("TicketId"));
                 map.put("TicketNumber", rs.getString("TicketNumber"));
                 map.put("Title", rs.getString("Title"));
-                map.put("CreatedBy", rs.getInt("CreatedBy"));
                 Object assignedObj = rs.getObject("AssignedTo");
                 map.put("AssignedTo", assignedObj == null ? null : ((Number) assignedObj).intValue());
                 map.put("ResolutionDeadline", rs.getTimestamp("ResolutionDeadline"));

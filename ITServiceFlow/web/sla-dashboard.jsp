@@ -71,10 +71,10 @@
                                                 <div class="col-sm-12">
                                                     <div class="card">
                                                         <div class="card-body">
-                                                            <form action="SLADashboard" method="get" class="form-inline">
-                                                                <div class="form-group mb-2">
-                                                                    <label for="from" class="mr-2">From:</label>
-                                                                    <input type="date" class="form-control mr-3" name="from" value="${fromDate}">
+                                                             <form action="SLADashboard" method="get" class="form-inline">
+                                                                 <div class="form-group mb-2">
+                                                                     <label for="from" class="mr-2">From:</label>
+                                                                     <input type="date" class="form-control mr-3" name="from" value="${fromDate}">
                                                                 </div>
                                                                 <div class="form-group mb-2">
                                                                     <label for="to" class="mr-2">To:</label>
@@ -97,13 +97,16 @@
                                                                             <option value="${loc.Id}" ${locationId == loc.Id ? 'selected' : ''}>${loc.Name}</option>
                                                                         </c:forEach>
                                                                     </select>
-                                                                </div>
-                                                                <button type="submit" class="btn btn-primary mb-2">Filter</button>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                                 </div>
+                                                                 <button type="submit" class="btn btn-primary mb-2">Filter</button>
+                                                             </form>
+                                                             <small class="text-muted d-block mt-2">
+                                                                 SLA escalation sweep auto-runs every 60 seconds while this dashboard is open.
+                                                             </small>
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                             </div>
 
                                             <!-- [ Main Content ] start -->
                                             <!-- KPI Cards -->
@@ -254,12 +257,16 @@
                     <!-- [ Main Content ] end -->
 
                     <!-- Required Js -->
-                    <script src="assets/plugins/jquery/js/jquery.min.js"></script>
-                    <script src="assets/js/vendor-all.min.js"></script>
-                    <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-                    <script src="assets/js/pcoded.min.js"></script>
-                    
+                     <script src="assets/plugins/jquery/js/jquery.min.js"></script>
+                     <script src="assets/js/vendor-all.min.js"></script>
+                     <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+                     <script src="assets/js/pcoded.min.js"></script>
+                     <script>
+                        window.setTimeout(function () {
+                            window.location.reload();
+                        }, 60000);
+                     </script>
 
-                </body>
+                 </body>
 
-                </html>
+                 </html>

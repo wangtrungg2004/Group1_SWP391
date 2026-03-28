@@ -29,6 +29,8 @@ public class SLADashboard extends HttpServlet {
             return;
         }
 
+        slaTrackingService.runEscalationSweep();
+
         // Default Date Range: Last 30 Days 
         java.sql.Date toDate = new java.sql.Date(System.currentTimeMillis());
         java.util.Calendar cal = java.util.Calendar.getInstance();
