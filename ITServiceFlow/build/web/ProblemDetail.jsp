@@ -141,7 +141,7 @@
                             </c:if>
                             <c:if test="${param.error == 'rejected_reason_required'}">
                                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                    <strong>Thông báo:</strong> Rejected reason cannot be null.
+                                    <strong>Notice:</strong> Rejected reason cannot be null.
                                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
@@ -149,7 +149,7 @@
                             </c:if>
                             <c:if test="${not empty success}">
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                    <strong>Thành công:</strong> ${success}
+                                    <strong>Notice:</strong> ${success}
                                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
@@ -173,7 +173,7 @@
                                                             <input type="hidden" name="problemId" value="${problem.id}">
                                                             <input type="hidden" name="status" value="PENDING">
                                                             <button type="submit" class="btn btn-sm btn-success"
-                                                                    onclick="return confirm('Gửi problem này cho Manager duyệt?');">
+                                                                    onclick="return confirm('Send this problem to the manager for approval?');">
                                                                 <i class="feather icon-send"></i> Submit for approval
                                                             </button>
                                                         </form>
@@ -254,9 +254,9 @@
                                                                     <div class="modal-body">
                                                                         <input type="hidden" name="problemId" value="${problem.id}">
                                                                         <input type="hidden" name="status" value="REJECTED">
-                                                                        <label>Lý do từ chối <span class="text-danger">*</span></label>
+                                                                        <label>Rejected Reason <span class="text-danger">*</span></label>
                                                                         <textarea name="rejectedReason" class="form-control" rows="3" 
-                                                                                  placeholder="Nhập lý do từ chối..." maxlength="2000"></textarea>
+                                                                                  placeholder="Enter rejection reason..." maxlength="2000"></textarea>
                                                                     </div>
                                                                     <div class="modal-footer">
                                                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>

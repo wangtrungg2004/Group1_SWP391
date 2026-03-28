@@ -126,7 +126,7 @@
                             <!-- [ breadcrumb ] end -->
                             <c:if test="${param.error == 'cannot_edit'}">
                                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                    <strong>Thông báo:</strong> Không thể chỉnh sửa. Problem đang chờ duyệt hoặc đã được xử lý.
+                                    <strong>Notice:</strong> Cannot edit. This problem is pending approval or has already been processed.
                                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>

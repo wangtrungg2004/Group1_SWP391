@@ -39,7 +39,7 @@ public class TicketTimeLogController extends HttpServlet {
         String role    = (String)  session.getAttribute("role");
 
         // Chỉ IT Support mới được log giờ
-        if (userId == null || !"IT Support".equals(role) && "IT Manager".equals(role)) {
+        if (userId == null || !"IT Support".equals(role) && !"Manager".equals(role)) {
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
         }

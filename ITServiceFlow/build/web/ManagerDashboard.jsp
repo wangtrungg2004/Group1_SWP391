@@ -208,7 +208,7 @@
 									</div>
 									<div class="card top-list-card">
                                                                             <h6>Top agents</h6>
-                                                                            <small class="text-muted">Theo số ticket đã xử lý tháng này</small>
+                                                                            <small class="text-muted">Based on tickets resolved this month</small>
 
                                                                             <c:forEach var="agent" items="${topAgents}">
                                                                                 <div class="list-item">

@@ -90,7 +90,7 @@
                                                 <div class="form-group" id="userIdGroup">
                                                     <label>Chọn user</label>
                                                     <select name="userId" id="userIdInput" class="form-control">
-                                                        <option value="">-- Chọn user --</option>
+                                                        <option value="">-- Select user --</option>
                                                         <c:forEach items="${users}" var="u">
                                                             <option value="${u.id}" ${param.userId == u.id ? 'selected' : ''}>
                                                                 <c:out value="${u.fullName}"/> 
